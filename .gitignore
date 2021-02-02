@@ -1,0 +1,6 @@
+# exclude platformio build directory
+.pio
+# exclude clion build directory
+cmake-build-debug
+# exclude generated config
+sdkconfig

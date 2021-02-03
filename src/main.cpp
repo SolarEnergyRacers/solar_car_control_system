@@ -24,8 +24,9 @@
 
 
 // local libs
-#include <Adafruit_ADS1015.h>
-Adafruit_ADS1015 ads; // forAdafruit_ADS1115 ads;
+#include "ADS1X15.h"
+ADS1015 ads(0x48); // ADS1115 ADS(0x48);
+
 
 #include <DS18B20.h>
 DS18B20 ds(ONEWIRE_PIN);
@@ -100,20 +101,12 @@ void init_i2c(void){
 }
 
 void init_adc(void){
+
     // init library
     ads.begin();
 
-    /*
-     * set gain amplifier value                                       ADS1015  ADS1115
-     *                                                                -------  -------
-     * ads.setGain(GAIN_TWOTHIRDS);  // 2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
-     * ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
-     * ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
-     * ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
-     * ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
-     * ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
-     */
-    ads.setGain(GAIN_TWOTHIRDS);
+    // set gain amplifier value
+    ads.setGain(0); // 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
 }
 
 void read_adc(void *pvParameter){
@@ -121,22 +114,18 @@ void read_adc(void *pvParameter){
     while(1){
 
         // bit -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) 0.1875mV (ADS1215)
-        float multiplier = 3.0f;
+        float multiplier = ads.toVoltage(1);  // voltage factor
 
-        int16_t adc0 = ads.readADC_SingleEnded(0);
-        //vTaskDelay(50 / portTICK_PERIOD_MS);
+        int16_t adc0 = ads.readADC(0);
+        int16_t adc1 = ads.readADC(1);
+        int16_t adc2 = ads.readADC(2);
+        int16_t adc3 = ads.readADC(3);
 
-        int16_t adc1 = ads.readADC_SingleEnded(1);
-        //vTaskDelay(50 / portTICK_PERIOD_MS);
 
-        int16_t adc2 = ads.readADC_SingleEnded(2);
-        //vTaskDelay(50 / portTICK_PERIOD_MS);
-
-        int16_t adc3 = ads.readADC_SingleEnded(3);
-        printf("[ADS1x15] AIN0: %fmV\n", multiplier*adc0);
-        printf("[ADS1x15] AIN1: %fmV\n", multiplier*adc1);
-        printf("[ADS1x15] AIN2: %fmV\n", multiplier*adc2);
-        printf("[ADS1x15] AIN3: %fmV\n", multiplier*adc3);
+        printf("[ADS1x15] AIN0: %fmV\n", multiplier * adc0);
+        printf("[ADS1x15] AIN1: %fmV\n", multiplier * adc1);
+        printf("[ADS1x15] AIN2: %fmV\n", multiplier * adc2);
+        printf("[ADS1x15] AIN3: %fmV\n", multiplier * adc3);
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }

@@ -27,7 +27,8 @@
 #include <Adafruit_ADS1015.h>
 Adafruit_ADS1015 ads; // forAdafruit_ADS1115 ads;
 
-
+#include <DS18B20.h>
+DS18B20 ds(ONEWIRE_PIN);
 
 // add C linkage definition
 extern "C" {
@@ -136,6 +137,63 @@ void read_adc(void *pvParameter){
     }
 }
 
+void init_ds(){
+
+    printf("[OneWire] num devices on bus: %d\n", ds.getNumberOfDevices());
+
+    while (ds.selectNext()) {
+        switch (ds.getFamilyCode()) {
+            case MODEL_DS18S20:
+                printf("Model: DS18S20/DS1820");
+                break;
+            case MODEL_DS1822:
+                printf("Model: DS1822");
+                break;
+            case MODEL_DS18B20:
+                printf("Model: DS18B20");
+                break;
+            default:
+                printf("Unrecognized Device");
+                break;
+        }
+        printf(" ");
+
+        uint8_t address[8];
+        ds.getAddress(address);
+
+        printf("Address:");
+        for (uint8_t i = 0; i < 8; i++) {
+
+            printf(" %d", address[i]);
+        }
+        printf(" ");
+
+        printf("Resolution: %d", ds.getResolution());
+        printf(" ");
+
+        printf("Power Mode: ");
+        if (ds.getPowerMode()) {
+            printf("External");
+        } else {
+            printf("Parasite");
+        }
+        printf("\n");
+    }
+}
+
+void read_ds(void *pvParameter){
+
+    while(1){
+
+        while(ds.selectNext()){
+
+            printf("Temperature: %fC / %fF\n", ds.getTempC(), ds.getTempF());
+        }
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 void app_main(void) {
 
     // init arduino library
@@ -143,11 +201,13 @@ void app_main(void) {
 
     init_i2c();
     init_adc();
+    init_ds();
 
     // report chip info
     chip_info(NULL);
 
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
     xTaskCreate(&read_adc, "read_adc_task", 1800, NULL, 5, NULL);
+    xTaskCreate(&read_ds, "read_ds_task", 1800, NULL, 5, NULL);
 
 }

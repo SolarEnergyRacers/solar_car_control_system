@@ -130,11 +130,10 @@ void read_adc(void *pvParameter){
         //vTaskDelay(50 / portTICK_PERIOD_MS);
 
         int16_t adc3 = ads.readADC_SingleEnded(3);
-        printf("Reading ADS1x15 ADC inputs:\n");
-        printf("AIN0: %fmV\n", multiplier*adc0);
-        printf("AIN1: %fmV\n", multiplier*adc1);
-        printf("AIN2: %fmV\n", multiplier*adc2);
-        printf("AIN3: %fmV\n", multiplier*adc3);
+        printf("[ADS1x15] AIN0: %fmV\n", multiplier*adc0);
+        printf("[ADS1x15] AIN1: %fmV\n", multiplier*adc1);
+        printf("[ADS1x15] AIN2: %fmV\n", multiplier*adc2);
+        printf("[ADS1x15] AIN3: %fmV\n", multiplier*adc3);
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }

@@ -12,5 +12,8 @@
 #define I2C_FREQ 100000
 SemaphoreHandle_t i2c_mutex;
 
+#define ONEWIRE_PIN 2
+SemaphoreHandle_t onewire_mutex;
+
 
 #endif // DEFINITIONS_H

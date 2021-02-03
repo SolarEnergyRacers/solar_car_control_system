@@ -20,16 +20,17 @@
 #include "definitions.h"
 
 // external libs
-#include <Wire.h>
-
+#include <OneWire.h> // 1-Wire
+#include <Wire.h> // I2C
 
 // local libs
 #include "ADS1X15.h"
 ADS1015 ads(0x48); // ADS1115 ADS(0x48);
 
 
-#include <DS18B20.h>
-DS18B20 ds(ONEWIRE_PIN);
+#include <DallasTemperature.h>
+OneWire oneWire(ONEWIRE_PIN);
+DallasTemperature ds(&oneWire);
 
 #include <BMI088.h>
 
@@ -116,57 +117,40 @@ void read_adc(void *pvParameter){
         // bit -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) 0.1875mV (ADS1215)
         float multiplier = ads.toVoltage(1);  // voltage factor
 
-        int16_t adc0 = ads.readADC(0);
-        int16_t adc1 = ads.readADC(1);
-        int16_t adc2 = ads.readADC(2);
-        int16_t adc3 = ads.readADC(3);
+        for(int i = 0; i < 4; i++){
+            int16_t value = ads.readADC(i);
+            printf("[ADS1x15] AIN%d: %fmV\n", i, multiplier * value);
+        }
 
-
-        printf("[ADS1x15] AIN0: %fmV\n", multiplier * adc0);
-        printf("[ADS1x15] AIN1: %fmV\n", multiplier * adc1);
-        printf("[ADS1x15] AIN2: %fmV\n", multiplier * adc2);
-        printf("[ADS1x15] AIN3: %fmV\n", multiplier * adc3);
-
+        // sleep for 1s
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
 void init_ds(){
 
-    printf("[OneWire] num devices on bus: %d\n", ds.getNumberOfDevices());
+    ds.begin();
 
-    while (ds.selectNext()) {
-        switch (ds.getFamilyCode()) {
-            case MODEL_DS18S20:
-                printf("Model: DS18S20/DS1820");
-                break;
-            case MODEL_DS1822:
-                printf("Model: DS1822");
-                break;
-            case MODEL_DS18B20:
-                printf("Model: DS18B20");
-                break;
-            default:
-                printf("Unrecognized Device");
-                break;
-        }
-        printf(" ");
+    printf("[OneWire] num devices on bus: %d\n", ds.getDeviceCount());
 
-        uint8_t address[8];
-        ds.getAddress(address);
 
-        printf("Address:");
+    DeviceAddress device_addr;
+
+    oneWire.reset_search();
+    while (oneWire.search(device_addr)) {
+
+        printf("[DS18B20] Address:");
         for (uint8_t i = 0; i < 8; i++) {
 
-            printf(" %d", address[i]);
+            printf(" %d", device_addr[i]);
         }
         printf(" ");
 
-        printf("Resolution: %d", ds.getResolution());
+        printf("Resolution: %d", ds.getResolution(device_addr));
         printf(" ");
 
         printf("Power Mode: ");
-        if (ds.getPowerMode()) {
+        if (ds.isParasitePowerMode()) {
             printf("External");
         } else {
             printf("Parasite");
@@ -177,13 +161,18 @@ void init_ds(){
 
 void read_ds(void *pvParameter){
 
+    // polling loop
     while(1){
 
-        while(ds.selectNext()){
+        // request all temperature sensor readings
+        ds.requestTemperatures();
 
-            printf("[DS18B20] Temperature: %fC / %fF\n", ds.getTempC(), ds.getTempF());
+        // print all results
+        for(int i = 0; i < ds.getDeviceCount(); i++){
+            printf("[DS18B20] Temperature: %fC / %fF\n", ds.getTempCByIndex(i), ds.getTempFByIndex(i));
         }
 
+        // sleep for 1s
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -265,9 +254,9 @@ void app_main(void) {
 
     // create all tasks
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
-    xTaskCreate(&read_adc, "read_adc_task", 1800, NULL, 5, NULL);
-    xTaskCreate(&read_ds, "read_ds_task", 1800, NULL, 5, NULL);
-    xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 1800, NULL, 5, NULL);
-    xTaskCreate(&update_pwm, "update_pwm_task", 1800, NULL, 5, NULL);
+    xTaskCreate(&read_adc, "read_adc_task", 2000, NULL, 5, NULL);
+    xTaskCreate(&read_ds, "read_ds_task", 2000, NULL, 5, NULL);
+    xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2000, NULL, 5, NULL);
+    xTaskCreate(&update_pwm, "update_pwm_task", 2000, NULL, 5, NULL);
 
 }

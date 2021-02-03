@@ -32,6 +32,9 @@ DS18B20 ds(ONEWIRE_PIN);
 
 #include <BMI088.h>
 
+#include <PCA9685.h>
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
+
 
 // add C linkage definition
 extern "C" {
@@ -189,14 +192,14 @@ void read_ds(void *pvParameter){
 
         while(ds.selectNext()){
 
-            printf("Temperature: %fC / %fF\n", ds.getTempC(), ds.getTempF());
+            printf("[DS18B20] Temperature: %fC / %fF\n", ds.getTempC(), ds.getTempF());
         }
 
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
-void init_bmi088(void){
+void init_gyro_acc(void){
 
     if (bmi088.isConnection()) {
         bmi088.initialize();
@@ -231,6 +234,28 @@ void read_gyro_acc(void *pvParameter){
     }
 }
 
+void init_pwm(void){
+    pwm.begin();
+    pwm.setOscillatorFrequency(27000000);
+    pwm.setPWMFreq(1600);  // max pwm frequency
+
+}
+
+void update_pwm(void *pvParameter){
+
+    while(1){
+
+        for (int i = 0; i < 4096; i += 128) {
+            for (int output=0; output < 16; output++) {
+                pwm.setPWM(output, 0, i);
+            }
+            printf("[PCA9685] value=%d\n", i);
+
+            vTaskDelay(1000 / portTICK_PERIOD_MS);
+        }
+    }
+}
+
 void app_main(void) {
 
     // init arduino library
@@ -243,7 +268,8 @@ void app_main(void) {
     // init modules
     init_adc();
     init_ds();
-    init_bmi088();
+    init_gyro_acc();
+    init_pwm();
 
     // report chip info
     chip_info(NULL);
@@ -253,5 +279,6 @@ void app_main(void) {
     xTaskCreate(&read_adc, "read_adc_task", 1800, NULL, 5, NULL);
     xTaskCreate(&read_ds, "read_ds_task", 1800, NULL, 5, NULL);
     xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 1800, NULL, 5, NULL);
+    xTaskCreate(&update_pwm, "update_pwm_task", 1800, NULL, 5, NULL);
 
 }

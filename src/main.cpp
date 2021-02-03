@@ -85,7 +85,55 @@ void restart(void *pvParameter) {
 }
 
 void init_i2c(void){
+    // init i2c wire library
     Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+    // init mutex
+    i2c_mutex = xSemaphoreCreateBinary();
+    xSemaphoreGive(i2c_mutex);
+}
+
+void init_adc(void){
+    // init library
+    ads.begin();
+
+    /*
+     * set gain amplifier value                                       ADS1015  ADS1115
+     *                                                                -------  -------
+     * ads.setGain(GAIN_TWOTHIRDS);  // 2/3x gain +/- 6.144V  1 bit = 3mV      0.1875mV (default)
+     * ads.setGain(GAIN_ONE);        // 1x gain   +/- 4.096V  1 bit = 2mV      0.125mV
+     * ads.setGain(GAIN_TWO);        // 2x gain   +/- 2.048V  1 bit = 1mV      0.0625mV
+     * ads.setGain(GAIN_FOUR);       // 4x gain   +/- 1.024V  1 bit = 0.5mV    0.03125mV
+     * ads.setGain(GAIN_EIGHT);      // 8x gain   +/- 0.512V  1 bit = 0.25mV   0.015625mV
+     * ads.setGain(GAIN_SIXTEEN);    // 16x gain  +/- 0.256V  1 bit = 0.125mV  0.0078125mV
+     */
+    ads.setGain(GAIN_TWOTHIRDS);
+}
+
+void read_adc(void *pvParameter){
+
+    while(1){
+
+        // bit -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) 0.1875mV (ADS1215)
+        float multiplier = 3.0f;
+
+        int16_t adc0 = ads.readADC_SingleEnded(0);
+        //vTaskDelay(50 / portTICK_PERIOD_MS);
+
+        int16_t adc1 = ads.readADC_SingleEnded(1);
+        //vTaskDelay(50 / portTICK_PERIOD_MS);
+
+        int16_t adc2 = ads.readADC_SingleEnded(2);
+        //vTaskDelay(50 / portTICK_PERIOD_MS);
+
+        int16_t adc3 = ads.readADC_SingleEnded(3);
+        printf("Reading ADS1x15 ADC inputs:\n");
+        printf("AIN0: %fmV\n", multiplier*adc0);
+        printf("AIN1: %fmV\n", multiplier*adc1);
+        printf("AIN2: %fmV\n", multiplier*adc2);
+        printf("AIN3: %fmV\n", multiplier*adc3);
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 }
 
 void app_main(void) {
@@ -93,8 +141,13 @@ void app_main(void) {
     // init arduino library
     initArduino();
 
+    init_i2c();
+    init_adc();
+
     // report chip info
     chip_info(NULL);
 
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+    xTaskCreate(&read_adc, "read_adc_task", 1800, NULL, 5, NULL);
+
 }

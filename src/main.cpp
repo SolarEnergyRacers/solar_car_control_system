@@ -32,11 +32,12 @@ ADS1015 ads(0x48); // ADS1115 ADS(0x48);
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 
+// gyro & acc
 #include <BMI088.h>
 
-#include <PCA9685.h>
+#include <Wire.h>
+#include <Adafruit_PWMServoDriver.h>
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
-
 
 // add C linkage definition
 extern "C" {
@@ -214,6 +215,7 @@ void read_gyro_acc(void *pvParameter){
 
 void init_pwm(void){
     pwm.begin();
+
     pwm.setOscillatorFrequency(27000000);
     pwm.setPWMFreq(1600);  // max pwm frequency
 

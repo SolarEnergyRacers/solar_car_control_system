@@ -30,6 +30,9 @@ Adafruit_ADS1015 ads; // forAdafruit_ADS1115 ads;
 #include <DS18B20.h>
 DS18B20 ds(ONEWIRE_PIN);
 
+#include <BMI088.h>
+
+
 // add C linkage definition
 extern "C" {
     void app_main(void);
@@ -194,20 +197,62 @@ void read_ds(void *pvParameter){
     }
 }
 
+void init_bmi088(void){
+
+    if (bmi088.isConnection()) {
+        bmi088.initialize();
+        printf("BMI088 is connected");
+    } else {
+        printf("BMI088 is not connected");
+    }
+
+}
+
+void init_onewire(void){
+
+}
+
+void read_gyro_acc(void *pvParameter){
+
+    float ax = 0, ay = 0, az = 0;
+    float gx = 0, gy = 0, gz = 0;
+    int16_t temp = 0;
+
+    while(1){
+
+        bmi088.getAcceleration(&ax, &ay, &az);
+        bmi088.getGyroscope(&gx, &gy, &gz);
+        temp = bmi088.getTemperature();
+
+        printf("[BMI088] ax=%f, ay=%f, az=%f\n", ax, ay, az);
+        printf("[BMI088] gx=%f, gy=%f, gz=%f\n", gx, gy, gz);
+        printf("[BMI088] temperature=%d\n", temp);
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 void app_main(void) {
 
     // init arduino library
     initArduino();
 
+    // init buses
     init_i2c();
+    init_onewire();
+
+    // init modules
     init_adc();
     init_ds();
+    init_bmi088();
 
     // report chip info
     chip_info(NULL);
 
+    // create all tasks
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
     xTaskCreate(&read_adc, "read_adc_task", 1800, NULL, 5, NULL);
     xTaskCreate(&read_ds, "read_ds_task", 1800, NULL, 5, NULL);
+    xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 1800, NULL, 5, NULL);
 
 }

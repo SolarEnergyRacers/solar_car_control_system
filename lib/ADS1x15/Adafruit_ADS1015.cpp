@@ -40,9 +40,6 @@
 
 #include "Adafruit_ADS1015.h"
 
-#define I2C_SDA 33
-#define I2C_SCL 32
-#define I2C_FREQ 100000
 
 /**************************************************************************/
 /*!
@@ -142,7 +139,7 @@ Adafruit_ADS1115::Adafruit_ADS1115(uint8_t i2cAddress) {
     @brief  Sets up the HW (reads coefficients values, etc.)
 */
 /**************************************************************************/
-void Adafruit_ADS1015::begin() { Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ); }
+void Adafruit_ADS1015::begin() { } // do i2c bus initialization centrally (global)
 
 /**************************************************************************/
 /*!

@@ -1,5 +1,5 @@
 
-# Solar Car Control System
+# Solar Car Control System ![PlatformIO CI - Build Process](https://github.com/SolarEnergyRacers/solar_car_control_system/workflows/PlatformIO%20CI%20-%20Build%20Process/badge.svg?branch=master)
 
 
 

@@ -24,24 +24,22 @@
 #include <Wire.h> // I2C
 
 // local libs
-#include "ADS1X15.h"
+#include "ADS1X15.h" // ADS1x15
 ADS1015 ads(0x48); // ADS1115 ADS(0x48);
 
-
-#include <DallasTemperature.h>
+#include <DallasTemperature.h> // DS18B20
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 
-// gyro & acc
-#include <BMI088.h>
+#include "BMI088.h" // gyro & acc
 
-#include <Wire.h>
 #include <Adafruit_PWMServoDriver.h>
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
+
 // add C linkage definition
 extern "C" {
-    void app_main(void);
+void app_main(void);
 }
 
 void blink_task(void *pvParameter) {
@@ -94,7 +92,7 @@ void restart(void *pvParameter) {
     esp_restart();
 }
 
-void init_i2c(void){
+void init_i2c(void) {
     // init i2c wire library
     Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
     // init mutex
@@ -102,7 +100,9 @@ void init_i2c(void){
     xSemaphoreGive(i2c_mutex);
 }
 
-void init_adc(void){
+void init_onewire(void) {}
+
+void init_adc(void) {
 
     // init library
     ads.begin();
@@ -111,14 +111,14 @@ void init_adc(void){
     ads.setGain(0); // 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
 }
 
-void read_adc(void *pvParameter){
+void read_adc(void *pvParameter) {
 
-    while(1){
+    while (1) {
 
         // bit -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) 0.1875mV (ADS1215)
         float multiplier = ads.toVoltage(1);  // voltage factor
 
-        for(int i = 0; i < 4; i++){
+        for (int i = 0; i < 4; i++) {
             int16_t value = ads.readADC(i);
             printf("[ADS1x15] AIN%d: %fmV\n", i, multiplier * value);
         }
@@ -128,7 +128,7 @@ void read_adc(void *pvParameter){
     }
 }
 
-void init_ds(){
+void init_ds() {
 
     ds.begin();
 
@@ -160,16 +160,16 @@ void init_ds(){
     }
 }
 
-void read_ds(void *pvParameter){
+void read_ds(void *pvParameter) {
 
     // polling loop
-    while(1){
+    while (1) {
 
         // request all temperature sensor readings
         ds.requestTemperatures();
 
         // print all results
-        for(int i = 0; i < ds.getDeviceCount(); i++){
+        for (int i = 0; i < ds.getDeviceCount(); i++) {
             printf("[DS18B20] Temperature: %fC / %fF\n", ds.getTempCByIndex(i), ds.getTempFByIndex(i));
         }
 
@@ -178,55 +178,51 @@ void read_ds(void *pvParameter){
     }
 }
 
-void init_gyro_acc(void){
+void init_gyro_acc(void) {
 
+    // start the sensors
     if (bmi088.isConnection()) {
         bmi088.initialize();
-        printf("BMI088 is connected");
+        printf("[BMI088] is connected\n");
     } else {
-        printf("BMI088 is not connected");
+        printf("[BMI088] is not connected\n");
     }
 
 }
 
-void init_onewire(void){
-
-}
-
-void read_gyro_acc(void *pvParameter){
+void read_gyro_acc(void *pvParameter) {
 
     float ax = 0, ay = 0, az = 0;
     float gx = 0, gy = 0, gz = 0;
-    int16_t temp = 0;
 
-    while(1){
+    while (1) {
 
+        // read the accel
         bmi088.getAcceleration(&ax, &ay, &az);
+        // read the gyro
         bmi088.getGyroscope(&gx, &gy, &gz);
-        temp = bmi088.getTemperature();
 
+        // print result
         printf("[BMI088] ax=%f, ay=%f, az=%f\n", ax, ay, az);
         printf("[BMI088] gx=%f, gy=%f, gz=%f\n", gx, gy, gz);
-        printf("[BMI088] temperature=%d\n", temp);
 
+        // sleep for 1s
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
 
-void init_pwm(void){
+void init_pwm(void) {
     pwm.begin();
-
     pwm.setOscillatorFrequency(27000000);
     pwm.setPWMFreq(1600);  // max pwm frequency
-
 }
 
-void update_pwm(void *pvParameter){
+void update_pwm(void *pvParameter) {
 
-    while(1){
+    while (1) {
 
         for (int i = 0; i < 4096; i += 128) {
-            for (int output=0; output < 16; output++) {
+            for (int output = 0; output < 16; output++) {
                 pwm.setPWM(output, 0, i);
             }
             printf("[PCA9685] value=%d\n", i);
@@ -256,9 +252,9 @@ void app_main(void) {
 
     // create all tasks
     xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
-    xTaskCreate(&read_adc, "read_adc_task", 2000, NULL, 5, NULL);
-    xTaskCreate(&read_ds, "read_ds_task", 2000, NULL, 5, NULL);
-    xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2000, NULL, 5, NULL);
-    xTaskCreate(&update_pwm, "update_pwm_task", 2000, NULL, 5, NULL);
+    xTaskCreate(&read_adc, "read_adc_task", 2500, NULL, 5, NULL);
+    xTaskCreate(&read_ds, "read_ds_task", 2500, NULL, 5, NULL);
+    xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2500, NULL, 5, NULL);
+    xTaskCreate(&update_pwm, "update_pwm_task", 2500, NULL, 5, NULL);
 
 }

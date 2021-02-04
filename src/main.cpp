@@ -22,27 +22,26 @@
 // external libs
 #include <OneWire.h> // 1-Wire
 #include <Wire.h> // I2C
+#include <SPI.h> // SPI
 
 // local libs
 #include "ADS1X15.h" // ADS1x15
-
 ADS1015 ads(0x48); // ADS1115 ADS(0x48);
 
 #include <DallasTemperature.h> // DS18B20
-
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 
 #include "BMI088.h" // gyro & acc
 
 #include <Adafruit_PWMServoDriver.h>
-
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
 
 #include <RtcDS1307.h>
-
 RtcDS1307 <TwoWire> Rtc(Wire);
+
+#include <SD.h>
 
 
 // add C linkage definition
@@ -288,7 +287,6 @@ void init_rtc(void) {
 
 void read_rtc(void *pvParameter) {
 
-
     while (1) {
         if (!Rtc.IsDateTimeValid()) {
             if (Rtc.LastError() != 0) {
@@ -312,10 +310,46 @@ void read_rtc(void *pvParameter) {
     }
 }
 
+File dataFile;
+void init_sdcard(void){
+
+    if (!SD.begin(SPI_CS_SDCARD)) {
+        printf("[SDCard] Initialization failed\n");
+    } else {
+        printf("[SDCard] Initialization successful\n");
+
+        dataFile = SD.open("/datalog.txt", FILE_APPEND); //FILE_WRITE);
+
+    }
+}
+
+void write_sdcard(void *pvParameter) {
+
+
+    int counter = 0;
+
+    while(1){
+
+        if (dataFile) {
+            dataFile.print(counter);
+            dataFile.println("");
+            printf("[SDCard] Write to sdcard: %d\n", counter++);
+        } else {
+            printf("[SDCard] Error opening file.\n");
+        }
+        // dataFile.close();
+        dataFile.flush(); // ensure write-back
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 void app_main(void) {
 
     // init arduino library
     initArduino();
+
+    init_sdcard();
 
     // init buses
     init_i2c();
@@ -326,6 +360,7 @@ void app_main(void) {
     init_ds();
     init_gyro_acc();
     init_pwm();
+    init_rtc();
 
     // report chip info
     chip_info(NULL);
@@ -337,5 +372,5 @@ void app_main(void) {
     xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2500, NULL, 5, NULL);
     xTaskCreate(&update_pwm, "update_pwm_task", 2500, NULL, 5, NULL);
     xTaskCreate(&read_rtc, "read_adc_task", 2500, NULL, 5, NULL);
-
+    xTaskCreate(&write_sdcard, "write_sdcard_task", 2500, NULL, 5, NULL);
 }

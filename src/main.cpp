@@ -344,33 +344,85 @@ void write_sdcard(void *pvParameter) {
     }
 }
 
+portMUX_TYPE mux = portMUX_INITIALIZER_UNLOCKED;
+volatile int interrupt_counter = 0;
+void IRAM_ATTR handle_gpio_interrupt();
+void register_gpio_interrupt(){
+
+    printf("[HW Interrupt] Register gpio interrupt pin %d (falling edge)\n", GPIO_INTERRUPT_PIN);
+    pinMode(GPIO_INTERRUPT_PIN, INPUT_PULLUP);
+    attachInterrupt(digitalPinToInterrupt(GPIO_INTERRUPT_PIN), handle_gpio_interrupt, FALLING);
+
+}
+
+void IRAM_ATTR handle_gpio_interrupt() {
+    portENTER_CRITICAL_ISR(&mux);
+    interrupt_counter++;
+    portEXIT_CRITICAL_ISR(&mux);
+}
+
+void int_report(void *pvParameter){
+
+    while(1){
+
+        printf("[INT] Number of interrupts: %d\n", interrupt_counter);
+
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
+#define BLINK_ON true
+#define ADC_ON false
+#define DS_ON false
+#define GYRO_ACC_ON false
+#define PWM_ON false
+#define RTC_ON false
+#define INT_ON true
+#define SD_ON false
+
 void app_main(void) {
 
     // init arduino library
     initArduino();
 
-    init_sdcard();
+    // report chip info
+    chip_info(NULL);
 
     // init buses
     init_i2c();
     init_onewire();
 
-    // init modules
-    init_adc();
-    init_ds();
-    init_gyro_acc();
-    init_pwm();
-    init_rtc();
-
-    // report chip info
-    chip_info(NULL);
-
-    // create all tasks
-    xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
-    xTaskCreate(&read_adc, "read_adc_task", 2500, NULL, 5, NULL);
-    xTaskCreate(&read_ds, "read_ds_task", 2500, NULL, 5, NULL);
-    xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2500, NULL, 5, NULL);
-    xTaskCreate(&update_pwm, "update_pwm_task", 2500, NULL, 5, NULL);
-    xTaskCreate(&read_rtc, "read_adc_task", 2500, NULL, 5, NULL);
-    xTaskCreate(&write_sdcard, "write_sdcard_task", 2500, NULL, 5, NULL);
+    // init modules & create tasks
+    if(BLINK_ON){
+        xTaskCreate(&blink_task, "blink_task", configMINIMAL_STACK_SIZE, NULL, 5, NULL);
+    }
+    if(ADC_ON){
+        init_adc();
+        xTaskCreate(&read_adc, "read_adc_task", 2500, NULL, 5, NULL);
+    }
+    if(DS_ON) {
+        init_ds();
+        xTaskCreate(&read_ds, "read_ds_task", 2500, NULL, 5, NULL);
+    }
+    if(GYRO_ACC_ON){
+        init_gyro_acc();
+        xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2500, NULL, 5, NULL);
+    }
+    if(PWM_ON) {
+        init_pwm();
+        xTaskCreate(&update_pwm, "update_pwm_task", 2500, NULL, 5, NULL);
+    }
+    if(RTC_ON) {
+        init_rtc();
+        xTaskCreate(&read_rtc, "read_adc_task", 2500, NULL, 5, NULL);
+    }
+    if(SD_ON){
+        init_sdcard();
+        xTaskCreate(&write_sdcard, "write_sdcard_task", 2500, NULL, 5, NULL);
+    }
+    if(INT_ON) {
+        // register interrupt handler
+        register_gpio_interrupt();
+        xTaskCreate(&int_report, "int_report_task", 2500, NULL, 5, NULL);
+    }
 }

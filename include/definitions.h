@@ -51,5 +51,6 @@ SemaphoreHandle_t i2c_mutex;
 #define ONEWIRE_PIN 2
 SemaphoreHandle_t onewire_mutex;
 
+#define GPIO_INTERRUPT_PIN 25
 
 #endif // DEFINITIONS_H

@@ -35,10 +35,7 @@
 #include <RTC.h>
 #include <Temp.h>
 #include <Display.h>
-
-
-#include <SD.h> // sd card
-
+#include <SDCard.h>
 
 // add C linkage definition
 extern "C" {
@@ -61,41 +58,6 @@ void blink_task(void *pvParameter) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         /* Blink on (output high) */
         gpio_set_level(LED_BUILTIN, 1);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
-
-File dataFile;
-void init_sdcard(void){
-
-    if (!SD.begin(SPI_CS_SDCARD)) {
-        printf("[SDCard] Initialization failed\n");
-    } else {
-        printf("[SDCard] Initialization successful\n");
-
-        dataFile = SD.open("/datalog.txt", FILE_APPEND); //FILE_WRITE);
-
-    }
-}
-
-void write_sdcard(void *pvParameter) {
-
-
-    int counter = 0;
-
-    while(1){
-
-        if (dataFile) {
-            dataFile.print(counter);
-            dataFile.println("");
-            printf("[SDCard] Write to sdcard: %d\n", counter++);
-        } else {
-            printf("[SDCard] Error opening file.\n");
-        }
-        // dataFile.close();
-        dataFile.flush(); // ensure write-back
-
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -178,7 +140,7 @@ void app_main(void) {
     }
     if(SD_ON){
         init_sdcard();
-        xTaskCreate(&write_sdcard, "write_sdcard_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&write_sdcard_demo_task, "write_sdcard_task", 2500, NULL, 5, NULL);
     }
     if(INT_ON) {
         // register interrupt handler

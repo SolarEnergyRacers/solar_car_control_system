@@ -13,8 +13,6 @@
 #define OLED_RESET 9
 Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
 
-
-
 void init_display(void){
 
     // CRITICAL SECTION I2C: start

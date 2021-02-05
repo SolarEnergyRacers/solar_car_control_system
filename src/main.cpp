@@ -32,14 +32,12 @@
 #include <ADC.h>
 #include <Gyro_Acc.h>
 #include <PWM.h>
+#include <RTC.h>
 
 #include <DallasTemperature.h> // DS18B20
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 
-
-#include <RtcDS1307.h>
-RtcDS1307 <TwoWire> Rtc(Wire);
 
 #include <SD.h> // sd card
 
@@ -123,79 +121,6 @@ void read_ds(void *pvParameter) {
     }
 }
 
-
-
-
-void init_rtc(void) {
-
-    Rtc.Begin();
-
-    RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-    printf("[DS1307] %02u/%02u/%04u %02u:%02u:%02u\n", compiled.Month(), compiled.Day(), compiled.Year(), compiled.Hour(), compiled.Minute(), compiled.Second());
-
-    if (!Rtc.IsDateTimeValid()) {
-        if (Rtc.LastError() != 0) {
-            // we have a communications error
-            printf("RTC communications error = %d\n", Rtc.LastError());
-        } else {
-            // Common Causes:
-            //    1) first time you ran and the device wasn't running yet
-            //    2) the battery on the device is low or even missing
-
-            printf("RTC lost confidence in the DateTime! Set datetime to compile time of this binary.\n");
-            // following line sets the RTC to the date & time this sketch was compiled
-            // it will also reset the valid flag internally unless the Rtc device is
-            // having an issue
-
-            Rtc.SetDateTime(compiled);
-        }
-    }
-
-    if (!Rtc.GetIsRunning()) {
-        printf("RTC was not actively running, starting now\n");
-        Rtc.SetIsRunning(true);
-    }
-
-    RtcDateTime now = Rtc.GetDateTime();
-    if (now < compiled) {
-        printf("RTC is older than compile time!  (Updating DateTime)\n");
-        Rtc.SetDateTime(compiled);
-    } else if (now > compiled) {
-        printf("RTC is newer than compile time. (this is expected)\n");
-    } else if (now == compiled) {
-        printf("RTC is the same as compile time! (not expected but all is fine)\n");
-    }
-
-    // never assume the Rtc was last configured by you, so
-    // just clear them to your needed state
-    Rtc.SetSquareWavePin(DS1307SquareWaveOut_Low);
-}
-
-
-void read_rtc(void *pvParameter) {
-
-    while (1) {
-        if (!Rtc.IsDateTimeValid()) {
-            if (Rtc.LastError() != 0) {
-                // we have a communications error
-                // see https://www.arduino.cc/en/Reference/WireEndTransmission for
-                // what the number means
-                printf("RTC communications error = %d\n", Rtc.LastError());
-            } else {
-                // Common Causes:
-                //    1) the battery on the device is low or even missing and the power line was disconnected
-                printf("RTC lost confidence in the DateTime!\n");
-            }
-        }
-
-        RtcDateTime now = Rtc.GetDateTime();
-
-        printf("%02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(), now.Second());
-
-
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
 
 File dataFile;
 void init_sdcard(void){
@@ -318,8 +243,9 @@ void app_main(void) {
     chip_info();
 
     // init buses
-    init_i2c();
     init_onewire();
+    init_i2c();
+    init_spi();
 
     // init modules & create tasks
     if(BLINK_ON){
@@ -343,7 +269,7 @@ void app_main(void) {
     }
     if(RTC_ON) {
         init_rtc();
-        xTaskCreate(&read_rtc, "read_adc_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&read_rtc_demo_task, "read_adc_task", 2500, NULL, 5, NULL);
     }
     if(SD_ON){
         init_sdcard();

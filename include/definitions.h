@@ -4,9 +4,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h> // semaphore
-
 /*
  *  GPIO
  */
@@ -17,7 +14,6 @@
  * OneWire
  */
 #define ONEWIRE_PIN 2
-//SemaphoreHandle_t onewire_mutex;
 
 
 /*

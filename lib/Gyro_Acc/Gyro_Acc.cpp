@@ -5,7 +5,7 @@
 
 #include "../../include/definitions.h"
 
-#include <I2C.h>
+#include <I2CBus.h>
 #include "BMI088.h" // gyro & acc lib
 
 #include "Gyro_Acc.h"

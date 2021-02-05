@@ -4,13 +4,13 @@
 
 #include "../../include/definitions.h"
 
-#include <I2C.h>
+#include <I2CBus.h>
 #include "ADC.h"
 
 #include <Wire.h> // I2C
 #include <ADS1X15.h> // ADS1x15
 
-#define NUM_PORTS 4
+#define ADC_NUM_PORTS 4
 
 
 ADS1015 ads(I2C_ADDRESS_ADS1x15); // for ADS1115 use: ADS1115 ads(I2C_ADDRESS_ADS1x15);
@@ -32,7 +32,7 @@ void init_adc() {
 int16_t read_adc(int port){
 
     // check port number
-    if(port < 0 || port >= NUM_PORTS){
+    if(port < 0 || port >= ADC_NUM_PORTS){
         return -1;
     }
 

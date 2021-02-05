@@ -17,6 +17,7 @@ void init_spi(void){
 
     // init mutex (it is acquired)
     spi_mutex = xSemaphoreCreateBinary();
+
     // release mutex
     xSemaphoreGive(spi_mutex);
 }

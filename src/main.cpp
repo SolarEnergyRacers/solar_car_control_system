@@ -26,7 +26,7 @@
 
 // local libs
 #include <system.h>
-#include <I2C.h>
+#include <I2CBus.h>
 #include <SPIBus.h>
 #include <ADC.h>
 #include <Gyro_Acc.h>

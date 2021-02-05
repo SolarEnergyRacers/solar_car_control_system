@@ -28,21 +28,18 @@
 
 // local libs
 #include <I2C.h>
-#include <ADC.h>// analog to digital converter
+#include <ADC.h> // analog to digital converter
+#include <Gyro_Acc.h>
 
 #include <DallasTemperature.h> // DS18B20
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 
-#include "BMI088.h" // gyro & acc
-
 #include <Adafruit_PWMServoDriver.h>
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
-
 #include <RtcDS1307.h>
 RtcDS1307 <TwoWire> Rtc(Wire);
-
 
 #include <SD.h> // sd card
 
@@ -160,38 +157,6 @@ void read_ds(void *pvParameter) {
     }
 }
 
-void init_gyro_acc(void) {
-
-    // start the sensors
-    if (bmi088.isConnection()) {
-        bmi088.initialize();
-        printf("[BMI088] is connected\n");
-    } else {
-        printf("[BMI088] is not connected\n");
-    }
-
-}
-
-void read_gyro_acc(void *pvParameter) {
-
-    float ax = 0, ay = 0, az = 0;
-    float gx = 0, gy = 0, gz = 0;
-
-    while (1) {
-
-        // read the accel
-        bmi088.getAcceleration(&ax, &ay, &az);
-        // read the gyro
-        bmi088.getGyroscope(&gx, &gy, &gz);
-
-        // print result
-        printf("[BMI088] ax=%f, ay=%f, az=%f\n", ax, ay, az);
-        printf("[BMI088] gx=%f, gy=%f, gz=%f\n", gx, gy, gz);
-
-        // sleep for 1s
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
 
 void init_pwm(void) {
     pwm.begin();
@@ -423,7 +388,7 @@ void app_main(void) {
     }
     if(GYRO_ACC_ON){
         init_gyro_acc();
-        xTaskCreate(&read_gyro_acc, "read_gyro_acc_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_task", 2500, NULL, 5, NULL);
     }
     if(PWM_ON) {
         init_pwm();

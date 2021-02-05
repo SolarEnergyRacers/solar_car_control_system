@@ -8,6 +8,8 @@
 // FreeRTOS / Arduino
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
+#include <freertos/semphr.h> // semaphore
+
 #include <Arduino.h>
 
 // esp32 includes
@@ -25,8 +27,8 @@
 #include <SPI.h> // SPI
 
 // local libs
-#include "ADS1X15.h" // ADS1x15
-ADS1015 ads(0x48); // ADS1115 ADS(0x48);
+#include<I2C.h>
+#include <ADC.h>// analog to digital converter
 
 #include <DallasTemperature.h> // DS18B20
 OneWire oneWire(ONEWIRE_PIN);
@@ -104,41 +106,9 @@ void restart(void *pvParameter) {
     esp_restart();
 }
 
-void init_i2c(void) {
-    // init i2c wire library
-    Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
-    // init mutex
-    i2c_mutex = xSemaphoreCreateBinary();
-    xSemaphoreGive(i2c_mutex);
-}
-
 void init_onewire(void) {}
 
-void init_adc(void) {
 
-    // init library
-    ads.begin();
-
-    // set gain amplifier value
-    ads.setGain(0); // 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
-}
-
-void read_adc(void *pvParameter) {
-
-    while (1) {
-
-        // bit -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) 0.1875mV (ADS1215)
-        float multiplier = ads.toVoltage(1);  // voltage factor
-
-        for (int i = 0; i < 4; i++) {
-            int16_t value = ads.readADC(i);
-            printf("[ADS1x15] AIN%d: %fmV\n", i, multiplier * value);
-        }
-
-        // sleep for 1s
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
 
 void init_ds() {
 
@@ -417,7 +387,7 @@ void draw_display(void *pvParameter){
 }
 
 #define BLINK_ON true
-#define ADC_ON false
+#define ADC_ON true
 #define DS_ON false
 #define GYRO_ACC_ON false
 #define PWM_ON false
@@ -445,7 +415,7 @@ void app_main(void) {
     }
     if(ADC_ON){
         init_adc();
-        xTaskCreate(&read_adc, "read_adc_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&read_adc_demo_task, "read_adc_task", 2500, NULL, 5, NULL);
     }
     if(DS_ON) {
         init_ds();

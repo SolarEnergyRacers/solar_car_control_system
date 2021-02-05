@@ -1,5 +1,5 @@
 /*
- *  TODO: add description & license
+ *  SER - Solar Car Control System - Main Routine for setting up tasks, initialize devices, ..
  */
 
 // standard libraries
@@ -33,11 +33,7 @@
 #include <Gyro_Acc.h>
 #include <PWM.h>
 #include <RTC.h>
-
-#include <DallasTemperature.h> // DS18B20
-OneWire oneWire(ONEWIRE_PIN);
-DallasTemperature ds(&oneWire);
-
+#include <Temp.h>
 
 #include <SD.h> // sd card
 
@@ -67,56 +63,6 @@ void blink_task(void *pvParameter) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
         /* Blink on (output high) */
         gpio_set_level(LED_BUILTIN, 1);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
-void init_ds() {
-
-    ds.begin();
-
-    printf("[OneWire] num devices on bus: %d\n", ds.getDeviceCount());
-
-
-    DeviceAddress device_addr;
-
-    oneWire.reset_search();
-    while (oneWire.search(device_addr)) {
-
-        printf("[DS18B20] Address:");
-        for (uint8_t i = 0; i < 8; i++) {
-
-            printf(" %d", device_addr[i]);
-        }
-        printf(" ");
-
-        printf("Resolution: %d", ds.getResolution(device_addr));
-        printf(" ");
-
-        printf("Power Mode: ");
-        if (ds.isParasitePowerMode()) {
-            printf("External");
-        } else {
-            printf("Parasite");
-        }
-        printf("\n");
-    }
-}
-
-void read_ds(void *pvParameter) {
-
-    // polling loop
-    while (1) {
-
-        // request all temperature sensor readings
-        ds.requestTemperatures();
-
-        // print all results
-        for (int i = 0; i < ds.getDeviceCount(); i++) {
-            printf("[DS18B20] Temperature: %fC / %fF\n", ds.getTempCByIndex(i), ds.getTempFByIndex(i));
-        }
-
-        // sleep for 1s
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
@@ -257,7 +203,7 @@ void app_main(void) {
     }
     if(DS_ON) {
         init_ds();
-        xTaskCreate(&read_ds, "read_ds_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&read_ds_demo_task, "read_ds_task", 2500, NULL, 5, NULL);
     }
     if(GYRO_ACC_ON){
         init_gyro_acc();

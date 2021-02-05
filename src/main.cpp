@@ -2,23 +2,21 @@
  *  TODO: add description & license
  */
 
-// standard library includes
+// standard libraries
 #include <stdio.h>
 
 // FreeRTOS / Arduino
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
-#include <freertos/semphr.h> // semaphore
-
+#include <freertos/semphr.h>
 #include <Arduino.h>
 
 // esp32 includes
 #include <driver/gpio.h>
-#include "esp_system.h"
-#include "esp_spi_flash.h"
+
 #include "sdkconfig.h"
 
-// local includes
+// local definitions
 #include "definitions.h"
 
 // external libs
@@ -27,8 +25,9 @@
 #include <SPI.h> // SPI
 
 // local libs
+#include <system.h>
 #include <I2C.h>
-#include <ADC.h> // analog to digital converter
+#include <ADC.h>
 #include <Gyro_Acc.h>
 
 #include <DallasTemperature.h> // DS18B20
@@ -73,39 +72,7 @@ void blink_task(void *pvParameter) {
     }
 }
 
-void chip_info(void *pvParameter) {
-
-    // print chip information
-    esp_chip_info_t chip_info;
-    esp_chip_info(&chip_info);
-    printf("This is ESP32 chip with %d CPU cores, WiFi%s%s, ",
-           chip_info.cores,
-           (chip_info.features & CHIP_FEATURE_BT) ? "/BT" : "",
-           (chip_info.features & CHIP_FEATURE_BLE) ? "/BLE" : "");
-
-    printf("silicon revision %d, ", chip_info.revision);
-
-    printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
-           (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
-}
-
-void restart(void *pvParameter) {
-
-    // count time down
-    for (int i = 10; i >= 0; i--) {
-        printf("Restarting in %d seconds...\n", i);
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-
-    // actual restart
-    printf("Restarting now.\n");
-    fflush(stdout);
-    esp_restart();
-}
-
 void init_onewire(void) {}
-
-
 
 void init_ds() {
 
@@ -368,7 +335,7 @@ void app_main(void) {
     initArduino();
 
     // report chip info
-    chip_info(NULL);
+    chip_info();
 
     // init buses
     init_i2c();

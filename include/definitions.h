@@ -24,7 +24,7 @@
 /*
  * ESP32 SPI
  *
- *  ESP32  - Probe
+ *  ESP32  - SPI PIN
  *  --------------
  *  VSPI
  *  GPIO23   MOSI

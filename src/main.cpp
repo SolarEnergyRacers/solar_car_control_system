@@ -41,12 +41,17 @@ Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 #include <RtcDS1307.h>
 RtcDS1307 <TwoWire> Rtc(Wire);
 
-#include <SD.h>
 
+#include <SD.h> // sd card
+
+#include <Adafruit_GFX.h> // graphics library
+#include <Adafruit_SSD1305.h> // display
+#define OLED_RESET 9
+Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
 
 // add C linkage definition
 extern "C" {
-void app_main(void);
+    void app_main(void);
 }
 
 void blink_task(void *pvParameter) {
@@ -371,14 +376,56 @@ void int_report(void *pvParameter){
     }
 }
 
+void init_display(void){
+
+    if (!display.begin(0x3C) ) {
+        printf("[Display] Unable to initialize OLED screen.\n");
+    } else {
+        printf("[Display] Screen initialize successfully.\n");
+    }
+
+    // init done
+    display.display(); // show splashscreen
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    display.clearDisplay();   // clears the screen and buffer
+
+
+
+}
+
+
+void draw_display(void *pvParameter){
+
+    while(1){
+
+        display.clearDisplay();   // clears the screen and buffer
+
+        display.setTextSize(1);
+        display.setTextWrap(false);
+        display.setTextColor(WHITE);
+        display.setCursor(0,0);
+
+        for (uint8_t i=0; i < 168; i++) {
+            if (i == '\n') continue;
+            display.write(i);
+            if ((i > 0) && (i % 21 == 0))
+                display.println();
+        }
+        display.display();
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
+}
+
 #define BLINK_ON true
 #define ADC_ON false
 #define DS_ON false
 #define GYRO_ACC_ON false
 #define PWM_ON false
 #define RTC_ON false
-#define INT_ON true
+#define INT_ON false
 #define SD_ON false
+#define DISPLAY_ON true
+
 
 void app_main(void) {
 
@@ -424,5 +471,9 @@ void app_main(void) {
         // register interrupt handler
         register_gpio_interrupt();
         xTaskCreate(&int_report, "int_report_task", 2500, NULL, 5, NULL);
+    }
+    if(DISPLAY_ON){
+        init_display();
+        xTaskCreate(&draw_display, "display_task", 2500, NULL, 5, NULL);
     }
 }

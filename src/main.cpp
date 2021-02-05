@@ -31,13 +31,12 @@
 #include <SPIBus.h>
 #include <ADC.h>
 #include <Gyro_Acc.h>
+#include <PWM.h>
 
 #include <DallasTemperature.h> // DS18B20
 OneWire oneWire(ONEWIRE_PIN);
 DallasTemperature ds(&oneWire);
 
-#include <Adafruit_PWMServoDriver.h>
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(0x40, Wire);
 
 #include <RtcDS1307.h>
 RtcDS1307 <TwoWire> Rtc(Wire);
@@ -125,26 +124,7 @@ void read_ds(void *pvParameter) {
 }
 
 
-void init_pwm(void) {
-    pwm.begin();
-    pwm.setOscillatorFrequency(27000000);
-    pwm.setPWMFreq(1600);  // max pwm frequency
-}
 
-void update_pwm(void *pvParameter) {
-
-    while (1) {
-
-        for (int i = 0; i < 4096; i += 128) {
-            for (int output = 0; output < 16; output++) {
-                pwm.setPWM(output, 0, i);
-            }
-            printf("[PCA9685] value=%d\n", i);
-
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
-        }
-    }
-}
 
 void init_rtc(void) {
 
@@ -359,7 +339,7 @@ void app_main(void) {
     }
     if(PWM_ON) {
         init_pwm();
-        xTaskCreate(&update_pwm, "update_pwm_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&update_pwm_demo_task, "update_pwm_task", 2500, NULL, 5, NULL);
     }
     if(RTC_ON) {
         init_rtc();

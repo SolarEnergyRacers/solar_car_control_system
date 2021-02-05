@@ -4,6 +4,9 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h> // semaphore
+
 /*
  *  GPIO
  */
@@ -14,7 +17,7 @@
  * OneWire
  */
 #define ONEWIRE_PIN 2
-SemaphoreHandle_t onewire_mutex;
+//SemaphoreHandle_t onewire_mutex;
 
 
 /*
@@ -23,7 +26,9 @@ SemaphoreHandle_t onewire_mutex;
 #define I2C_SDA 33
 #define I2C_SCL 32
 #define I2C_FREQ 100000
-SemaphoreHandle_t i2c_mutex;
+
+#define I2C_ADDRESS_ADS1x15 0x48
+
 
 /*
  *  SPI
@@ -47,7 +52,7 @@ SemaphoreHandle_t i2c_mutex;
 #define SPI_MISO 19
 #define SPI_CLK 18
 #define SPI_CS_SDCARD 5
-
+//SemaphoreHandle_t spi_mutex;
 
 /*
  * ESP32 JTAG Debug Probe Wiring

@@ -1,5 +1,5 @@
 //
-// Created by andre on 2/5/2021.
+// I2C Bus
 //
 
 #include <freertos/FreeRTOS.h>
@@ -14,12 +14,14 @@
 SemaphoreHandle_t i2c_mutex;
 
 void init_i2c(void) {
-    // init mutex
+
+    // CRITICAL SECTION I2C: start
+    // init mutex (it is acquired)
     i2c_mutex = xSemaphoreCreateBinary();
-    // release mutex
-    xSemaphoreGive(i2c_mutex);
 
     // init i2c wire library
     Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
+    xSemaphoreGive(i2c_mutex);
+    // CRITICAL SECTION I2C: end
 }

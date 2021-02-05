@@ -52,7 +52,6 @@
 #define SPI_MISO 19
 #define SPI_CLK 18
 #define SPI_CS_SDCARD 5
-//SemaphoreHandle_t spi_mutex;
 
 /*
  * ESP32 JTAG Debug Probe Wiring

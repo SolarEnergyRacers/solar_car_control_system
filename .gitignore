@@ -2,5 +2,7 @@
 .pio
 # exclude clion build directory
 cmake-build-debug
+# exclude vscode config directory
+.vscode
 # exclude generated config
 sdkconfig

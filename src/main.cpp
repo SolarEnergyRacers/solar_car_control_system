@@ -34,13 +34,11 @@
 #include <PWM.h>
 #include <RTC.h>
 #include <Temp.h>
+#include <Display.h>
+
 
 #include <SD.h> // sd card
 
-#include <Adafruit_GFX.h> // graphics library
-#include <Adafruit_SSD1305.h> // display
-#define OLED_RESET 9
-Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
 
 // add C linkage definition
 extern "C" {
@@ -129,45 +127,6 @@ void int_report(void *pvParameter){
     }
 }
 
-void init_display(void){
-
-    if (!display.begin(0x3C) ) {
-        printf("[Display] Unable to initialize OLED screen.\n");
-    } else {
-        printf("[Display] Screen initialize successfully.\n");
-    }
-
-    // init done
-    display.display(); // show splashscreen
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
-    display.clearDisplay();   // clears the screen and buffer
-
-
-
-}
-
-
-void draw_display(void *pvParameter){
-
-    while(1){
-
-        display.clearDisplay();   // clears the screen and buffer
-
-        display.setTextSize(1);
-        display.setTextWrap(false);
-        display.setTextColor(WHITE);
-        display.setCursor(0,0);
-
-        for (uint8_t i=0; i < 168; i++) {
-            if (i == '\n') continue;
-            display.write(i);
-            if ((i > 0) && (i % 21 == 0))
-                display.println();
-        }
-        display.display();
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
 
 #define BLINK_ON true
 #define ADC_ON true
@@ -228,6 +187,6 @@ void app_main(void) {
     }
     if(DISPLAY_ON){
         init_display();
-        xTaskCreate(&draw_display, "display_task", 2500, NULL, 5, NULL);
+        xTaskCreate(&draw_display_demo_task, "display_task", 2500, NULL, 5, NULL);
     }
 }

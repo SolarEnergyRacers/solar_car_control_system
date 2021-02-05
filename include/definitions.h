@@ -25,6 +25,7 @@
 
 #define I2C_ADDRESS_ADS1x15 0x48
 #define I2C_ADDRESS_PCA9685 0x40
+#define I2C_ADDRESS_SSD1305 0x3C
 
 /*
  *  SPI

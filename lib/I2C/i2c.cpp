@@ -9,7 +9,7 @@
 
 #include "../../include/definitions.h"
 
-#include "i2c.h"
+#include "I2C.h"
 
 SemaphoreHandle_t i2c_mutex;
 

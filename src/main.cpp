@@ -26,6 +26,7 @@
 
 // local libs
 #include <system.h>
+#include <OneWireBus.h>
 #include <I2CBus.h>
 #include <SPIBus.h>
 #include <ADC.h>
@@ -72,8 +73,6 @@ void blink_task(void *pvParameter) {
         vTaskDelay(1000 / portTICK_PERIOD_MS);
     }
 }
-
-void init_onewire(void) {}
 
 void init_ds() {
 
@@ -321,12 +320,12 @@ void draw_display(void *pvParameter){
 
 #define BLINK_ON true
 #define ADC_ON true
-#define DS_ON false
-#define GYRO_ACC_ON false
-#define PWM_ON false
-#define RTC_ON false
-#define INT_ON false
-#define SD_ON false
+#define DS_ON true
+#define GYRO_ACC_ON true
+#define PWM_ON true
+#define RTC_ON true
+#define INT_ON true
+#define SD_ON true
 #define DISPLAY_ON true
 
 

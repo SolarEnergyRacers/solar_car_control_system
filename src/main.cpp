@@ -27,7 +27,7 @@
 #include <SPI.h> // SPI
 
 // local libs
-#include<I2C.h>
+#include <I2C.h>
 #include <ADC.h>// analog to digital converter
 
 #include <DallasTemperature.h> // DS18B20

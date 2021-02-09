@@ -9,6 +9,7 @@
  */
 #define LED_BUILTIN (gpio_num_t)22
 #define GPIO_INTERRUPT_PIN 25
+#define PCF8574_INTERRUPT_PIN 26
 
 /*
  * OneWire
@@ -26,6 +27,7 @@
 #define I2C_ADDRESS_ADS1x15 0x48
 #define I2C_ADDRESS_PCA9685 0x40
 #define I2C_ADDRESS_SSD1305 0x3C
+#define I2C_ADDRESS_PCF8574 0x38
 
 /*
  *  SPI

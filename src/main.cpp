@@ -30,6 +30,7 @@
 #include <Display.h>
 #include <SDCard.h>
 #include <gpio.h>
+#include <IOExt.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
@@ -42,6 +43,7 @@
 #define SD_ON true
 #define DISPLAY_ON true
 #define INT_ON true
+#define IOEXT_ON true
 
 // add C linkage definition
 extern "C" {
@@ -96,5 +98,9 @@ void app_main(void) {
     if (DISPLAY_ON) {
         init_display();
         xTaskCreate(&draw_display_demo_task, "display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if(IOEXT_ON){
+        init_ioext();
+        xTaskCreate(&io_ext_demo_task, "io_extension_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

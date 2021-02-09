@@ -16,6 +16,9 @@ PCF8574 pcf8574(I2C_ADDRESS_PCF8574, PCF8574_INTERRUPT_PIN, key_pressed_interrup
 
 void init_ioext(){
 
+    // CRITICAL SECTION I2C: start
+    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+
     // setup pins
     pcf8574.pinMode(P0, INPUT_PULLUP);
     pcf8574.pinMode(P1, INPUT_PULLUP);
@@ -33,6 +36,8 @@ void init_ioext(){
         printf("[PCF8574] Init failed..\n");
     }
 
+    xSemaphoreGive(i2c_mutex);
+    // CRITICAL SECTION I2C: end
 }
 
 volatile int interrupt_counter = 0;

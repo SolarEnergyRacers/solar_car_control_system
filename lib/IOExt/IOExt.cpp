@@ -10,12 +10,9 @@
 #include <Wire.h> // I2C
 #include "PCF8574.h" // PCF8574
 
-
 #define PCF8574_NUM_PORTS 8
-void key_pressed_interrupt_handler();
 
 PCF8574 pcf8574(I2C_ADDRESS_PCF8574, PCF8574_INTERRUPT_PIN, key_pressed_interrupt_handler);
-
 
 void init_ioext(){
 
@@ -36,6 +33,11 @@ void init_ioext(){
         printf("[PCF8574] Init failed..\n");
     }
 
+}
+
+volatile int interrupt_counter = 0;
+void key_pressed_interrupt_handler(){
+    interrupt_counter++;
 }
 
 void set_ioext(int port, bool value){
@@ -79,6 +81,9 @@ void io_ext_demo_task(void *pvParameter){
 
         // blink port 6
         set_ioext(6, !get_ioext(6));
+
+        // report interrupts
+        printf("[PCF8574] Num interrupts: %d", interrupt_counter);
 
         // sleep for 1s
         vTaskDelay(1000 / portTICK_PERIOD_MS);

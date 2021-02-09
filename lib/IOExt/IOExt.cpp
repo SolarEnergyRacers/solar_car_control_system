@@ -40,9 +40,9 @@ void init_ioext(){
     // CRITICAL SECTION I2C: end
 }
 
-volatile int interrupt_counter = 0;
+volatile int interrupt_counter_pcf8574 = 0;
 void key_pressed_interrupt_handler(){
-    interrupt_counter++;
+    interrupt_counter_pcf8574++;
 }
 
 void set_ioext(int port, bool value){
@@ -88,7 +88,7 @@ void io_ext_demo_task(void *pvParameter){
         set_ioext(6, !get_ioext(6));
 
         // report interrupts
-        printf("[PCF8574] Num interrupts: %d", interrupt_counter);
+        printf("[PCF8574] Num interrupts: %d", interrupt_counter_pcf8574);
 
         // sleep for 1s
         vTaskDelay(1000 / portTICK_PERIOD_MS);

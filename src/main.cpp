@@ -29,21 +29,23 @@
 #include <Temp.h>
 #include <Display.h>
 #include <DisplayLarge.h>
+#include <DisplayLargeIndicator.h>
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
-#define ADC_ON true
-#define DS_ON true
-#define GYRO_ACC_ON true
-#define PWM_ON true
-#define RTC_ON true
-#define INT_ON true
-#define SD_ON true
-#define DISPLAY_ON true
+#define ADC_ON false
+#define DS_ON false
+#define GYRO_ACC_ON false
+#define PWM_ON false
+#define RTC_ON false
+#define INT_ON false
+#define SD_ON false
+#define DISPLAY_ON false
 #define DISPLAY_LARGE_ON true
+#define DISPLAY_LARGE_INDICATOR_ON true
 #define INT_ON false
 #define IOEXT_ON false
 
@@ -64,6 +66,12 @@ void app_main(void) {
     init_onewire();
     init_i2c();
     init_spi();
+
+    Serial.begin(115200);
+    delay(2000);
+    Serial.println("---------------------------");
+    Serial.println("esp32dev Test!"); 
+
 
     // init modules & create tasks
     if (BLINK_ON) {
@@ -101,9 +109,17 @@ void app_main(void) {
         init_display();
         xTaskCreate(&draw_display_demo_task, "display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
+    // if (DISPLAY_LARGE_ON) {
+    //     init_display_large();
+    //     xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    // }
     if (DISPLAY_LARGE_ON) {
         init_display_large();
-        xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        xTaskCreate(&draw_display_large_background_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+   if (DISPLAY_LARGE_INDICATOR_ON) {
+        init_display_large_indicator();
+        xTaskCreate(&draw_display_large_indicator_task, "display_indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
     if(IOEXT_ON){
         init_ioext();

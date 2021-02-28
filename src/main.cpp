@@ -44,12 +44,12 @@
 #define SD_ON true
 #define DISPLAY_ON true
 #define DISPLAY_LARGE_ON true
-#define INT_ON true
-#define IOEXT_ON true
+#define INT_ON false
+#define IOEXT_ON false
 
 // add C linkage definition
 extern "C" {
-void app_main(void);
+    void app_main(void);
 }
 
 void app_main(void) {

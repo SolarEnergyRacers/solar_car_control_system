@@ -28,6 +28,7 @@
 #include <RTC.h>
 #include <Temp.h>
 #include <Display.h>
+#include <DisplayLarge.h>
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
@@ -42,6 +43,7 @@
 #define INT_ON true
 #define SD_ON true
 #define DISPLAY_ON true
+#define DISPLAY_LARGE_ON true
 #define INT_ON true
 #define IOEXT_ON true
 
@@ -98,6 +100,10 @@ void app_main(void) {
     if (DISPLAY_ON) {
         init_display();
         xTaskCreate(&draw_display_demo_task, "display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if (DISPLAY_LARGE_ON) {
+        init_display_large();
+        xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
     if(IOEXT_ON){
         init_ioext();

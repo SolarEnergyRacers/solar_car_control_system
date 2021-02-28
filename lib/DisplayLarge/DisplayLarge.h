@@ -8,4 +8,4 @@
 void init_display_large(void);
 void draw_display_large_demo_task(void *pvParameter);
 
-#endif // DISPLAY_H
+#endif // DISPLAY_LARGE_H

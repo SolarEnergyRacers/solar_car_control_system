@@ -10,7 +10,7 @@
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341(TFT_CS, TFT_DC, TFT_MOSI, TFT_CLK, TFT_RST, TFT_MISO);
+Adafruit_ILI9341 tft = Adafruit_ILI9341(SPI_CS, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
 
 int speedFrameCx;
 int speedFrameCy;
@@ -134,9 +134,6 @@ void draw_display_large_background_task(void *pvParameter)
         default:
             setIndicatorDirection('o');
             counter = 0;
-        }
-        if (counter > 3)
-        {
         }
         
         tft.setRotation(1);

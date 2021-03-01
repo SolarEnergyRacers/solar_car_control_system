@@ -95,7 +95,7 @@ void app_main(void) {
     }
     if (RTC_ON) {
         init_rtc();
-        xTaskCreate(&read_rtc_demo_task, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        xTaskCreate(&read_rtc_demo_task, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 10, NULL);
     }
     if (SD_ON) {
         init_sdcard();

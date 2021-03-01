@@ -52,6 +52,10 @@
 #define SPI_CLK 18
 #define SPI_CS_SDCARD 5
 
+#define SPI_DC 12
+#define SPI_CS 5
+#define SPI_RST 17
+
 /*
  * ESP32 JTAG Debug Probe Wiring
  *

@@ -20,7 +20,10 @@ int speedFrameY;
 char indicatorDirection = 'o';
 bool indicatorState = false;
 
-int counter = 0;
+int counterIndicator = 0;
+int counterSpeed = 0;
+
+GFXcanvas1 canvas(144, 64); // 128x32 pixel canvas
 
 void init_display_large(void)
 {
@@ -51,7 +54,7 @@ void init_display_large(void)
     {
         printf("[Display Large] Unable to initialize OLED screen.\n");
     }
-
+    //tft.setFont(&FreeSans9pt7b);
     tft.setRotation(1);
     tft.setCursor(0, 0);
     tft.setTextColor(ILI9341_GREEN);
@@ -120,40 +123,53 @@ void draw_display_large_background_task(void *pvParameter)
         // CRITICAL SECTION SPI: start
         xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-        switch (++counter)
+        unsigned long start;
+        start = micros();
+
+        switch (counterIndicator++)
         {
-        case 1:
+        case 0:
             setIndicatorDirection('w');
             break;
-        case 2:
+        case 1:
             setIndicatorDirection('l');
             break;
-        case 3:
+        case 2:
             setIndicatorDirection('r');
             break;
         default:
             setIndicatorDirection('o');
-            counter = 0;
+            counterIndicator = 0;
         }
-        
-        tft.setRotation(1);
 
-        unsigned long start;
-        start = micros();
-
-        draw_info_border(ILI9341_GREEN);
-
-        write_speed(1, ILI9341_YELLOW);
-        delay(500);
-
-        write_speed(12, ILI9341_GREEN);
-        delay(500);
-
-        write_speed(123, ILI9341_ORANGE);
-        delay(500);
-
-        write_speed(0, ILI9341_RED);
-        draw_info_border(ILI9341_RED);
+        switch (counterSpeed++)
+        {
+        case 0:
+            draw_info_border(ILI9341_GREEN);
+            write_speed(1, ILI9341_YELLOW);
+            break;
+        case 1:
+            write_speed(12, ILI9341_YELLOW);
+            break;
+        case 2:
+            write_speed(123, ILI9341_GREEN);
+            break;
+        case 3:
+            draw_info_border(ILI9341_YELLOW);
+            write_speed(888, ILI9341_YELLOW);
+            break;
+        case 4:
+            draw_info_border(ILI9341_RED);
+            write_speed(120, ILI9341_RED);
+            break;
+        case 5:
+            write_speed(42, ILI9341_GREEN);
+            break;
+        default:
+            write_speed(0, ILI9341_RED);
+            draw_info_border(ILI9341_RED);
+            counterSpeed = 0;
+        }
 
         Serial.printf("time elapsed: %ld\n", micros() - start);
 
@@ -168,8 +184,8 @@ void draw_display_large_background_task(void *pvParameter)
 void calc_and_draw_display_background()
 {
     int cx = tft.width();
-    speedFrameCx = 148;
-    speedFrameCy = 68;
+    speedFrameCx = 154;
+    speedFrameCy = 70;
     speedFrameX = (cx - speedFrameCx) / 2;
     speedFrameY = 70;
 
@@ -189,24 +205,49 @@ void write_speed(int speed, int color)
 {
     //DOTO_KSC: split in 3 separate digits and draw one by one
     int text_size = 8;
-    tft.setTextColor(color);
     tft.setTextSize(text_size);
-    tft.fillRoundRect(speedFrameX + 1, speedFrameY + 1, speedFrameCx - 2, speedFrameCy - 2, 4, ILI9341_BLACK);
+    // tft.setTextColor(color);
+    // tft.setTextSize(text_size);
+    // tft.fillRoundRect(speedFrameX + 1, speedFrameY + 1, speedFrameCx - 2, speedFrameCy - 2, 4, ILI9341_BLACK);
 
+    // // print right adjusted numbers
+    // if (speed < 10)
+    // {
+    //     tft.setCursor(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 6);
+    // }
+    // else if (speed < 100)
+    // {
+    //     tft.setCursor(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 6);
+    // }
+    // else
+    // {
+    //     tft.setCursor(speedFrameX + 6 + 0 * text_size * 6, speedFrameY + 6);
+    // }
+    // tft.println(speed);
+
+    canvas.setTextSize(text_size);
     if (speed < 10)
     {
-        tft.setCursor(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 6);
+        canvas.setCursor(2 * text_size * 6, 4);
     }
     else if (speed < 100)
     {
-        tft.setCursor(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 6);
+        canvas.setCursor(1 * text_size * 6, 4);
     }
     else
     {
-        tft.setCursor(speedFrameX + 6 + 0 * text_size * 6, speedFrameY + 6);
+        canvas.setCursor(0 * text_size * 6, 4);
     }
+    //canvas.setCursor(0,0);
+    canvas.fillRect(0, 0, canvas.width(), canvas.height(), ILI9341_BLACK);
+    canvas.setTextColor(color);
+    canvas.println(speed);
+    tft.drawBitmap(speedFrameX + 6, speedFrameY + 4, canvas.getBuffer(), canvas.width(), canvas.height(), color, ILI9341_BLACK); // Copy to screen
+    //Clean canvas
+    // canvas.setTextColor(ILI9341_BLACK);
+    // canvas.println(speed);
 
-    tft.println(speed);
+    Serial.printf("Speed: %d\n", speed);
 }
 
 char getIndicatorDirection()

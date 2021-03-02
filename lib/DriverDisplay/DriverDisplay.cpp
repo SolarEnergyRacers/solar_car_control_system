@@ -5,7 +5,7 @@
 #include "../../include/definitions.h"
 
 #include <SPIBus.h>
-#include "DisplayLarge.h"
+#include "DriverDisplay.h"
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
@@ -25,12 +25,12 @@ int counterSpeed = 0;
 
 GFXcanvas1 canvas(144, 64); // 128x32 pixel canvas
 
-void init_display_large(void)
+void init_driver_display(void)
 {
     // CRITICAL SECTION SPI: start
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-    tft.begin();
+    tft.begin(4000000);
     try
     {
         uint8_t x = tft.readcommand8(ILI9341_RDMODE);
@@ -114,7 +114,7 @@ void draw_display_large_demo_task(void *pvParameter)
     }
 }
 
-void draw_display_large_background_task(void *pvParameter)
+void driver_display_task(void *pvParameter)
 {
     // polling loop
     while (1)
@@ -206,43 +206,43 @@ void write_speed(int speed, int color)
     //DOTO_KSC: split in 3 separate digits and draw one by one
     int text_size = 8;
     tft.setTextSize(text_size);
-    // tft.setTextColor(color);
-    // tft.setTextSize(text_size);
-    // tft.fillRoundRect(speedFrameX + 1, speedFrameY + 1, speedFrameCx - 2, speedFrameCy - 2, 4, ILI9341_BLACK);
+    tft.setTextColor(color);
+    tft.setTextSize(text_size);
+    tft.fillRoundRect(speedFrameX + 1, speedFrameY + 1, speedFrameCx - 2, speedFrameCy - 2, 4, ILI9341_BLACK);
 
-    // // print right adjusted numbers
-    // if (speed < 10)
-    // {
-    //     tft.setCursor(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 6);
-    // }
-    // else if (speed < 100)
-    // {
-    //     tft.setCursor(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 6);
-    // }
-    // else
-    // {
-    //     tft.setCursor(speedFrameX + 6 + 0 * text_size * 6, speedFrameY + 6);
-    // }
-    // tft.println(speed);
-
-    canvas.setTextSize(text_size);
+    // print right adjusted numbers
     if (speed < 10)
     {
-        canvas.setCursor(2 * text_size * 6, 4);
+        tft.setCursor(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 6);
     }
     else if (speed < 100)
     {
-        canvas.setCursor(1 * text_size * 6, 4);
+        tft.setCursor(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 6);
     }
     else
     {
-        canvas.setCursor(0 * text_size * 6, 4);
+        tft.setCursor(speedFrameX + 6 + 0 * text_size * 6, speedFrameY + 6);
     }
-    //canvas.setCursor(0,0);
-    canvas.fillRect(0, 0, canvas.width(), canvas.height(), ILI9341_BLACK);
-    canvas.setTextColor(color);
-    canvas.println(speed);
-    tft.drawBitmap(speedFrameX + 6, speedFrameY + 4, canvas.getBuffer(), canvas.width(), canvas.height(), color, ILI9341_BLACK); // Copy to screen
+    tft.println(speed);
+
+    // canvas.setTextSize(text_size);
+    // if (speed < 10)
+    // {
+    //     canvas.setCursor(2 * text_size * 6, 4);
+    // }
+    // else if (speed < 100)
+    // {
+    //     canvas.setCursor(1 * text_size * 6, 4);
+    // }
+    // else
+    // {
+    //     canvas.setCursor(0 * text_size * 6, 4);
+    // }
+    // canvas.setCursor(0,0);
+    // canvas.fillRect(0, 0, canvas.width(), canvas.height(), ILI9341_BLACK);
+    // canvas.setTextColor(color);
+    // canvas.println(speed);
+    // tft.drawBitmap(speedFrameX + 6, speedFrameY + 4, canvas.getBuffer(), canvas.width(), canvas.height(), color, ILI9341_BLACK); // Copy to screen
     //Clean canvas
     // canvas.setTextColor(ILI9341_BLACK);
     // canvas.println(speed);

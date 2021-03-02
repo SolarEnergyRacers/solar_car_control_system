@@ -5,13 +5,13 @@
 #include "../../include/definitions.h"
 
 #include <SPIBus.h>
-#include "DisplayLarge.h"
-#include "DisplayLargeIndicator.h"
+#include "DriverDisplay.h"
+#include "Indicator.h"
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 
-void init_display_large_indicator(void)
+void init_indicator(void)
 {
 
     // CRITICAL SECTION SPI: start
@@ -23,7 +23,7 @@ void init_display_large_indicator(void)
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 
-void draw_display_large_indicator_task(void *pvParameter)
+void indicator_task(void *pvParameter)
 {
 
     // polling loop

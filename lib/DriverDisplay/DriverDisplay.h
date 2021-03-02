@@ -2,12 +2,12 @@
 // Display
 //
 
-#ifndef DISPLAY_LARGE_H
-#define DISPLAY_LARGE_H
+#ifndef DRIVER_DISPLAY_H
+#define DRIVER_DISPLAY_H
 
-void init_display_large(void);
+void init_driver_display(void);
 void draw_display_large_demo_task(void *pvParameter);
-void draw_display_large_background_task(void *pvParameter);
+void driver_display_task(void *pvParameter);
 void calc_and_draw_display_background();
 void write_speed(int speed, int color);
 void turn_indicator(char kind);
@@ -26,4 +26,4 @@ void setIndicatorState(bool state);
 // #define TFT_MISO 21
 
 
-#endif // DISPLAY_LARGE_H
+#endif // DRIVER_DISPLAY_H

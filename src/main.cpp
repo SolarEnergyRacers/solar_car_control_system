@@ -28,8 +28,8 @@
 #include <RTC.h>
 #include <Temp.h>
 #include <Display.h>
-#include <DisplayLarge.h>
-#include <DisplayLargeIndicator.h>
+#include <DriverDisplay.h>
+#include <Indicator.h>
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
@@ -114,12 +114,12 @@ void app_main(void) {
     //     xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     // }
     if (DISPLAY_LARGE_ON) {
-        init_display_large();
-        xTaskCreate(&draw_display_large_background_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        init_driver_display();
+        xTaskCreate(&driver_display_task, "driver_display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
    if (DISPLAY_LARGE_INDICATOR_ON) {
-        init_display_large_indicator();
-        xTaskCreate(&draw_display_large_indicator_task, "display_indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        init_indicator();
+        xTaskCreate(&indicator_task, "indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
     if(IOEXT_ON){
         init_ioext();

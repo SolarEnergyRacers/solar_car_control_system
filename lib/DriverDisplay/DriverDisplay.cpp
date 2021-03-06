@@ -188,9 +188,10 @@ void driver_display_task(void *pvParameter)
             draw_info_border(ILI9341_RED);
             break;
         default:
-            write_speed(counterSpeed, ILI9341_RED);
+            write_speed(counterSpeed, ILI9341_GREENYELLOW);
             draw_info_border(ILI9341_GREEN);
-            if( counterSpeed > 990){
+            if (counterSpeed > 990)
+            {
                 counterSpeed = 0;
             }
         }
@@ -201,7 +202,7 @@ void driver_display_task(void *pvParameter)
         // CRITICAL SECTION SPI: end
 
         // sleep for 1s
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }
 
@@ -225,53 +226,47 @@ void draw_info_border(int color)
     tft.drawRoundRect(0, 0, cx, cy, 8, color);
 }
 
+int lastSpeed = 0;
 void write_speed(int speed, int color)
 {
-    //DOTO_KSC: split in 3 separate digits and draw one by one
     int text_size = 8;
     tft.setTextSize(text_size);
     tft.setTextColor(color);
     tft.setTextSize(text_size);
-    tft.fillRoundRect(speedFrameX + 1, speedFrameY + 1, speedFrameCx - 2, speedFrameCy - 2, 4, ILI9341_BLACK);
 
-    // print right adjusted numbers
-    if (speed < 10)
+    int digit1new = (int)(speed / 100);
+    int digit2new = (int)((speed - digit1new * 100) / 10);
+    int digit3new = (int)(speed - digit1new * 100 - digit2new * 10);
+
+    int digit1old = (int)(lastSpeed / 100);
+    int digit2old = (int)((lastSpeed - digit1old * 100) / 10);
+    int digit3old = (int)(lastSpeed - digit1old * 100 - digit2old * 10);
+
+    Serial.printf("Speed: %d [%d-%d-%d] -> [%d-%d-%d]\n", speed, digit1old, digit2old, digit3old, digit1new, digit2new, digit3new);
+    if (digit1new != digit1old)
     {
-        tft.setCursor(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 6);
-    }
-    else if (speed < 100)
-    {
-        tft.setCursor(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 6);
-    }
-    else
-    {
+        tft.fillRect(speedFrameX + 6 + 0 * text_size * 6, speedFrameY + 5, text_size * 6, speedFrameCy - 8, ILI9341_BLACK);
         tft.setCursor(speedFrameX + 6 + 0 * text_size * 6, speedFrameY + 6);
+        if (digit1new != 0)
+        {
+            tft.println(digit1new);
+        }
     }
-    tft.println(speed);
-
-    // canvas.setTextSize(text_size);
-    // if (speed < 10)
-    // {
-    //     canvas.setCursor(2 * text_size * 6, 4);
-    // }
-    // else if (speed < 100)
-    // {
-    //     canvas.setCursor(1 * text_size * 6, 4);
-    // }
-    // else
-    // {
-    //     canvas.setCursor(0 * text_size * 6, 4);
-    // }
-    // canvas.setCursor(0,0);
-    // canvas.fillRect(0, 0, canvas.width(), canvas.height(), ILI9341_BLACK);
-    // canvas.setTextColor(color);
-    // canvas.println(speed);
-    // tft.drawBitmap(speedFrameX + 6, speedFrameY + 4, canvas.getBuffer(), canvas.width(), canvas.height(), color, ILI9341_BLACK); // Copy to screen
-    //Clean canvas
-    // canvas.setTextColor(ILI9341_BLACK);
-    // canvas.println(speed);
-
-    Serial.printf("Speed: %d\n", speed);
+    if (digit2new != digit2old)
+    {
+        tft.fillRect(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 5, text_size * 6, speedFrameCy - 8, ILI9341_BLACK);
+        tft.setCursor(speedFrameX + 6 + 1 * text_size * 6, speedFrameY + 6);
+        if (digit2new != 0 || digit1new != 0){
+            tft.println(digit2new);
+        }
+    }
+    if (digit3new != digit3old)
+    {
+        tft.fillRect(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 5, text_size * 6, speedFrameCy - 8, ILI9341_BLACK);
+        tft.setCursor(speedFrameX + 6 + 2 * text_size * 6, speedFrameY + 6);
+        tft.println(digit3new);
+    }
+    lastSpeed = speed;
 }
 
 char getIndicatorDirection()

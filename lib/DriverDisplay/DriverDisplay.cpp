@@ -10,7 +10,7 @@
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 
-Adafruit_ILI9341 tft = Adafruit_ILI9341(SPI_CS, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
+Adafruit_ILI9341 tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
 
 int speedFrameCx;
 int speedFrameCy;
@@ -30,7 +30,25 @@ void init_driver_display(void)
     // CRITICAL SECTION SPI: start
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-    tft.begin(4000000);
+    // TODO: Display OLED-128-6LGA
+    //     SPI.begin(4);
+    //     SPI.beginTransaction(SPISettings(1000000, SPI_MSBFIRST, SPI_MODE0));
+    //     SPI.transfer(0xF0);
+    //     SPI.transfer(0x40);
+    //     SPI.transfer(0xA0);
+    //     SPI.transfer(0xC0);
+    //     SPI.transfer(0xA6);
+
+    //     SPI.transfer(0x81); SPI.transfer(0xFF);
+
+    //     SPI.transfer(0xD5); SPI.transfer(0x40);
+
+    //     SPI.transfer(0xD9); SPI.transfer(0x44);
+
+    //     SPI.transfer(0xAF);
+    //     SPI.endTransaction();
+    //END - TODO
+    tft.begin();
     try
     {
         uint8_t x = tft.readcommand8(ILI9341_RDMODE);
@@ -165,10 +183,16 @@ void driver_display_task(void *pvParameter)
         case 5:
             write_speed(42, ILI9341_GREEN);
             break;
-        default:
+        case 6:
             write_speed(0, ILI9341_RED);
             draw_info_border(ILI9341_RED);
-            counterSpeed = 0;
+            break;
+        default:
+            write_speed(counterSpeed, ILI9341_RED);
+            draw_info_border(ILI9341_GREEN);
+            if( counterSpeed > 990){
+                counterSpeed = 0;
+            }
         }
 
         Serial.printf("time elapsed: %ld\n", micros() - start);

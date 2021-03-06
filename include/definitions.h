@@ -16,7 +16,6 @@
  */
 #define ONEWIRE_PIN 2
 
-
 /*
  * I2C
  */
@@ -29,6 +28,10 @@
 #define I2C_ADDRESS_SSD1305 0x3C
 #define I2C_ADDRESS_PCF8574 0x38
 
+#define ESP32Andy false
+#define ESP32OLED false
+#define ESP32Huzza true
+#if ESP32Andy == true
 /*
  *  SPI
  *
@@ -47,14 +50,50 @@
  *  GPIO15   CS
  *
  */
+#define SPI_MOSI 18
+#define SPI_MISO 19
+#define SPI_CLK 18
+#define SPI_CS_SDCARD 5
+
+#define SPI_DC 12
+#define SPI_CS_TFT 5
+#define SPI_RST 17
+#endif
+
+#if ESP32OLED
 #define SPI_MOSI 23
 #define SPI_MISO 19
 #define SPI_CLK 18
 #define SPI_CS_SDCARD 5
 
 #define SPI_DC 12
-#define SPI_CS 5
+#define SPI_CS_TFT 5
 #define SPI_RST 17
+#endif
+
+#if ESP32Huzza == true
+/*
+ *  SPI
+ *
+ *  ESP32  - SPI PIN
+ *  --------------
+ *  VSPI
+ *  GPIO19   MOSI
+ *  GPIO18   MISO
+ *  GPIO5    CLK
+ *  GPIO21    CS (first spi device)
+ *
+ */
+#define SPI_MOSI 18
+#define SPI_MISO 19
+#define SPI_CLK 5
+
+#define SPI_DC 4
+#define SPI_RST 21
+
+#define SPI_CS_TFT 36
+#define SPI_CS_SDCARD 14
+#endif
 
 /*
  * ESP32 JTAG Debug Probe Wiring

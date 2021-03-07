@@ -11,6 +11,16 @@
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 
+
+
+void indicator(char direction)
+{
+    setIndicatorDirection(direction);
+}
+
+// ------------------
+// FreeRTOS INIT TASK
+// ------------------
 void init_indicator(void)
 {
 
@@ -23,6 +33,9 @@ void init_indicator(void)
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 
+// -------------
+// FreeRTOS TASK
+// -------------
 void indicator_task(void *pvParameter)
 {
 
@@ -51,7 +64,4 @@ void indicator_task(void *pvParameter)
     }
 }
 
-void indicator(char direction)
-{
-    setIndicatorDirection(direction);
-}
+

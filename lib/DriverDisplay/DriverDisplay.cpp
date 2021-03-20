@@ -529,24 +529,20 @@ void driver_display_task(void *pvParameter)
         switch (counterIndicator++)
         {
         case 0:
-            setIndicatorDirection('w');
             write_driver_info("Stop!", ILI9341_RED);
             show_Slower(false);
             show_Faster(false);
             break;
         case 40:
-            setIndicatorDirection('l');
             write_driver_info("Go", ILI9341_WHITE);
             //write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
             show_Faster(true);
             break;
         case 80:
-            setIndicatorDirection('r');
             write_driver_info("Go", ILI9341_WHITE);
             show_Slower(true);
             break;
         case 120:
-            setIndicatorDirection('o');
             write_driver_info("", ILI9341_WHITE);
             show_Slower(false);
             show_Faster(false);
@@ -639,6 +635,6 @@ void driver_display_task(void *pvParameter)
         // CRITICAL SECTION SPI: end
 
         // sleep for 1s
-        vTaskDelay(10 / portTICK_PERIOD_MS);
+        vTaskDelay(100 / portTICK_PERIOD_MS);
     }
 }

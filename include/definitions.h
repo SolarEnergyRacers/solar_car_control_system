@@ -4,6 +4,10 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#define ESP32Andy false
+#define ESP32OLED false
+#define ESP32Huzza true
+#if ESP32Andy == true
 /*
  *  GPIO
  */
@@ -28,10 +32,6 @@
 #define I2C_ADDRESS_SSD1305 0x3C
 #define I2C_ADDRESS_PCF8574 0x38
 
-#define ESP32Andy false
-#define ESP32OLED false
-#define ESP32Huzza true
-#if ESP32Andy == true
 /*
  *  SPI
  *
@@ -72,6 +72,32 @@
 #endif
 
 #if ESP32Huzza == true
+
+/*
+ *  GPIO
+ */
+#define LED_BUILTIN (gpio_num_t)13
+#define GPIO_INTERRUPT_PIN 25
+#define PCF8574_INTERRUPT_PIN 14
+
+/*
+ * OneWire
+ */
+#define ONEWIRE_PIN 2
+
+/*
+ * I2C
+ */
+#define I2C_SDA 23
+#define I2C_SCL 22
+#define I2C_FREQ 100000 //100kHz
+//#define I2C_FREQ 400000 //400KHz
+
+#define I2C_ADDRESS_ADS1x15 0x48
+#define I2C_ADDRESS_PCA9685 0x42
+#define I2C_ADDRESS_SSD1305 0x3C
+#define I2C_ADDRESS_PCF8574 0x20
+
 /*
  *  SPI
  *

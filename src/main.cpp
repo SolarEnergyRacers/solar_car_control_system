@@ -47,7 +47,7 @@
 #define DISPLAY_LARGE_ON true
 #define DISPLAY_LARGE_INDICATOR_ON true
 #define INT_ON false
-#define IOEXT_ON false
+#define IOEXT_ON true
 
 // add C linkage definition
 extern "C" {

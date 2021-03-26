@@ -2,9 +2,6 @@
 // Display
 //
 
-
-
-
 #include "../../include/definitions.h"
 
 #include <SPIBus.h>
@@ -18,21 +15,28 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, S
 // display formats and sizes
 int infoFrameX = 0;
 int infoFrameY = 0;
-int infoFrameSizeX = 0; // full tft width
-int infoFrameSizeY = 16;
+int infoFrameSizeX = -1; // full tft width
+int infoFrameSizeY = 64;
 int infoTextSize = 3;
 
-int bigFrameX = 64;
+int mainFrameX = infoFrameSizeY;
 
-int speedFrameX = 0; //(sizeX - speedFrameCx) / 2;
+int speedFrameX = -1; // get calculated later: (sizeX - speedFrameCx) / 2;
 int speedFrameY = 80;
 int speedFrameSizeX = 156;
 int speedFrameSizeY = 76;
 int speedTextSize = 8;
 
+int accFrameX = 2;
+int accFrameY = 118;    // speedFrameY + speedFrameSizeY / 2
+int accFrameSizeX = -1; // get calculated later: speedFrameX - 4
+int accFrameSizeY = 38; // speedFrameSizeY / 2
+int accTextSize = 4;    // speedTextSize / 2
+
 int batFrameX = 10;
 int batFrameY = 180;
 int batTextSize = 2;
+int lightTextSize = 2;
 
 int pvFrameX = 10;
 int pvFrameY = 200;
@@ -43,38 +47,45 @@ int motorFrameY = 220;
 int motorTextSize = 2;
 
 int indicatorLeftX = 10;
-int indicatorY = 100;
-int indicatorRightX = 300;
+int indicatorY = 92;
+int indicatorRightX = 310;
 int indicatorWidth = 30;
 int indicatorHeight = 20;
 
+int light1OnX = 250;
+int light1OnY = 118;
+int light2OnX = 250;
+int light2OnY = 138;
+
+int lifeSignX = -1;
+int lifeSignY = -1;
+int lifeSignRadius = 4;
+
+int labelLen = 9;
+
 // dsiplay cache
-char indicatorDirection = 'o';
-bool indicatorState = false;
+int lifeSignCounter = 0;
+bool lifeSignState = false;
+//INDICATOR indicatorDirection = INDICATOR::OFF;
 String infoLast = "";
 int speedLast = -1;
+int accelerationLast = -1;
 float batLast = -1;
 float pvLast = -1;
 float motorLast = -1;
-
-// counters for demo display
-int counterIndicator = 0;
-int counterSpeed = 0;
-int counterPV = 0;
-
+bool light1On = false;
+bool light2On = false;
 // ----------------------------------------------
 
 // writes float value  in the range from -9999.9 to 9999.9
 float _write_float(int x, int y, float valueLast, float value, int textSize, int color)
 {
+
     if (value < -9999.9 || value > 9999.9)
     {
         Serial.printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
         return value;
     }
-    tft.setTextSize(textSize);
-    tft.setTextColor(color);
-    tft.setCursor(x, y);
     int digitWidth = textSize * 6;
     int digitHeight = textSize * 8;
     //determine the sign of new and old value
@@ -94,6 +105,13 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
     int d3o = ((int)valOld / 100) % 10;
     int d4o = ((int)valOld / 1000) % 10;
     int d0o = (valOld - (int)valOld) * 10;
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    tft.setTextSize(textSize);
+    tft.setTextColor(color);
+    tft.setCursor(x, y);
     // if a change in the digit then replace the old with new value by
     // first deleting the digit area and second write the new value
     if (d0 != d0o)
@@ -142,6 +160,9 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
         tft.print(sign);
     }
 
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+
     return value;
 }
 
@@ -153,10 +174,6 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
         Serial.printf("ERROR: call _write_int with a value outside the range: '%d'", value);
         return value;
     }
-
-    tft.setTextSize(textSize);
-    tft.setTextColor(color);
-    tft.setCursor(x, y);
     int digitWidth = textSize * 6;
     int digitHeight = textSize * 8;
     // determine the three digits the stored, new value
@@ -167,6 +184,13 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
     int d1o = (int)valueLast % 10;
     int d2o = ((int)valueLast / 10) % 10;
     int d3o = ((int)valueLast / 100) % 10;
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    tft.setTextSize(textSize);
+    tft.setTextColor(color);
+    tft.setCursor(x, y);
     // if a change in the digit then replace the old with new value by
     // first deleting the digit area and second write the new value
     if (d1 != d1o)
@@ -194,28 +218,82 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
         }
     }
 
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+
     return value;
 }
 
 // write color of the border of the main display
 void draw_display_border(int color)
 {
-    tft.drawRoundRect(0, bigFrameX, tft.width(), tft.height() - bigFrameX, 8, color);
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    tft.drawRoundRect(0, mainFrameX, tft.width(), tft.height() - mainFrameX, 8, color);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
 }
 
 // write color of the border of the speed display
 void draw_speed_border(int color)
 {
-    speedFrameX = (tft.width() - speedFrameSizeX) / 2;
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
     tft.drawRoundRect(speedFrameX, speedFrameY, speedFrameSizeX, speedFrameSizeY, 4, color);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+}
+
+// write color of the border of the speed display
+void draw_acceleration_border(int color)
+{
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    accFrameSizeX = speedFrameX - 3;
+    tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+}
+
+void lifeSign()
+{
+    int color;
+    if (lifeSignState)
+    {
+        color = ILI9341_BLACK;
+    }
+    else
+    {
+        color = ILI9341_GREEN;
+    }
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    lifeSignX = tft.width() - lifeSignRadius - 6;
+    lifeSignY = tft.height() - lifeSignRadius - 6;
+    tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, color);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+
+    lifeSignState = !lifeSignState;
 }
 
 void draw_display_background()
 {
-    tft.fillScreen(ILI9341_BLACK);
-    draw_display_border(ILI9341_GREEN);
-    draw_speed_border(ILI9341_YELLOW);
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
+    tft.setRotation(0);
+    tft.fillScreen(ILI9341_BLACK);
+    tft.setRotation(1);
     tft.setTextSize(2);
     tft.setTextColor(ILI9341_DARKGREEN);
     tft.setCursor(batFrameX, batFrameY);
@@ -226,70 +304,68 @@ void draw_display_background()
 
     tft.setCursor(motorFrameX, motorFrameY);
     tft.print("Motor(A):");
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+
+    infoFrameSizeX = tft.width();
+    speedFrameX = (tft.width() - speedFrameSizeX) / 2;
+
+    draw_display_border(ILI9341_GREEN);
+    draw_speed_border(ILI9341_YELLOW);
+    draw_acceleration_border(ILI9341_YELLOW);
 }
 
-// Write the speed in the centre frame
-void write_speed(int speed, int color)
-{
-    speedLast = _write_int(speedFrameX + 9, speedFrameY + 10, speedLast, speed, speedTextSize, ILI9341_GREEN);
-}
-
-char getIndicatorDirection()
-{
-    return indicatorDirection;
-}
-
-// set indicator [l - left, r - right, w - hazard warning, o - off]
-void setIndicatorDirection(char direction)
-{
-    indicatorDirection = direction;
-    Serial.printf("Indicator: %c\n", direction);
-}
-
-bool getIndicatorState()
-{
-    return indicatorState;
-}
-
-void setIndicatorState(bool state)
-{
-    indicatorState = state;
-}
-
-// show the faster arrow (green above the speed display)
-void show_Faster(bool on)
+void _arrow_increase(int color)
 {
     int x = speedFrameX;
     int y = speedFrameY - 3;
-    int color;
-    if (on)
-    {
-        show_Slower(false);
-        color = ILI9341_YELLOW;
-    }
-    else
-    {
-        color = ILI9341_BLACK;
-    }
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
     tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y - 10, color);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
 }
 
-// show the slower arrow (red under the speed display)
-void show_Slower(bool on)
+void _arrow_decrease(int color)
 {
     int x = speedFrameX;
     int y = speedFrameY + speedFrameSizeY + 3;
-    int color;
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y + 10, color);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+}
+
+// show the slower arrow (red under the speed display)
+void arrow_decrease(bool on)
+{
+    int color = ILI9341_BLACK;
     if (on)
     {
-        show_Faster(false);
+        arrow_increase(false);
         color = ILI9341_RED;
     }
-    else
+    _arrow_decrease(color);
+}
+
+// show the faster arrow (green above the speed display)
+void arrow_increase(bool on)
+{
+    int color = ILI9341_BLACK;
+    if (on)
     {
-        color = ILI9341_BLACK;
+        arrow_decrease(false);
+        color = ILI9341_YELLOW;
     }
-    tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y + 10, color);
+    _arrow_increase(color);
 }
 
 void _turn_Left(int color)
@@ -306,69 +382,184 @@ void _turn_Right(int color)
     tft.fillTriangle(x, y, x - indicatorWidth, y - indicatorHeight, x - indicatorWidth, y + indicatorHeight, color);
 }
 
-void turn_indicator(char direction)
+void indicator_set_and_blink(INDICATOR direction, bool blinkOn)
 {
-    // set indicator [l - left, r - right, w - hazard warning, o - off]
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
     _turn_Left(ILI9341_BLACK);
     _turn_Right(ILI9341_BLACK);
-    switch (direction)
+    if (blinkOn)
     {
-    case 'l':
-        _turn_Left(ILI9341_YELLOW);
-        break;
+        switch (direction)
+        {
+        case INDICATOR::LEFT:
+            _turn_Left(ILI9341_YELLOW);
+            break;
 
-    case 'r':
-        _turn_Right(ILI9341_YELLOW);
-        break;
+        case INDICATOR::RIGHT:
+            _turn_Right(ILI9341_YELLOW);
+            break;
 
-    case 'o':
-        break;
+        case INDICATOR::WARN:
+            _turn_Left(ILI9341_RED);
+            _turn_Right(ILI9341_RED);
+            break;
 
-    case 'w':
-    default:
-        _turn_Left(ILI9341_RED);
-        _turn_Right(ILI9341_RED);
+        case INDICATOR::OFF:
+        default:
+            break;
+        }
     }
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
 }
 
-void write_bat(float value, int color)
+void _light1(bool lightOn)
 {
-    int labelLen = 9;
+    light1On = !lightOn;
+    light1OnOff();
+}
+
+void _light2(bool lightOn)
+{
+    light2On = !lightOn;
+    light2OnOff();
+}
+
+void light1OnOff()
+{
+    int color = ILI9341_YELLOW;
+    if (light1On)
+    {
+        color = ILI9341_BLACK;
+        _light2(false);
+    }
+
+    light1On = !light1On;
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    tft.setTextColor(color);
+    tft.setTextSize(lightTextSize);
+    tft.setCursor(light1OnX, light1OnY);
+    tft.print("Light");
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+}
+
+void light2OnOff()
+{
+    int color = ILI9341_BLUE;
+    if (light2On)
+    {
+        color = ILI9341_BLACK;
+    }
+    else
+    {
+        _light1(true);
+    }
+    light2On = !light2On;
+
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+    tft.setTextColor(color);
+    tft.setTextSize(lightTextSize);
+    tft.setCursor(light2OnX, light2OnY);
+    tft.print("LIGTH");
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
+}
+
+// Write the speed in the centre frame
+void write_speed(int value)
+{
+    speedLast = _write_int(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
+}
+
+// acceleration value: 0-255
+void write_acceleration(int value)
+{
+    if (value < 0 || value > 999)
+    {
+        value = 999;
+    }
+    accelerationLast = _write_int(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
+}
+
+void write_bat(float value)
+{
     int labelOffset = labelLen * batTextSize * 6;
-    batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value, batTextSize, color);
+    batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value, batTextSize, ILI9341_BLUE);
 }
 
-void write_pv(float value, int color)
+void write_pv(float value)
 {
-    int labelLen = 9;
     int labelOffset = labelLen * pvTextSize * 6;
-    pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value, pvTextSize, color);
+    pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value, pvTextSize, ILI9341_YELLOW);
 }
 
-void write_motor(float value, int color)
+void write_motor(float value)
 {
-    int labelLen = 9;
     int labelOffset = labelLen * motorTextSize * 6;
-    motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, color);
+    motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, ILI9341_YELLOW);
 }
 
 void _drawCentreString(const String &buf, int x, int y)
 {
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
     int16_t x1, y1;
     uint16_t w, h;
     tft.getTextBounds(buf, x, y, &x1, &y1, &w, &h); //calc width of new string
     tft.setCursor(x - w / 2, y);
     tft.print(buf);
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
 }
 
-void write_driver_info(String msg, int color)
+//INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR = ILI9341_RED
+int _getColorForInfoType(INFO_TYPE type)
 {
+    int color;
+    switch (type)
+    {
+    case INFO_TYPE::ERROR:
+        color = ILI9341_RED;
+        break;
+
+    case INFO_TYPE::WARN:
+        color = ILI9341_PURPLE;
+        break;
+
+    case INFO_TYPE::STATUS:
+        color = ILI9341_GREEN;
+        break;
+
+    case INFO_TYPE::INFO:
+    default:
+        color = ILI9341_WHITE;
+        break;
+    }
+    return color;
+}
+
+void write_driver_info(String msg, INFO_TYPE type)
+{
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
     int textSize = 4;
 
     if (msg != infoLast)
     {
-        //Serial.printf("delete '%s', write '%s'", infoLast.c_str(), msg.c_str());
-        // tft.fillRect(infoFrameX, infoFrameY, infoFrameSizeX, infoFrameSizeY, ILI9341_BLACK);
         tft.setTextSize(textSize);
         tft.setTextWrap(true);
 
@@ -376,13 +567,49 @@ void write_driver_info(String msg, int color)
         tft.setCursor(infoFrameX, infoFrameY);
         tft.print(infoLast);
 
-        tft.setTextColor(color);
+        tft.setTextColor(_getColorForInfoType(type));
         tft.setCursor(infoFrameX, infoFrameY);
         tft.print(msg);
-        //_drawCentreString(msg.c_str(), 0, 0);
+        //TODO: _drawCentreString(msg.c_str(), 0, 0);
         infoLast = msg;
     }
+
+    xSemaphoreGive(spi_mutex);
+    // CRITICAL SECTION SPI: end
 }
+
+void driver_display_demo_screen()
+{
+    Serial.printf("Draw demo screen:\n");
+    draw_display_background();
+    Serial.printf(" - background\n");
+    write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
+    Serial.printf(" - driver info\n");
+    indicator_set_and_blink(INDICATOR::WARN, true);
+    Serial.printf(" - hazzard warn\n");
+    write_speed(888);
+    Serial.printf(" - spped\n");
+    write_acceleration(888);
+    Serial.printf(" - acceleration\n");
+    _arrow_increase(ILI9341_YELLOW);
+    Serial.printf(" -  increase arrow\n");
+    _arrow_decrease(ILI9341_RED);
+    Serial.printf(" - decrease arrow\n");
+    light1OnOff();
+    Serial.printf(" - light1 on\n");
+    light2OnOff();
+    Serial.printf(" - light1 on\n");
+    write_bat(8888.8);
+    Serial.printf(" - battery\n");
+    write_pv(8888.8);
+    Serial.printf(" - photovoltaic\n");
+    write_motor(-888.8);
+    Serial.printf(" - motor\n");
+    lifeSign();
+    Serial.printf(" - life sign\n");
+    Serial.printf("ready.\n");
+}
+
 // ------------------
 // FreeRTOS INIT TASK
 // ------------------
@@ -420,51 +647,41 @@ void init_driver_display(void)
     try
     {
         uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-        Serial.print("Display Power Mode: 0x");
-        Serial.println(x, HEX);
+        Serial.printf("Display Power Mode: 0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDMADCTL);
-        Serial.print("MADCTL Mode: 0x");
-        Serial.println(x, HEX);
+        Serial.printf("MADCTL Mode:        0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDPIXFMT);
-        Serial.print("Pixel Format: 0x");
-        Serial.println(x, HEX);
+        Serial.printf("Pixel Format:       0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDIMGFMT);
-        Serial.print("Image Format: 0x");
-        Serial.println(x, HEX);
+        Serial.printf("Image Format:       0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDSELFDIAG);
-        Serial.print("Self Diagnostic: 0x");
-        Serial.println(x, HEX);
-        printf("[Display Large] Screen initialize successfully.\n");
+        Serial.printf("Self Diagnostic:    0x%x\n", x);
+        infoFrameSizeX = tft.width();
+        speedFrameX = (tft.width() - speedFrameSizeX) / 2;
+        printf("[Display ILI9341] Initialize successfully with screen %d x %d.\n", tft.height(), tft.width());
     }
     catch (__exception ex)
     {
-        printf("[Display Large] Unable to initialize OLED screen.\n");
+        printf("[Display ILI9341] Unable to initialize screen.\n");
     }
-    infoFrameSizeX = tft.width();
-
-    //tft.setFont(&FreeSans9pt7b);
-    tft.setRotation(1);
-    draw_display_background();
-
-    write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
-    write_speed(888, ILI9341_GREEN);
-    write_bat(-8888.8, ILI9341_GREEN);
-    write_pv(-8888.8, ILI9341_GREEN);
-    write_motor(-8888.8, ILI9341_GREEN);
-    show_Faster(true);
-    setIndicatorDirection('w');
-    delay(500);
-    show_Slower(true);
-    delay(500);
-    setIndicatorDirection('o');
-    write_driver_info("", ILI9341_WHITE);
-    write_speed(0, ILI9341_GREEN);
-    write_bat(0, ILI9341_GREEN);
-    write_pv(0, ILI9341_GREEN);
-    write_motor(0, ILI9341_GREEN);
 
     xSemaphoreGive(spi_mutex);
     // CRITICAL SECTION SPI: end
+
+    //tft.setFont(&FreeSans9pt7b);
+    driver_display_demo_screen();
+    delay(1000);
+    write_driver_info("ready.", INFO_TYPE::INFO);
+    indicator_set_and_blink(INDICATOR::OFF, false);
+    write_speed(0);
+    write_acceleration(0);
+    _arrow_increase(ILI9341_BLACK);
+    _arrow_decrease(ILI9341_BLACK);
+    _light1(false);
+    _light2(false);
+    write_bat(0.0);
+    write_pv(0.0);
+    write_motor(0.0);
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
@@ -472,170 +689,26 @@ void init_driver_display(void)
 // -------------
 // FreeRTOS TASK
 // -------------
-void draw_display_large_demo_task(void *pvParameter)
-{
-    // polling loop
-    while (1)
-    {
-
-        // CRITICAL SECTION SPI: start
-        xSemaphoreTake(spi_mutex, portMAX_DELAY);
-
-        tft.setRotation(1);
-        tft.setCursor(0, 0);
-        tft.setTextColor(ILI9341_WHITE);
-        tft.setTextSize(1);
-        tft.println("Hello ILI!");
-
-        // clears the screen and buffer
-        tft.fillScreen(ILI9341_BLACK);
-
-        // setup params
-        tft.setTextSize(1);
-        tft.setTextWrap(false);
-        tft.setTextColor(ILI9341_GREENYELLOW);
-        tft.setCursor(0, 0);
-
-        // print demo characters
-        for (int i = 0; i < 168; i++)
-        {
-            if (i == '\n')
-                continue;
-            // write char
-            tft.write(i);
-            // newline
-            if ((i > 0) && (i % 21 == 0))
-                tft.println();
-        }
-        //tft.display();
-
-        xSemaphoreGive(spi_mutex);
-        // CRITICAL SECTION SPI: end
-
-        // sleep for 1s
-        vTaskDelay(1000 / portTICK_PERIOD_MS);
-    }
-}
-
 void driver_display_task(void *pvParameter)
 {
     // polling loop
     while (1)
     {
+        // long start = micros();
 
-        // CRITICAL SECTION SPI: start
-        xSemaphoreTake(spi_mutex, portMAX_DELAY);
+        // // CRITICAL SECTION SPI: start
+        // xSemaphoreTake(spi_mutex, portMAX_DELAY);
+        // xSemaphoreGive(spi_mutex);
+        // // CRITICAL SECTION SPI: end
 
-        //unsigned long start;
-        //start = micros();
-
-        switch (counterIndicator++)
+        if (lifeSignCounter > 10)
         {
-        case 0:
-            write_driver_info("Stop!", ILI9341_RED);
-            show_Slower(false);
-            show_Faster(false);
-            break;
-        case 40:
-            write_driver_info("Go", ILI9341_WHITE);
-            //write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
-            show_Faster(true);
-            break;
-        case 80:
-            write_driver_info("Go", ILI9341_WHITE);
-            show_Slower(true);
-            break;
-        case 120:
-            write_driver_info("", ILI9341_WHITE);
-            show_Slower(false);
-            show_Faster(false);
-            break;
-        case 170:
-            counterIndicator = 0;
+            lifeSign();
+            lifeSignCounter = 0;
         }
-
-        switch (counterSpeed++)
-        {
-        case 0:
-            draw_display_border(ILI9341_GREEN);
-            write_speed(1, ILI9341_YELLOW);
-            break;
-        case 1:
-            write_speed(12, ILI9341_YELLOW);
-            break;
-        case 2:
-            write_speed(123, ILI9341_GREEN);
-            break;
-        case 3:
-            draw_display_border(ILI9341_YELLOW);
-            write_speed(888, ILI9341_YELLOW);
-            delay(1000);
-            break;
-        case 4:
-            draw_display_border(ILI9341_RED);
-            write_speed(120, ILI9341_RED);
-            break;
-        case 5:
-            write_speed(42, ILI9341_GREEN);
-            break;
-        case 6:
-            write_speed(0, ILI9341_RED);
-            draw_display_border(ILI9341_RED);
-            break;
-        default:
-            write_speed(counterSpeed, ILI9341_GREENYELLOW);
-            draw_display_border(ILI9341_GREEN);
-            if (counterSpeed > 990)
-            {
-                counterSpeed = 0;
-            }
-        }
-
-        switch (counterPV++)
-        {
-        case 0:
-            write_pv(1, ILI9341_YELLOW);
-            write_motor(1.1, ILI9341_YELLOW);
-            break;
-        case 1:
-            write_pv(12, ILI9341_YELLOW);
-            write_motor(12.3, ILI9341_YELLOW);
-            break;
-        case 2:
-            write_pv(123, ILI9341_YELLOW);
-            write_motor(123.4, ILI9341_YELLOW);
-            break;
-        case 3:
-            write_pv(1234, ILI9341_YELLOW);
-            write_motor(1234.5, ILI9341_YELLOW);
-            break;
-        case 4:
-            write_pv(-1, ILI9341_YELLOW);
-            write_motor(-1.2, ILI9341_YELLOW);
-            break;
-        case 5:
-            write_pv(-12, ILI9341_YELLOW);
-            write_motor(-12.3, ILI9341_YELLOW);
-            break;
-        case 6:
-            write_pv(-123, ILI9341_YELLOW);
-            write_motor(-123.4, ILI9341_YELLOW);
-            counterPV = -99999;
-            break;
-        default:
-            write_pv((float)counterPV / 10, ILI9341_YELLOW);
-            write_motor((float)counterPV / -10, ILI9341_YELLOW);
-            write_bat((float)counterPV / 1000, ILI9341_BLUE);
-            if (counterPV > 99999)
-            {
-                counterPV = -99999;
-            }
-        }
+        lifeSignCounter++;
 
         //Serial.printf("time elapsed: %ld\n", micros() - start);
-
-        xSemaphoreGive(spi_mutex);
-        // CRITICAL SECTION SPI: end
 
         // sleep for 1s
         vTaskDelay(100 / portTICK_PERIOD_MS);

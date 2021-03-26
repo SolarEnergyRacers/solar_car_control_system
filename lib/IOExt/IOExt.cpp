@@ -2,14 +2,14 @@
 // PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
 //
 
+#include "../../include/definitions.h"
 #include <I2CBus.h>
-
 #include <Wire.h>    // I2C
 #include "PCF8574.h" // PCF8574
 
-#include "../../include/definitions.h"
 #include "DriverDisplay.h"
 #include "IOExt.h"
+#include "Indicator.h"
 
 #define PCF8574_NUM_PORTS 8
 
@@ -85,11 +85,11 @@ void init_ioext()
     // start
     if (pcf8574.begin())
     {
-        printf("[PCF8574] Init successful..\n");
+        printf("[PCF8574] Init successful.\n");
     }
     else
     {
-        printf("[PCF8574] Init failed..\n");
+        printf("[PCF8574] Init failed.\n");
     }
 
     xSemaphoreGive(i2c_mutex);
@@ -107,49 +107,24 @@ void key_pressed_interrupt_handler()
     // ioBuf = Wire.read();
 }
 
-void handleIoInterrupt()
+void _handleIoInterrupt()
 {
+    // CRITICAL SECTION I2C: start
+    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+
     PCF8574::DigitalInput dra = pcf8574.digitalReadAll();
+
+    xSemaphoreGive(i2c_mutex);
+    // CRITICAL SECTION I2C: end
+
     if ((dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) == 1)
     {
         return;
     }
     Serial.printf("PCF: %d %d %d %d - %d %d %d %d\n", dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
-
-    char direction = getIndicatorDirection();
-    if (!dra.p1 && !dra.p7)
-    {
-        if (direction != 'w')
-        {
-            setIndicatorDirection('w');
-        }
-        else
-        {
-            setIndicatorDirection('o');
-        }
-    }
-    else if (!dra.p7)
-    {
-        if (direction != 'l')
-        {
-            setIndicatorDirection('l');
-        }
-        else
-        {
-            setIndicatorDirection('o');
-        }
-    }
-    else if (!dra.p1)
-    {
-        if (direction != 'r')
-        {
-            setIndicatorDirection('r');
-        }
-        else
-        {
-            setIndicatorDirection('o');
-        }
-    }
+    update_indicator(!dra.p7, !dra.p1);
+    if(!dra.p6) light1OnOff();
+    if(!dra.p5) light2OnOff();
 
     // int v[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     // for (int idx = 0; idx < 8; idx++)
@@ -202,13 +177,9 @@ int get_ioext(int port)
 int counter = 0;
 void io_ext_demo_task(void *pvParameter)
 {
-
     // polling loop
     while (1)
     {
-        // if (initOk)
-        // {
-        // blink port 0
         if (counter > 10)
         {
             set_ioext(0, !get_ioext(0));
@@ -219,10 +190,11 @@ void io_ext_demo_task(void *pvParameter)
         // handle inputs
         if (ioInterruptRequest)
         {
-            handleIoInterrupt();
+            _handleIoInterrupt();
             ioInterruptRequest = false;
+
             // sleep a bit longer
-            vTaskDelay(100 / portTICK_PERIOD_MS);
+            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
         else
         {

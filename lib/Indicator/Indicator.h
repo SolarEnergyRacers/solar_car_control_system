@@ -7,6 +7,6 @@
 
 void init_indicator(void);
 void indicator_task(void *pvParameter);
-void indicator(char direction);
+void update_indicator(int left, int right);
 
 #endif // INDICATOR_H

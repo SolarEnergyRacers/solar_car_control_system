@@ -5,16 +5,51 @@
 #include "../../include/definitions.h"
 
 #include <SPIBus.h>
-#include "DriverDisplay.h"
-#include "Indicator.h"
-
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 
-// set indicator [l - left, r - right, w - hazard warning, o - off]
-void indicator(char direction)
+#include "DriverDisplay.h"
+#include "Indicator.h"
+
+bool blinkState = false;
+INDICATOR direction = INDICATOR::OFF;
+
+void update_indicator(int leftButton, int rightButton)
 {
-    setIndicatorDirection(direction);
+    if (leftButton && rightButton)
+    {
+        if (direction == INDICATOR::WARN)
+        {
+            direction = INDICATOR::OFF;
+        }
+        else
+        {
+            direction = INDICATOR::WARN;
+        }
+    }
+    else if (leftButton)
+    {
+        if (direction == INDICATOR::LEFT)
+        {
+            direction = INDICATOR::OFF;
+        }
+        else
+        {
+            direction = INDICATOR::LEFT;
+        }
+    }
+    else if (rightButton)
+    {
+        if (direction == INDICATOR::RIGHT)
+        {
+            direction = INDICATOR::OFF;
+        }
+        else
+        {
+            direction = INDICATOR::RIGHT;
+        }
+    }
+    indicator_set_and_blink(direction, true);
 }
 
 // ------------------
@@ -22,12 +57,6 @@ void indicator(char direction)
 // ------------------
 void init_indicator(void)
 {
-
-    // CRITICAL SECTION SPI: start
-    xSemaphoreTake(spi_mutex, portMAX_DELAY);
-
-    xSemaphoreGive(spi_mutex);
-    // CRITICAL SECTION SPI: end
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
@@ -41,24 +70,10 @@ void indicator_task(void *pvParameter)
     // polling loop
     while (1)
     {
+        indicator_set_and_blink(direction, blinkState);
+        blinkState = !blinkState;
 
-        // CRITICAL SECTION SPI: start
-        xSemaphoreTake(spi_mutex, portMAX_DELAY);
-
-        if (getIndicatorState())
-        {
-            turn_indicator(getIndicatorDirection());
-        }
-        else
-        {
-            turn_indicator('o');
-        }
-        setIndicatorState(!getIndicatorState());
-
-        xSemaphoreGive(spi_mutex);
-        // CRITICAL SECTION SPI: end
-
-        // sleep for 1s
+        // sleep
         vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 }

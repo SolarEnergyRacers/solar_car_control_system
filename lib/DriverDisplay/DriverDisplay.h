@@ -5,6 +5,13 @@
 #ifndef DRIVER_DISPLAY_H
 #define DRIVER_DISPLAY_H
 
+#define ILI9341 // (320x240)
+
+#include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
+
+extern SemaphoreHandle_t spi_mutex;
+
 // RTOS task
 void init_driver_display(void);
 void driver_display_task(void *pvParameter);

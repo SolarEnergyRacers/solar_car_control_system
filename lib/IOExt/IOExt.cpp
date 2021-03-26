@@ -222,7 +222,7 @@ void io_ext_demo_task(void *pvParameter)
             handleIoInterrupt();
             ioInterruptRequest = false;
             // sleep a bit longer
-            vTaskDelay(1000 / portTICK_PERIOD_MS);
+            vTaskDelay(100 / portTICK_PERIOD_MS);
         }
         else
         {

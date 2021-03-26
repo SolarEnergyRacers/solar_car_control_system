@@ -2,6 +2,9 @@
 // Display
 //
 
+
+
+
 #include "../../include/definitions.h"
 
 #include <SPIBus.h>
@@ -58,9 +61,10 @@ float motorLast = -1;
 int counterIndicator = 0;
 int counterSpeed = 0;
 int counterPV = 0;
+
 // ----------------------------------------------
 
-// writes float value  in the range from -9999.9 to 999.9
+// writes float value  in the range from -9999.9 to 9999.9
 float _write_float(int x, int y, float valueLast, float value, int textSize, int color)
 {
     if (value < -9999.9 || value > 9999.9)
@@ -73,30 +77,25 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
     tft.setCursor(x, y);
     int digitWidth = textSize * 6;
     int digitHeight = textSize * 8;
-    //tft.fillRect(x, y, 6 * digitWidth, 1 * digitHeight, ILI9341_BLACK);
-    // tft.printf("%.1f", value);
-
+    //determine the sign of new and old value
     char sign = value < 0 ? '-' : '+';
     char signOld = valueLast < 0 ? '-' : '+';
+    // determine the four digits and one decimal of the new value
     float val = abs(value);
-    float valOld = abs(valueLast);
-
     int d1 = (int)val % 10;
     int d2 = ((int)val / 10) % 10;
     int d3 = ((int)val / 100) % 10;
     int d4 = ((int)val / 1000) % 10;
     int d0 = (val - (int)val) * 10;
-
+    // determine the four digits and one decimal of the stored, old value
+    float valOld = abs(valueLast);
     int d1o = (int)valOld % 10;
     int d2o = ((int)valOld / 10) % 10;
     int d3o = ((int)valOld / 100) % 10;
     int d4o = ((int)valOld / 1000) % 10;
     int d0o = (valOld - (int)valOld) * 10;
-
-    // Serial.printf("FLOAT: %8.1f [%c|%d-%d-%d-%d-%d] -> %8.1f [%c|%d-%d-%d-%d-%d]\n",
-    //               value, sign, d4, d3, d2, d1, d0,
-    //               valueLast, signOld, d4o, d3o, d2o, d1o, d0o);
-
+    // if a change in the digit then replace the old with new value by
+    // first deleting the digit area and second write the new value
     if (d0 != d0o)
     {
         tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, ILI9341_BLACK);
@@ -160,15 +159,16 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
     tft.setCursor(x, y);
     int digitWidth = textSize * 6;
     int digitHeight = textSize * 8;
-
+    // determine the three digits the stored, new value
     int d1 = (int)value % 10;
     int d2 = ((int)value / 10) % 10;
     int d3 = ((int)value / 100) % 10;
-
+    // determine the three digits the stored, old value
     int d1o = (int)valueLast % 10;
     int d2o = ((int)valueLast / 10) % 10;
     int d3o = ((int)valueLast / 100) % 10;
-
+    // if a change in the digit then replace the old with new value by
+    // first deleting the digit area and second write the new value
     if (d1 != d1o)
     {
         tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, ILI9341_BLACK);
@@ -197,11 +197,13 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
     return value;
 }
 
+// write color of the border of the main display
 void draw_display_border(int color)
 {
     tft.drawRoundRect(0, bigFrameX, tft.width(), tft.height() - bigFrameX, 8, color);
 }
 
+// write color of the border of the speed display
 void draw_speed_border(int color)
 {
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
@@ -226,6 +228,7 @@ void draw_display_background()
     tft.print("Motor(A):");
 }
 
+// Write the speed in the centre frame
 void write_speed(int speed, int color)
 {
     speedLast = _write_int(speedFrameX + 9, speedFrameY + 10, speedLast, speed, speedTextSize, ILI9341_GREEN);
@@ -236,6 +239,7 @@ char getIndicatorDirection()
     return indicatorDirection;
 }
 
+// set indicator [l - left, r - right, w - hazard warning, o - off]
 void setIndicatorDirection(char direction)
 {
     indicatorDirection = direction;
@@ -252,6 +256,7 @@ void setIndicatorState(bool state)
     indicatorState = state;
 }
 
+// show the faster arrow (green above the speed display)
 void show_Faster(bool on)
 {
     int x = speedFrameX;
@@ -269,6 +274,7 @@ void show_Faster(bool on)
     tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y - 10, color);
 }
 
+// show the slower arrow (red under the speed display)
 void show_Slower(bool on)
 {
     int x = speedFrameX;
@@ -302,10 +308,7 @@ void _turn_Right(int color)
 
 void turn_indicator(char direction)
 {
-    // l - left
-    // r - right
-    // o - off
-    // w - hazard warning
+    // set indicator [l - left, r - right, w - hazard warning, o - off]
     _turn_Left(ILI9341_BLACK);
     _turn_Right(ILI9341_BLACK);
     switch (direction)

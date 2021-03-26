@@ -33,10 +33,11 @@
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
+#include <Simulator.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
-#define ADC_ON false
+#define ADC_ON true
 #define DS_ON false
 #define GYRO_ACC_ON false
 #define PWM_ON false
@@ -48,6 +49,7 @@
 #define DISPLAY_LARGE_INDICATOR_ON true
 #define INT_ON false
 #define IOEXT_ON true
+#define SIMULATOR_ON false
 
 // add C linkage definition
 extern "C" {
@@ -113,6 +115,10 @@ void app_main(void) {
     //     init_display_large();
     //     xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     // }
+    if (SIMULATOR_ON) {
+        init_simulator();
+        xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
     if (DISPLAY_LARGE_ON) {
         init_driver_display();
         xTaskCreate(&driver_display_task, "driver_display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);

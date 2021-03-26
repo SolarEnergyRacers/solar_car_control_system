@@ -11,8 +11,7 @@
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 
-
-
+// set indicator [l - left, r - right, w - hazard warning, o - off]
 void indicator(char direction)
 {
     setIndicatorDirection(direction);
@@ -38,7 +37,7 @@ void init_indicator(void)
 // -------------
 void indicator_task(void *pvParameter)
 {
-
+    // do not add code here -- only controlling the blink frequence
     // polling loop
     while (1)
     {
@@ -63,5 +62,3 @@ void indicator_task(void *pvParameter)
         vTaskDelay(200 / portTICK_PERIOD_MS);
     }
 }
-
-

@@ -1,10 +1,10 @@
 # <img src="media/logo/logo_green.svg" alt="SER Logo" width="150"/> SolarEnergyRacers
 
+# Solar Car Control System
 
+[GitHub link](https://github.com/SolarEnergyRacers/solar_car_control_system)
 
-# Solar Car Control System 
-
-[PlatformIO CI - Build Process](https://github.com/SolarEnergyRacers/solar_car_control_system/workflows/PlatformIO%20CI%20-%20Build%20Process/badge.svg?branch=master) 
+[PlatformIO CI - Build Process](https://github.com/SolarEnergyRacers/solar_car_control_system/workflows/PlatformIO%20CI%20-%20Build%20Process/badge.svg?branch=master)
 
 ![Badge](https://img.shields.io/badge/License-GPLv3-blue.svg)][]]
 

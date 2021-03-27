@@ -15,6 +15,9 @@
 
 PCF8574 pcf8574(I2C_ADDRESS_PCF8574, I2C_SDA, I2C_SCL, PCF8574_INTERRUPT_PIN, key_pressed_interrupt_handler);
 
+int speed = 0;
+int taskSleep = 10;
+
 void scan()
 {
     /* I2C slave Address Scanner
@@ -107,6 +110,26 @@ void key_pressed_interrupt_handler()
     // ioBuf = Wire.read();
 }
 
+void _speedCheck(int speed)
+{
+    if (speed < 50)
+    {
+        arrow_increase(true);
+    }
+    else
+    {
+        arrow_increase(false);
+    }
+    if (speed > 80)
+    {
+        arrow_decrease(true);
+    }
+    else
+    {
+        arrow_decrease(false);
+    }
+}
+
 void _handleIoInterrupt()
 {
     // CRITICAL SECTION I2C: start
@@ -122,9 +145,42 @@ void _handleIoInterrupt()
         return;
     }
     Serial.printf("PCF: %d %d %d %d - %d %d %d %d\n", dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
-    update_indicator(!dra.p7, !dra.p1);
-    if(!dra.p6) light1OnOff();
-    if(!dra.p5) light2OnOff();
+
+    taskSleep = 10;
+
+    if (!dra.p7 || !dra.p1)
+    {
+        taskSleep = 200;
+        update_indicator(!dra.p7, !dra.p1);
+    }
+    if (!dra.p6)
+    {
+        taskSleep = 100;
+        light1OnOff();
+    }
+    if (!dra.p5)
+    {
+        taskSleep = 100;
+        light2OnOff();
+    }
+
+    // Simulation
+    if (!dra.p4)
+    {
+        speed += 10;
+        write_speed(speed);
+        _speedCheck(speed);
+    }
+    if (!dra.p3)
+    {
+        speed -= 10;
+        if (speed < 0)
+        {
+            speed = 0;
+        }
+        write_speed(speed);
+        _speedCheck(speed);
+    }
 
     // int v[8] = {0, 0, 0, 0, 0, 0, 0, 0};
     // for (int idx = 0; idx < 8; idx++)
@@ -192,14 +248,8 @@ void io_ext_demo_task(void *pvParameter)
         {
             _handleIoInterrupt();
             ioInterruptRequest = false;
-
-            // sleep a bit longer
-            vTaskDelay(500 / portTICK_PERIOD_MS);
         }
-        else
-        {
-            // sleep short
-            vTaskDelay(10 / portTICK_PERIOD_MS);
-        }
+        // sleep
+        vTaskDelay(taskSleep / portTICK_PERIOD_MS);
     }
 }

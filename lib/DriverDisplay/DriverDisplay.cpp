@@ -13,6 +13,7 @@
 Adafruit_ILI9341 tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
 
 // display formats and sizes
+int bgColor = 0x000000;
 int infoFrameX = 0;
 int infoFrameY = 0;
 int infoFrameSizeX = -1; // full tft width
@@ -116,19 +117,19 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
     // first deleting the digit area and second write the new value
     if (d0 != d0o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 5, y);
         tft.printf(".%d", d0);
     }
     if (d1 != d1o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 4, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 4, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 4, y);
         tft.print(d1);
     }
     if (d2 != d2o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 3, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 3, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 3, y);
         if (abs(value) > 9)
         {
@@ -137,7 +138,7 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
     }
     if (d3 != d3o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 2, y);
         if (abs(value) > 99)
         {
@@ -146,7 +147,7 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
     }
     if (d4 != d4o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 1, y);
         if (abs(value) > 999)
         {
@@ -155,7 +156,7 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
     }
     if (sign != signOld)
     {
-        tft.fillRect(x, y, (digitWidth + 1), digitHeight, ILI9341_BLACK);
+        tft.fillRect(x, y, (digitWidth + 1), digitHeight, bgColor);
         tft.setCursor(x, y);
         tft.print(sign);
     }
@@ -195,13 +196,13 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
     // first deleting the digit area and second write the new value
     if (d1 != d1o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 2, y);
         tft.print(d1);
     }
     if (d2 != d2o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 1, y);
         if (abs(value) > 9)
         {
@@ -210,7 +211,7 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
     }
     if (d3 != d3o)
     {
-        tft.fillRect(x + (digitWidth + 1) * 0, y, digitWidth, digitHeight, ILI9341_BLACK);
+        tft.fillRect(x + (digitWidth + 1) * 0, y, digitWidth, digitHeight, bgColor);
         tft.setCursor(x + (digitWidth + 1) * 0, y);
         if (abs(value) > 99)
         {
@@ -266,7 +267,7 @@ void lifeSign()
     int color;
     if (lifeSignState)
     {
-        color = ILI9341_BLACK;
+        color = bgColor;
     }
     else
     {
@@ -292,7 +293,7 @@ void draw_display_background()
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
     tft.setRotation(0);
-    tft.fillScreen(ILI9341_BLACK);
+    tft.fillScreen(bgColor);
     tft.setRotation(1);
     tft.setTextSize(2);
     tft.setTextColor(ILI9341_DARKGREEN);
@@ -347,7 +348,7 @@ void _arrow_decrease(int color)
 // show the slower arrow (red under the speed display)
 void arrow_decrease(bool on)
 {
-    int color = ILI9341_BLACK;
+    int color = bgColor;
     if (on)
     {
         arrow_increase(false);
@@ -359,7 +360,7 @@ void arrow_decrease(bool on)
 // show the faster arrow (green above the speed display)
 void arrow_increase(bool on)
 {
-    int color = ILI9341_BLACK;
+    int color = bgColor;
     if (on)
     {
         arrow_decrease(false);
@@ -387,8 +388,8 @@ void indicator_set_and_blink(INDICATOR direction, bool blinkOn)
     // CRITICAL SECTION SPI: start
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-    _turn_Left(ILI9341_BLACK);
-    _turn_Right(ILI9341_BLACK);
+    _turn_Left(bgColor);
+    _turn_Right(bgColor);
     if (blinkOn)
     {
         switch (direction)
@@ -433,7 +434,7 @@ void light1OnOff()
     int color = ILI9341_YELLOW;
     if (light1On)
     {
-        color = ILI9341_BLACK;
+        color = bgColor;
         _light2(false);
     }
 
@@ -456,7 +457,7 @@ void light2OnOff()
     int color = ILI9341_BLUE;
     if (light2On)
     {
-        color = ILI9341_BLACK;
+        color = bgColor;
     }
     else
     {
@@ -563,7 +564,7 @@ void write_driver_info(String msg, INFO_TYPE type)
         tft.setTextSize(textSize);
         tft.setTextWrap(true);
 
-        tft.setTextColor(ILI9341_BLACK);
+        tft.setTextColor(bgColor);
         tft.setCursor(infoFrameX, infoFrameY);
         tft.print(infoLast);
 
@@ -581,32 +582,40 @@ void write_driver_info(String msg, INFO_TYPE type)
 void driver_display_demo_screen()
 {
     Serial.printf("Draw demo screen:\n");
-    draw_display_background();
+    // Power measurement: start
+    // Serial.printf(" - black background\n");
+    // tft.fillScreen(ILI9341_BLACK);
+    // delay(5000);
+    // Serial.printf(" - white background\n");
+    // tft.fillScreen(ILI9341_WHITE);
+    // delay(5000);
+    // Power measurement: end
     Serial.printf(" - background\n");
-    write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
+    draw_display_background();
     Serial.printf(" - driver info\n");
-    indicator_set_and_blink(INDICATOR::WARN, true);
+    write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
     Serial.printf(" - hazzard warn\n");
-    write_speed(888);
+    indicator_set_and_blink(INDICATOR::WARN, true);
     Serial.printf(" - spped\n");
-    write_acceleration(888);
+    write_speed(888);
     Serial.printf(" - acceleration\n");
-    _arrow_increase(ILI9341_YELLOW);
+    write_acceleration(888);
     Serial.printf(" -  increase arrow\n");
-    _arrow_decrease(ILI9341_RED);
+    _arrow_increase(ILI9341_YELLOW);
     Serial.printf(" - decrease arrow\n");
+    _arrow_decrease(ILI9341_RED);
+    Serial.printf(" - light1 on\n");
     light1OnOff();
     Serial.printf(" - light1 on\n");
     light2OnOff();
-    Serial.printf(" - light1 on\n");
-    write_bat(8888.8);
     Serial.printf(" - battery\n");
-    write_pv(8888.8);
+    write_bat(8888.8);
     Serial.printf(" - photovoltaic\n");
-    write_motor(-888.8);
+    write_pv(8888.8);
     Serial.printf(" - motor\n");
-    lifeSign();
+    write_motor(-888.8);
     Serial.printf(" - life sign\n");
+    lifeSign();
     Serial.printf("ready.\n");
 }
 
@@ -675,15 +684,15 @@ void init_driver_display(void)
     indicator_set_and_blink(INDICATOR::OFF, false);
     write_speed(0);
     write_acceleration(0);
-    _arrow_increase(ILI9341_BLACK);
-    _arrow_decrease(ILI9341_BLACK);
+    _arrow_increase(bgColor);
+    _arrow_decrease(bgColor);
     _light1(false);
     _light2(false);
     write_bat(0.0);
     write_pv(0.0);
     write_motor(0.0);
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(500 / portTICK_PERIOD_MS);
 }
 
 // -------------

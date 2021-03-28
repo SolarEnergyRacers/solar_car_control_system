@@ -1,5 +1,26 @@
 # DOCU ILI9341 + PCF8574 + ESP32-Hazzy
 
+## Product Links
+
+### MicroProcessor
+
+- [Adafruit: HUZZAH32 – ESP32 Feather Board](https://www.adafruit.com/product/3405)
+- [Adafruit-ESP32-HUZZAH-Breakout (PCB)](https://github.com/adafruit/Adafruit-ESP32-HUZZAH-Breakout-PCB)
+
+### Display
+
+- [Adafruit: 2.8" TFT LCD with Touchscreen Breakout Board w/MicroSD Socket - ILI9341](https://www.adafruit.com/product/1770)
+- [Adafruit: 2.8" TFT LCD (PCB)](https://learn.adafruit.com/adafruit-2-8-and-3-2-color-tft-touchscreen-breakout-v2/downloads)
+- [Adafruit_ILI9341 (C++ Library)](https://github.com/adafruit/Adafruit_ILI9341)
+
+### IO Extender
+
+- [8-bit 2.5- to 5.5-V I2C/SMBus I/O expander with interrupt](https://www.ti.com/product/PCF8574)
+
+### AD Wandler
+
+- [16-bit, 860-SPS, 4-channel, delta-sigma ADC with PGA, oscillator, VREF, comparator and I2C](https://www.ti.com/product/ADS1115)
+
 ## ILI9341 + PCF8574 + ADS1115
 
 10 Kabel vom Miroprocessor zum Display/Buttons/ReglerLeistungsaufnahme Experimentalaufbau mit 

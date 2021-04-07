@@ -51,7 +51,7 @@ void scan()
             Serial.println();
         }
     }
-    Serial.printf("Scan Completed, %d I2C Devices found.\n", cnt);
+    printf("Scan Completed, %d I2C Devices found.\n", cnt);
 }
 
 bool i2cReady(uint8_t adr)
@@ -144,7 +144,7 @@ void _handleIoInterrupt()
     {
         return;
     }
-    Serial.printf("PCF: %d %d %d %d - %d %d %d %d\n", dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
+    printf("PCF: %d %d %d %d - %d %d %d %d\n", dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
 
     taskSleep = 10;
 
@@ -189,7 +189,7 @@ void _handleIoInterrupt()
     // }
     // for (int idx = 0; idx < 8; idx++)
     // {
-    //     Serial.printf("%d:%d - ", idx, v[idx]);
+    //     printf("%d:%d - ", idx, v[idx]);
     // }
     // Serial.println();
 }

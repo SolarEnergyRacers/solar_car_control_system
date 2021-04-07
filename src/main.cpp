@@ -31,6 +31,7 @@
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
+#include <CANBus.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
@@ -44,6 +45,7 @@
 #define DISPLAY_ON true
 #define INT_ON true
 #define IOEXT_ON true
+#define CAN_ON true
 
 // add C linkage definition
 extern "C" {
@@ -51,7 +53,6 @@ void app_main(void);
 }
 
 void app_main(void) {
-
     // init arduino library
     initArduino();
 
@@ -62,6 +63,8 @@ void app_main(void) {
     init_onewire();
     init_i2c();
     init_spi();
+
+    Serial.begin(115200);
 
     // init modules & create tasks
     if (BLINK_ON) {
@@ -102,5 +105,9 @@ void app_main(void) {
     if(IOEXT_ON){
         init_ioext();
         xTaskCreate(&io_ext_demo_task, "io_extension_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if(CAN_ON){
+        init_can();
+        xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

@@ -30,6 +30,18 @@
 #define I2C_ADDRESS_PCF8574 0x38
 
 /*
+ * CAN Bus
+ * 
+ *  GPIO25  TX
+ *  GPIO26  RX
+ */
+#define CAN_TX (gpio_num_t)25
+#define CAN_RX (gpio_num_t)26
+
+#define CAN_RX_QUEUE 10
+
+
+/*
  *  SPI
  *
  *  ESP32  - SPI PIN

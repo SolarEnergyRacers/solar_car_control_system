@@ -84,7 +84,7 @@ float _write_float(int x, int y, float valueLast, float value, int textSize, int
 
     if (value < -9999.9 || value > 9999.9)
     {
-        Serial.printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
+        printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
         return value;
     }
     int digitWidth = textSize * 6;
@@ -172,7 +172,7 @@ int _write_int(int x, int y, int valueLast, int value, int textSize, int color)
 {
     if (value < 0 || value > 999)
     {
-        Serial.printf("ERROR: call _write_int with a value outside the range: '%d'", value);
+        printf("ERROR: call _write_int with a value outside the range: '%d'", value);
         return value;
     }
     int digitWidth = textSize * 6;
@@ -581,42 +581,42 @@ void write_driver_info(String msg, INFO_TYPE type)
 
 void driver_display_demo_screen()
 {
-    Serial.printf("Draw demo screen:\n");
+    printf("Draw demo screen:\n");
     // Power measurement: start
-    // Serial.printf(" - black background\n");
+    // printf(" - black background\n");
     // tft.fillScreen(ILI9341_BLACK);
     // delay(5000);
-    // Serial.printf(" - white background\n");
+    // printf(" - white background\n");
     // tft.fillScreen(ILI9341_WHITE);
     // delay(5000);
     // Power measurement: end
-    Serial.printf(" - background\n");
+    printf(" - background\n");
     draw_display_background();
-    Serial.printf(" - driver info\n");
+    printf(" - driver info\n");
     write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
-    Serial.printf(" - hazzard warn\n");
+    printf(" - hazzard warn\n");
     indicator_set_and_blink(INDICATOR::WARN, true);
-    Serial.printf(" - spped\n");
+    printf(" - spped\n");
     write_speed(888);
-    Serial.printf(" - acceleration\n");
+    printf(" - acceleration\n");
     write_acceleration(888);
-    Serial.printf(" -  increase arrow\n");
+    printf(" - increase arrow\n");
     _arrow_increase(ILI9341_YELLOW);
-    Serial.printf(" - decrease arrow\n");
+    printf(" - decrease arrow\n");
     _arrow_decrease(ILI9341_RED);
-    Serial.printf(" - light1 on\n");
+    printf(" - light1 on\n");
     light1OnOff();
-    Serial.printf(" - light1 on\n");
+    printf(" - light1 on\n");
     light2OnOff();
-    Serial.printf(" - battery\n");
+    printf(" - battery\n");
     write_bat(8888.8);
-    Serial.printf(" - photovoltaic\n");
+    printf(" - photovoltaic\n");
     write_pv(8888.8);
-    Serial.printf(" - motor\n");
+    printf(" - motor\n");
     write_motor(-888.8);
-    Serial.printf(" - life sign\n");
+    printf(" - life sign\n");
     lifeSign();
-    Serial.printf("ready.\n");
+    printf("ready.\n");
 }
 
 // ------------------
@@ -629,7 +629,7 @@ void init_driver_display(void)
 
 #ifdef DISPLAY_OLED_128_6LGA
     // TODO: DISPLAY_OLED_128_6LGA
-    Serial.println("Display Test DISPLAY_OLED_128_6LGA");
+    println("Display Test DISPLAY_OLED_128_6LGA");
     SPI.begin(4);
     SPI.beginTransaction(SPISettings(1000000, SPI_MSBFIRST, SPI_MODE0));
     SPI.transfer(0xF0);
@@ -649,22 +649,22 @@ void init_driver_display(void)
 
     SPI.transfer(0xAF);
     SPI.endTransaction();
-    Serial.println("End Display Test DISPLAY_OLED_128_6LGA");
+    println("End Display Test DISPLAY_OLED_128_6LGA");
 #endif
 
     tft.begin();
     try
     {
         uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-        Serial.printf("Display Power Mode: 0x%x\n", x);
+        printf("Display Power Mode: 0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDMADCTL);
-        Serial.printf("MADCTL Mode:        0x%x\n", x);
+        printf("MADCTL Mode:        0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDPIXFMT);
-        Serial.printf("Pixel Format:       0x%x\n", x);
+        printf("Pixel Format:       0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDIMGFMT);
-        Serial.printf("Image Format:       0x%x\n", x);
+        printf("Image Format:       0x%x\n", x);
         x = tft.readcommand8(ILI9341_RDSELFDIAG);
-        Serial.printf("Self Diagnostic:    0x%x\n", x);
+        printf("Self Diagnostic:    0x%x\n", x);
         infoFrameSizeX = tft.width();
         speedFrameX = (tft.width() - speedFrameSizeX) / 2;
         printf("[Display ILI9341] Initialize successfully with screen %d x %d.\n", tft.height(), tft.width());
@@ -717,7 +717,7 @@ void driver_display_task(void *pvParameter)
         }
         lifeSignCounter++;
 
-        //Serial.printf("time elapsed: %ld\n", micros() - start);
+        //printf("time elapsed: %ld\n", micros() - start);
 
         // sleep for 1s
         vTaskDelay(100 / portTICK_PERIOD_MS);

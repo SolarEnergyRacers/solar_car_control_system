@@ -75,6 +75,7 @@ void app_main(void)
     delay(2000);
     Serial.println("---------------------------");
     Serial.println("esp32dev Test!");
+    printf("printf test\n");
 
     // init modules & create tasks
     if (BLINK_ON)

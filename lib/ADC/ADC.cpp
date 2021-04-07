@@ -61,12 +61,12 @@ void init_adc()
     // conversion factor: bit-value -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) 0.1875mV (ADS1215)
     multiplier = ads.toVoltage(1); // voltage factor
 
-    Serial.printf("Max voltage: %f\n", ads.getMaxVoltage());
+    printf("Max voltage: %f\n", ads.getMaxVoltage());
     // read all inputs & report
     for (int i = 0; i < 4; i++)
     {
         int16_t value = _read_adc(i);
-        Serial.printf("[ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
+        printf("[ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
     }
 
     xSemaphoreGive(i2c_mutex);

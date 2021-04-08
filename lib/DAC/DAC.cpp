@@ -4,6 +4,8 @@
 
 #include "../../include/definitions.h"
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <I2CBus.h>
 #include "DAC.h"
 

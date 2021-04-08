@@ -4,11 +4,6 @@
 
 #include "../../include/definitions.h"
 
-<<<<<<< HEAD
-#include <freertos/FreeRTOS.h>
-#include <freertos/task.h>
-=======
->>>>>>> Add initial implementation of the DS1803 digital potentiometer.
 #include <I2CBus.h>
 #include "DAC.h"
 

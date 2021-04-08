@@ -34,6 +34,7 @@
 #include <gpio.h>
 #include <IOExt.h>
 #include <Simulator.h>
+#include <DAC.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
@@ -49,6 +50,7 @@
 #define DISPLAY_LARGE_INDICATOR_ON true
 #define INT_ON false
 #define IOEXT_ON true
+#define DAC_ON true
 #define SIMULATOR_ON false
 
 // add C linkage definition
@@ -75,7 +77,7 @@ void app_main(void)
     delay(2000);
     printf("---------------------------\n");
     Serial.println("esp32dev + free RTOS\n");
-    
+
     // init modules & create tasks
     if (BLINK_ON)
     {
@@ -144,5 +146,9 @@ void app_main(void)
     {
         init_ioext();
         xTaskCreate(&io_ext_demo_task, "io_extension_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if(DAC_ON){
+        init_dac();
+        xTaskCreate(&dac_demo_task, "dac_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

@@ -31,6 +31,7 @@
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
+#include <DAC.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
@@ -44,6 +45,7 @@
 #define DISPLAY_ON true
 #define INT_ON true
 #define IOEXT_ON true
+#define DAC_ON true
 
 // add C linkage definition
 extern "C" {
@@ -102,5 +104,9 @@ void app_main(void) {
     if(IOEXT_ON){
         init_ioext();
         xTaskCreate(&io_ext_demo_task, "io_extension_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if(DAC_ON){
+        init_dac();
+        xTaskCreate(&dac_demo_task, "dac_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

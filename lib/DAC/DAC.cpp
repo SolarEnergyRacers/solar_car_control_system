@@ -4,6 +4,8 @@
 
 #include "../../include/definitions.h"
 
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
 #include <I2CBus.h>
 #include "DAC.h"
 
@@ -13,12 +15,32 @@
 #define BASE_ADDR_CMD 0xA8
 
 
-void init_adc() {
+void dac_demo_task(void *pvParameter) {
+
+    // polling loop
+    uint8_t val = 0;
+    while(1) {
+
+        // set potentiometer value
+        printf("set potentiometer value=%d", val);
+        set_pot(val, POT_CHAN0);
+        set_pot(0xFF - val, POT_CHAN1); // negate
+
+        // sleep for 100ms
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+
+        // increment timer
+        val += 10;
+    }
+}
+
+
+void init_dac() {
     // nothing to do, i2c bus is getting initialized externally
 }
 
-byte get_cmd(pot_chan channel){
-    byte command = BASE_ADDR_CMD;
+uint8_t get_cmd(pot_chan channel){
+    uint8_t command = BASE_ADDR_CMD;
     switch (channel) {
         case POT_CHAN0:
             command |= 0x01;
@@ -37,10 +59,10 @@ byte get_cmd(pot_chan channel){
 }
 
 
-void set_pot(byte val, pot_chan channel){
+void set_pot(uint8_t val, pot_chan channel){
 
     // setup command
-    byte command = get_cmd(channel);
+    uint8_t command = get_cmd(channel);
 
     // CRITICAL SECTION I2C: start
     xSemaphoreTake(i2c_mutex, portMAX_DELAY);
@@ -63,8 +85,8 @@ uint16_t get_pot(pot_chan channel){
     xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
     Wire.requestFrom(I2C_ADDRESS_DS1803, 2); // request 2 bytes
-    byte pot0 = Wire.read(); // get pot0
-    byte pot1 = Wire.read(); // get pot1
+    uint8_t pot0 = Wire.read(); // get pot0
+    uint8_t pot1 = Wire.read(); // get pot1
 
     xSemaphoreGive(i2c_mutex);
     // CRITICAL SECTION I2C: end

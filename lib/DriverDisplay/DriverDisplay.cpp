@@ -582,14 +582,16 @@ void write_driver_info(String msg, INFO_TYPE type)
 void driver_display_demo_screen()
 {
     printf("Draw demo screen:\n");
-    // Power measurement: start
-    // printf(" - black background\n");
-    // tft.fillScreen(ILI9341_BLACK);
-    // delay(5000);
-    // printf(" - white background\n");
-    // tft.fillScreen(ILI9341_WHITE);
-    // delay(5000);
-    // Power measurement: end
+    #ifdef POWERMEASUREMENT
+    // ---- for power measurement: start
+    printf(" - black background\n");
+    tft.fillScreen(ILI9341_BLACK);
+    delay(15000);
+    printf(" - white background\n");
+    tft.fillScreen(ILI9341_WHITE);
+    delay(15000);
+    // ---- for power measurement: end
+    #endif
     printf(" - background\n");
     draw_display_background();
     printf(" - driver info\n");
@@ -609,11 +611,11 @@ void driver_display_demo_screen()
     printf(" - light1 on\n");
     light2OnOff();
     printf(" - battery\n");
-    write_bat(8888.8);
+    write_bat(-8888.8);
     printf(" - photovoltaic\n");
-    write_pv(8888.8);
+    write_pv(-8888.8);
     printf(" - motor\n");
-    write_motor(-888.8);
+    write_motor(-8888.8);
     printf(" - life sign\n");
     lifeSign();
     printf("ready.\n");

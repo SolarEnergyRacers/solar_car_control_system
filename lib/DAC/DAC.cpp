@@ -4,6 +4,11 @@
 
 #include "../../include/definitions.h"
 
+<<<<<<< HEAD
+=======
+#include <freertos/FreeRTOS.h>
+#include <freertos/task.h>
+>>>>>>> origin/add_ds1803
 #include <I2CBus.h>
 #include "DAC.h"
 

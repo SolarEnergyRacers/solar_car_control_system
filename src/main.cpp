@@ -112,15 +112,17 @@ void app_main(void) {
         init_driver_display();
         xTaskCreate(&driver_display_task, "display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    // if (DISPLAY_LARGE_ON) {
-    //     init_display_large();
-    //     xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-    // }
+    /*
+    if (DISPLAY_LARGE_ON) {
+        init_display_large();
+        xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
     if (SIMULATOR_ON)
     {
         init_simulator();
         xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
+    */
     if (DISPLAY_LARGE_ON)
     {
         init_driver_display();

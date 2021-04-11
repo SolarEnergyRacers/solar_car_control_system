@@ -15,5 +15,6 @@ void init_dac(void);
 void set_pot(uint8_t val, pot_chan channel);
 uint16_t get_pot(pot_chan channel);
 void dac_demo_task(void *pvParameter);
+void dac_user_input_demo_task(void *pvParameter);
 
 #endif //SOLAR_CAR_CONTROL_SYSTEM_DAC_H

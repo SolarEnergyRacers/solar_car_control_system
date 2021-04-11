@@ -34,6 +34,54 @@ void dac_demo_task(void *pvParameter) {
     }
 }
 
+char* fgets_blocking(char* str, int n, FILE* stream){
+    return NULL;
+}
+
+void dac_user_input_demo_task(void *pvParameter) {
+
+    // polling loop
+    uint8_t val = 0;
+    int input;
+    int N = 10;
+    char input_str[N];
+
+    while(1) {
+
+        // read user input
+        char c;
+        int i = 0;
+        do {
+            c = getchar();
+            if(c == 255){
+                // taskYIELD();
+                // Kick_Watchdog();
+                vTaskDelay(100 / portTICK_PERIOD_MS);
+            } else {
+                input_str[i++] = c;
+            }
+        } while(i < N && c != '\n'); // user workaroudn since fgets is somehow not blocking
+
+        printf("fgets read: %s\n", input_str);
+
+        sscanf(input_str, "%d", &input);
+
+        if(input >= 0 && input < 255){
+            val = input;
+            printf("set dac to %d\n", val);
+        } else {
+            printf("dac: input value out of bound: %d\n", input);
+        }
+
+        // set potentiometer value
+        printf("set potentiometer value=%d\n", val);
+        set_pot(val, POT_CHAN0);
+
+        // sleep for 10s
+        vTaskDelay(100 / portTICK_PERIOD_MS);
+    }
+}
+
 
 void init_dac() {
     // nothing to do, i2c bus is getting initialized externally

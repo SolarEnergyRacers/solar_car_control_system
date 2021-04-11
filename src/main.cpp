@@ -54,13 +54,11 @@
 #define SIMULATOR_ON false
 
 // add C linkage definition
-extern "C"
-{
-    void app_main(void);
+extern "C" {
+void app_main(void);
 }
 
-void app_main(void)
-{
+void app_main(void) {
 
     // init arduino library
     initArduino();
@@ -79,42 +77,34 @@ void app_main(void)
     Serial.println("esp32dev + free RTOS\n");
 
     // init modules & create tasks
-    if (BLINK_ON)
-    {
+    if (BLINK_ON) {
         xTaskCreate(&blink_demo_task, "blink_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (ADC_ON)
-    {
+    if (ADC_ON) {
         init_adc();
         xTaskCreate(&read_adc_demo_task, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (DS_ON)
-    {
+    if (DS_ON) {
         init_ds();
         xTaskCreate(&read_ds_demo_task, "read_ds_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (GYRO_ACC_ON)
-    {
+    if (GYRO_ACC_ON) {
         init_gyro_acc();
         xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (PWM_ON)
-    {
+    if (PWM_ON) {
         init_pwm();
         xTaskCreate(&update_pwm_demo_task, "update_pwm_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (RTC_ON)
-    {
+    if (RTC_ON) {
         init_rtc();
-        xTaskCreate(&read_rtc_demo_task, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 10, NULL);
+        xTaskCreate(&read_rtc_demo_task, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (SD_ON)
-    {
+    if (SD_ON) {
         init_sdcard();
         xTaskCreate(&write_sdcard_demo_task, "write_sdcard_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (INT_ON)
-    {
+    if (INT_ON) {
         register_gpio_interrupt();
         xTaskCreate(&int_report_demo_task, "int_report_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }

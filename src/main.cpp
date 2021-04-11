@@ -37,8 +37,8 @@
 #include <DAC.h>
 
 // (de-)activate functionality & devices
-#define BLINK_ON true
-#define ADC_ON true
+#define BLINK_ON false
+#define ADC_ON false
 #define DS_ON false
 #define GYRO_ACC_ON false
 #define PWM_ON false
@@ -46,10 +46,10 @@
 #define INT_ON false
 #define SD_ON false
 #define DISPLAY_ON false
-#define DISPLAY_LARGE_ON true
-#define DISPLAY_LARGE_INDICATOR_ON true
+#define DISPLAY_LARGE_ON false
+#define DISPLAY_LARGE_INDICATOR_ON false
 #define INT_ON false
-#define IOEXT_ON true
+#define IOEXT_ON false
 #define DAC_ON true
 #define SIMULATOR_ON false
 
@@ -141,6 +141,6 @@ void app_main(void) {
     }
     if(DAC_ON){
         init_dac();
-        xTaskCreate(&dac_demo_task, "dac_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        xTaskCreate(&dac_user_input_demo_task, "dac_user_input_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

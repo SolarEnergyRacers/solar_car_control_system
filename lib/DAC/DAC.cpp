@@ -7,9 +7,11 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 #include <I2CBus.h>
+#include <Helper.h>
 #include "DAC.h"
 
 #include <Wire.h> // I2C
+#include <stdio.h>
 #include <inttypes.h>
 
 #define BASE_ADDR_CMD 0xA8
@@ -34,33 +36,20 @@ void dac_demo_task(void *pvParameter) {
     }
 }
 
-char* fgets_blocking(char* str, int n, FILE* stream){
-    return NULL;
-}
-
 void dac_user_input_demo_task(void *pvParameter) {
 
     // polling loop
     uint8_t val = 0;
     int input;
-    int N = 10;
-    char input_str[N];
+    int n = 10;
+    char input_str[n];
+
+    printf("start dac task\n");
 
     while(1) {
 
         // read user input
-        char c;
-        int i = 0;
-        do {
-            c = getchar();
-            if(c == 255){
-                // taskYIELD();
-                // Kick_Watchdog();
-                vTaskDelay(100 / portTICK_PERIOD_MS);
-            } else {
-                input_str[i++] = c;
-            }
-        } while(i < N && c != '\n'); // user workaroudn since fgets is somehow not blocking
+        fgets_stdio_blocking(input_str, n);
 
         printf("fgets read: %s\n", input_str);
 

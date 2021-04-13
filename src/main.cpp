@@ -34,10 +34,11 @@
 #include <gpio.h>
 #include <IOExt.h>
 #include <Simulator.h>
+#include <Serial.h>
 
 // (de-)activate functionality & devices
 #define BLINK_ON true
-#define ADC_ON true
+#define ADC_ON false
 #define DS_ON false
 #define GYRO_ACC_ON false
 #define PWM_ON false
@@ -45,11 +46,12 @@
 #define INT_ON false
 #define SD_ON false
 #define DISPLAY_ON false
-#define DISPLAY_LARGE_ON true
-#define DISPLAY_LARGE_INDICATOR_ON true
+#define DISPLAY_LARGE_ON false
+#define DISPLAY_LARGE_INDICATOR_ON false
 #define INT_ON false
-#define IOEXT_ON true
+#define IOEXT_ON false
 #define SIMULATOR_ON false
+#define SERIAL_ON true
 
 // add C linkage definition
 extern "C"
@@ -144,5 +146,10 @@ void app_main(void)
     {
         init_ioext();
         xTaskCreate(&io_ext_demo_task, "io_extension_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if (SERIAL_ON)
+    {
+        init_serial();
+        xTaskCreate(&serial_demo_task, "serial_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

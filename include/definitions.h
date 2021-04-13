@@ -99,6 +99,14 @@
 #define I2C_ADDRESS_PCF8574 0x20
 
 /*
+ * SERIAL
+ */
+#define SERIAL_RX 16
+#define SERIAL_TX 15
+#define SERIAL_BAUDRATE 115200
+
+
+/*
  *  SPI
  *
  *  ESP32  - SPI PIN

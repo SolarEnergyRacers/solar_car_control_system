@@ -32,6 +32,13 @@
 #define I2C_ADDRESS_SSD1305 0x3C
 #define I2C_ADDRESS_PCF8574 0x38
 
+// address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
+#define DS1803_BASE_ADDR 0x28
+#define DS1803_ADDR0 0 // pulled down to ground
+#define DS1803_ADDR1 0 // pulled down to ground
+#define DS1803_ADDR2 0 // pulled down to ground
+#define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
+
 /*
  *  SPI
  *
@@ -97,6 +104,13 @@
 #define I2C_ADDRESS_PCA9685 0x42
 #define I2C_ADDRESS_SSD1305 0x3C
 #define I2C_ADDRESS_PCF8574 0x20
+
+// address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
+#define DS1803_BASE_ADDR 0x28
+#define DS1803_ADDR0 0 // pulled down to ground
+#define DS1803_ADDR1 0 // pulled down to ground
+#define DS1803_ADDR2 0 // pulled down to ground
+#define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
  * SERIAL

@@ -143,6 +143,7 @@ void app_main(void) {
     if(DAC_ON){
         init_dac();
         xTaskCreate(&dac_user_input_demo_task, "dac_user_input_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
     if (SERIAL_ON)
     {
         init_serial();

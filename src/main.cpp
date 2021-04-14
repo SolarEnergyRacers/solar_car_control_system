@@ -33,11 +33,12 @@
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
+#include <Serial.h>
 #include <Simulator.h>
 #include <DAC.h>
 
 // (de-)activate functionality & devices
-#define BLINK_ON false
+#define BLINK_ON tue
 #define ADC_ON false
 #define DS_ON false
 #define GYRO_ACC_ON false
@@ -52,6 +53,7 @@
 #define IOEXT_ON false
 #define DAC_ON true
 #define SIMULATOR_ON false
+#define SERIAL_ON true
 
 // add C linkage definition
 extern "C" {
@@ -108,8 +110,7 @@ void app_main(void) {
         register_gpio_interrupt();
         xTaskCreate(&int_report_demo_task, "int_report_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (DISPLAY_ON)
-    {
+    if (DISPLAY_ON){
         init_driver_display();
         xTaskCreate(&driver_display_task, "display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
@@ -118,29 +119,29 @@ void app_main(void) {
         init_display_large();
         xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (SIMULATOR_ON)
-    {
+    if (SIMULATOR_ON){
         init_simulator();
         xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
     */
-    if (DISPLAY_LARGE_ON)
-    {
+    if (DISPLAY_LARGE_ON){
         init_driver_display();
         xTaskCreate(&driver_display_task, "driver_display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (DISPLAY_LARGE_INDICATOR_ON)
-    {
+    if (DISPLAY_LARGE_INDICATOR_ON){
         init_indicator();
         xTaskCreate(&indicator_task, "indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    if (IOEXT_ON)
-    {
+    if (IOEXT_ON){
         init_ioext();
         xTaskCreate(&io_ext_demo_task, "io_extension_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
     if(DAC_ON){
         init_dac();
         xTaskCreate(&dac_user_input_demo_task, "dac_user_input_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    }
+    if (SERIAL_ON){
+        init_serial();
+        xTaskCreate(&serial_demo_task, "serial_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

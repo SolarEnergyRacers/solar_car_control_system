@@ -7,6 +7,7 @@
 #define ESP32Andy false
 #define ESP32OLED false
 #define ESP32Huzza true
+
 #if ESP32Andy == true
 /*
  *  GPIO
@@ -111,6 +112,13 @@
 #define DS1803_ADDR1 0 // pulled down to ground
 #define DS1803_ADDR2 0 // pulled down to ground
 #define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
+
+/*
+ * SERIAL
+ */
+#define SERIAL_RX 16
+#define SERIAL_TX 15
+#define SERIAL_BAUDRATE 115200
 
 /*
  *  SPI

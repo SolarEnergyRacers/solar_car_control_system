@@ -38,7 +38,7 @@
 #include <DAC.h>
 
 // (de-)activate functionality & devices
-#define BLINK_ON tue
+#define BLINK_ON true
 #define ADC_ON false
 #define DS_ON false
 #define GYRO_ACC_ON false

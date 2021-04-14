@@ -55,7 +55,7 @@ void dac_user_input_demo_task(void *pvParameter) {
 
         sscanf(input_str, "%d", &input);
 
-        if(input >= 0 && input < 255){
+        if(input >= 0 && input < 256){
             val = input;
             printf("set dac to %d\n", val);
         } else {

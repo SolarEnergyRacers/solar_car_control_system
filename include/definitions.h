@@ -7,6 +7,7 @@
 #define ESP32Andy false
 #define ESP32OLED false
 #define ESP32Huzza true
+
 #if ESP32Andy == true
 /*
  *  GPIO
@@ -118,7 +119,6 @@
 #define SERIAL_RX 16
 #define SERIAL_TX 15
 #define SERIAL_BAUDRATE 115200
-
 
 /*
  *  SPI

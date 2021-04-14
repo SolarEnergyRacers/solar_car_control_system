@@ -33,11 +33,11 @@
 #include <SDCard.h>
 #include <gpio.h>
 #include <IOExt.h>
+#include <Serial.h>
 #include <Simulator.h>
 #include <DAC.h>
 
-// (de-)activate functionality & devices
-#define BLINK_ON false
+#define BLINK_ON true
 #define ADC_ON false
 #define DS_ON false
 #define GYRO_ACC_ON false
@@ -52,6 +52,7 @@
 #define IOEXT_ON false
 #define DAC_ON true
 #define SIMULATOR_ON false
+#define SERIAL_ON true
 
 // add C linkage definition
 extern "C" {
@@ -142,5 +143,9 @@ void app_main(void) {
     if(DAC_ON){
         init_dac();
         xTaskCreate(&dac_user_input_demo_task, "dac_user_input_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    if (SERIAL_ON)
+    {
+        init_serial();
+        xTaskCreate(&serial_demo_task, "serial_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
 }

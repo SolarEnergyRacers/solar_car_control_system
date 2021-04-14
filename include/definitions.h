@@ -113,6 +113,14 @@
 #define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
+ * SERIAL
+ */
+#define SERIAL_RX 16
+#define SERIAL_TX 15
+#define SERIAL_BAUDRATE 115200
+
+
+/*
  *  SPI
  *
  *  ESP32  - SPI PIN

@@ -37,23 +37,7 @@
 #include <Simulator.h>
 #include <DAC.h>
 
-// (de-)activate functionality & devices
-#define BLINK_ON true
-#define ADC_ON false
-#define DS_ON false
-#define GYRO_ACC_ON false
-#define PWM_ON false
-#define RTC_ON false
-#define INT_ON false
-#define SD_ON false
-#define DISPLAY_ON false
-#define DISPLAY_LARGE_ON false
-#define DISPLAY_LARGE_INDICATOR_ON false
-#define INT_ON false
-#define IOEXT_ON false
-#define DAC_ON true
-#define SIMULATOR_ON false
-#define SERIAL_ON true
+#include "LocalFunctionsAndDevices.h"
 
 // add C linkage definition
 extern "C" {
@@ -65,6 +49,12 @@ void app_main(void) {
     // init arduino library
     initArduino();
 
+    // init serial output fo rconsole
+    Serial.begin(115200);
+    delay(2000);
+    printf("---------------------------\n");
+    Serial.println("esp32dev + free RTOS\n");
+    
     // report chip info
     chip_info();
 
@@ -72,11 +62,6 @@ void app_main(void) {
     init_onewire();
     init_i2c();
     init_spi();
-
-    Serial.begin(115200);
-    delay(2000);
-    printf("---------------------------\n");
-    Serial.println("esp32dev + free RTOS\n");
 
     // init modules & create tasks
     if (BLINK_ON) {
@@ -114,16 +99,10 @@ void app_main(void) {
         init_driver_display();
         xTaskCreate(&driver_display_task, "display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
-    /*
-    if (DISPLAY_LARGE_ON) {
-        init_display_large();
-        xTaskCreate(&draw_display_large_demo_task, "display_large_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-    }
-    if (SIMULATOR_ON){
+    /*if (SIMULATOR_ON){
         init_simulator();
         xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-    }
-    */
+    }*/
     if (DISPLAY_LARGE_ON){
         init_driver_display();
         xTaskCreate(&driver_display_task, "driver_display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);

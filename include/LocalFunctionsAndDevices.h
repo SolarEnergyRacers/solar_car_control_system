@@ -16,6 +16,7 @@
 #define PWM_ON true                         // 16-channel, 12-bit PWM Fm, I2C (PCA9685)
 #define RTC_ON true                         // real time clock
 #define SERIAL_ON true                      // write/read to/from console
+#define SD_ON true                          // SD card
 #define SIMULATOR_ON true
 
 #endif // LocalFunctionsAndDevices_H

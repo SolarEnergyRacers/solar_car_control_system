@@ -9,7 +9,7 @@
 #define ADC_ON true
 #define BLINK_ON true
 #define COMMANDHANDLER_ON true
-#define DAC_ON false
+#define DAC_ON true
 #define DISPLAY_LARGE_INDICATOR_ON true
 #define DISPLAY_LARGE_ON true
 #define DISPLAY_ON false

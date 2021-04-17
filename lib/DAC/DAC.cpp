@@ -21,21 +21,21 @@
 
 void dac_demo_task(void *pvParameter) {
 
-  // polling loop
-  uint8_t val = 0;
-  while (1) {
+  // // polling loop
+  // uint8_t val = 0;
+  // while (1) {
 
-    // set potentiometer value
-    printf("set potentiometer value=%d", val);
-    set_pot(val, POT_CHAN0);
-    set_pot(0xFF - val, POT_CHAN1); // negate
+  //   // set potentiometer value
+  //   printf("set potentiometer value=%d", val);
+  //   set_pot(val, POT_CHAN0);
+  //   set_pot(0xFF - val, POT_CHAN1); // negate
 
-    // sleep for 100ms
-    vTaskDelay(100 / portTICK_PERIOD_MS);
+  //   // sleep for 100ms
+  //   vTaskDelay(100 / portTICK_PERIOD_MS);
 
-    // increment timer
-    val += 10;
-  }
+  //   // increment timer
+  //   val += 10;
+  // }
 }
 
 void dac_user_input_demo_task(void *pvParameter) {

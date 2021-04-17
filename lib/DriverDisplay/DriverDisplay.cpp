@@ -524,7 +524,7 @@ int _getColorForInfoType(INFO_TYPE type) {
     break;
 
   case INFO_TYPE::WARN:
-    color = ILI9341_PURPLE;
+    color = ILI9341_GREENYELLOW;
     break;
 
   case INFO_TYPE::STATUS:

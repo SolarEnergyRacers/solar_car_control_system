@@ -71,7 +71,6 @@ void init_ioext() {
   pcf8574.pinMode(P6, INPUT);
   pcf8574.pinMode(P7, INPUT);
 
-  Wire.begin();
   scan();
 
   // start
@@ -131,7 +130,7 @@ void _handleIoInterrupt() {
   }
   if (!dra.p6) {
     taskSleep = 100;
-    light1OnOff();
+    light1OnOff();digitalWrite(LED_BUILTIN, HIGH);digitalWrite(LED_BUILTIN, HIGH);
   }
   if (!dra.p5) {
     taskSleep = 100;

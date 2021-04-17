@@ -22,8 +22,9 @@ void init_command_handler() {
   printf("Command handler task inited\n");
 }
 
-String commands = "<>lLwudsabpmM:";
-String helpText = "Available commands (%s):\n"
+String commands = "<>lLwudsabpmM:!";
+String helpText = "Available commands (" + commands +
+                  "):\n"
                   "\t< [off]  - left indicator\n"
                   "\t> [off]  - right indicator\n"
                   "\tw [off]  - hazard warning lights\n"
@@ -38,28 +39,21 @@ String helpText = "Available commands (%s):\n"
                   "\tl [off]  - position lights on/off\n"
                   "\tL [off]  - beam light on/off\n"
                   "\t:<text>  - display driver info text\n"
+                  "\t!<text>  - display driver warn text\n"
                   "\t\n";
 
 void command_handler_task(void *pvParameter) {
 
-  //   int n = 30;
-  //   char input_str[n];
-
   while (1) {
 
-    // printf("command > ");
     while (Serial.available() > 0) {
       // read the incoming chars:
       String input = Serial.readString();
-      // fgets_stdio_blocking(input_str, n);
-      // scanf("%s", input_str);
-      // printf("got command: '%s'\n", input_str);
-      // String input = input_str;
 
       if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
         input = "help";
       }
-      int16_t val = -1;
+
       switch (input[0]) {
       case '<':
         if (String("off") == String(&input[2])) {
@@ -108,13 +102,12 @@ void command_handler_task(void *pvParameter) {
       case 'p':
         write_pv(atof(&input[1]));
         break;
-      case 'm':
+      case 'M':
         write_motor(atof(&input[1]));
         break;
-      case 'M':
-        val = atoi(&input[1]);
-        printf("Motor Poti: %d\n", val);
-        set_pot(val, POT_CHAN0);
+      case 'm':
+        write_speed(atoi(&input[1]));
+        set_pot(atoi(&input[1]), POT_CHAN0);
         break;
       case 'l':
         light1OnOff();
@@ -125,13 +118,16 @@ void command_handler_task(void *pvParameter) {
       case ':':
         write_driver_info(&input[1], INFO_TYPE::INFO);
         break;
+      case '!':
+        write_driver_info(&input[1], INFO_TYPE::WARN);
+        break;
       case 'h':
       default:
         printf("Unknown command '%s'\n", input.c_str());
-        printf(helpText.c_str(), commands);
+        printf("%s", helpText.c_str());
       }
     }
-    // sleep for 10s
+    // sleep for some seconds
     vTaskDelay(100 / portTICK_PERIOD_MS);
   }
 }

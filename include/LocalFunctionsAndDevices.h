@@ -17,6 +17,6 @@
 #define RTC_ON false                        // real time clock, I2C
 #define SERIAL_ON false                     // write/read to/from console
 #define SD_ON false                         // SD card
-#define SIMULATOR_ON false
+#define SIMULATOR_ON false                  // Display simulator [TODO]
 
 #endif // LocalFunctionsAndDevices_H

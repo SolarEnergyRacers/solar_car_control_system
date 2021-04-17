@@ -124,14 +124,17 @@ void _handleIoInterrupt() {
 
   taskSleep = 10;
 
+  // turn indicator and hazard lights
   if (!dra.p7 || !dra.p1) {
     taskSleep = 200;
     update_indicator(!dra.p7, !dra.p1);
   }
+  // position lights on/off
   if (!dra.p6) {
     taskSleep = 100;
-    light1OnOff();digitalWrite(LED_BUILTIN, HIGH);digitalWrite(LED_BUILTIN, HIGH);
+    light1OnOff();
   }
+  // head lights on/off
   if (!dra.p5) {
     taskSleep = 100;
     light2OnOff();
@@ -200,6 +203,7 @@ int counter = 0;
 void io_ext_demo_task(void *pvParameter) {
   // polling loop
   while (1) {
+    // I/O extender blink light
     if (counter > 10) {
       set_ioext(0, !get_ioext(0));
       counter = 0;

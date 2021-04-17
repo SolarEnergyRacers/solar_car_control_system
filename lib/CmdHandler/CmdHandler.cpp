@@ -137,7 +137,6 @@ void command_handler_task(void *pvParameter) {
 //   while (1) {
 
 //     while (Serial.available() > 0) {
-//       digitalWrite(LED_BUILTIN, HIGH);
 //       // read the incoming chars:
 //       String input = Serial.readString();
 //       printf("Received command: %s\n", input.c_str());

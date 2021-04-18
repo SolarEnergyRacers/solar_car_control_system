@@ -22,7 +22,6 @@
 | ADC1:1 |  |
 | ADC1:2 |  |
 | ADC1:3 |  |
-
 | Input/Output extender PCF8574  |  |
 | IOExt0, I2C Addr 0x38 |   |
 | IOExt0:0 |  |

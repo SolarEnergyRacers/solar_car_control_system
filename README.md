@@ -11,7 +11,7 @@
 
 | Device:Port    | Functionality |
 | :------------- | :-----------: |
-| Analog to digital converter ADS1x15  |  |
+| ***Analog to digital converter ADS1x15***  |  |
 | ADC0, I2C Addr 0x48 |  |
 | ADC0:0 | Motor Controller, speed indication |
 | ADC0:1 |  |
@@ -22,7 +22,7 @@
 | ADC1:1 |  |
 | ADC1:2 |  |
 | ADC1:3 |  |
-| Input/Output extender PCF8574  |  |
+| ***Input/Output extender PCF8574***  |  |
 | IOExt0, I2C Addr 0x38 |   |
 | IOExt0:0 |  |
 | IOExt0:1 |  |

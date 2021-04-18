@@ -7,7 +7,33 @@
 ![Alt text](media/esp32_pinout.png "ESP32 Pinout")
 
 
-***Wiring***: TODO
+## Wiring / Port Usage
+
+| Device:Port    | Functionality |
+| :------------- | :-----------: |
+| Analog to digital converter ADS1x15  |  |
+| ADC0, I2C Addr 0x48 |  |
+| ADC0:0 | Motor Controller, speed indication |
+| ADC0:1 |  |
+| ADC0:2 |  |
+| ADC0:3 |  |
+| ADC1, I2C Addr TBD |  |
+| ADC1:0 |  |
+| ADC1:1 |  |
+| ADC1:2 |  |
+| ADC1:3 |  |
+
+| Input/Output extender PCF8574  |  |
+| IOExt0, I2C Addr 0x38 |   |
+| IOExt0:0 |  |
+| IOExt0:1 |  |
+| IOExt0:2 |  |
+| IOExt0:3 |  |
+| IOExt0:4 |  |
+| IOExt0:5 |  |
+| IOExt0:6 |  |
+| IOExt0:7 |  |
+
 
 ## PlatformIO - Command Guide
 

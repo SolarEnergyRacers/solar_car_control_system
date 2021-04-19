@@ -46,11 +46,12 @@
 | IOExt1:5 |  |
 | IOExt1:6 |  |
 | IOExt1:7 | right |
-| ***Display 3.2" 320x240 Adafruit ILI9341*** | |
-| CS | |
-|MOSI||
-|MISO| CLK |
-|D/S||
+| ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display |
+| CS  | |
+| MOSI| |
+| MISO| |
+| CLK | |
+| D/S | |
 
 ## PlatformIO - Command Guide
 

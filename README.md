@@ -22,17 +22,11 @@
 | ADC1:1 |  |
 | ADC1:2 |  |
 | ADC1:3 |  |
-| ***Analog to digital converter ADS1x15***  | steering wheel acceleration potentiometer |
-| ADC0, I2C Addr 0x48 |  |
-| ADC0:0 | Motor Controller, speed indication |
-| ADC0:1 |  |
-| ADC0:2 |  |
-| ADC0:3 |  |
-| ADC1, I2C Addr TBD |  |
-| ADC1:0 |  |
-| ADC1:1 |  |
-| ADC1:2 |  |
-| ADC1:3 |  |
+| ADC2, I2C Addr 0x48 |  |
+| ADC2:0 | steering wheel acceleration potentiometer |
+| ADC2:1 |  |
+| ADC2:2 |  |
+| ADC2:3 |  |
 | ***Input/Output extender PCF8574***  |  |
 | IOExt0, I2C Addr 0x38 |   |
 | IOExt0:0 |  |
@@ -43,16 +37,20 @@
 | IOExt0:5 |  |
 | IOExt0:6 |  |
 | IOExt0:7 |  |
-| ***Input/Output extender PCF8574***  |  steering wheel buttons |
-| IOExt0, I2C Addr 0x20 |   |
-| IOExt0:0 | left |
-| IOExt0:1 | light |
-| IOExt0:2 | LIGHT |
-| IOExt0:3 |  |
-| IOExt0:4 |  |
-| IOExt0:5 |  |
-| IOExt0:6 |  |
-| IOExt0:7 | right |
+| IOExt1, I2C Addr 0x20 | steering wheel buttons  |
+| IOExt1:0 | left |
+| IOExt1:1 | light |
+| IOExt1:2 | LIGHT |
+| IOExt1:3 |  |
+| IOExt1:4 |  |
+| IOExt1:5 |  |
+| IOExt1:6 |  |
+| IOExt1:7 | right |
+| ***Display 3.2" 320x240 Adafruit ILI9341*** | |
+| CS | |
+|MOSI||
+|MISO| CLK |
+|D/S||
 
 ## PlatformIO - Command Guide
 

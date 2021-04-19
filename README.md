@@ -22,7 +22,7 @@
 | ADC1:1 |  |
 | ADC1:2 |  |
 | ADC1:3 |  |
-| ***Analog to digital converter ADS1x15***  | steering wheel accelleration potentiometer |
+| ***Analog to digital converter ADS1x15***  | steering wheel acceleration potentiometer |
 | ADC0, I2C Addr 0x48 |  |
 | ADC0:0 | Motor Controller, speed indication |
 | ADC0:1 |  |
@@ -43,7 +43,7 @@
 | IOExt0:5 |  |
 | IOExt0:6 |  |
 | IOExt0:7 |  |
-| ***Input/Output extender PCF8574***  |  steering wheel buttons|
+| ***Input/Output extender PCF8574***  |  steering wheel buttons |
 | IOExt0, I2C Addr 0x20 |   |
 | IOExt0:0 | left |
 | IOExt0:1 | light |

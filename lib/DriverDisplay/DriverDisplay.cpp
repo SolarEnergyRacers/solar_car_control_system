@@ -576,6 +576,7 @@ void driver_display_demo_screen() {
   delay(15000);
 // ---- for power measurement: end
 #endif
+  tft.setFont(Arial_32);
   printf(" - background\n");
   draw_display_background();
   printf(" - driver info\n");

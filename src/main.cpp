@@ -75,6 +75,9 @@ void app_main(void) {
   if (DISPLAY_LARGE_INDICATOR_ON) {
     init_indicator();
   }
+  if (COMMANDHANDLER_ON) {
+    init_command_handler();
+  }
   if (ADC_ON) {
     init_adc();
   }
@@ -107,9 +110,6 @@ void app_main(void) {
   }
   if (SERIAL_ON) {
     init_serial();
-  }
-  if (COMMANDHANDLER_ON) {
-    init_command_handler();
   }
   if (SIMULATOR_ON) {
     init_simulator();

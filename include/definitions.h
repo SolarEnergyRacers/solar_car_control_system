@@ -140,6 +140,7 @@
 #define SPI_RST 21
 
 #define SPI_CS_TFT 36
+#define SPI_CS_POTI 33
 #define SPI_CS_SDCARD 14
 #endif
 

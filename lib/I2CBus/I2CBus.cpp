@@ -15,13 +15,16 @@ SemaphoreHandle_t i2c_mutex;
 
 void init_i2c(void) {
 
-    // CRITICAL SECTION I2C: start
-    // init mutex (it is acquired)
-    i2c_mutex = xSemaphoreCreateBinary();
+  // CRITICAL SECTION I2C: start
+  // init mutex (it is acquired)
+  i2c_mutex = xSemaphoreCreateBinary();
 
-    // init i2c wire library
-    Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  // init i2c wire library
+  Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
 
-    xSemaphoreGive(i2c_mutex);
-    // CRITICAL SECTION I2C: end
+  xSemaphoreGive(i2c_mutex);
+  // CRITICAL SECTION I2C: end
+
+  printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA,
+         I2C_SCL, I2C_FREQ);
 }

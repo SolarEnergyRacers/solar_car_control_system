@@ -10,6 +10,7 @@
 #include <freertos/task.h>
 
 #include <Arduino.h>
+#include <SPI.h>
 #include <Wire.h> // I2C
 #include <inttypes.h>
 #include <stdio.h>
@@ -73,11 +74,6 @@ void dac_user_input_demo_task(void *pvParameter) {
   }
 }
 
-void init_dac() {
-  // nothing to do, i2c bus is getting initialized externally
-  printf("dac task inited\n");
-}
-
 uint8_t get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {
@@ -97,26 +93,44 @@ uint8_t get_cmd(pot_chan channel) {
   return command;
 }
 
-void set_pot(uint8_t val, pot_chan channel) {
+// void set_pot(uint8_t val, pot_chan channel) {
 
-  // setup command
-  uint8_t command = get_cmd(channel);
+//   // setup command
+//   uint8_t command = get_cmd(channel);
 
-  printf("Write motor potentiometer %02x to %d\n", command, val);
+//   printf("Write motor potentiometer %02x to %d\n", command, val);
 
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+//   // CRITICAL SECTION I2C: start
+//   xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
-  Wire.beginTransmission(I2C_ADDRESS_DS1803);
-  Wire.write(command);
-  Wire.write(val); // first pot value
-  if (channel == POT_CHAN_ALL) {
-    Wire.write(val); // second pot value
-  }
-  Wire.endTransmission();
+//   Wire.beginTransmission(I2C_ADDRESS_DS1803);
+//   Wire.write(command);
+//   Wire.write(val); // first pot value
+//   if (channel == POT_CHAN_ALL) {
+//     Wire.write(val); // second pot value
+//   }
+//   Wire.endTransmission();
 
-  xSemaphoreGive(i2c_mutex);
-  // CRITICAL SECTION I2C: end
+//   xSemaphoreGive(i2c_mutex);
+//   // CRITICAL SECTION I2C: end
+// }
+
+void set_pot(uint8_t value) {
+  printf("Write motor potentiometer to %d...", value);
+  // CRITICAL SECTION SPI: start
+  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+  // send command
+  pinMode(SPI_CS_POTI, OUTPUT);
+  delayMicroseconds(15);
+  digitalWrite(SPI_CS_POTI, LOW); // activation of CS line
+  delayMicroseconds(15);
+  SPI.transfer(value); // Send the variable i (i=0->Vout=0V i=255->Vout=Vcc)
+  digitalWrite(SPI_CS_POTI, HIGH); // deactivation of CS line
+
+  xSemaphoreGive(spi_mutex);
+  // CRITICAL SECTION SPI: end
+  printf("set.\n");
 }
 
 uint16_t get_pot(pot_chan channel) {
@@ -138,4 +152,17 @@ uint16_t get_pot(pot_chan channel) {
   } else { // POT_CHAN1
     return pot1;
   }
+}
+
+void init_dac() {
+  //  // CRITICAL SECTION SPI: start
+  // xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+  // // set the slaveSelectPin as an output:
+  pinMode(SPI_CS_POTI, OUTPUT);
+
+  //   xSemaphoreGive(spi_mutex);
+  // // CRITICAL SECTION SPI: end
+
+  printf("[v] dac task (Digital Poti) inited with =%d\n", SPI_CS_POTI);
 }

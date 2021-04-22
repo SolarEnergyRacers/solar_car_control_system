@@ -14,6 +14,15 @@
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
+#include <Fonts/FreeMono12pt7b.h>
+#include <Fonts/FreeMono18pt7b.h>
+#include <Fonts/FreeMono24pt7b.h>
+#include <Fonts/FreeMono9pt7b.h>
+#include <Fonts/FreeMonoBold24pt7b.h>
+#include <Fonts/FreeSans12pt7b.h>
+#include <Fonts/FreeSans18pt7b.h>
+#include <Fonts/FreeSans24pt7b.h>
+#include <Fonts/FreeSans9pt7b.h>
 
 Adafruit_ILI9341 tft =
     Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
@@ -188,6 +197,7 @@ int _write_int(int x, int y, int valueLast, int value, int textSize,
   }
   int digitWidth = textSize * 6;
   int digitHeight = textSize * 8;
+
   // determine the three digits the stored, new value
   int d1 = (int)value % 10;
   int d2 = ((int)value / 10) % 10;
@@ -471,6 +481,12 @@ void light2OnOff() {
 void write_speed(int value) {
   speedLast = _write_int(speedFrameX + 9, speedFrameY + 10, speedLast, value,
                          speedTextSize, ILI9341_WHITE);
+
+  // tft.setFont(&FreeMonoBold24pt7b);
+  // speedLast = _write_int(speedFrameX + 20, speedFrameY + 25, speedLast,
+  // value,
+  //                        2, ILI9341_WHITE);
+  // tft.setFont();
 }
 
 // acceleration value: 0-255
@@ -540,8 +556,28 @@ int _getColorForInfoType(INFO_TYPE type) {
 }
 
 void write_driver_info(String msg, INFO_TYPE type) {
+
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+  // int textSize = 1;
+  // tft.setFont(&FreeSans18pt7b);
+
+  // if (msg != infoLast) {
+  //   tft.setTextSize(textSize);
+  //   tft.setTextWrap(true);
+
+  //   tft.setTextColor(bgColor);
+  //   tft.setCursor(infoFrameX, infoFrameY + 9);
+  //   tft.print(infoLast);
+
+  //   tft.setTextColor(_getColorForInfoType(type));
+  //   tft.setCursor(infoFrameX, infoFrameY + 9);
+  //   tft.print(msg);
+  //   // TODO: _drawCentreString(msg.c_str(), 0, 0);
+  //   infoLast = msg;
+  // }
+  // tft.setFont();
 
   int textSize = 4;
 
@@ -576,7 +612,7 @@ void driver_display_demo_screen() {
   delay(15000);
 // ---- for power measurement: end
 #endif
-  tft.setFont(Arial_32);
+
   printf(" - background\n");
   draw_display_background();
   printf(" - driver info\n");
@@ -676,6 +712,9 @@ void init_driver_display(void) {
   write_pv(0.0);
   write_motor(0.0);
 
+  printf("[v] Driver Display inited: SPI_CS_TFT=%d, SPI_DC=%d, SPI_MOSI=%d, "
+         "SPI_CLK=%d, SPI_RST=%d, SPI_MISO=%d.\n",
+         SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   vTaskDelay(500 / portTICK_PERIOD_MS);
 }
 

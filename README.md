@@ -4,7 +4,7 @@
 ## ESP32 Pinout & Wiring
 
 ***Wiring***:
-![Alt text](media/esp32_pinout.png "ESP32 Pinout")
+![Alt text](media/Adafruit-HUZZAH32-Feather-pinout.png "ESP32 Pinout")
 
 
 ## Wiring / Port Usage

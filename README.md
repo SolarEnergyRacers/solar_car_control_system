@@ -77,13 +77,13 @@
 | IOExt2:6 | button: power/speed |
 | IOExt2:7 | button: set/reset |
 
-| ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires)|
-| :------------- | :-----------: |
-| CS   | see ESP32:SPI:CS_TFT_SCREEN |
-| MOSI | see ESP32:SPI:MOSI |
-| MISO | see ESP32:SPI:MISO |
-| CLK  | see ESP32:SPI:CLK  |
-| D/S  | required?? |
+| ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires) |
+| :------------------------------------------ | :------------------------------------------------------: |
+| CS                                          |               see ESP32:SPI:CS_TFT_SCREEN                |
+| MOSI                                        |                    see ESP32:SPI:MOSI                    |
+| MISO                                        |       see ESP32:SPI:MISO (Pull Down: 10kΏ to GND)        |
+| CLK                                         |                    see ESP32:SPI:CLK                     |
+| D/S                                         |                  Pull Down: 10kΏ to GND                  |
 
 | ***DigitPot*** | digital potentiometer |
 | :------------- | :-----------: |

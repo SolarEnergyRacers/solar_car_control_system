@@ -5,11 +5,35 @@
    xmlns:rdf="http://www.w3.org/1999/02/22-rdf-syntax-ns#"
    xmlns:svg="http://www.w3.org/2000/svg"
    xmlns="http://www.w3.org/2000/svg"
+   xmlns:sodipodi="http://sodipodi.sourceforge.net/DTD/sodipodi-0.dtd"
+   xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape"
    id="svg8"
    version="1.1"
    viewBox="0 0 297 210"
    height="210mm"
-   width="297mm">
+   width="297mm"
+   sodipodi:docname="device_diagram.svg"
+   inkscape:version="0.92.4 (5da689c313, 2019-01-14)">
+  <sodipodi:namedview
+     pagecolor="#ffffff"
+     bordercolor="#666666"
+     borderopacity="1"
+     objecttolerance="10"
+     gridtolerance="10"
+     guidetolerance="10"
+     inkscape:pageopacity="0"
+     inkscape:pageshadow="2"
+     inkscape:window-width="3840"
+     inkscape:window-height="2066"
+     id="namedview954"
+     showgrid="false"
+     inkscape:zoom="6.5677032"
+     inkscape:cx="805.8095"
+     inkscape:cy="91.61116"
+     inkscape:window-x="3829"
+     inkscape:window-y="-11"
+     inkscape:window-maximized="1"
+     inkscape:current-layer="layer1" />
   <defs
      id="defs2" />
   <metadata
@@ -20,7 +44,7 @@
         <dc:format>image/svg+xml</dc:format>
         <dc:type
            rdf:resource="http://purl.org/dc/dcmitype/StillImage" />
-        <dc:title></dc:title>
+        <dc:title />
       </cc:Work>
     </rdf:RDF>
   </metadata>
@@ -34,21 +58,7 @@
        width="29.90983"
        id="rect815"
        style="fill:#87cdde;fill-opacity:1;stroke:#000000;stroke-width:1.301;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill" />
-    <flowRoot
-       transform="matrix(0.13251191,0,0,0.13251191,50.341467,163.46188)"
-       style="font-style:normal;font-weight:normal;font-size:53.24468994px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
-       id="flowRoot817"
-       xml:space="preserve"><flowRegion
-         style="font-size:53.24468994px"
-         id="flowRegion819"><rect
-           style="font-size:53.24468994px"
-           y="363.34366"
-           x="433.57144"
-           height="120.35714"
-           width="200"
-           id="rect821" /></flowRegion><flowPara
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:53.24468994px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold'"
-         id="flowPara823">ESP32</flowPara></flowRoot>    <rect
+    <rect
        y="198.30988"
        x="4.4973741"
        height="94.570717"
@@ -71,7 +81,7 @@
        id="rect832-9"
        style="fill:none;fill-opacity:1;stroke:#000000;stroke-width:0.53319967;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:0.53319973, 3.1991984;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill" />
     <flowRoot
-       transform="matrix(0.26458333,0,0,0.26458333,33.44668,53.153091)"
+       transform="matrix(0.26458333,0,0,0.26458333,17.042503,53.153091)"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        id="flowRoot853"
        xml:space="preserve"><flowRegion
@@ -82,7 +92,7 @@
            width="283.85287"
            id="rect857" /></flowRegion><flowPara
          style="font-size:32px"
-         id="flowPara859">Steuerrad</flowPara></flowRoot>    <text
+         id="flowPara859">steering wheel</flowPara></flowRoot>    <text
        id="text863"
        y="193.04755"
        x="16.292433"
@@ -91,7 +101,7 @@
          style="font-size:8.46666622px;stroke-width:0.26458332"
          y="193.04755"
          x="16.292433"
-         id="tspan861">Hauptrechnerplatine</tspan></text>
+         id="tspan861">main micro processor</tspan></text>
     <rect
        y="147.61134"
        x="58.623009"
@@ -688,7 +698,7 @@
          x="88.662621"
          id="tspan959-3-0">1Wire</tspan></text>
     <flowRoot
-       transform="matrix(0.26458333,0,0,0.26458333,-1.4174107,64.179687)"
+       transform="matrix(0.26458333,0,0,0.26458333,-29.675685,94.375021)"
        style="font-style:normal;font-weight:normal;font-size:40px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none"
        id="flowRoot1530"
        xml:space="preserve"><flowRegion
@@ -699,5 +709,27 @@
            width="217.94041"
            id="rect1534" /></flowRegion><flowPara
          style="font-size:16px"
-         id="flowPara1536">Outputs: Blinker, Horn, .. </flowPara></flowRoot>  </g>
+         id="flowPara1536" /></flowRoot>    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="107.94481"
+       y="218.53749"
+       id="text4661"><tspan
+         sodipodi:role="line"
+         id="tspan4659"
+         x="107.94481"
+         y="218.53749"
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05555534px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:0.26458332">ESP32</tspan></text>
+    <text
+       xml:space="preserve"
+       style="font-style:normal;font-weight:normal;font-size:10.58333302px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
+       x="205.59862"
+       y="291.25793"
+       id="text4665"><tspan
+         sodipodi:role="line"
+         id="tspan4663"
+         x="205.59862"
+         y="291.25793"
+         style="font-size:4.23333311px;stroke-width:0.26458332">Outputs: Blinker, Horn, .. </tspan></text>
+  </g>
 </svg>

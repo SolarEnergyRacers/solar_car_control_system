@@ -80,9 +80,9 @@
 | ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires)|
 | :------------- | :-----------: |
 | CS   | see ESP32:SPI:CS_TFT_SCREEN |
-| MOSI | see ESP32:MOSI |
-| MISO | see ESP32:MISO |
-| CLK  | see ESP32:CLK  |
+| MOSI | see ESP32:SPI:MOSI |
+| MISO | see ESP32:SPI:MISO |
+| CLK  | see ESP32:SPI:CLK  |
 | D/S  | required?? |
 
 | ***DigitPot*** | digital potentiometer |

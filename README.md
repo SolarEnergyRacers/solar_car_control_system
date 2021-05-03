@@ -30,8 +30,8 @@
 | ESP32:13 | GPIO:LED_BUILTIN |
 | ESP32:25 | GPIO:INTERRUPT |
 | ESP32:14 | GPIO:PCF8574_INTERRUPT |
-| ESP32:??? | CAN:Lo |
-| ESP32:??? | CAN:Hi |
+| ESP32:25 | CAN:TX |
+| ESP32:26 | CAN:RX |
 
 
 | ***Analog to digital converter ADS1x15***  |  |

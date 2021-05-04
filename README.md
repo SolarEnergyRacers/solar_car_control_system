@@ -46,6 +46,11 @@
 | ADC1:1 | steering wheel deceleration piezo |
 | ADC1:2 | |
 | ADC1:3 | |
+| ADC2, I2C Addr 0x50 (can be set??) |  |
+| ADC2:0 | Umot: motorcontroller voltage |
+| ADC2:1 | |
+| ADC2:2 | |
+| ADC2:3 | |
 
 | ***Input/Output extender PCF8574***  |  |
 | :------------- | :-----------: |

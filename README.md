@@ -1,4 +1,5 @@
 # <img src="media/logo/logo_green.svg" alt="SER Logo" width="150"/> SolarEnergyRacers
+
 # Solar Car Control System ![PlatformIO CI - Build Process](https://github.com/SolarEnergyRacers/solar_car_control_system/workflows/PlatformIO%20CI%20-%20Build%20Process/badge.svg?branch=master) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
 ## ESP32 Pinout & Wiring
@@ -6,15 +7,14 @@
 ***Wiring***:
 ![ESP32 Pinout](media/Adafruit-HUZZAH32-Feather-pinout.png "ESP32 Pinout")
 
-
 ## Wiring / Port Usage
 
 ![Device Diagram](media/device_diagram.svg "Device Diagram")
 
 
-| Device:Port    | Functionality |
-| :------------- | :-----------: |
-| ***ESP32***  | main micro processor |
+| Device:Port | Functionality |
+| :- | :-: |
+| ***ESP32*** | main micro processor |
 | ESP32:2 | 1Wire |
 | ESP32:22 | I2C:SCL |
 | ESP32:23 | I2C:SDA |
@@ -34,28 +34,29 @@
 | ESP32:26 | CAN:RX |
 
 
-| ***Analog to digital converter ADS1x15***  |  |
-| :------------- | :-----------: |
-| ADC0, I2C Addr 0x48 |  |
+| ***Analog to digital converter ADS1x15*** |   |
+| :- | :-: |
+| ADC0, I2C Addr 0x48 |   |
 | ADC0:0 | motor controller, speed indication |
 | ADC0:1 | Ibat: battery current sensor |
 | ADC0:2 | Imot: motor current sensor |
-| ADC0:3 | Ipv: pv current sensor  |
-| ADC1, I2C Addr 0x49 (can be set??) |  |
+| ADC0:3 | Ipv: pv current sensor |
+| ADC1, I2C Addr 0x49 (can be set??) |   |
 | ADC1:0 | steering wheel acceleration piezo |
 | ADC1:1 | steering wheel deceleration piezo |
-| ADC1:2 | |
-| ADC1:3 | |
-| ADC2, I2C Addr 0x50 (can be set??) |  |
+| ADC1:2 |   |
+| ADC1:3 |   |
+| ADC2, I2C Addr 0x50 (can be set??) |   |
 | ADC2:0 | Umot: motorcontroller voltage |
-| ADC2:1 | |
-| ADC2:2 | |
-| ADC2:3 | |
+| ADC2:1 |   |
+| ADC2:2 |   |
+| ADC2:3 |   |
 
-| ***Input/Output extender PCF8574***  |  |
-| :------------- | :-----------: |
+
+| ***Input/Output extender PCF8574*** |   |
+| :- | :-: |
 | IOExt0, I2C Addr tbd |   |
-| IOExt0:0 | switch: battery on/off  |
+| IOExt0:0 | switch: battery on/off |
 | IOExt0:1 | switch: PV on/off |
 | IOExt0:2 | switch: motor on/off |
 | IOExt0:3 | mc: eco/power |
@@ -69,10 +70,10 @@
 | IOExt1:2 | output: horn |
 | IOExt1:3 | output: head light |
 | IOExt1:4 | output: light |
-| IOExt1:5 | |
-| IOExt1:6 | |
-| IOExt1:7 | |
-| IOExt2, I2C Addr tbd | steering wheel buttons  |
+| IOExt1:5 |   |
+| IOExt1:6 |   |
+| IOExt1:7 |   |
+| IOExt2, I2C Addr tbd | steering wheel buttons |
 | IOExt2:0 | button: left indicator |
 | IOExt2:1 | button: right indicator |
 | IOExt2:2 | button: head light |
@@ -82,65 +83,76 @@
 | IOExt2:6 | button: power/speed |
 | IOExt2:7 | button: set/reset |
 
-| ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires) |
-| :------------------------------------------ | :------------------------------------------------------: |
-| CS                                          |               see ESP32:SPI:CS_TFT_SCREEN                |
-| MOSI                                        |                    see ESP32:SPI:MOSI                    |
-| MISO                                        |       see ESP32:SPI:MISO (Pull Down: 10kΏ to GND)        |
-| CLK                                         |                    see ESP32:SPI:CLK                     |
-| D/S                                         |                  Pull Down: 10kΏ to GND                  |
 
-| ***DigitPot*** | digital potentiometer |
-| :------------- | :-----------: |
-| SCL | see ESP32:I2C:SCL |
-| SDA | see ESP32:I2C:SDA |
-| H0  | 5V input |
-| M0  | MC:acceleration input |
-| L0  | GND |
-| H1  | 5V input |
-| M1  | MC: deceleration input |
-| L1  | GND |
+| ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires) |
+| :- | :-: |
+| CS | see ESP32:SPI:CS_TFT_SCREEN |
+| MOSI | see ESP32:SPI:MOSI |
+| MISO | see ESP32:SPI:MISO (Pull Down: 10kΏ to GND) |
+| CLK | see ESP32:SPI:CLK |
+| D/S | Pull Down: 10kΏ to GND |
+
+
+| ***DigitPot*** DS1803 | digital potentiometer |
+| :- | :-: |
+| SCL:8 | see ESP32:I2C:SCL |
+| SDA:9 | see ESP32:I2C:SDA |
+| H0:12 | VCC at 5V Powersupply |
+| W0:10 | MC:acceleration input |
+| L0:11 | GND at 5V Powersupply + ESP32:GND |
+| H1:1 | VCC at 5V Powersupply |
+| W1:3 | MC: deceleration input |
+| L1:2 | GND at 5V Powersupply + ESP32:GND |
+| A0:6 | GND for address 0x28 |
+| A1:5 | GND for address 0x28 |
+| A0:4 | GND for address 0x28 |
+
 
 | ***RTC*** | real time clock |
-| :------------- | :-----------: |
+| :- | :-: |
 | SCL | see ESP32:I2C:SCL |
 | SDA | see ESP32:I2C:SDA |
 
+
 | ***Gyro&Acc*** | gyroscope & accelerator |
-| :------------- | :-----------: |
-| SCL  | see ESP32:I2C:SCL |
-| SDA  | see ESP32:I2C:SDA |
+| :- | :-: |
+| SCL | see ESP32:I2C:SCL |
+| SDA | see ESP32:I2C:SDA |
+
 
 | ***Temp*** | temperature sensor |
-| :------------- | :-----------: |
-| Temp0  | see ESP32:1Wire |
-| Temp1  | see ESP32:1Wire |
-| Temp2  | see ESP32:1Wire |
-| Temp3  | see ESP32:1Wire |
+| :- | :-: |
+| Temp0 | see ESP32:1Wire |
+| Temp1 | see ESP32:1Wire |
+| Temp2 | see ESP32:1Wire |
+| Temp3 | see ESP32:1Wire |
+
 
 | ***SD*** | sd card |
-| :------------- | :-----------: |
-| CS   | see ESP32:SPI:CS_SD_CARD |
+| :- | :-: |
+| CS | see ESP32:SPI:CS_SD_CARD |
 | MOSI | see ESP32:MOSI |
 | MISO | see ESP32:MISO |
-| CLK  | see ESP32:CLK  |
-| D/S  | required? |
+| CLK | see ESP32:CLK |
+| D/S | required? |
+
 
 | ***Serial*** | serial telemetry communication |
-| :------------- | :-----------: |
-| RX  | see ESP32:SERIAL:RX |
-| TX  | see ESP32:SERIAL:TX |
+| :- | :-: |
+| RX | see ESP32:SERIAL:RX |
+| TX | see ESP32:SERIAL:TX |
+
 
 | ***MPPT*** | maximum power point tracking communication |
-| :------------- | :-----------: |
-| CAN Lo  | see ESP32:CAN:Lo |
-| CAN Hi  | see ESP32:CAN:Hi |
+| :- | :-: |
+| CAN Lo | see ESP32:CAN:Lo |
+| CAN Hi | see ESP32:CAN:Hi |
+
 
 | ***BMS*** | battery management system communication |
-| :------------- | :-----------: |
-| CAN Lo  | see ESP32:CAN:Lo |
-| CAN Hi  | see ESP32:CAN:Hi |
-
+| :- | :-: |
+| CAN Lo | see ESP32:CAN:Lo |
+| CAN Hi | see ESP32:CAN:Hi |
 
 ## PlatformIO - Command Guide
 

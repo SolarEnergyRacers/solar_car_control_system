@@ -13,19 +13,19 @@
 
 
 | Device:Port | Functionality |
-| :- | :-: |
+| :-          | :-:           |
 | ***ESP32*** | main micro processor |
-| ESP32:2 | 1Wire |
+| ESP32:2  | 1Wire |
 | ESP32:22 | I2C:SCL |
 | ESP32:23 | I2C:SDA |
 | ESP32:15 | SERIAL:TX |
 | ESP32:16 | SERIAL:RX |
 | ESP32:18 | SPI:MOSI |
 | ESP32:19 | SPI:MISO |
-| ESP32:5 | SPI:CLK |
+| ESP32:5  | SPI:CLK |
 | ESP32:36 | SPI:CS_TFT_SCREEN |
 | ESP32:14 | SPI:CS_SD_CARD |
-| ESP32:4 | SPI:DC |
+| ESP32:4  | SPI:DC |
 | ESP32:21 | SPI:RST |
 | ESP32:13 | GPIO:LED_BUILTIN |
 | ESP32:25 | GPIO:INTERRUPT |
@@ -34,28 +34,28 @@
 | ESP32:26 | CAN:RX |
 
 
-| ***Analog to digital converter ADS1x15*** |   |
+| ***ADS1x15*** | Analog to digital converter |
 | :- | :-: |
 | ADC0, I2C Addr 0x48 |   |
 | ADC0:0 | motor controller, speed indication |
 | ADC0:1 | Ibat: battery current sensor |
 | ADC0:2 | Imot: motor current sensor |
 | ADC0:3 | Ipv: pv current sensor |
-| ADC1, I2C Addr 0x49 (can be set??) |   |
-| ADC1:0 | Umot: motorcontroller voltage |
-| ADC1:1 |  |
+| ADC1, I2C Addr 0x49 (TODO: can be set??) |   |
+| ADC1:0 | steering wheel acceleration piezo |
+| ADC1:1 | steering wheel deceleration piezo |
 | ADC1:2 |   |
 | ADC1:3 |   |
-| ADC2, I2C Addr 0x50 (can be set??) |   |
-| ADC2:0 | steering wheel deceleration piezo |
-| ADC2:1 | steering wheel acceleration piezo |
+| ADC2, I2C Addr 0x50 (TODO: can be set??) |   |
+| ADC2:0 | Umot: motorcontroller voltage |
+| ADC2:1 |   |
 | ADC2:2 |   |
 | ADC2:3 |   |
 
 
-| ***Input/Output extender PCF8574*** |   |
+| ***PCF8574*** | Input/Output extender |
 | :- | :-: |
-| IOExt0, I2C Addr tbd |   |
+| IOExt0, I2C Addr (TODO) |   |
 | IOExt0:0 | switch: battery on/off |
 | IOExt0:1 | switch: PV on/off |
 | IOExt0:2 | switch: motor on/off |
@@ -64,7 +64,7 @@
 | IOExt0:5 | mc: fwd/rwd |
 | IOExt0:6 | pv: on/off |
 | IOExt0:7 | battery fan on/off |
-| IOExt1, I2C Addr tbd |   |
+| IOExt1, I2C Addr (TODO) |   |
 | IOExt1:0 | output: left indicator |
 | IOExt1:1 | output: right indicator |
 | IOExt1:2 | output: horn |
@@ -73,7 +73,7 @@
 | IOExt1:5 |   |
 | IOExt1:6 |   |
 | IOExt1:7 |   |
-| IOExt2, I2C Addr 0x20 | steering wheel buttons |
+| IOExt2, I2C Addr (TODO) | steering wheel buttons |
 | IOExt2:0 | button: left indicator |
 | IOExt2:1 | button: right indicator |
 | IOExt2:2 | button: head light |
@@ -82,10 +82,9 @@
 | IOExt2:5 | button: next |
 | IOExt2:6 | button: power/speed |
 | IOExt2:7 | button: set/reset |
-| IOEXT2:Int | interrupt |
 
 
-| ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires) |
+| ***ILI9341*** | 3.2" 320x240 display |
 | :- | :-: |
 | CS | see ESP32:SPI:CS_TFT_SCREEN |
 | MOSI | see ESP32:SPI:MOSI |
@@ -94,7 +93,7 @@
 | D/S | Pull Down: 10kΏ to GND |
 
 
-| ***DigitPot*** DS1803 | digital potentiometer |
+| ***DS1803***  | digital potentiometer |
 | :- | :-: |
 | SCL:8 | see ESP32:I2C:SCL |
 | SDA:9 | see ESP32:I2C:SDA |
@@ -131,11 +130,11 @@
 
 | ***SD*** | sd card |
 | :- | :-: |
-| CS | see ESP32:SPI:CS_SD_CARD |
+| CS   | see ESP32:SPI:CS_SD_CARD |
 | MOSI | see ESP32:MOSI |
 | MISO | see ESP32:MISO |
-| CLK | see ESP32:CLK |
-| D/S | required? |
+| CLK  | see ESP32:CLK |
+| D/S  | required? |
 
 
 | ***Serial*** | serial telemetry communication |
@@ -171,4 +170,4 @@
 
 ## License
 
-This project is published under the GNU General Public License v3.0, see [LICENSE](LICENSE).
+This project is published under the [GNU General Public License v3.0](LICENSE).

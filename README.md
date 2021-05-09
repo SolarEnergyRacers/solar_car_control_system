@@ -42,13 +42,13 @@
 | ADC0:2 | Imot: motor current sensor |
 | ADC0:3 | Ipv: pv current sensor |
 | ADC1, I2C Addr 0x49 (can be set??) |   |
-| ADC1:0 | steering wheel acceleration piezo |
-| ADC1:1 | steering wheel deceleration piezo |
+| ADC1:0 | Umot: motorcontroller voltage |
+| ADC1:1 |  |
 | ADC1:2 |   |
 | ADC1:3 |   |
 | ADC2, I2C Addr 0x50 (can be set??) |   |
-| ADC2:0 | Umot: motorcontroller voltage |
-| ADC2:1 |   |
+| ADC2:0 | steering wheel deceleration piezo |
+| ADC2:1 | steering wheel acceleration piezo |
 | ADC2:2 |   |
 | ADC2:3 |   |
 
@@ -73,7 +73,7 @@
 | IOExt1:5 |   |
 | IOExt1:6 |   |
 | IOExt1:7 |   |
-| IOExt2, I2C Addr tbd | steering wheel buttons |
+| IOExt2, I2C Addr 0x20 | steering wheel buttons |
 | IOExt2:0 | button: left indicator |
 | IOExt2:1 | button: right indicator |
 | IOExt2:2 | button: head light |
@@ -82,6 +82,7 @@
 | IOExt2:5 | button: next |
 | IOExt2:6 | button: power/speed |
 | IOExt2:7 | button: set/reset |
+| IOEXT2:Int | interrupt |
 
 
 | ***Display 3.2" 320x240 Adafruit ILI9341*** | driver display (TODO: can't we use i2c?? to save #wires) |

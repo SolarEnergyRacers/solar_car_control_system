@@ -61,7 +61,7 @@
 | IOExt0:2 | switch: motor on/off |
 | IOExt0:3 | mc: eco/power |
 | IOExt0:4 | mc: on/off |
-| IOExt0:5 | mc: ?more? |
+| IOExt0:5 | mc: fwd/rwd |
 | IOExt0:6 | pv: on/off |
 | IOExt0:7 | battery fan on/off |
 | IOExt1, I2C Addr tbd |   |

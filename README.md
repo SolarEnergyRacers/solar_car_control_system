@@ -63,7 +63,7 @@
 | IOExt0:4 | mc: on/off |
 | IOExt0:5 | mc: ?more? |
 | IOExt0:6 | pv: on/off |
-| IOExt0:7 | battery: ?more? |
+| IOExt0:7 | battery fan on/off |
 | IOExt1, I2C Addr tbd |   |
 | IOExt1:0 | output: left indicator |
 | IOExt1:1 | output: right indicator |

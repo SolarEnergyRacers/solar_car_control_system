@@ -62,7 +62,7 @@ void init_ioext() {
   xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
   // setup pins
-  pcf8574.pinMode(P0, OUTPUT, LOW);
+  pcf8574.pinMode(P0, INPUT);
   pcf8574.pinMode(P1, INPUT);
   pcf8574.pinMode(P2, INPUT);
   pcf8574.pinMode(P3, INPUT);
@@ -203,12 +203,12 @@ int counter = 0;
 void io_ext_demo_task(void *pvParameter) {
   // polling loop
   while (1) {
-    // I/O extender blink light
-    if (counter > 10) {
-      set_ioext(0, !get_ioext(0));
-      counter = 0;
-    }
-    counter++;
+    //   // I/O extender blink light
+    //   if (counter > 10) {
+    //     set_ioext(0, !get_ioext(0));
+    //     counter = 0;
+    //   }
+    //   counter++;
 
     // handle inputs
     if (ioInterruptRequest) {

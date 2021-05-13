@@ -25,7 +25,7 @@ Display SPI mode: connect **IM1**, **IM2** and **IM3** pins to 3.3V. Do not sold
 >
 > [Adafruit](https://learn.adafruit.com/adafruit-2-8-and-3-2-color-tft-touchscreen-breakout-v2/pinouts)
 
-![image-20210420060135949](DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/image-20210420060135949.png)
+![pinout circuit view](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/image-20210420060135949.png)
 
 #### Wiring
 
@@ -51,15 +51,15 @@ No need to connect the **RST**.
 
 ## ILI9341 + PCF8574 + ADS1115
 
-10 Kabel vom Miroprocessor zum Display/Buttons/ReglerLeistungsaufnahme Experimentalaufbau mit
+- 10 cables from Miroprocessor to display/buttons/controllerPower recording Experimental setup with
 
-- Display ILI9341 (320x240 pixel)
-- IO Extender PCF8574 (8 bit) (7 Taster und 1 LED)
-- Analog-Digital-Wandler (12bit) und Potentiometer
+  - Display ILI9341 (320x240 pixel)
+  - IO Extender PCF8574 (8 bit) (7 buttons and 1 LED)
+  - Analogue-digital converter (12bit) and potentiometer
 
 ![image-20210323171846165](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/2021-03-27 09.09.17.jpg)
 
-## U-I-Diagramm bei Spannungsänderung
+## U-I diagram when changing the base voltage Vcc
 
 
 | Spannung<br />[V] | Strom<br />[mA] | Leistung<br />[mW] |
@@ -70,12 +70,12 @@ No need to connect the **RST**.
 | 4.0 | 73 | 292 |
 | 5.0 | 85 | 425 |
 
-## U-I-Diagramm bei Displayänderung
+## U-I diagram when changing the display mode
 
-Es wurde bei Vollbild Black und Vollbild White gemessen:
+It was measured at full screen black and full screen white (without any additional output):
 
 
-| Spannung [V] | Strom Black  [mA] | Strom White  [mA] | Leistung Black[mW] | Leistung White  [mW] |
+| Voltage [V] | Current Black  [mA] | Current White  [mA] | Power Black[mW] | Power White  [mW] |
 | :-: | :-: | :-: | :-: | :-: |
 | 3.05 | 25 | 24 | 75 | 72 |
 | 3.3 | 30 | 29 | 99 | 96 |
@@ -83,4 +83,4 @@ Es wurde bei Vollbild Black und Vollbild White gemessen:
 | 4.0 | 63 | 62 | 252 | 248 |
 | 5.0 | 83 | 80 | 415 | 400 |
 
-![image-20210327121949117](DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/image-20210327121949117.png)
+![image-20210327121949117](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/image-20210327121949117.png)

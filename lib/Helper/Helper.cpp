@@ -22,6 +22,7 @@ char* fgets_stdio_blocking(char* str, int n){
         } else { // store char
             str[i++] = c;
         }
+        printf("[%d:%d]", i, c);
     } while(i < (n-1) && c != '\n' && c != '\r');
     str[i] = 0; // add zero-termination
 

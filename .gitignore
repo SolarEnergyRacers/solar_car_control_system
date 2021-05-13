@@ -6,3 +6,4 @@ cmake-build-debug
 .vscode
 # exclude generated config
 sdkconfig
+include/LocalFunctionsAndDevices.h

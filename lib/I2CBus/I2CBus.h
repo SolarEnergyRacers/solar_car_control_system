@@ -11,5 +11,7 @@
 extern SemaphoreHandle_t i2c_mutex;
 
 void init_i2c(void);
+bool i2c_available(uint8_t adr);
+void scan_i2c_devices();
 
 #endif // I2CBUS_H

@@ -610,7 +610,7 @@ void driver_display_demo_screen() {
   printf(" - white background\n");
   tft.fillScreen(ILI9341_WHITE);
   delay(15000);
-// ---- for power measurement: end
+  // ---- for power measurement: end
 #endif
 
   printf(" - background\n");

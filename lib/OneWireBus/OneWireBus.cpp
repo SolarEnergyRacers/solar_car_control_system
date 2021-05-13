@@ -14,14 +14,16 @@
 SemaphoreHandle_t onewire_mutex;
 OneWire oneWire;
 
-void init_onewire(void){
+void init_onewire(void) {
 
-    // init mutex (it is acquired)
-    onewire_mutex = xSemaphoreCreateBinary();
+  // init mutex (it is acquired)
+  onewire_mutex = xSemaphoreCreateBinary();
 
-    // init
-    OneWire oneWire(ONEWIRE_PIN);
+  // init
+  OneWire oneWire(ONEWIRE_PIN);
 
-    // release mutex
-    xSemaphoreGive(onewire_mutex);
+  // release mutex
+  xSemaphoreGive(onewire_mutex);
+
+  printf("[v] OneWire inited: ONEWIRE_PIN=%d.\n", ONEWIRE_PIN);
 }

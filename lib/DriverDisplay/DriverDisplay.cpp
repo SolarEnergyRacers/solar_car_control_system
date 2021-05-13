@@ -556,36 +556,21 @@ int _getColorForInfoType(INFO_TYPE type) {
 }
 
 void write_driver_info(String msg, INFO_TYPE type) {
+  // comments are preparation for font usage
 
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
+  int textSize = 4;
   // int textSize = 1;
   // tft.setFont(&FreeSans18pt7b);
-
-  // if (msg != infoLast) {
-  //   tft.setTextSize(textSize);
-  //   tft.setTextWrap(true);
-
-  //   tft.setTextColor(bgColor);
-  //   tft.setCursor(infoFrameX, infoFrameY + 9);
-  //   tft.print(infoLast);
-
-  //   tft.setTextColor(_getColorForInfoType(type));
-  //   tft.setCursor(infoFrameX, infoFrameY + 9);
-  //   tft.print(msg);
-  //   // TODO: _drawCentreString(msg.c_str(), 0, 0);
-  //   infoLast = msg;
-  // }
-  // tft.setFont();
-
-  int textSize = 4;
 
   if (msg != infoLast) {
     tft.setTextSize(textSize);
     tft.setTextWrap(true);
 
     tft.setTextColor(bgColor);
+    //tft.setCursor(infoFrameX, infoFrameY + 9);
     tft.setCursor(infoFrameX, infoFrameY);
     tft.print(infoLast);
 
@@ -595,6 +580,7 @@ void write_driver_info(String msg, INFO_TYPE type) {
     // TODO: _drawCentreString(msg.c_str(), 0, 0);
     infoLast = msg;
   }
+  // tft.setFont();
 
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
@@ -649,31 +635,6 @@ void init_driver_display(void) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-#ifdef DISPLAY_OLED_128_6LGA
-  // TODO: DISPLAY_OLED_128_6LGA
-  println("Display Test DISPLAY_OLED_128_6LGA");
-  SPI.begin(4);
-  SPI.beginTransaction(SPISettings(1000000, SPI_MSBFIRST, SPI_MODE0));
-  SPI.transfer(0xF0);
-  SPI.transfer(0x40);
-  SPI.transfer(0xA0);
-  SPI.transfer(0xC0);
-  SPI.transfer(0xA6);
-
-  SPI.transfer(0x81);
-  SPI.transfer(0xFF);
-
-  SPI.transfer(0xD5);
-  SPI.transfer(0x40);
-
-  SPI.transfer(0xD9);
-  SPI.transfer(0x44);
-
-  SPI.transfer(0xAF);
-  SPI.endTransaction();
-  println("End Display Test DISPLAY_OLED_128_6LGA");
-#endif
-
   tft.begin();
   try {
     uint8_t x = tft.readcommand8(ILI9341_RDMODE);
@@ -724,20 +685,12 @@ void init_driver_display(void) {
 void driver_display_task(void *pvParameter) {
   // polling loop
   while (1) {
-    // long start = micros();
-
-    // // CRITICAL SECTION SPI: start
-    // xSemaphoreTake(spi_mutex, portMAX_DELAY);
-    // xSemaphoreGive(spi_mutex);
-    // // CRITICAL SECTION SPI: end
 
     if (lifeSignCounter > 10) {
       lifeSign();
       lifeSignCounter = 0;
     }
     lifeSignCounter++;
-
-    // printf("time elapsed: %ld\n", micros() - start);
 
     // sleep for 1s
     vTaskDelay(100 / portTICK_PERIOD_MS);

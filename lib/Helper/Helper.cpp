@@ -12,7 +12,7 @@
 
 char* fgets_stdio_blocking(char* str, int n){
 
-    char c = '.';
+    char c;
     int i = 0;
     do {
         c = getchar();

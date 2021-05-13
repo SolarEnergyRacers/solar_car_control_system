@@ -65,6 +65,8 @@ void app_main(void) {
   init_onewire();
   init_i2c();
   init_spi();
+  
+  scan_i2c_devices();
 
   // ---- init modules ----
   if (BLINK_ON) {
@@ -100,7 +102,7 @@ void app_main(void) {
     register_gpio_interrupt();
   }
   if (DISPLAY_ON) {
-      init_display();
+    init_display();
   }
   if (IOEXT_ON) {
     init_ioext();
@@ -169,8 +171,6 @@ void app_main(void) {
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DAC_ON) {
-    xTaskCreate(&dac_user_input_demo_task, "dac_user_input_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (COMMANDHANDLER_ON) {
     xTaskCreate(&command_handler_task, "command_handler_task",

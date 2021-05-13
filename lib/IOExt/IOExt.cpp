@@ -19,43 +19,6 @@ PCF8574 pcf8574(I2C_ADDRESS_PCF8574, I2C_SDA, I2C_SCL, PCF8574_INTERRUPT_PIN,
 int speed = 0;
 int taskSleep = 10;
 
-void scan() {
-  /* I2C slave Address Scanner
-  for 5V bus
-      * Connect a 4.7k resistor between SDA and Vcc
-      * Connect a 4.7k resistor between SCL and Vcc
-  for 3.3V bus
-      * Connect a 2.4k resistor between SDA and Vcc
-      * Connect a 2.4k resistor between SCL and Vcc
-  */
-  printf("Scanning I2C Addresses:\n");
-  uint8_t cnt = 0;
-  for (uint8_t i = 0; i < 0x80; i++) {
-    Wire.beginTransmission(i);
-    uint8_t ec = Wire.endTransmission(true);
-    if (ec == 0) {
-      printf("%02x ", i);
-      cnt++;
-    } else {
-      printf("-- ");
-    }
-    if ((i & 0x0f) == 0x0f) {
-      printf("\n");
-    }
-  }
-  printf("Scan Completed, %d I2C Devices found.\n", cnt);
-}
-
-bool i2cReady(uint8_t adr) {
-  uint32_t timeout = millis();
-  bool ready = false;
-  while ((millis() - timeout < 100) && (!ready)) {
-    Wire.beginTransmission(adr);
-    ready = (Wire.endTransmission() == 0);
-  }
-  return ready;
-}
-
 void init_ioext() {
 
   // CRITICAL SECTION I2C: start
@@ -70,8 +33,6 @@ void init_ioext() {
   pcf8574.pinMode(P5, INPUT);
   pcf8574.pinMode(P6, INPUT);
   pcf8574.pinMode(P7, INPUT);
-
-  scan();
 
   // start
   if (pcf8574.begin()) {
@@ -154,17 +115,16 @@ void _handleIoInterrupt() {
     write_speed(speed);
     _speedCheck(speed);
   }
-
-  // int v[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-  // for (int idx = 0; idx < 8; idx++)
-  // {
-  //     v[idx] = pcf8574.digitalRead(idx);
-  // }
-  // for (int idx = 0; idx < 8; idx++)
-  // {
-  //     printf("%d:%d - ", idx, v[idx]);
-  // }
-  // Serial.println();
+#ifdef DEBUGLEVEL_VERBOSE == true
+  int v[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+  for (int idx = 0; idx < 8; idx++) {
+    v[idx] = pcf8574.digitalRead(idx);
+  }
+  for (int idx = 0; idx < 8; idx++) {
+    printf("%d:%d - ", idx, v[idx]);
+  }
+  Serial.println();
+#endif
 }
 
 void set_ioext(int port, bool value) {
@@ -199,18 +159,11 @@ int get_ioext(int port) {
   return value;
 }
 
-int counter = 0;
 void io_ext_demo_task(void *pvParameter) {
+
   // polling loop
   while (1) {
-    //   // I/O extender blink light
-    //   if (counter > 10) {
-    //     set_ioext(0, !get_ioext(0));
-    //     counter = 0;
-    //   }
-    //   counter++;
-
-    // handle inputs
+    // handle input interrupts
     if (ioInterruptRequest) {
       _handleIoInterrupt();
       ioInterruptRequest = false;

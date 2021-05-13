@@ -61,7 +61,7 @@ void command_handler_task(void *pvParameter) {
       }
 
       switch (input[0]) {
-      // controller commands
+      // ---------------- controller commands
       case 's':
         write_speed(atoi(&input[1]));
         break;
@@ -76,10 +76,9 @@ void command_handler_task(void *pvParameter) {
         break;
       case 'm':
         write_speed(atoi(&input[1]));
-        //set_pot(atoi(&input[1]), POT_CHAN0);
-        set_pot(atoi(&input[1]));
+        set_pot(atoi(&input[1]), POT_CHAN0);
         break;
-      // Chase car commands
+      // -------------- chase car commands
       case 'u':
         if (String("off") == String(&input[2])) {
           printf("%s:%s-->off\n", input.c_str(), &input[2]);
@@ -102,7 +101,7 @@ void command_handler_task(void *pvParameter) {
       case '!':
         write_driver_info(&input[1], INFO_TYPE::WARN);
         break;
-      // steering wheel input element emulators
+      // -------------- steering wheel input element emulators
       case '<':
         if (String("off") == String(&input[2])) {
           indicator_set_and_blink(INDICATOR::OFF);

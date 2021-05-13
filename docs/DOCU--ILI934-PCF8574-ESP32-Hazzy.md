@@ -57,7 +57,7 @@ No need to connect the **RST**.
 - IO Extender PCF8574 (8 bit) (7 Taster und 1 LED)
 - Analog-Digital-Wandler (12bit) und Potentiometer
 
-![image-20210323171846165](DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/2021-03-27 09.09.17.jpg)
+![image-20210323171846165](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/2021-03-27 09.09.17.jpg)
 
 ## U-I-Diagramm bei Spannungsänderung
 

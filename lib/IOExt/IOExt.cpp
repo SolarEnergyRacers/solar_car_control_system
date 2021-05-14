@@ -77,7 +77,7 @@ void _handleIoInterrupt() {
   xSemaphoreGive(i2c_mutex);
   // CRITICAL SECTION I2C: end
 
-  if ((dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) == 1) {
+  if ((dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) == 1) {
     return;
   }
   printf("PCF: %d %d %d %d - %d %d %d %d\n", dra.p0, dra.p1, dra.p2, dra.p3,
@@ -115,7 +115,7 @@ void _handleIoInterrupt() {
     write_speed(speed);
     _speedCheck(speed);
   }
-#ifdef DEBUGLEVEL_VERBOSE == true
+#if DEBUGLEVEL_VERBOSE == true
   int v[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   for (int idx = 0; idx < 8; idx++) {
     v[idx] = pcf8574.digitalRead(idx);

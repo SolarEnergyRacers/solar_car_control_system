@@ -49,6 +49,8 @@ void command_handler_task(void *pvParameter) {
     while (Serial.available() > 0) {
       // read the incoming chars:
       String input = Serial.readString();
+      printf("Received: %s\n", input.c_str());
+      Serial.flush();
       if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
         input = "help";
       }
@@ -90,8 +92,10 @@ void command_handler_task(void *pvParameter) {
         break;
       case 'd':
         if (String("off") == String(&input[2])) {
+          printf("%s:%s-->off\n", input.c_str(), &input[2]);
           arrow_decrease(false);
         } else {
+          printf("%s:%s-->off\n", input.c_str(), &input[2]);
           arrow_decrease(true);
         }
         break;
@@ -104,23 +108,23 @@ void command_handler_task(void *pvParameter) {
       // -------------- steering wheel input element emulators
       case '<':
         if (String("off") == String(&input[2])) {
-          indicator_set_and_blink(INDICATOR::OFF);
+          update_indicator(false,false);
         } else {
-          indicator_set_and_blink(INDICATOR::LEFT);
+          update_indicator(true,false);
         }
         break;
       case '>':
         if (String("off") == String(&input[2])) {
-          indicator_set_and_blink(INDICATOR::OFF);
+          update_indicator(false,false);
         } else {
-          indicator_set_and_blink(INDICATOR::RIGHT);
+          update_indicator(false,true);
         }
         break;
       case 'w':
         if (String("off") == String(&input[2])) {
-          indicator_set_and_blink(INDICATOR::OFF);
+          update_indicator(false,false);
         } else {
-          indicator_set_and_blink(INDICATOR::WARN);
+          update_indicator(true,true);
         }
         break;
       case 'a':

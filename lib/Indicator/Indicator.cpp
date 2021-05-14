@@ -11,30 +11,30 @@
 #include "DriverDisplay.h"
 #include "Indicator.h"
 
-bool blinkState = false;
-INDICATOR direction = INDICATOR::OFF;
+volatile bool blinkState = false;
+volatile INDICATOR curState = INDICATOR::OFF;
 
 void update_indicator(int leftButton, int rightButton) {
   if (leftButton && rightButton) {
-    if (direction == INDICATOR::WARN) {
-      direction = INDICATOR::OFF;
+    if (curState == INDICATOR::WARN) {
+      curState = INDICATOR::OFF;
     } else {
-      direction = INDICATOR::WARN;
+      curState = INDICATOR::WARN;
     }
   } else if (leftButton) {
-    if (direction == INDICATOR::LEFT) {
-      direction = INDICATOR::OFF;
+    if (curState == INDICATOR::LEFT) {
+      curState = INDICATOR::OFF;
     } else {
-      direction = INDICATOR::LEFT;
+      curState = INDICATOR::LEFT;
     }
   } else if (rightButton) {
-    if (direction == INDICATOR::RIGHT) {
-      direction = INDICATOR::OFF;
+    if (curState == INDICATOR::RIGHT) {
+      curState = INDICATOR::OFF;
     } else {
-      direction = INDICATOR::RIGHT;
+      curState = INDICATOR::RIGHT;
     }
   }
-  indicator_set_and_blink(direction, true);
+  indicator_set_and_blink(curState, true);
 }
 
 // ------------------
@@ -49,7 +49,7 @@ void indicator_task(void *pvParameter) {
   // do not add code here -- only controlling the blink frequence
   // polling loop
   while (1) {
-    indicator_set_and_blink(direction, blinkState);
+    indicator_set_and_blink(curState , blinkState);
     blinkState = !blinkState;
 
     // sleep

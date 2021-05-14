@@ -4,10 +4,6 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define ESP32Andy false
-#define ESP32OLED false
-#define ESP32Huzza true
-
 /*
  *  GPIO
  */

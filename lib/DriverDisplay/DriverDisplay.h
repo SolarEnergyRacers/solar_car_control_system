@@ -30,7 +30,7 @@ void write_motor(float ampers);
 void write_pv(float voltage);
 void write_acceleration(int value);
 
-void indicator_set_and_blink(INDICATOR direction);
+void indicator(INDICATOR direction);
 void light1OnOff();
 void light2OnOff();
 
@@ -42,6 +42,7 @@ void driver_display_demo_screen();
 // internal functions for inner task communication
 INDICATOR getIndicatorDirection();
 void indicator_set_and_blink(INDICATOR direction, bool blinkOn);
+
 bool getIndicatorState();
 void setIndicatorState(bool state);
 

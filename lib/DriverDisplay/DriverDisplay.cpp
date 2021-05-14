@@ -390,10 +390,30 @@ void _turn_Right(int color) {
                    x - indicatorWidth, y + indicatorHeight, color);
 }
 
-void indicator_set_and_blink(INDICATOR direction) {
+void indicator(INDICATOR direction) {
+  switch (direction) {
+  case INDICATOR::LEFT:
+    printf("turn-left-indicator\n");
+    break;
+
+  case INDICATOR::RIGHT:
+    printf("turn-right-indicator\n");
+    break;
+
+  case INDICATOR::WARN:
+    printf("hazzard-warn-indicator\n");
+    break;
+
+  case INDICATOR::OFF:
+  default:
+    printf("indicators off\n");
+    break;
+  }
+  Serial.flush();
   indicator_set_and_blink(direction, true);
 }
 
+// only for intern calls from module IOExt
 void indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
@@ -570,7 +590,7 @@ void write_driver_info(String msg, INFO_TYPE type) {
     tft.setTextWrap(true);
 
     tft.setTextColor(bgColor);
-    //tft.setCursor(infoFrameX, infoFrameY + 9);
+    // tft.setCursor(infoFrameX, infoFrameY + 9);
     tft.setCursor(infoFrameX, infoFrameY);
     tft.print(infoLast);
 
@@ -605,7 +625,7 @@ void driver_display_demo_screen() {
   write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
   printf(" - hazzard warn\n");
   indicator_set_and_blink(INDICATOR::WARN, true);
-  printf(" - spped\n");
+  printf(" - speed\n");
   write_speed(888);
   printf(" - acceleration\n");
   write_acceleration(888);

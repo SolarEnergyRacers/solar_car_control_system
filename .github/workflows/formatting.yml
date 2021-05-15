@@ -16,7 +16,7 @@ jobs:
         uses: HorstBaerbel/action-clang-format@1.4
         with:
           scandir: '.'
-          excludedirs: 'build'
+          excludedirs: 'build, .github'
           extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
           style: 'file'
       - name: Commit changes

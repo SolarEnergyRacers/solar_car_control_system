@@ -12,6 +12,15 @@ jobs:
       - uses: actionsx/prettier@v2
         with:
           args: --write .
+          
+      - uses: actions/checkout@v2
+      - name: Run clang-format
+        uses: HorstBaerbel/action-clang-format@1.4
+        with:
+          scandir: '.'
+          excludedirs: 'build'
+          extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+          style: 'file'
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4.1.2
         with:

@@ -20,14 +20,13 @@ SemaphoreHandle_t can_mutex;
 void init_can(void){
     can_mutex = xSemaphoreCreateBinary();
 
-    CAN_cfg.speed = CAN_SPEED_250KBPS; //MPPT & BMS are both running on 125KBPS by default
+    CAN_cfg.speed = CAN_SPEED; // MPPT & BMS are both running on 125KBPS by default
     CAN_cfg.tx_pin_id = CAN_TX;
     CAN_cfg.rx_pin_id = CAN_RX;
     CAN_cfg.rx_queue = xQueueCreate(CAN_RX_QUEUE, sizeof(CAN_frame_t));
     ESP32Can.CANInit();
 
     xSemaphoreGive(can_mutex);
-    
 }
 
 

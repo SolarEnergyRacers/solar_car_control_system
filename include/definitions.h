@@ -22,7 +22,6 @@
 #define I2C_SDA 23
 #define I2C_SCL 22
 #define I2C_FREQ 100000 //100kHz
-//#define I2C_FREQ 400000 //400KHz
 
 #define I2C_ADDRESS_ADS1x15 0x48
 #define I2C_ADDRESS_PCA9685 0x42
@@ -51,7 +50,7 @@
  */
 #define CAN_TX (gpio_num_t)25
 #define CAN_RX (gpio_num_t)26
-
+#define CAN_SPEED CAN_SPEED_250KBPS
 #define CAN_RX_QUEUE 10
 
 

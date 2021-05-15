@@ -1,5 +1,5 @@
 //
-// PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
+// PCF8574 I/O Extension over I2C
 //
 
 #include "../../include/definitions.h"
@@ -13,47 +13,44 @@
 
 #define PCF8574_NUM_PORTS 8
 
-PCF8574 pcf8574(I2C_ADDRESS_PCF8574, I2C_SDA, I2C_SCL, PCF8574_INTERRUPT_PIN,
-                key_pressed_interrupt_handler);
+PCF8574 IOExt2(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL,
+               I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
 
+// simulation - start (for simulation purpose)
 int speed = 0;
-int taskSleep = 10;
+int acceleration = 0;
+// simulation - end
+int taskSleep = 50;
 
-void init_ioext() {
+void init_IOExt2() {
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
   // setup pins
-  pcf8574.pinMode(P0, INPUT);
-  pcf8574.pinMode(P1, INPUT);
-  pcf8574.pinMode(P2, INPUT);
-  pcf8574.pinMode(P3, INPUT);
-  pcf8574.pinMode(P4, INPUT);
-  pcf8574.pinMode(P5, INPUT);
-  pcf8574.pinMode(P6, INPUT);
-  pcf8574.pinMode(P7, INPUT);
+  IOExt2.pinMode(P0, INPUT); // left indicator
+  IOExt2.pinMode(P1, INPUT); // right indicator
+  IOExt2.pinMode(P2, INPUT); // set tempomat/poweromat
+  IOExt2.pinMode(P3, INPUT); // set tempo or power mode
+  IOExt2.pinMode(P4, INPUT); // horn
+  IOExt2.pinMode(P5, INPUT); // position lights
+  IOExt2.pinMode(P6, INPUT); // driving lights
+  IOExt2.pinMode(P7, INPUT); // next screen
 
   // start
-  if (pcf8574.begin()) {
-    printf("[PCF8574] Init successful.\n");
+  if (IOExt2.begin()) {
+    printf("[v] IOExt2 inited.\n");
   } else {
-    printf("[PCF8574] Init failed.\n");
+    printf("[x] IOExt2 init failed.\n");
+    // TODO: action for init error?
   }
 
   xSemaphoreGive(i2c_mutex);
   // CRITICAL SECTION I2C: end
 }
 
-// volatile PCF8574::DigitalInput digitalIn;
 volatile bool ioInterruptRequest = false;
-void key_pressed_interrupt_handler() {
-  ioInterruptRequest = true;
-  // digitalIn = pcf8574.digitalReadAll();
-  // buf = readBuffer();
-  // Wire.requestFrom(0x20,(uint8_t)1);
-  // ioBuf = Wire.read();
-}
+void keyPressedInterruptHandler() { ioInterruptRequest = true; }
 
 void _speedCheck(int speed) {
   if (speed < 50) {
@@ -72,42 +69,51 @@ void _handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
-  PCF8574::DigitalInput dra = pcf8574.digitalReadAll();
+  PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
 
-  xSemaphoreGive(i2c_mutex);
-  // CRITICAL SECTION I2C: end
-
-  if ((dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) == 1) {
+  if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
+    taskSleep = 50; // default value for fast reaction to pressed button
+    xSemaphoreGive(i2c_mutex);
+    // CRITICAL SECTION I2C: end
     return;
   }
-  printf("PCF: %d %d %d %d - %d %d %d %d\n", dra.p0, dra.p1, dra.p2, dra.p3,
-         dra.p4, dra.p5, dra.p6, dra.p7);
 
-  taskSleep = 10;
+  taskSleep = 100; // debounce button
+
+  printf("PCF %ld: %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1,
+         dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
+
+  bool left = !dra.p0;
+  bool right = !dra.p1;
+  bool speedPowerControlOnOff = !dra.p2;
+  bool speedPowerControlMode = !dra.p3;
+  bool horn = !dra.p4;
+  bool positionLights = !dra.p5;
+  bool drivingLights = !dra.p6;
+  bool nextScreen = !dra.p7;
 
   // turn indicator and hazard lights
-  if (!dra.p7 || !dra.p1) {
-    taskSleep = 200;
-    update_indicator(!dra.p7, !dra.p1);
+  if (left && right) {
+    setIndicator(INDICATOR_WARN);
+  } else if (left && !right) {
+    setIndicator(INDICATOR_LEFT);
+  } else if (!left && right) {
+    setIndicator(INDICATOR_RIGHT);
   }
-  // position lights on/off
-  if (!dra.p6) {
-    taskSleep = 100;
+  if (positionLights) {
     light1OnOff();
   }
-  // head lights on/off
-  if (!dra.p5) {
-    taskSleep = 100;
+  if (drivingLights) {
     light2OnOff();
   }
 
   // Simulation
-  if (!dra.p4) {
+  if (speedPowerControlOnOff) {
     speed += 10;
     write_speed(speed);
     _speedCheck(speed);
   }
-  if (!dra.p3) {
+  if (speedPowerControlMode) {
     speed -= 10;
     if (speed < 0) {
       speed = 0;
@@ -115,16 +121,19 @@ void _handleIoInterrupt() {
     write_speed(speed);
     _speedCheck(speed);
   }
-#if DEBUGLEVEL_VERBOSE == true
-  int v[8] = {0, 0, 0, 0, 0, 0, 0, 0};
-  for (int idx = 0; idx < 8; idx++) {
-    v[idx] = pcf8574.digitalRead(idx);
+  if (horn) {
+    acceleration += 10;
+    write_acceleration(acceleration);
   }
-  for (int idx = 0; idx < 8; idx++) {
-    printf("%d:%d - ", idx, v[idx]);
+  if (nextScreen) {
+    acceleration -= 10;
+    if (acceleration < 0) {
+      acceleration = 0;
+    }
+    write_acceleration(acceleration);
   }
-  Serial.println();
-#endif
+  xSemaphoreGive(i2c_mutex);
+  // CRITICAL SECTION I2C: end
 }
 
 void set_ioext(int port, bool value) {
@@ -136,7 +145,7 @@ void set_ioext(int port, bool value) {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
-  pcf8574.digitalWrite(port, value);
+  IOExt2.digitalWrite(port, value);
 
   xSemaphoreGive(i2c_mutex);
   // CRITICAL SECTION I2C: end
@@ -151,7 +160,7 @@ int get_ioext(int port) {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
-  int value = pcf8574.digitalRead(P0);
+  int value = IOExt2.digitalRead(P0);
 
   xSemaphoreGive(i2c_mutex);
   // CRITICAL SECTION I2C: end
@@ -159,14 +168,17 @@ int get_ioext(int port) {
   return value;
 }
 
-void io_ext_demo_task(void *pvParameter) {
+bool isInInterruptHandler = false;
+void IOExt2_task(void *pvParameter) {
 
   // polling loop
   while (1) {
     // handle input interrupts
-    if (ioInterruptRequest) {
+    if (ioInterruptRequest && !isInInterruptHandler) {
+      isInInterruptHandler = true;
       _handleIoInterrupt();
       ioInterruptRequest = false;
+      isInInterruptHandler = false;
     }
     // sleep
     vTaskDelay(taskSleep / portTICK_PERIOD_MS);

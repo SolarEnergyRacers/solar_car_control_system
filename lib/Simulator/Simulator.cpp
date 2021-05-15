@@ -20,6 +20,7 @@ int counterPV = 0;
 void init_simulator(void)
 {
     driver_display_demo_screen();
+    printf("[v] Simulator inited.\n");
     delay(10000);
 
     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -38,21 +39,21 @@ void simulator_task(void *pvParameter)
         switch (counterIndicator++)
         {
         case 0:
-            write_driver_info("Stop!", INFO_TYPE::ERROR);
+            write_driver_info("Stop!", INFO_TYPE_ERROR);
             arrow_increase(false);
             arrow_decrease(false);
             break;
         case 40:
-            write_driver_info("Go", INFO_TYPE::INFO);
+            write_driver_info("Go", INFO_TYPE_INFO);
             //write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
             arrow_increase(true);
             break;
         case 80:
-            write_driver_info("Go", INFO_TYPE::INFO);
+            write_driver_info("Go", INFO_TYPE_INFO);
             arrow_decrease(true);
             break;
         case 120:
-            write_driver_info("", INFO_TYPE::INFO);
+            write_driver_info("", INFO_TYPE_INFO);
             arrow_increase(false);
             arrow_decrease(false);
             break;

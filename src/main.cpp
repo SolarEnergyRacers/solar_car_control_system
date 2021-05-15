@@ -48,6 +48,8 @@ void app_main(void);
 
 void app_main(void) {
 
+  bool startOk = true;
+
   // init arduino library
   initArduino();
 
@@ -65,17 +67,15 @@ void app_main(void) {
   init_onewire();
   init_i2c();
   init_spi();
-  
-  scan_i2c_devices();
 
   // ---- init modules ----
   if (BLINK_ON) {
   }
   if (DISPLAY_LARGE_ON) {
-    init_driver_display();
+    startOk &= init_driver_display();
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
-    init_indicator();
+    startOk &= init_indicator();
   }
   if (COMMANDHANDLER_ON) {
     init_command_handler();
@@ -105,7 +105,7 @@ void app_main(void) {
     init_display();
   }
   if (IOEXT_ON) {
-    init_ioext();
+    init_IOExt2();
   }
   if (DAC_ON) {
     init_dac();
@@ -117,67 +117,83 @@ void app_main(void) {
     init_simulator();
   }
 
+  if (!startOk) {
+    printf("ERROR in init sequence(s). System halted!\n");
+    exit(0);
+  }
+  printf("-----------------------------------------------------------------\n");
+  printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
+  printf("-----------------------------------------------------------------\n");
+
   // ---- create tasks ----
   if (DISPLAY_ON) {
-    xTaskCreate(&draw_display_demo_task, "display_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - draw_display_demo_task\n");
+    xTaskCreate(&draw_display_demo_task, "draw_display_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DISPLAY_LARGE_ON) {
-    xTaskCreate(&driver_display_task, "driver_display_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - driver_display_task\n");
+    xTaskCreate(&driver_display_task, "driver_display_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
-    xTaskCreate(&indicator_task, "indicator_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - indicator_task\n");
+    xTaskCreate(&indicator_task, "indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (BLINK_ON) {
-    xTaskCreate(&blink_demo_task, "blink_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - blink_demo_task\n");
+    xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (ADC_ON) {
-    xTaskCreate(&read_adc_demo_task, "read_adc_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - read_adc_demo_task\n");
+    xTaskCreate(&read_adc_demo_task, "read_adc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DS_ON) {
-    xTaskCreate(&read_ds_demo_task, "read_ds_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - read_ds_demo_task\n");
+    xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (GYRO_ACC_ON) {
-    xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - read_gyro_acc_demo_task\n");
+    xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (PWM_ON) {
-    xTaskCreate(&update_pwm_demo_task, "update_pwm_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - update_pwm_demo_task\n");
+    xTaskCreate(&update_pwm_demo_task, "update_pwm_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (RTC_ON) {
-    xTaskCreate(&read_rtc_demo_task, "read_adc_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - read_rtc_demo_task\n");
+    xTaskCreate(&read_rtc_demo_task, "read_adc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (SD_ON) {
-    xTaskCreate(&write_sdcard_demo_task, "write_sdcard_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - write_sdcard_demo_task\n");
+    xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
-    xTaskCreate(&int_report_demo_task, "int_report_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - int_report_demo_task\n");
+    xTaskCreate(&int_report_demo_task, "int_report_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (SIMULATOR_ON) {
-    xTaskCreate(&simulator_task, "simulator_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - simulator_task\n");
+    xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (IOEXT_ON) {
-    xTaskCreate(&io_ext_demo_task, "io_extension_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - IOExt2_task\n");
+    xTaskCreate(&IOExt2_task, "IOExt2_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DAC_ON) {
+    printf(" - DAC DAC DAC\n");
   }
   if (COMMANDHANDLER_ON) {
-    xTaskCreate(&command_handler_task, "command_handler_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - command_handler_task\n");
+    xTaskCreate(&command_handler_task, "command_handler_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (SERIAL_ON) {
-    xTaskCreate(&serial_demo_task, "serial_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - serial_demo_task\n");
+    xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
+
+  // char buffer[40*10];
+  // vTaskList(buffer);
+  // printf(buffer);
+  printf("-----------------------------------------------------------------\n");
+  printf("Creating FreeRTOS tasks successful. System running.\n");
+  printf("-----------------------------------------------------------------\n\n");
 }

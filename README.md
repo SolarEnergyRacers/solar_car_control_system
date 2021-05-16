@@ -11,26 +11,26 @@
 
 ![Device Diagram](media/device_diagram.svg "Device Diagram")
 
-| Device:Port |     Functionality      |
-| :---------- | :--------------------: |
-| **_ESP32_** |  main micro processor  |
-| ESP32:2     |         1Wire          |
-| ESP32:22    |        I2C:SCL         |
-| ESP32:23    |        I2C:SDA         |
-| ESP32:15    |       SERIAL:TX        |
-| ESP32:16    |       SERIAL:RX        |
-| ESP32:18    |        SPI:MOSI        |
-| ESP32:19    |        SPI:MISO        |
-| ESP32:5     |        SPI:CLK         |
-| ESP32:36    |   SPI:CS_TFT_SCREEN    |
-| ESP32:14    |     SPI:CS_SD_CARD     |
-| ESP32:4     |         SPI:DC         |
-| ESP32:21    |        SPI:RST         |
-| ESP32:13    |    GPIO:LED_BUILTIN    |
-| ESP32:25    |     GPIO:INTERRUPT  (TODO: fix collision with CAN:TX !!)   |
-| ESP32:14    | GPIO:PCF8574_INTERRUPT |
-| ESP32:25    |         CAN:TX         |
-| ESP32:26    |         CAN:RX         |
+| Device:Port |                    Functionality                    |
+| :---------- | :-------------------------------------------------: |
+| **_ESP32_** |                main micro processor                 |
+| ESP32:2     |                        1Wire                        |
+| ESP32:22    |                       I2C:SCL                       |
+| ESP32:23    |                       I2C:SDA                       |
+| ESP32:15    |                      SERIAL:TX                      |
+| ESP32:16    |                      SERIAL:RX                      |
+| ESP32:18    |                      SPI:MOSI                       |
+| ESP32:19    |                      SPI:MISO                       |
+| ESP32:5     |                       SPI:CLK                       |
+| ESP32:36    |                  SPI:CS_TFT_SCREEN                  |
+| ESP32:14    |                   SPI:CS_SD_CARD                    |
+| ESP32:4     |                       SPI:DC                        |
+| ESP32:21    |                       SPI:RST                       |
+| ESP32:13    |                  GPIO:LED_BUILTIN                   |
+| ESP32:25    | GPIO:INTERRUPT (TODO: fix collision with CAN:TX !!) |
+| ESP32:14    |               GPIO:PCF8574_INTERRUPT                |
+| ESP32:25    |                       CAN:TX                        |
+| ESP32:26    |                       CAN:RX                        |
 
 | **_ADS1x15_**                            |    Analog to digital converter     |
 | :--------------------------------------- | :--------------------------------: |
@@ -40,13 +40,13 @@
 | ADC0:2                                   |     Imot: motor current sensor     |
 | ADC0:3                                   |       Ipv: pv current sensor       |
 | ADC1, I2C Addr 0x49 (TODO: can be set??) |                                    |
-| ADC1:0                                   |  Ubat: battery voltage (analog)   |
-| ADC1:1                                   |  Umot: motorcontroller voltage |
+| ADC1:0                                   |   Ubat: battery voltage (analog)   |
+| ADC1:1                                   |   Umot: motorcontroller voltage    |
 | ADC1:2                                   |                                    |
 | ADC1:3                                   |                                    |
 | ADC2, I2C Addr 0x50 (TODO: can be set??) |                                    |
 | ADC2:0                                   | steering wheel acceleration piezo  |
-| ADC2:1                                   | steering wheel deceleration piezo |
+| ADC2:1                                   | steering wheel deceleration piezo  |
 | ADC2:2                                   |                                    |
 | ADC2:3                                   |                                    |
 

@@ -570,7 +570,7 @@ void write_driver_info(String msg, INFO_TYPE type) {
     tft.setTextWrap(true);
 
     tft.setTextColor(bgColor);
-    //tft.setCursor(infoFrameX, infoFrameY + 9);
+    // tft.setCursor(infoFrameX, infoFrameY + 9);
     tft.setCursor(infoFrameX, infoFrameY);
     tft.print(infoLast);
 

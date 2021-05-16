@@ -20,6 +20,7 @@
 
 // local libs
 #include <ADC.h>
+#include <CANBus.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
@@ -37,8 +38,6 @@
 #include <Simulator.h>
 #include <Temp.h>
 #include <gpio.h>
-#include <IOExt.h>
-#include <CANBus.h>
 #include <system.h>
 
 #include "LocalFunctionsAndDevices.h"
@@ -118,7 +117,7 @@ void app_main(void) {
   if (SIMULATOR_ON) {
     init_simulator();
   }
-  if(CAN_ON) {
+  if (CAN_ON) {
     init_can();
   }
 
@@ -185,7 +184,7 @@ void app_main(void) {
     xTaskCreate(&serial_demo_task, "serial_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
-  if(CAN_ON){
+  if (CAN_ON) {
     xTaskCreate(&read_can_demo_task, "can_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }

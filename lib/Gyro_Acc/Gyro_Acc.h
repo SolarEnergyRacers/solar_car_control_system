@@ -6,7 +6,7 @@
 #define GYRO_ACC_H
 
 typedef struct {
-    float x, y, z;
+  float x, y, z;
 } Float3D;
 
 void init_gyro_acc(void);

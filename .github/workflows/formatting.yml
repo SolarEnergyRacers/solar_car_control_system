@@ -25,7 +25,7 @@ jobs:
           git config --global user.email "formatter@bot"
           git config --global user.name "Formatter Bot"
           if [ -n "$(git status --porcelain)" ]; then
-            git commit . -m "Apply clang-format" &&
+            git commit . -m "Apply prettier and clang-format" &&
             git push origin
           fi
           

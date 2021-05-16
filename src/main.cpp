@@ -20,6 +20,7 @@
 
 // local libs
 #include <ADC.h>
+#include <CANBus.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
@@ -65,7 +66,7 @@ void app_main(void) {
   init_onewire();
   init_i2c();
   init_spi();
-  
+
   scan_i2c_devices();
 
   // ---- init modules ----
@@ -115,6 +116,9 @@ void app_main(void) {
   }
   if (SIMULATOR_ON) {
     init_simulator();
+  }
+  if (CAN_ON) {
+    init_can();
   }
 
   // ---- create tasks ----
@@ -178,6 +182,10 @@ void app_main(void) {
   }
   if (SERIAL_ON) {
     xTaskCreate(&serial_demo_task, "serial_task",
+                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  }
+  if (CAN_ON) {
+    xTaskCreate(&read_can_demo_task, "can_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
 }

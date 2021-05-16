@@ -7,9 +7,9 @@
 
 #define ILI9341 // (320x240)
 
+#include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
-#include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
 
 extern SemaphoreHandle_t spi_mutex;
 
@@ -18,8 +18,14 @@ void init_driver_display(void);
 void driver_display_task(void *pvParameter);
 
 // public structures
-enum class INDICATOR {OFF, LEFT, RIGHT, WARN};
-enum class INFO_TYPE {INFO, STATUS, WARN, ERROR};    //INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR = ILI9341_RED
+enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
+enum class INFO_TYPE {
+  INFO,
+  STATUS,
+  WARN,
+  ERROR
+}; // INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR
+   // = ILI9341_RED
 // public functions
 void draw_display_border(int color);
 

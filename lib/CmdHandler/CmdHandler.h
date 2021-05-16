@@ -8,4 +8,4 @@
 void init_command_handler();
 void command_handler_task(void *pvParameter);
 
-#endif //CMDHANDLER_H
+#endif // CMDHANDLER_H

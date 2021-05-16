@@ -27,7 +27,7 @@
 | ESP32:4     |         SPI:DC         |
 | ESP32:21    |        SPI:RST         |
 | ESP32:13    |    GPIO:LED_BUILTIN    |
-| ESP32:25    |     GPIO:INTERRUPT     |
+| ESP32:25    |     GPIO:INTERRUPT  (TODO: fix collision with CAN:TX !!)   |
 | ESP32:14    | GPIO:PCF8574_INTERRUPT |
 | ESP32:25    |         CAN:TX         |
 | ESP32:26    |         CAN:RX         |
@@ -40,13 +40,13 @@
 | ADC0:2                                   |     Imot: motor current sensor     |
 | ADC0:3                                   |       Ipv: pv current sensor       |
 | ADC1, I2C Addr 0x49 (TODO: can be set??) |                                    |
-| ADC1:0                                   | steering wheel acceleration piezo  |
-| ADC1:1                                   | steering wheel deceleration piezo  |
+| ADC1:0                                   |  Ubat: battery voltage (analog)   |
+| ADC1:1                                   |  Umot: motorcontroller voltage |
 | ADC1:2                                   |                                    |
 | ADC1:3                                   |                                    |
 | ADC2, I2C Addr 0x50 (TODO: can be set??) |                                    |
-| ADC2:0                                   |   Umot: motorcontroller voltage    |
-| ADC2:1                                   |                                    |
+| ADC2:0                                   | steering wheel acceleration piezo  |
+| ADC2:1                                   | steering wheel deceleration piezo |
 | ADC2:2                                   |                                    |
 | ADC2:3                                   |                                    |
 

@@ -22,8 +22,10 @@ jobs:
         run: find . -name "*.cpp" -o -name "*.c" -o -name "*.h"|xargs -I {} clang-format -i {}
       - name: commit changes & push
         run: |
+          git config --global user.email "formatter@bot"
+          git config --global user.name "Formatter Bot"
           if [ -n "$(git status --porcelain)" ]; then
-            git commit . -m "Apply clang-format" &&
+            git commit . -m "Apply prettier and clang-format" &&
             git push origin
           fi
           

@@ -17,7 +17,7 @@ jobs:
         with:
           scandir: '.'
           excludedirs: 'build, .github'
-          extensions: 'c,h,C,H,cpp,hpp,cc,hh,c++,h++,cxx,hxx'
+          extensions: 'c, h, C, H, cpp, hpp, cc, hh, c++, h++, cxx, hxx'
           style: 'file'
       - name: Commit changes
         uses: stefanzweifel/git-auto-commit-action@v4.1.2

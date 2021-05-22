@@ -39,6 +39,8 @@
 #include <Temp.h>
 #include <gpio.h>
 #include <system.h>
+#include "Template.h"
+
 
 #include "LocalFunctionsAndDevices.h"
 
@@ -48,6 +50,10 @@ void app_main(void);
 }
 
 void app_main(void) {
+
+  class Template template0;
+  template0.init();
+  printf("Template: %d\n", template0.getValue());
 
   // init arduino library
   initArduino();

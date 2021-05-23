@@ -54,7 +54,7 @@ void app_main(void) {
   // init arduino library
   initArduino();
 
-  // init serial output for  console 
+  // init serial output for  console
 
   Serial.begin(115200);
   delay(2000);

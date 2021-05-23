@@ -26,7 +26,7 @@ enum INFO_TYPE {
   INFO_TYPE_WARN,   // WARN = ILI9341_PURPLE
   INFO_TYPE_ERROR   // ILI9341_RED
 };
-// =
+
 // public functions
 void draw_display_border(int color);
 

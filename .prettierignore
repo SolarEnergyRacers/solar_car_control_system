@@ -1,0 +1,8 @@
+# Ignore artifacts:
+build
+coverage
+.vscode
+.pio
+cmake-build-debug
+CMakeFiles
+.github

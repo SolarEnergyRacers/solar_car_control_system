@@ -20,8 +20,7 @@
  */
 #define I2C_SDA 23
 #define I2C_SCL 22
-#define I2C_FREQ 100000 //100kHz
-//#define I2C_FREQ 400000 //400KHz
+#define I2C_FREQ 100000 // 100kHz
 
 #define I2C_ADDRESS_ADS1x15 0x48
 #define I2C_ADDRESS_PCA9685 0x42
@@ -34,7 +33,8 @@
 #define DS1803_ADDR0 0 // pulled down to ground
 #define DS1803_ADDR1 0 // pulled down to ground
 #define DS1803_ADDR2 0 // pulled down to ground
-#define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
+#define I2C_ADDRESS_DS1803                                                     \
+  (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
  * SERIAL
@@ -42,6 +42,17 @@
 #define SERIAL_RX 16
 #define SERIAL_TX 15
 #define SERIAL_BAUDRATE 115200
+
+/*
+ * CAN Bus
+ *
+ *  GPIO25  TX
+ *  GPIO26  RX
+ */
+#define CAN_TX (gpio_num_t)25
+#define CAN_RX (gpio_num_t)26
+#define CAN_SPEED CAN_SPEED_250KBPS
+#define CAN_RX_QUEUE 10
 
 /*
  *  SPI
@@ -76,9 +87,11 @@
  *  GPIO13 - TCK
  *  GPIO14 - TMS
  *
- *  Tutorial: https://medium.com/@manuel.bl/low-cost-esp32-in-circuit-debugging-dbbee39e508b
+ *  Tutorial:
+ * https://medium.com/@manuel.bl/low-cost-esp32-in-circuit-debugging-dbbee39e508b
  *
- *  General ESP32 Pinout: https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
+ *  General ESP32 Pinout:
+ * https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
  */
 
 #endif // DEFINITIONS_H

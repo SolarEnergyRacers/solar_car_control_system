@@ -1,6 +1,6 @@
 # Steering Wheel
 
-ILI9341 + PCF8574  + ADS1x15 controlled with ESP32-Hazzy
+ILI9341 + PCF8574 + ADS1x15 controlled with ESP32-Hazzy
 
 ## Product Links
 
@@ -15,7 +15,7 @@ ILI9341 + PCF8574  + ADS1x15 controlled with ESP32-Hazzy
 - [Adafruit: 2.8"/3.2" TFT LCD (PCB)](https://learn.adafruit.com/adafruit-2-8-and-3-2-color-tft-touchscreen-breakout-v2/downloads)
 - [Adafruit_ILI9341 (C++ Library)](https://github.com/adafruit/Adafruit_ILI9341)
 
-All logic pins, both 8-bit and SPI sides, are 3-5V logic level  compatible, the 74LVX245 chips on the back perform fast level shifting  so you can use either kind of logic levels. If there's data output, the  levels are at at 3.3V.
+All logic pins, both 8-bit and SPI sides, are 3-5V logic level compatible, the 74LVX245 chips on the back perform fast level shifting so you can use either kind of logic levels. If there's data output, the levels are at at 3.3V.
 
 #### SPI Mode Jumpers
 
@@ -29,7 +29,7 @@ Display SPI mode: connect **IM1**, **IM2** and **IM3** pins to 3.3V. Do not sold
 
 #### Wiring
 
-Wiring up the display in SPI mode is much easier than  8-bit mode since there's way fewer wires. Start by connecting the power  pins
+Wiring up the display in SPI mode is much easier than 8-bit mode since there's way fewer wires. Start by connecting the power pins
 
 - **3-5V Vin** connects to the Arduino **5V** pin
 - **GND** connects to Arduino ground
@@ -61,26 +61,24 @@ No need to connect the **RST**.
 
 ## U-I diagram when changing the base voltage Vcc
 
-
 | Spannung<br />[V] | Strom<br />[mA] | Leistung<br />[mW] |
-| - | - | - |
-| 3.0 | 20 | 60 |
-| 3.3 | 32 | 106 |
-| 3.8 | 59 | 224 |
-| 4.0 | 73 | 292 |
-| 5.0 | 85 | 425 |
+| ----------------- | --------------- | ------------------ |
+| 3.0               | 20              | 60                 |
+| 3.3               | 32              | 106                |
+| 3.8               | 59              | 224                |
+| 4.0               | 73              | 292                |
+| 5.0               | 85              | 425                |
 
 ## U-I diagram when changing the display mode
 
 It was measured at full screen black and full screen white (without any additional output):
 
-
-| Voltage [V] | Current Black  [mA] | Current White  [mA] | Power Black[mW] | Power White  [mW] |
-| :-: | :-: | :-: | :-: | :-: |
-| 3.05 | 25 | 24 | 75 | 72 |
-| 3.3 | 30 | 29 | 99 | 96 |
-| 3.8 | 54 | 53 | 205 | 201 |
-| 4.0 | 63 | 62 | 252 | 248 |
-| 5.0 | 83 | 80 | 415 | 400 |
+| Voltage [V] | Current Black [mA] | Current White [mA] | Power Black[mW] | Power White [mW] |
+| :---------: | :----------------: | :----------------: | :-------------: | :--------------: |
+|    3.05     |         25         |         24         |       75        |        72        |
+|     3.3     |         30         |         29         |       99        |        96        |
+|     3.8     |         54         |         53         |       205       |       201        |
+|     4.0     |         63         |         62         |       252       |       248        |
+|     5.0     |         83         |         80         |       415       |       400        |
 
 ![image-20210327121949117](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/image-20210327121949117.png)

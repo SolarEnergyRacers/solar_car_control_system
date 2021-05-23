@@ -2,10 +2,10 @@
 #ifndef LocalFunctionsAndDevices_H
 #define LocalFunctionsAndDevices_H
 
-#define ADC_ON false                    // analog digital converte, I2C (ADS1015, ADS1115)
-#define BLINK_ON true                   // blink microcontroller LED
-#define COMMANDHANDLER_ON true          // command input and deploy
-#define DAC_ON false                    // digital analog converter, I2C (DS1803)
+#define ADC_ON false  // analog digital converte, I2C (ADS1015, ADS1115)
+#define BLINK_ON true // blink microcontroller LED
+#define COMMANDHANDLER_ON true // command input and deploy
+#define DAC_ON false           // digital analog converter, I2C (DS1803)
 #define DISPLAY_LARGE_INDICATOR_ON true // indicator blink
 #define DISPLAY_LARGE_ON true           // driver display, SPI (ILI9341)
 #define DISPLAY_ON false                // display elements
@@ -18,7 +18,7 @@
 #define SERIAL_ON false                 // write/read to/from console
 #define SD_ON false                     // SD card
 #define SIMULATOR_ON false              // Display simulator [TODO]
-
+#define CAN_ON false       // CAN bus (MPPT, BMS, ..)
 
 #define DEBUGLEVEL_VERBOSE true
 

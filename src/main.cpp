@@ -20,6 +20,7 @@
 
 // local libs
 #include <ADC.h>
+#include <CANBus.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
@@ -116,6 +117,9 @@ void app_main(void) {
   if (SIMULATOR_ON) {
     init_simulator();
   }
+  if (CAN_ON) {
+    init_can();
+  }
 
   if (!startOk) {
     printf("ERROR in init sequence(s). System halted!\n");
@@ -189,10 +193,10 @@ void app_main(void) {
     printf(" - serial_demo_task\n");
     xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
-
-  // char buffer[40*10];
-  // vTaskList(buffer);
-  // printf(buffer);
+  if (CAN_ON) {
+    printf(" - read_can_demo_task\n");
+    xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  }
   printf("-----------------------------------------------------------------\n");
   printf("Creating FreeRTOS tasks successful. System running.\n");
   printf("-----------------------------------------------------------------\n\n");

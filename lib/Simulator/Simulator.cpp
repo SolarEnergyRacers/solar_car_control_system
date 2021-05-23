@@ -17,49 +17,45 @@ int counterPV = 0;
 // ------------------
 // FreeRTOS INIT TASK
 // ------------------
-void init_simulator(void)
-{
-    driver_display_demo_screen();
-    printf("[v] Simulator inited.\n");
-    delay(10000);
+void init_simulator(void) {
+  driver_display_demo_screen();
+  printf("[v] Simulator inited.\n");
+  delay(10000);
 
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 
 // -------------
 // FreeRTOS TASK
 // -------------
-void simulator_task(void *pvParameter)
-{
-    // polling loop
-    while (1)
-    {
-        // CRITICAL SECTION SPI: start
-        xSemaphoreTake(spi_mutex, portMAX_DELAY);
-        switch (counterIndicator++)
-        {
-        case 0:
-            write_driver_info("Stop!", INFO_TYPE_ERROR);
-            arrow_increase(false);
-            arrow_decrease(false);
-            break;
-        case 40:
-            write_driver_info("Go", INFO_TYPE_INFO);
-            //write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
-            arrow_increase(true);
-            break;
-        case 80:
-            write_driver_info("Go", INFO_TYPE_INFO);
-            arrow_decrease(true);
-            break;
-        case 120:
-            write_driver_info("", INFO_TYPE_INFO);
-            arrow_increase(false);
-            arrow_decrease(false);
-            break;
-        case 170:
-            counterIndicator = 0;
-        }
+void simulator_task(void *pvParameter) {
+  // polling loop
+  while (1) {
+    // CRITICAL SECTION SPI: start
+    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+    switch (counterIndicator++) {
+    case 0:
+      write_driver_info("Stop!", INFO_TYPE_ERROR);
+      arrow_increase(false);
+      arrow_decrease(false);
+      break;
+    case 40:
+      write_driver_info("Go", INFO_TYPE_INFO);
+      // write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
+      arrow_increase(true);
+      break;
+    case 80:
+      write_driver_info("Go", INFO_TYPE_INFO);
+      arrow_decrease(true);
+      break;
+    case 120:
+      write_driver_info("", INFO_TYPE_INFO);
+      arrow_increase(false);
+      arrow_decrease(false);
+      break;
+    case 170:
+      counterIndicator = 0;
+    }
     switch (counterSpeed++) {
     case 0:
       draw_display_border(ILI9341_GREEN);

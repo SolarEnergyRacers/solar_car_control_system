@@ -40,8 +40,8 @@
 #include <gpio.h>
 #include <system.h>
 #include <string>
-#include "abstract_task.h"
-
+//#include "abstract_task.h"
+#include "asdf.h"
 
 #include "LocalFunctionsAndDevices.h"
 
@@ -52,24 +52,30 @@ void app_main(void);
 
 using namespace std;
 
-class test: public abstract_task {
-private:
-    string name = "test";
-public:
-    void init(){};
-    string getName() {
-        return name;
-    }
-};
+//class test: public abstract_task {
+//private:
+//    string name = "test";
+//public:
+//    void init(){};
+//    string getName() {
+//        return name;
+//    }
+//    void polling_task(){
+//        printf("hello from %s polling task\n", getName().c_str());
+//    }
+//};
 
 
 
 
 void app_main(void) {
 
-  class test template0;
-  template0.init();
-  printf("Template: %s\n", template0.getInfo().c_str());
+//  class test template0;
+//  template0.init();
+//  printf("Template: %s\n", template0.getInfo().c_str());
+
+    MyClass x;
+    x.create_task();
 
   // init arduino library
   initArduino();

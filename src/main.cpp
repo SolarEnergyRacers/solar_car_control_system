@@ -19,6 +19,7 @@
 #include "definitions.h"
 
 // local libs
+#include "abstract_task.h"
 #include <ADC.h>
 #include <CANBus.h>
 #include <CmdHandler.h>
@@ -38,7 +39,6 @@
 #include <Simulator.h>
 #include <Temp.h>
 #include <gpio.h>
-#include <system.h>
 #include <string>
 //#include "abstract_task.h"
 #include "asdf.h"

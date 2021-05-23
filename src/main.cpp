@@ -19,6 +19,7 @@
 #include "definitions.h"
 
 // local libs
+#include "Template.h"
 #include <ADC.h>
 #include <CANBus.h>
 #include <CmdHandler.h>
@@ -39,8 +40,6 @@
 #include <Temp.h>
 #include <gpio.h>
 #include <system.h>
-#include "Template.h"
-
 
 #include "LocalFunctionsAndDevices.h"
 
@@ -51,10 +50,6 @@ void app_main(void);
 
 void app_main(void) {
 
-  class Template template0;
-  template0.init();
-  printf("Template: %d\n", template0.getValue());
-
   // init arduino library
   initArduino();
 
@@ -64,6 +59,10 @@ void app_main(void) {
   printf("\n--------------------\n");
   Serial.println("esp32dev + free RTOS\n");
   printf("--------------------\n");
+
+  class Template template0;
+  template0.init();
+  Serial.printf("%s -- %d\n", template0.getInfo(), template0.getValue());
 
   // report chip info
   chip_info();

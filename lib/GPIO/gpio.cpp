@@ -69,7 +69,10 @@ void int_report_demo_task(void *pvParameter) {
 
     // print the number of interrupts handled by the interrupt handler
     // handle_gpio_interrupt
-    printf("[INT] Number of interrupts: %d\n", interrupt_counter);
+    if (interrupt_counter > 0) {
+      printf("[INT] Number of interrupts: %d\n", interrupt_counter);
+      interrupt_counter = 0;
+    }
 
     // sleep for 1s
     vTaskDelay(1000 / portTICK_PERIOD_MS);

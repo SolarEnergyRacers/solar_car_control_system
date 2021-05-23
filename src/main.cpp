@@ -19,6 +19,7 @@
 #include "definitions.h"
 
 // local libs
+#include "abstract_task.h"
 #include <ADC.h>
 #include <CANBus.h>
 #include <CmdHandler.h>
@@ -38,10 +39,8 @@
 #include <Simulator.h>
 #include <Temp.h>
 #include <gpio.h>
-#include <system.h>
 #include <string>
-#include "abstract_task.h"
-
+#include <system.h>
 
 #include "LocalFunctionsAndDevices.h"
 
@@ -52,18 +51,14 @@ void app_main(void);
 
 using namespace std;
 
-class test: public abstract_task {
+class test : public abstract_task {
 private:
-    string name = "test";
+  string name = "test";
+
 public:
-    void init(){};
-    string getName() {
-        return name;
-    }
+  void init(){};
+  string getName() { return name; }
 };
-
-
-
 
 void app_main(void) {
 

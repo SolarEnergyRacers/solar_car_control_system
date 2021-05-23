@@ -39,7 +39,8 @@
 #include <Temp.h>
 #include <gpio.h>
 #include <system.h>
-#include "Template.h"
+#include <string>
+#include "abstract_task.h"
 
 
 #include "LocalFunctionsAndDevices.h"
@@ -49,11 +50,26 @@ extern "C" {
 void app_main(void);
 }
 
+using namespace std;
+
+class test: public abstract_task {
+private:
+    string name = "test";
+public:
+    void init(){};
+    string getName() {
+        return name;
+    }
+};
+
+
+
+
 void app_main(void) {
 
-  class Template template0;
+  class test template0;
   template0.init();
-  printf("Template: %d\n", template0.getValue());
+  printf("Template: %s\n", template0.getInfo().c_str());
 
   // init arduino library
   initArduino();

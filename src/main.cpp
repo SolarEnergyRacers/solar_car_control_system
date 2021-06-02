@@ -19,13 +19,14 @@
 #include "definitions.h"
 
 // local libs
-#include "abstract_task.h"
+#include "../interfaces/abstract_task.h"
 #include <ADC.h>
 #include <CANBus.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
 #include <DriverDisplay.h>
+#include <DriverDisplayC.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
 #include <IOExt.h>
@@ -38,9 +39,9 @@
 #include <Serial.h>
 #include <Simulator.h>
 #include <Temp.h>
-#include <system.h>
 #include <gpio.h>
 #include <string>
+#include <system.h>
 //#include "abstract_task.h"
 #include "asdf.h"
 
@@ -53,10 +54,10 @@ void app_main(void);
 
 using namespace std;
 
-//class test: public abstract_task {
-//private:
+// class test: public abstract_task {
+// private:
 //    string name = "test";
-//public:
+// public:
 //    void init(){};
 //    string getName() {
 //        return name;
@@ -66,17 +67,14 @@ using namespace std;
 //    }
 //};
 
-
-
-
 void app_main(void) {
 
-//  class test template0;
-//  template0.init();
-//  printf("Template: %s\n", template0.getInfo().c_str());
+  //  class test template0;
+  //  template0.init();
+  //  printf("Template: %s\n", template0.getInfo().c_str());
 
-    MyClass x;
-    x.create_task();
+  // MyClass x;
+  // x.create_task();
 
   // init arduino library
   initArduino();
@@ -97,12 +95,19 @@ void app_main(void) {
   init_spi();
 
   scan_i2c_devices();
+  
+  DriverDisplayC *dd;
 
   // ---- init modules ----
   if (BLINK_ON) {
   }
   if (DISPLAY_LARGE_ON) {
+#ifdef DRIVER_DISPLAY_CPP
+    dd = new DriverDisplayC();
+    dd->init();
+#else
     init_driver_display();
+#endif
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
     init_indicator();
@@ -156,8 +161,13 @@ void app_main(void) {
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DISPLAY_LARGE_ON) {
+
+#ifdef DRIVER_DISPLAY_CPP
+    dd->create_task();
+#else
     xTaskCreate(&driver_display_task, "driver_display_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+#endif
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
     xTaskCreate(&indicator_task, "indicator_task",

@@ -68,6 +68,7 @@ using namespace std;
 //};
 
 void app_main(void) {
+  bool startOk = true;
 
   //  class test template0;
   //  template0.init();

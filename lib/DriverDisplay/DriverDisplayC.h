@@ -21,7 +21,7 @@ extern SemaphoreHandle_t spi_mutex;
 class DriverDisplayC : public abstract_task {
 
 public:
- // public structures
+  // public structures
   enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
   enum class INFO_TYPE {
     INFO,
@@ -30,12 +30,14 @@ public:
     ERROR
   }; // INFO => ILI9341_WHITE, STATUS => ILI9341_GREEN, WARN => ILI9341_PURPLE,
      // ERROR => ILI9341_RED
- 
+
 private:
   // put private/internal variables/functions here
   uint32_t sleep_polling_ms = 1000;
-  float _write_float(int x, int y, float valueLast, float value, int textSize, int color);
-  int _write_int(int x, int y, int valueLast, int value, int textSize, int color);
+  float _write_float(int x, int y, float valueLast, float value, int textSize,
+                     int color);
+  int _write_int(int x, int y, int valueLast, int value, int textSize,
+                 int color);
   void _arrow_increase(int color);
   void _arrow_decrease(int color);
   void _light1(bool lightOn);
@@ -62,7 +64,6 @@ public:
   void lifeSign();
   void draw_display_background();
 
-
   void write_driver_info(String msg, INFO_TYPE type);
   void write_speed(int speed);
   void write_bat(float voltage);
@@ -87,4 +88,4 @@ public:
 };
 
 #endif // DRIVER_DISPLAY_C_H
-#endif //DRIVER_DISPLAY_CPP
+#endif // DRIVER_DISPLAY_CPP

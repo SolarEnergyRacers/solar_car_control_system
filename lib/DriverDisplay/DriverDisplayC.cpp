@@ -124,8 +124,8 @@ void DriverDisplayC ::re_init(void) {}
 void exit(void) {}
 
 // writes flDriverDisplayC ::oat value  in the range from -9999.9 to 9999.9
-float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, int textSize,
-                   int color) {
+float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value,
+                                    int textSize, int color) {
 
   if (value < -9999.9 || value > 9999.9) {
     printf("ERROR: call _write_float with a value outside the range: '%f'\n",
@@ -205,8 +205,8 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
 }
 
 // writes integer value in the range from 0 to 999
-int DriverDisplayC ::_write_int(int x, int y, int valueLast, int value, int textSize,
-               int color) {
+int DriverDisplayC ::_write_int(int x, int y, int valueLast, int value,
+                                int textSize, int color) {
   if (value < 0 || value > 999) {
     printf("ERROR: call _write_int with a value outside the range: '%d'",
            value);
@@ -411,7 +411,8 @@ void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction) {
   indicator_set_and_blink(direction, true);
 }
 
-void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
+void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction,
+                                              bool blinkOn) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
@@ -645,7 +646,6 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("ready.\n");
 }
 
-
 // -------------
 // FreeRTOS TASK
 // -------------
@@ -659,9 +659,9 @@ void DriverDisplayC ::runInner() {
     }
     lifeSignCounter++;
 
-    // sleep for sleep_polling_ms 
-    //this->sleep();
+    // sleep for sleep_polling_ms
+    // this->sleep();
   }
 }
 
-#endif //DRIVER_DISPLAY_CPP
+#endif // DRIVER_DISPLAY_CPP

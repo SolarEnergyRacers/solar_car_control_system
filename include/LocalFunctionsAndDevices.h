@@ -2,7 +2,7 @@
 #ifndef LocalFunctionsAndDevices_H
 #define LocalFunctionsAndDevices_H
 
-#define ADC_ON true  // analog digital converte, I2C (ADS1015, ADS1115)
+#define ADC_ON true   // analog digital converte, I2C (ADS1015, ADS1115)
 #define BLINK_ON true // blink microcontroller LED
 #define COMMANDHANDLER_ON true // command input and deploy
 #define DAC_ON false           // digital analog converter, I2C (DS1803)

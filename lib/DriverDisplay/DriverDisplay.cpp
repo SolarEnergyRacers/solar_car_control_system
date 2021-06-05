@@ -513,7 +513,7 @@ void write_acceleration(int value) {
   if (value < -99 || value > 999) {
     value = 999;
   }
-  int color = value >=0 ? ILI9341_GREENYELLOW : ILI9341_RED;
+  int color = value >= 0 ? ILI9341_GREENYELLOW : ILI9341_RED;
   accelerationLast = _write_int(accFrameX + 4, accFrameY + 4, accelerationLast,
                                 abs(value), accTextSize, color);
 }

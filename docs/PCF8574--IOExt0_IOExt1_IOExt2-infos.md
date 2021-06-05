@@ -9,17 +9,22 @@
 
 Board size: 49x16, height with jumpers and pins : 11
 
-Usage in steering wheel: 
-  - 8 bits and interrupt from yellow pins (alls PCF8574 can use the same interrupt wire)
-  - VCC, GND, SDA, SCL from plug (chainable)
+Usage in steering wheel:
+
+- 8 bits and interrupt from yellow pins (alls PCF8574 can use the same interrupt wire)
+- VCC, GND, SDA, SCL from plug (chainable)
 
 Usage in car hull:
-  -  ###TODO
+
+- ###TODO
 
 ## Daisy-Chain
 
 ![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/FRLI1IMJPSNYF2K.jpg)
 
 ## Diagram
+
+- Push buttons for steering wheel
+- GND, VCC, I2C (SDA,SCL), Interrupt
 
 ![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/IO-Ext-CurcuitDiagram.drawio.png)

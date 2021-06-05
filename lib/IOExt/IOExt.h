@@ -5,10 +5,16 @@
 #ifndef IOEXT_H
 #define IOEXT_H
 
-void init_ioext();
+// public
 void set_ioext(int port, bool value);
 int get_ioext(int port);
-void key_pressed_interrupt_handler();
-void io_ext_demo_task(void *pvParameter);
+
+// internal
+void keyPressedInterruptHandler();
+
+// FreeRTOS - start
+void init_IOExt2();
+void IOExt2_task(void *pvParameter);
+// FreeRTOS - end
 
 #endif // IOEXT_H

@@ -13,19 +13,20 @@
 
 extern SemaphoreHandle_t spi_mutex;
 
-// RTOS task
-void init_driver_display(void);
-void driver_display_task(void *pvParameter);
-
 // public structures
-enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-enum class INFO_TYPE {
-  INFO,
-  STATUS,
-  WARN,
-  ERROR
-}; // INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR
-   // = ILI9341_RED
+enum INDICATOR {
+  INDICATOR_OFF,
+  INDICATOR_LEFT,
+  INDICATOR_RIGHT,
+  INDICATOR_WARN
+};
+enum INFO_TYPE {
+  INFO_TYPE_INFO,   // INFO = ILI9341_WHITE
+  INFO_TYPE_STATUS, // STATUS = ILI9341_GREEN
+  INFO_TYPE_WARN,   // WARN = ILI9341_PURPLE
+  INFO_TYPE_ERROR   // ILI9341_RED
+};
+
 // public functions
 void draw_display_border(int color);
 
@@ -36,7 +37,7 @@ void write_motor(float ampers);
 void write_pv(float voltage);
 void write_acceleration(int value);
 
-void indicator_set_and_blink(INDICATOR direction);
+void indicator(INDICATOR direction);
 void light1OnOff();
 void light2OnOff();
 
@@ -48,7 +49,10 @@ void driver_display_demo_screen();
 // internal functions for inner task communication
 INDICATOR getIndicatorDirection();
 void indicator_set_and_blink(INDICATOR direction, bool blinkOn);
-bool getIndicatorState();
-void setIndicatorState(bool state);
+
+// FreeRTOS - start
+bool init_driver_display(void);
+void driver_display_task(void *pvParameter);
+// FreeRTOS - end
 
 #endif // DRIVER_DISPLAY_H

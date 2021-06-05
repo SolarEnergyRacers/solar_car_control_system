@@ -79,7 +79,8 @@ void app_main(void) {
   // init arduino library
   initArduino();
 
-  // init serial output for console
+  // init serial output for  console
+
   Serial.begin(115200);
   delay(2000);
   printf("\n--------------------\n");
@@ -112,7 +113,7 @@ void app_main(void) {
 #endif
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
-    init_indicator();
+    startOk &= init_indicator();
   }
   if (COMMANDHANDLER_ON) {
     init_command_handler();
@@ -142,7 +143,7 @@ void app_main(void) {
     init_display();
   }
   if (IOEXT_ON) {
-    init_ioext();
+    init_IOExt2();
   }
   if (DAC_ON) {
     init_dac();
@@ -157,9 +158,18 @@ void app_main(void) {
     init_can();
   }
 
+  if (!startOk) {
+    printf("ERROR in init sequence(s). System halted!\n");
+    exit(0);
+  }
+  printf("-----------------------------------------------------------------\n");
+  printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
+  printf("-----------------------------------------------------------------\n");
+
   // ---- create tasks ----
   if (DISPLAY_ON) {
-    xTaskCreate(&draw_display_demo_task, "display_task",
+    printf(" - draw_display_demo_task\n");
+    xTaskCreate(&draw_display_demo_task, "draw_display_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DISPLAY_LARGE_ON) {
@@ -167,16 +177,20 @@ void app_main(void) {
 #ifdef DRIVER_DISPLAY_CPP
     dd->create_task();
 #else
+    printf(" - driver_display_task\n");
     xTaskCreate(&driver_display_task, "driver_display_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
 #endif
   }
+  
   if (DISPLAY_LARGE_INDICATOR_ON) {
+    printf(" - indicator_task\n");
     xTaskCreate(&indicator_task, "indicator_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (BLINK_ON) {
-    xTaskCreate(&blink_demo_task, "blink_task",
+    printf(" - blink_demo_task\n");
+    xTaskCreate(&blink_demo_task, "blink_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (ADC_ON) {
@@ -186,49 +200,65 @@ void app_main(void) {
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DS_ON) {
-    xTaskCreate(&read_ds_demo_task, "read_ds_task",
+    printf(" - read_ds_demo_task\n");
+    xTaskCreate(&read_ds_demo_task, "read_ds_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (GYRO_ACC_ON) {
-    xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_task",
+    printf(" - read_gyro_acc_demo_task\n");
+    xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (PWM_ON) {
-    xTaskCreate(&update_pwm_demo_task, "update_pwm_task",
+    printf(" - update_pwm_demo_task\n");
+    xTaskCreate(&update_pwm_demo_task, "update_pwm_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (RTC_ON) {
-    xTaskCreate(&read_rtc_demo_task, "read_adc_task",
+    printf(" - read_rtc_demo_task\n");
+    xTaskCreate(&read_rtc_demo_task, "read_adc_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (SD_ON) {
-    xTaskCreate(&write_sdcard_demo_task, "write_sdcard_task",
+    printf(" - write_sdcard_demo_task\n");
+    xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
-    xTaskCreate(&int_report_demo_task, "int_report_task",
+    printf(" - int_report_demo_task\n");
+    xTaskCreate(&int_report_demo_task, "int_report_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (SIMULATOR_ON) {
+    printf(" - simulator_task\n");
     xTaskCreate(&simulator_task, "simulator_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (IOEXT_ON) {
-    xTaskCreate(&io_ext_demo_task, "io_extension_task",
+    printf(" - IOExt2_task\n");
+    xTaskCreate(&IOExt2_task, "IOExt2_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DAC_ON) {
+    printf(" - DAC DAC DAC\n");
   }
   if (COMMANDHANDLER_ON) {
+    printf(" - command_handler_task\n");
     xTaskCreate(&command_handler_task, "command_handler_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (SERIAL_ON) {
-    xTaskCreate(&serial_demo_task, "serial_task",
+    printf(" - serial_demo_task\n");
+    xTaskCreate(&serial_demo_task, "serial_demo_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
+    printf(" - read_can_demo_task\n");
     xTaskCreate(&read_can_demo_task, "can_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
+  printf("-----------------------------------------------------------------\n");
+  printf("Creating FreeRTOS tasks successful. System running.\n");
+  printf(
+      "-----------------------------------------------------------------\n\n");
 }

@@ -19,7 +19,7 @@
 
 void init_command_handler() {
   // nothing to do, i2c bus is getting initialized externally
-  printf("Command handler task inited\n");
+  printf("[v] Command handler inited\n");
 }
 
 String commands = "<>lLwudsabpmM:!";
@@ -49,6 +49,11 @@ void command_handler_task(void *pvParameter) {
     while (Serial.available() > 0) {
       // read the incoming chars:
       String input = Serial.readString();
+
+#if DEBUGGINGLEVEL_VERBOSED == true
+      printf("Received: %s\n", input.c_str());
+#endif
+      Serial.flush();
       if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
         input = "help";
       }
@@ -90,38 +95,28 @@ void command_handler_task(void *pvParameter) {
         break;
       case 'd':
         if (String("off") == String(&input[2])) {
+          printf("%s:%s-->off\n", input.c_str(), &input[2]);
           arrow_decrease(false);
         } else {
+          printf("%s:%s-->off\n", input.c_str(), &input[2]);
           arrow_decrease(true);
         }
         break;
       case ':':
-        write_driver_info(&input[1], INFO_TYPE::INFO);
+        write_driver_info(&input[1], INFO_TYPE_INFO);
         break;
       case '!':
-        write_driver_info(&input[1], INFO_TYPE::WARN);
+        write_driver_info(&input[1], INFO_TYPE_WARN);
         break;
       // -------------- steering wheel input element emulators
       case '<':
-        if (String("off") == String(&input[2])) {
-          indicator_set_and_blink(INDICATOR::OFF);
-        } else {
-          indicator_set_and_blink(INDICATOR::LEFT);
-        }
+        setIndicator(INDICATOR_LEFT);
         break;
       case '>':
-        if (String("off") == String(&input[2])) {
-          indicator_set_and_blink(INDICATOR::OFF);
-        } else {
-          indicator_set_and_blink(INDICATOR::RIGHT);
-        }
+        setIndicator(INDICATOR_RIGHT);
         break;
       case 'w':
-        if (String("off") == String(&input[2])) {
-          indicator_set_and_blink(INDICATOR::OFF);
-        } else {
-          indicator_set_and_blink(INDICATOR::WARN);
-        }
+        setIndicator(INDICATOR_WARN);
         break;
       case 'a':
         write_acceleration(atoi(&input[1]));
@@ -140,6 +135,6 @@ void command_handler_task(void *pvParameter) {
       }
     }
     // sleep for some seconds
-    vTaskDelay(500 / portTICK_PERIOD_MS);
+    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
 }

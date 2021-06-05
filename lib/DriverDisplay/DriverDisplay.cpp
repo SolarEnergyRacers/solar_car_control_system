@@ -303,7 +303,6 @@ void draw_display_background() {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-  tft.setRotation(0);
   tft.fillScreen(bgColor);
   tft.setRotation(1);
   tft.setTextSize(2);
@@ -390,10 +389,30 @@ void _turn_Right(int color) {
                    x - indicatorWidth, y + indicatorHeight, color);
 }
 
-void indicator_set_and_blink(INDICATOR direction) {
+void indicator(INDICATOR direction) {
+  switch (direction) {
+  case INDICATOR_LEFT:
+    printf("turn-left-indicator\n");
+    break;
+
+  case INDICATOR_RIGHT:
+    printf("turn-right-indicator\n");
+    break;
+
+  case INDICATOR_WARN:
+    printf("hazzard-warn-indicator\n");
+    break;
+
+  case INDICATOR_OFF:
+  default:
+    printf("indicators off\n");
+    break;
+  }
+  Serial.flush();
   indicator_set_and_blink(direction, true);
 }
 
+// only for intern calls from module IOExt
 void indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
@@ -402,20 +421,20 @@ void indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
   _turn_Right(bgColor);
   if (blinkOn) {
     switch (direction) {
-    case INDICATOR::LEFT:
+    case INDICATOR_LEFT:
       _turn_Left(ILI9341_YELLOW);
       break;
 
-    case INDICATOR::RIGHT:
+    case INDICATOR_RIGHT:
       _turn_Right(ILI9341_YELLOW);
       break;
 
-    case INDICATOR::WARN:
+    case INDICATOR_WARN:
       _turn_Left(ILI9341_RED);
       _turn_Right(ILI9341_RED);
       break;
 
-    case INDICATOR::OFF:
+    case INDICATOR_OFF:
     default:
       break;
     }
@@ -536,19 +555,19 @@ void _drawCentreString(const String &buf, int x, int y) {
 int _getColorForInfoType(INFO_TYPE type) {
   int color;
   switch (type) {
-  case INFO_TYPE::ERROR:
+  case INFO_TYPE_ERROR:
     color = ILI9341_RED;
     break;
 
-  case INFO_TYPE::WARN:
+  case INFO_TYPE_WARN:
     color = ILI9341_GREENYELLOW;
     break;
 
-  case INFO_TYPE::STATUS:
+  case INFO_TYPE_STATUS:
     color = ILI9341_GREEN;
     break;
 
-  case INFO_TYPE::INFO:
+  case INFO_TYPE_INFO:
   default:
     color = ILI9341_WHITE;
     break;
@@ -603,10 +622,10 @@ void driver_display_demo_screen() {
   printf(" - background\n");
   draw_display_background();
   printf(" - driver info\n");
-  write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
+  write_driver_info("123456789_123456789_123456", INFO_TYPE_INFO);
   printf(" - hazzard warn\n");
-  indicator_set_and_blink(INDICATOR::WARN, true);
-  printf(" - spped\n");
+  indicator_set_and_blink(INDICATOR_WARN, true);
+  printf(" - speed\n");
   write_speed(888);
   printf(" - acceleration\n");
   write_acceleration(888);
@@ -632,10 +651,11 @@ void driver_display_demo_screen() {
 // ------------------
 // FreeRTOS INIT TASK
 // ------------------
-void init_driver_display(void) {
+bool init_driver_display(void) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
+  printf("[v] Display0 (driver display) initializing...\n");
   tft.begin();
   try {
     uint8_t x = tft.readcommand8(ILI9341_RDMODE);
@@ -650,10 +670,12 @@ void init_driver_display(void) {
     printf("Self Diagnostic:    0x%x\n", x);
     infoFrameSizeX = tft.width();
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
-    printf("[Display ILI9341] Initialize successfully with screen %d x %d.\n",
+    printf("[v] Display0 (driver display) inited: screen %d x %d.\n",
            tft.height(), tft.width());
   } catch (__exception ex) {
-    printf("[Display ILI9341] Unable to initialize screen.\n");
+    printf("[x] Display0 (driver display): Unable to initialize screen "
+           "ILI9341.\n");
+    return false;
   }
 
   xSemaphoreGive(spi_mutex);
@@ -662,8 +684,8 @@ void init_driver_display(void) {
   // tft.setFont(&FreeSans9pt7b);
   driver_display_demo_screen();
   delay(1000);
-  write_driver_info("ready.", INFO_TYPE::INFO);
-  indicator_set_and_blink(INDICATOR::OFF, false);
+  write_driver_info("ready.", INFO_TYPE_INFO);
+  indicator_set_and_blink(INDICATOR_OFF, false);
   write_speed(0);
   write_acceleration(0);
   _arrow_increase(bgColor);
@@ -674,10 +696,12 @@ void init_driver_display(void) {
   write_pv(0.0);
   write_motor(0.0);
 
-  printf("[v] Driver Display inited: SPI_CS_TFT=%d, SPI_DC=%d, SPI_MOSI=%d, "
+  printf("[v] Display0 (driver display) inited: SPI_CS_TFT=%d, SPI_DC=%d, "
+         "SPI_MOSI=%d, "
          "SPI_CLK=%d, SPI_RST=%d, SPI_MISO=%d.\n",
          SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   vTaskDelay(500 / portTICK_PERIOD_MS);
+  return true;
 }
 
 // -------------

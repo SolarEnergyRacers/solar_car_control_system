@@ -95,8 +95,10 @@ void app_main(void) {
   init_spi();
 
   scan_i2c_devices();
-  
+
+#ifdef DRIVER_DISPLAY_CPP
   DriverDisplayC *dd;
+#endif
 
   // ---- init modules ----
   if (BLINK_ON) {
@@ -178,7 +180,9 @@ void app_main(void) {
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (ADC_ON) {
-    xTaskCreate(&read_adc_demo_task, "read_adc_task",
+    // xTaskCreate(&read_adc_demo_task, "read_adc_task",
+    //             CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task",
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DS_ON) {

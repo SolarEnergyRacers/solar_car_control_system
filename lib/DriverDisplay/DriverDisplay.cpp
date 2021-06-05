@@ -190,7 +190,7 @@ float _write_float(int x, int y, float valueLast, float value, int textSize,
 // writes integer value in the range from 0 to 999
 int _write_int(int x, int y, int valueLast, int value, int textSize,
                int color) {
-  if (value < 0 || value > 999) {
+  if (value < -99 || value > 999) {
     printf("ERROR: call _write_int with a value outside the range: '%d'",
            value);
     return value;
@@ -491,11 +491,12 @@ void write_speed(int value) {
 
 // acceleration value: 0-255
 void write_acceleration(int value) {
-  if (value < 0 || value > 999) {
+  if (value < -99 || value > 999) {
     value = 999;
   }
+  int color = value >=0 ? ILI9341_GREENYELLOW : ILI9341_RED;
   accelerationLast = _write_int(accFrameX + 4, accFrameY + 4, accelerationLast,
-                                value, accTextSize, ILI9341_GREENYELLOW);
+                                abs(value), accTextSize, color);
 }
 
 void write_bat(float value) {

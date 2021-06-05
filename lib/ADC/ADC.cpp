@@ -9,6 +9,7 @@
 #include <Wire.h> // I2C
 
 #include "ADC.h"
+#include "DAC.h"
 #include "DriverDisplay.h"
 
 #define ADC_NUM_PORTS 4
@@ -17,31 +18,17 @@ ADS1015 ads(
     I2C_ADDRESS_ADS1x15); // for ADS1115 use: ADS1115 ads(I2C_ADDRESS_ADS1x15);
 
 float multiplier = 0;
-int valueLast0 = 9999;
+int16_t valueLast0 = 9999;
 float valueLast1 = 9999.9;
 float valueLast2 = 9999.9;
 float valueLast3 = 9999.9;
 
-int16_t _read_adc(int port) {
-  // check port number
-  if (port < 0 || port >= ADC_NUM_PORTS) {
-    return -1;
-  }
-
-  // read value
-  int16_t value = ads.readADC(port);
-
-  return value;
-}
+int16_t accelLast = 0;
+int16_t recupLast = 0;
 
 int _normalize(int value, int maxValue) {
   // return (int)(10 * value / 4096);
-  return (int)(maxValue * value / 1100);
-}
-
-float _normalize(float value, float maxValue) {
-  // return (int)(10 * value / 4096);
-  return (maxValue * value / 1100);
+  return (int)(maxValue * value / 1024);
 }
 
 void init_adc() {
@@ -52,17 +39,19 @@ void init_adc() {
   ads.begin();
 
   // set gain amplifier value
-  ads.setGain(
-      0); // 2/3x gain +/- 6.144V  1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
+  // 2/3x gain +/- 6.144V
+  // 1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
+  ads.setGain(0);
 
-  // conversion factor: bit-value -> mV: 2/3x gain +/- 6.144V  1 bit = 3mV
-  // (ADS1015) 0.1875mV (ADS1215)
+  // conversion factor:
+  // bit-value -> mV: 2/3x gain +/- 6.144V
+  // 1 bit = 3mV (ADS1015) 0.1875mV (ADS1115)
   multiplier = ads.toVoltage(1); // voltage factor
 
   printf("Max voltage: %f\n", ads.getMaxVoltage());
   // read all inputs & report
   for (int i = 0; i < 4; i++) {
-    int16_t value = _read_adc(i);
+    int16_t value = ads.readADC(i);
     printf("[ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
   }
 
@@ -86,7 +75,7 @@ void read_adc_demo_task(void *pvParameter) {
 
     if (abs(valueLast0 - value0) > 10) {
       valueLast0 = value0;
-      int acc = _normalize(value0, 10);
+      int acc = _normalize(value0, 100);
       printf("Acceleration: %d --> %d\n", value0, acc);
       write_acceleration(acc);
     }
@@ -108,6 +97,61 @@ void read_adc_demo_task(void *pvParameter) {
       printf("Motor: %d --> %6.1f\n", value3, 9999.9 / 2 - acc);
       write_motor(9999.9 / 2 - acc);
     }
+    // sleep for 1s
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  }
+}
+
+void read_adc_acceleration_recuperation(void *pvParameter) {
+
+  while (1) {
+    int16_t accel = 0;
+    int16_t recup = 0;
+    int16_t accDisplay = 0;
+
+    // CRITICAL SECTION I2C: start
+    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+
+    int16_t value0 = ads.readADC(0);
+    int16_t value1 = ads.readADC(1);
+
+    xSemaphoreGive(i2c_mutex);
+    // CRITICAL SECTION I2C: end
+
+    bool accelChanged = abs(accelLast - value0) > 10;
+    bool recupChanged = abs(recupLast - value1) > 10;
+
+    if (accelChanged | recupChanged) {
+
+      if (accelChanged) {
+        accelLast = value0;
+        accel = _normalize(value0, 100);
+      }
+      if (recupChanged) {
+        recupLast = value1;
+        recup = _normalize(value1, 100);
+      }
+      // priority controll: recuperation wins
+      if (recup > 0) {
+        accDisplay = -recup;
+        accel = 0;
+      } else {
+        accDisplay = accel;
+        recup = 0;
+      }
+      // write console log
+      printf("Acceleration: %4d --> %4d | Recuperation:  %4d --> %4d | "
+             "ACCEL-DISPLAY: %d\n",
+             value0, accel, value1, recup, accDisplay);
+      // write driver display info
+      write_acceleration(accDisplay);
+      arrow_increase(accel > 0 ? true : false);
+      arrow_decrease(recup > 0 ? true : false);
+      // write motor acceleration and recuperation values
+      set_pot(accel, pot_chan::POT_CHAN0);
+      set_pot(recup, pot_chan::POT_CHAN1);
+    }
+
     // sleep for 1s
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }

@@ -16,7 +16,7 @@ void abstract_task::init(){
 
 void abstract_task::create_task(){
 
-    static void run( void* pvParams ){
+    void run( void* pvParams ){
         ((MyClass*)pcParams)->runInner();
     }
     xTaskCreate( (void (*)(void*))task<MyClass>, taskName, stackDepth, x, taskPrio, taskHandle );

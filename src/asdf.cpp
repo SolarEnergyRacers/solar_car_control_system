@@ -7,7 +7,8 @@
 // using namespace std;
 
 // void MyClass::create_task(){
-//     xTaskCreate( (void (*)(void*))&init_task, "test", 1024, (void *)this, 1, NULL);
+//     xTaskCreate( (void (*)(void*))&init_task, "test", 1024, (void *)this, 1,
+//     NULL);
 // };
 
 // void MyClass::task(){

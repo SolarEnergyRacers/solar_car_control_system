@@ -9,15 +9,15 @@
 
 Board size: 42x24, height with jumpers and plugs : 14
 
-Usage in steering wheel: 
+Usage in steering wheel:
 
-  - 2 analog in from green screw clamp (pin assignment left from screw clamp: VCC | GND | A0 | A1)
-  - GND, VCC from green screw clamp
-  - VCC, GND, SDA, SCL from plug
+- 2 analog in from green screw clamp (pin assignment left from screw clamp: VCC | GND | A0 | A1)
+- GND, VCC from green screw clamp
+- VCC, GND, SDA, SCL from plug
 
 Usage in car hull:
 
-  - ###TODO
+- ###TODO
 
 ## Diagram
 
@@ -26,5 +26,3 @@ Usage in car hull:
 ## Hints and Discussion
 
 - [ ] May be we can desolder the screw clamp and the plugs and use smaller plugs or soldered wires
-
-  

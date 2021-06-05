@@ -182,7 +182,7 @@ void app_main(void) {
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
 #endif
   }
-  
+
   if (DISPLAY_LARGE_INDICATOR_ON) {
     printf(" - indicator_task\n");
     xTaskCreate(&indicator_task, "indicator_task",

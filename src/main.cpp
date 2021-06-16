@@ -19,7 +19,6 @@
 #include "definitions.h"
 
 // local libs
-#include "../interfaces/abstract_task.h"
 #include <ADC.h>
 #include <CANBus.h>
 #include <CmdHandler.h>
@@ -41,10 +40,9 @@
 #include <gpio.h>
 #include <string>
 #include <system.h>
-//#include "abstract_task.h"
-#include "asdf.h"
 
 #include "LocalFunctionsAndDevices.h"
+#include <../interfaces/abstract_task.h>
 
 // add C linkage definition
 extern "C" {
@@ -53,28 +51,8 @@ void app_main(void);
 
 using namespace std;
 
-// class test: public abstract_task {
-// private:
-//    string name = "test";
-// public:
-//    void init(){};
-//    string getName() {
-//        return name;
-//    }
-//    void polling_task(){
-//        printf("hello from %s polling task\n", getName().c_str());
-//    }
-//};
-
 void app_main(void) {
   bool startOk = true;
-
-  //  class test template0;
-  //  template0.init();
-  //  printf("Template: %s\n", template0.getInfo().c_str());
-
-  // MyClass x;
-  // x.create_task();
 
   // init arduino library
   initArduino();
@@ -97,14 +75,11 @@ void app_main(void) {
 
   scan_i2c_devices();
 
-  DriverDisplayC *dd;
-
   // ---- init modules ----
   if (BLINK_ON) {
   }
   if (DISPLAY_LARGE_ON) {
-    dd = new DriverDisplayC();
-    dd->init();
+    DriverDisplayC::instance()->init();
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
     startOk &= init_indicator();
@@ -168,7 +143,7 @@ void app_main(void) {
   }
   if (DISPLAY_LARGE_ON) {
 
-    dd->create_task();
+    DriverDisplayC::instance()->create_task();
     // printf(" - driver_display_task\n");
     // xTaskCreate(&driver_display_task, "driver_display_task",
     //             CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);

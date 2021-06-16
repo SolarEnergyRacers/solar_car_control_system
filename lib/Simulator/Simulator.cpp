@@ -18,7 +18,9 @@ int counterPV = 0;
 // FreeRTOS INIT TASK
 // ------------------
 void init_simulator(void) {
-  driver_display_demo_screen();
+  DriverDisplayC *dd = DriverDisplayC::instance();
+
+  dd->driver_display_demo_screen();
   printf("[v] Simulator inited.\n");
   delay(10000);
 
@@ -30,62 +32,64 @@ void init_simulator(void) {
 // -------------
 void simulator_task(void *pvParameter) {
   // polling loop
+  DriverDisplayC *dd = DriverDisplayC::instance();
+
   while (1) {
     // CRITICAL SECTION SPI: start
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
     switch (counterIndicator++) {
     case 0:
-      write_driver_info("Stop!", INFO_TYPE_ERROR);
-      arrow_increase(false);
-      arrow_decrease(false);
+      dd->write_driver_info("Stop!", DriverDisplayC::INFO_TYPE::ERROR);
+      dd->arrow_increase(false);
+      dd->arrow_decrease(false);
       break;
     case 40:
-      write_driver_info("Go", INFO_TYPE_INFO);
+      dd->write_driver_info("Go", DriverDisplayC::INFO_TYPE::INFO);
       // write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
-      arrow_increase(true);
+      dd->arrow_increase(true);
       break;
     case 80:
-      write_driver_info("Go", INFO_TYPE_INFO);
-      arrow_decrease(true);
+      dd->write_driver_info("Go", DriverDisplayC::INFO_TYPE::INFO);
+      dd->arrow_decrease(true);
       break;
     case 120:
-      write_driver_info("", INFO_TYPE_INFO);
-      arrow_increase(false);
-      arrow_decrease(false);
+      dd->write_driver_info("", DriverDisplayC::INFO_TYPE::INFO);
+      dd->arrow_increase(false);
+      dd->arrow_decrease(false);
       break;
     case 170:
       counterIndicator = 0;
     }
     switch (counterSpeed++) {
     case 0:
-      draw_display_border(ILI9341_GREEN);
-      write_speed(1);
+      dd->draw_display_border(ILI9341_GREEN);
+      dd->write_speed(1);
       break;
     case 1:
-      write_speed(12);
+     dd-> write_speed(12);
       break;
     case 2:
-      write_speed(123);
+      dd->write_speed(123);
       break;
     case 3:
-      draw_display_border(ILI9341_YELLOW);
-      write_speed(888);
+      dd->draw_display_border(ILI9341_YELLOW);
+      dd->write_speed(888);
       delay(1000);
       break;
     case 4:
-      draw_display_border(ILI9341_RED);
-      write_speed(120);
+      dd->draw_display_border(ILI9341_RED);
+      dd->write_speed(120);
       break;
     case 5:
-      write_speed(42);
+      dd->write_speed(42);
       break;
     case 6:
-      write_speed(0);
-      draw_display_border(ILI9341_RED);
+      dd->write_speed(0);
+      dd->draw_display_border(ILI9341_RED);
       break;
     default:
-      write_speed(counterSpeed);
-      draw_display_border(ILI9341_GREEN);
+      dd->write_speed(counterSpeed);
+      dd->draw_display_border(ILI9341_GREEN);
       if (counterSpeed > 990) {
         counterSpeed = 0;
       }
@@ -93,38 +97,38 @@ void simulator_task(void *pvParameter) {
 
     switch (counterPV++) {
     case 0:
-      write_pv(1);
-      write_motor(1.1);
+      dd->write_pv(1);
+      dd->write_motor(1.1);
       break;
     case 1:
-      write_pv(12);
-      write_motor(12.3);
+      dd->write_pv(12);
+      dd->write_motor(12.3);
       break;
     case 2:
-      write_pv(123);
-      write_motor(123.4);
+      dd->write_pv(123);
+      dd->write_motor(123.4);
       break;
     case 3:
-      write_pv(1234);
-      write_motor(1234.5);
+      dd->write_pv(1234);
+      dd->write_motor(1234.5);
       break;
     case 4:
-      write_pv(-1);
-      write_motor(-1.2);
+      dd->write_pv(-1);
+      dd->write_motor(-1.2);
       break;
     case 5:
-      write_pv(-12);
-      write_motor(-12.3);
+      dd->write_pv(-12);
+      dd->write_motor(-12.3);
       break;
     case 6:
-      write_pv(-123);
-      write_motor(-123.4);
+      dd->write_pv(-123);
+      dd->write_motor(-123.4);
       counterPV = -99999;
       break;
     default:
-      write_pv((float)counterPV / 10);
-      write_motor((float)counterPV / -10);
-      write_bat((float)counterPV / 1000);
+      dd->write_pv((float)counterPV / 10);
+      dd->write_motor((float)counterPV / -10);
+      dd->write_bat((float)counterPV / 1000);
       if (counterPV > 99999) {
         counterPV = -99999;
       }

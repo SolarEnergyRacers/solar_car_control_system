@@ -44,6 +44,7 @@ String helpText = "Available commands (" + commands +
 
 void command_handler_task(void *pvParameter) {
 
+  DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
 
     while (Serial.available() > 0) {
@@ -68,45 +69,45 @@ void command_handler_task(void *pvParameter) {
       switch (input[0]) {
       // ---------------- controller commands
       case 's':
-        write_speed(atoi(&input[1]));
+        dd->write_speed(atoi(&input[1]));
         break;
       case 'b':
-        write_bat(atof(&input[1]));
+        dd->write_bat(atof(&input[1]));
         break;
       case 'p':
-        write_pv(atof(&input[1]));
+        dd->write_pv(atof(&input[1]));
         break;
       case 'M':
-        write_motor(atof(&input[1]));
+        dd->write_motor(atof(&input[1]));
         break;
       case 'm':
-        write_speed(atoi(&input[1]));
+        dd->write_speed(atoi(&input[1]));
         set_pot(atoi(&input[1]), POT_CHAN0);
         break;
       // -------------- chase car commands
       case 'u':
         if (String("off") == String(&input[2])) {
           printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          arrow_increase(false);
+          dd->arrow_increase(false);
         } else {
           printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          arrow_increase(true);
+          dd->arrow_increase(true);
         }
         break;
       case 'd':
         if (String("off") == String(&input[2])) {
           printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          arrow_decrease(false);
+          dd->arrow_decrease(false);
         } else {
           printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          arrow_decrease(true);
+          dd->arrow_decrease(true);
         }
         break;
       case ':':
-        write_driver_info(&input[1], INFO_TYPE_INFO);
+        dd->write_driver_info(&input[1], DriverDisplayC::INFO_TYPE::INFO);
         break;
       case '!':
-        write_driver_info(&input[1], INFO_TYPE_WARN);
+        dd->write_driver_info(&input[1], DriverDisplayC::INFO_TYPE::WARN);
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -119,13 +120,13 @@ void command_handler_task(void *pvParameter) {
         setIndicator(DriverDisplayC::INDICATOR::WARN);
         break;
       case 'a':
-        write_acceleration(atoi(&input[1]));
+        dd->write_acceleration(atoi(&input[1]));
         break;
       case 'l':
-        DriverDisplayC::light1OnOff();
+        dd->light1OnOff();
         break;
       case 'L':
-        light2OnOff();
+        dd->light2OnOff();
         break;
       // usage
       case 'h':

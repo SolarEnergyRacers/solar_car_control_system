@@ -61,6 +61,8 @@ void init_adc() {
 
 void read_adc_demo_task(void *pvParameter) {
 
+  DriverDisplayC *dd = DriverDisplayC::instance();
+
   while (1) {
     // CRITICAL SECTION I2C: start
     xSemaphoreTake(i2c_mutex, portMAX_DELAY);
@@ -77,25 +79,25 @@ void read_adc_demo_task(void *pvParameter) {
       valueLast0 = value0;
       int acc = _normalize(value0, 100);
       printf("Acceleration: %d --> %d\n", value0, acc);
-      write_acceleration(acc);
+      dd->write_acceleration(acc);
     }
     if (abs(valueLast1 - value1) > 10) {
       valueLast1 = value1;
       float acc = _normalize(value1, 999.9);
       printf("Battery: %d --> %6.1f\n", value1, acc);
-      write_bat(acc);
+      dd->write_bat(acc);
     }
     if (abs(valueLast2 - value2) > 10) {
       valueLast2 = value2;
       float acc = _normalize(value2, 9999.9);
       printf("PV: %d --> %6.1f\n", value2, 9999.9 / 2 - acc);
-      write_pv(9999.9 / 2 - acc);
+      dd->write_pv(9999.9 / 2 - acc);
     }
     if (abs(valueLast3 - value3) > 10) {
       valueLast3 = value3;
       float acc = _normalize(value3, 9999.9);
       printf("Motor: %d --> %6.1f\n", value3, 9999.9 / 2 - acc);
-      write_motor(9999.9 / 2 - acc);
+      dd->write_motor(9999.9 / 2 - acc);
     }
     // sleep for 1s
     vTaskDelay(1000 / portTICK_PERIOD_MS);
@@ -103,6 +105,8 @@ void read_adc_demo_task(void *pvParameter) {
 }
 
 void read_adc_acceleration_recuperation(void *pvParameter) {
+
+  DriverDisplayC *dd = DriverDisplayC::instance();
 
   while (1) {
     int16_t accel = 0;
@@ -144,9 +148,9 @@ void read_adc_acceleration_recuperation(void *pvParameter) {
              "ACCEL-DISPLAY: %d\n",
              value0, accel, value1, recup, accDisplay);
       // write driver display info
-      write_acceleration(accDisplay);
-      arrow_increase(accel > 0 ? true : false);
-      arrow_decrease(recup > 0 ? true : false);
+      dd->write_acceleration(accDisplay);
+      dd->arrow_increase(accel > 0 ? true : false);
+      dd->arrow_decrease(recup > 0 ? true : false);
       // write motor acceleration and recuperation values
       set_pot(accel, pot_chan::POT_CHAN0);
       set_pot(recup, pot_chan::POT_CHAN1);

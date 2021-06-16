@@ -53,15 +53,16 @@ volatile bool ioInterruptRequest = false;
 void keyPressedInterruptHandler() { ioInterruptRequest = true; }
 
 void _speedCheck(int speed) {
+  DriverDisplayC *dd = DriverDisplayC::instance();
   if (speed < 50) {
-    arrow_increase(true);
+    dd->arrow_increase(true);
   } else {
-    arrow_increase(false);
+    dd->arrow_increase(false);
   }
   if (speed > 80) {
-    arrow_decrease(true);
+    dd->arrow_decrease(true);
   } else {
-    arrow_decrease(false);
+    dd->arrow_decrease(false);
   }
 }
 
@@ -73,7 +74,7 @@ void _handleIoInterrupt() {
 
   if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
     taskSleep = 50; // default value for fast reaction to pressed button
-    xSemaphoreGive(i2c_mutex);
+    xSemaphoreGive(i2c_mutex); /// TODO_KSC:move directly after digitalReadAll
     // CRITICAL SECTION I2C: end
     return;
   }
@@ -92,25 +93,27 @@ void _handleIoInterrupt() {
   bool drivingLights = !dra.p6;
   bool nextScreen = !dra.p7;
 
+  DriverDisplayC *dd = DriverDisplayC::instance();
+
   // turn indicator and hazard lights
   if (left && right) {
-    setIndicator(INDICATOR_WARN);
+    setIndicator(DriverDisplayC::INDICATOR::WARN);
   } else if (left && !right) {
-    setIndicator(INDICATOR_LEFT);
+    setIndicator(DriverDisplayC::INDICATOR::LEFT);
   } else if (!left && right) {
-    setIndicator(INDICATOR_RIGHT);
+    setIndicator(DriverDisplayC::INDICATOR::RIGHT);
   }
   if (positionLights) {
-    light1OnOff();
+    dd->light1OnOff();
   }
   if (drivingLights) {
-    light2OnOff();
+    dd->light2OnOff();
   }
 
   // Simulation
   if (speedPowerControlOnOff) {
     speed += 10;
-    write_speed(speed);
+    dd->write_speed(speed);
     _speedCheck(speed);
   }
   if (speedPowerControlMode) {
@@ -118,21 +121,21 @@ void _handleIoInterrupt() {
     if (speed < 0) {
       speed = 0;
     }
-    write_speed(speed);
+    dd->write_speed(speed);
     _speedCheck(speed);
   }
   if (horn) {
     acceleration += 10;
-    write_acceleration(acceleration);
+    dd->write_acceleration(acceleration);
   }
   if (nextScreen) {
     acceleration -= 10;
     if (acceleration < 0) {
       acceleration = 0;
     }
-    write_acceleration(acceleration);
+    dd->write_acceleration(acceleration);
   }
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2c_mutex); // TODO_KSC: remove
   // CRITICAL SECTION I2C: end
 }
 

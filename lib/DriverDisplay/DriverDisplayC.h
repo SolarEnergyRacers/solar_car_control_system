@@ -22,13 +22,23 @@ class DriverDisplayC : public abstract_task {
 public:
   // public structures
   enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-  enum class INFO_TYPE {
-    INFO,
-    STATUS,
-    WARN,
-    ERROR
-  }; // INFO => ILI9341_WHITE, STATUS => ILI9341_GREEN, WARN => ILI9341_PURPLE,
-     // ERROR => ILI9341_RED
+  enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+  // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
+  // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
+
+  static DriverDisplayC *instance() {
+    if (!_instance) {
+      _instance = new DriverDisplayC();
+    }
+    return _instance;
+  }
+  virtual ~DriverDisplayC() { _instance = 0; }
+
+private:
+  static DriverDisplayC *_instance;
+
+protected:
+  DriverDisplayC() {}
 
 private:
   // put private/internal variables/functions here

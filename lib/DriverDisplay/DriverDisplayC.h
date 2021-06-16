@@ -2,7 +2,6 @@
 // Display
 //
 #include "../../include/LocalFunctionsAndDevices.h"
-#ifdef DRIVER_DISPLAY_CPP
 
 #ifndef DRIVER_DISPLAY_C_H
 #define DRIVER_DISPLAY_C_H
@@ -46,7 +45,6 @@ private:
   int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int);
   void _turn_Right(int);
-  void runInner();
 
 public:
   string getName(void);
@@ -85,7 +83,7 @@ public:
   void indicator_set_and_blink(INDICATOR direction, bool blinkOn);
   bool getIndicatorState();
   void setIndicatorState(bool state);
+  void task(void);
 };
 
 #endif // DRIVER_DISPLAY_C_H
-#endif // DRIVER_DISPLAY_CPP

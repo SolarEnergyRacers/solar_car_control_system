@@ -8,7 +8,6 @@
  ***/
 
 #include "../../include/LocalFunctionsAndDevices.h"
-#ifdef DRIVER_DISPLAY_CPP
 
 #include "../../include/definitions.h"
 #include "../../interfaces/abstract_task.h"
@@ -120,6 +119,24 @@ void DriverDisplayC ::init() {
 void DriverDisplayC ::exit() {}
 
 void DriverDisplayC ::re_init(void) {}
+
+// -------------
+// FreeRTOS TASK
+// -------------
+void DriverDisplayC ::task(void) {
+  // polling loop
+  while (1) {
+
+    if (lifeSignCounter > 10) {
+      lifeSign();
+      lifeSignCounter = 0;
+    }
+    lifeSignCounter++;
+
+    // sleep for sleep_polling_ms
+    // this->sleep();
+  }
+}
 
 void exit(void) {}
 
@@ -646,22 +663,20 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("ready.\n");
 }
 
-// -------------
-// FreeRTOS TASK
-// -------------
-void DriverDisplayC ::runInner() {
-  // polling loop
-  while (1) {
+// // -------------
+// // FreeRTOS TASK
+// // -------------
+// void DriverDisplayC ::task(void) {
+//   // polling loop
+//   while (1) {
 
-    if (lifeSignCounter > 10) {
-      lifeSign();
-      lifeSignCounter = 0;
-    }
-    lifeSignCounter++;
+//     if (lifeSignCounter > 10) {
+//       lifeSign();
+//       lifeSignCounter = 0;
+//     }
+//     lifeSignCounter++;
 
-    // sleep for sleep_polling_ms
-    // this->sleep();
-  }
-}
-
-#endif // DRIVER_DISPLAY_CPP
+//     // sleep for sleep_polling_ms
+//     // this->sleep();
+//   }
+// }

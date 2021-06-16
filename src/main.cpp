@@ -25,7 +25,6 @@
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
-#include <DriverDisplay.h>
 #include <DriverDisplayC.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
@@ -98,20 +97,14 @@ void app_main(void) {
 
   scan_i2c_devices();
 
-#ifdef DRIVER_DISPLAY_CPP
   DriverDisplayC *dd;
-#endif
 
   // ---- init modules ----
   if (BLINK_ON) {
   }
   if (DISPLAY_LARGE_ON) {
-#ifdef DRIVER_DISPLAY_CPP
     dd = new DriverDisplayC();
     dd->init();
-#else
-    init_driver_display();
-#endif
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
     startOk &= init_indicator();
@@ -175,13 +168,10 @@ void app_main(void) {
   }
   if (DISPLAY_LARGE_ON) {
 
-#ifdef DRIVER_DISPLAY_CPP
     dd->create_task();
-#else
-    printf(" - driver_display_task\n");
-    xTaskCreate(&driver_display_task, "driver_display_task",
-                CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-#endif
+    // printf(" - driver_display_task\n");
+    // xTaskCreate(&driver_display_task, "driver_display_task",
+    //             CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
 
   if (DISPLAY_LARGE_INDICATOR_ON) {

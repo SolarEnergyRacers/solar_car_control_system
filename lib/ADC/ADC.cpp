@@ -10,7 +10,7 @@
 
 #include "ADC.h"
 #include "DAC.h"
-#include "DriverDisplay.h"
+#include "DriverDisplayC.h"
 
 #define ADC_NUM_PORTS 4
 

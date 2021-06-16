@@ -8,23 +8,23 @@
 #include <Adafruit_ILI9341.h> // display
 #include <SPIBus.h>
 
-#include "DriverDisplay.h"
+#include "DriverDisplayC.h"
 #include "Indicator.h"
 
 volatile bool blinkState = false;
-volatile INDICATOR curState = INDICATOR_OFF;
+volatile DriverDisplayC::INDICATOR curState = DriverDisplayC::INDICATOR::OFF;
 
-INDICATOR getIndicator() { return curState; }
+DriverDisplayC::INDICATOR getIndicator() { return curState; }
 
-void setIndicator(INDICATOR state) {
+void setIndicator(DriverDisplayC::INDICATOR state) {
   if (curState == state) {
     printf("Set indicator '%d' off\n", state);
-    curState = INDICATOR_OFF;
-    indicator_set_and_blink(curState, false);
+    curState = DriverDisplayC::INDICATOR::OFF;
+    //DriverDisplayC::indicator_set_and_blink(curState, false);
   } else {
     printf("Set indicator '%d' on\n", state);
     curState = state;
-    indicator_set_and_blink(curState, true);
+    //DriverDisplayC::indicator_set_and_blink(curState, true);
   }
 }
 

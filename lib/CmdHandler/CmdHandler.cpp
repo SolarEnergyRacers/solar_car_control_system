@@ -13,7 +13,7 @@
 
 #include "CmdHandler.h"
 #include "DAC.h"
-#include "DriverDisplay.h"
+#include "DriverDisplayC.h"
 #include "Helper.h"
 #include "Indicator.h"
 
@@ -110,19 +110,19 @@ void command_handler_task(void *pvParameter) {
         break;
       // -------------- steering wheel input element emulators
       case '<':
-        setIndicator(INDICATOR_LEFT);
+        setIndicator(DriverDisplayC::INDICATOR::LEFT);
         break;
       case '>':
-        setIndicator(INDICATOR_RIGHT);
+        setIndicator(DriverDisplayC::INDICATOR::RIGHT);
         break;
       case 'w':
-        setIndicator(INDICATOR_WARN);
+        setIndicator(DriverDisplayC::INDICATOR::WARN);
         break;
       case 'a':
         write_acceleration(atoi(&input[1]));
         break;
       case 'l':
-        light1OnOff();
+        DriverDisplayC::light1OnOff();
         break;
       case 'L':
         light2OnOff();

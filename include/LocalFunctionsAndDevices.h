@@ -22,6 +22,4 @@
 
 #define DEBUGLEVEL_VERBOSE true
 
-//#define DRIVER_DISPLAY_CPP
-
 #endif // LocalFunctionsAndDevices_H

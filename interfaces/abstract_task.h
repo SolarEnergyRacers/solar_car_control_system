@@ -20,13 +20,16 @@ public:
   virtual void init(void);
   virtual void re_init(void);
   virtual void exit(void);
-  virtual void runInner();
+  virtual void task(void); // this is the actual task
 
   string getInfo(void);
 
   void sleep(void);
+
   void create_task(void);
-  static void task(void *pvParameter);
+  static void init_task(void* pvParams){
+      ((abstract_task*)pvParams)->task();
+  };
 };
 
 #endif // ABSTRACT_TASK_H

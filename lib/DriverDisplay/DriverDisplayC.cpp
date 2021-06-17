@@ -108,12 +108,39 @@ bool light1On = false;
 bool light2On = false;
 //=======================================
 
-string DriverDisplayC ::getName() { return "DriverDisplay"; };
+DriverDisplayC *DriverDisplayC::_instance = 0;
+
+string DriverDisplayC ::getName() { return "Display0 (driver display)"; };
 
 void DriverDisplayC ::init() {
+  abstract_task::init();
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST,
                          SPI_MISO);
   sleep_polling_ms = 500;
+  tft.begin();
+  printf("done.\n");
+  try {
+    printf("[v] Display0 (driver display) initializing...\n");
+    uint8_t x = tft.readcommand8(ILI9341_RDMODE);
+    printf("Display Power Mode: 0x%x\n", x);
+    x = tft.readcommand8(ILI9341_RDMADCTL);
+    printf("MADCTL Mode:        0x%x\n", x);
+    x = tft.readcommand8(ILI9341_RDPIXFMT);
+    printf("Pixel Format:       0x%x\n", x);
+    x = tft.readcommand8(ILI9341_RDIMGFMT);
+    printf("Image Format:       0x%x\n", x);
+    x = tft.readcommand8(ILI9341_RDSELFDIAG);
+    printf("Self Diagnostic:    0x%x\n", x);
+    infoFrameSizeX = tft.width();
+    speedFrameX = (tft.width() - speedFrameSizeX) / 2;
+    printf("[v] Display0 (driver display) inited: screen %d x %d.\n",
+           tft.height(), tft.width());
+  } catch (__exception ex) {
+    printf("[x] Display0 (driver display): Unable to initialize screen "
+           "ILI9341.\n");
+  }
+  driver_display_demo_screen();
+  draw_display_background();
 }
 
 void DriverDisplayC ::exit() {}
@@ -565,8 +592,8 @@ void DriverDisplayC ::_drawCentreString(const String &buf, int x, int y) {
   // CRITICAL SECTION SPI: end
 }
 
-// INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR =
-// ILI9341_RED
+// INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR
+// = ILI9341_RED
 int DriverDisplayC ::_getColorForInfoType(INFO_TYPE type) {
   int color;
   switch (type) {

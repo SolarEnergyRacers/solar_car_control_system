@@ -34,13 +34,12 @@ public:
   }
   virtual ~DriverDisplayC() { _instance = 0; }
 
-private:
-  static DriverDisplayC *_instance;
-
 protected:
   DriverDisplayC() {}
 
 private:
+  static DriverDisplayC *_instance;
+
   // put private/internal variables/functions here
   uint32_t sleep_polling_ms = 1000;
   float _write_float(int x, int y, float valueLast, float value, int textSize,
@@ -55,6 +54,7 @@ private:
   int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int);
   void _turn_Right(int);
+  bool init_driver_display(void);
 
 public:
   string getName(void);

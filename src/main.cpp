@@ -123,6 +123,7 @@ void app_main(void) {
   if (SIMULATOR_ON) {
     init_simulator();
   }
+
   if (CAN_ON) {
     init_can();
   }
@@ -142,11 +143,8 @@ void app_main(void) {
                 CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DISPLAY_LARGE_ON) {
-
     DriverDisplayC::instance()->create_task();
-    // printf(" - driver_display_task\n");
-    // xTaskCreate(&driver_display_task, "driver_display_task",
-    //             CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf("done\n");
   }
 
   if (DISPLAY_LARGE_INDICATOR_ON) {
@@ -227,4 +225,8 @@ void app_main(void) {
   printf("Creating FreeRTOS tasks successful. System running.\n");
   printf(
       "-----------------------------------------------------------------\n\n");
+  // if (DISPLAY_LARGE_ON) {
+  //   DriverDisplayC::instance()->driver_display_demo_screen();
+  // }
+
 }

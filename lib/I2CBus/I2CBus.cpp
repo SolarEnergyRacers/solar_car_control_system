@@ -27,7 +27,7 @@ void init_i2c(void) {
 
   printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA,
          I2C_SCL, I2C_FREQ);
-  //scan_i2c_devices();
+  // scan_i2c_devices();
 }
 
 // test if the i2c bus is available and ready for transaction at address adr

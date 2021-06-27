@@ -228,5 +228,4 @@ void app_main(void) {
   // if (DISPLAY_LARGE_ON) {
   //   DriverDisplayC::instance()->driver_display_demo_screen();
   // }
-
 }

@@ -23,6 +23,8 @@ public:
   // public structures
   enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
   enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+  enum class CONSTANT_MODE { SPEED, POWER };
+  enum class DRIVE_DIRECTION { FORWARDS, BACKWARDS };
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
   // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
 
@@ -72,6 +74,8 @@ public:
   void lifeSign();
   void draw_display_background();
 
+  void write_constant_mode(CONSTANT_MODE);
+  void write_drive_direction(DRIVE_DIRECTION);
   void write_driver_info(String msg, INFO_TYPE type);
   void write_speed(int speed);
   void write_bat(float voltage);

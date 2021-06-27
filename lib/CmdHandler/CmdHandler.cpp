@@ -28,6 +28,8 @@ String helpText = "Available commands (" + commands +
                   "\tu [off]  - speed up arrow (green)\n"
                   "\td [off]  - speed down arrow (red)\n"
                   "\ts ddd    - speed value [0...999]\n"
+                  "\ts f    - drive forwards"
+                  "\ts b    - drive backwards"
                   "\ta dd     - acceleration value [0...9]\n"
                   "\tb fff.f  - battary voltage [0...999]\n"
                   "\tp ffff.f - photovoltaics current [-999...+999]\n"
@@ -40,6 +42,8 @@ String helpText = "Available commands (" + commands +
                   "\tw [off]  - hazard warning lights\n"
                   "\tl [off]  - position lights on/off\n"
                   "\tL [off]  - beam light on/off\n"
+                  "\tc s      - constant speed mode\n"
+                  "\tc p      - constant power mode\n"
                   "\t\n";
 
 void command_handler_task(void *pvParameter) {
@@ -69,7 +73,13 @@ void command_handler_task(void *pvParameter) {
       switch (input[0]) {
       // ---------------- controller commands
       case 's':
-        dd->write_speed(atoi(&input[1]));
+        if (input[2] == 'f') {
+          dd->write_drive_direction(DriverDisplayC::DRIVE_DIRECTION::FORWARDS);
+        } else if (input[2] == 'b') {
+          dd->write_drive_direction(DriverDisplayC::DRIVE_DIRECTION::BACKWARDS);
+        } else {
+          dd->write_speed(atoi(&input[1]));
+        }
         break;
       case 'b':
         dd->write_bat(atof(&input[1]));
@@ -127,6 +137,13 @@ void command_handler_task(void *pvParameter) {
         break;
       case 'L':
         dd->light2OnOff();
+        break;
+      case 'c':
+        if (input[2] == 's') {
+          dd->write_constant_mode(DriverDisplayC::CONSTANT_MODE::SPEED);
+        } else {
+          dd->write_constant_mode(DriverDisplayC::CONSTANT_MODE::POWER);
+        }
         break;
       // usage
       case 'h':

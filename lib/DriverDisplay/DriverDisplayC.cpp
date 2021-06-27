@@ -75,6 +75,16 @@ int motorFrameY = 220;
 int motorTextSize = 2;
 // ---- voltage and current displays ---- END
 
+// constant mode speed or power display
+int constantModeX = 240;
+int constantModeY = 180;
+int constantModeTextSize = 2;
+
+// constant mode speed or power display
+int driveDirectionX = 240;
+int driveDirectionY = 220;
+int driveDirectionTextSize = 2;
+
 // turn indicator arrows
 int indicatorLeftX = 10;
 int indicatorY = 92;
@@ -435,6 +445,40 @@ void DriverDisplayC ::arrow_increase(bool on) {
     color = ILI9341_YELLOW;
   }
   _arrow_increase(color);
+}
+
+void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
+  tft.setTextSize(constantModeTextSize);
+  tft.setTextColor(ILI9341_BLACK);
+  tft.setCursor(constantModeX, constantModeX);
+  tft.print("power");
+  tft.setCursor(constantModeX, constantModeX);
+  tft.print("speed");
+
+  tft.setTextColor(ILI9341_YELLOW);
+  tft.setCursor(constantModeX, constantModeX);
+  if (mode == CONSTANT_MODE::POWER) {
+    tft.print("power");
+  } else {
+    tft.print("speed");
+  }
+}
+
+void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
+  tft.setTextSize(driveDirectionTextSize);
+  tft.setTextColor(ILI9341_BLACK);
+  tft.setCursor(driveDirectionX, driveDirectionY);
+  tft.print("forwards");
+  tft.setCursor(driveDirectionX, driveDirectionY);
+  tft.print("backwards");
+
+  tft.setTextColor(ILI9341_YELLOW);
+  tft.setCursor(driveDirectionX, driveDirectionY);
+  if (direction == DRIVE_DIRECTION::FORWARDS) {
+    tft.print("forwards");
+  } else {
+    tft.print("backwards");
+  }
 }
 
 void DriverDisplayC ::_turn_Left(int color) {

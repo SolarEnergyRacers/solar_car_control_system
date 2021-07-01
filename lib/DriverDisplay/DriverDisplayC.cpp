@@ -28,7 +28,7 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
-//namespace DriverDisplayC {
+// namespace DriverDisplayC {
 //==== Driver Display definition ==== START
 // display formats and sizes
 int bgColor = 0x000000;

@@ -66,7 +66,7 @@ void simulator_task(void *pvParameter) {
       dd->write_speed(1);
       break;
     case 1:
-     dd-> write_speed(12);
+      dd->write_speed(12);
       break;
     case 2:
       dd->write_speed(123);

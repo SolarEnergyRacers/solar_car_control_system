@@ -24,7 +24,7 @@ void setIndicator(INDICATOR state) {
   } else {
     printf("Set indicator '%d' on\n", static_cast<int>(state));
     curState = state;
-    //DriverDisplayC::indicator_set_and_blink(curState, true);
+    // DriverDisplayC::indicator_set_and_blink(curState, true);
   }
 }
 

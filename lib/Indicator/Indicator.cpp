@@ -12,14 +12,14 @@
 #include "Indicator.h"
 
 volatile bool blinkState = false;
-volatile DriverDisplayC::INDICATOR curState = DriverDisplayC::INDICATOR::OFF;
+volatile INDICATOR curState = INDICATOR::OFF;
 
-DriverDisplayC::INDICATOR getIndicator() { return curState; }
+INDICATOR getIndicator() { return curState; }
 
-void setIndicator(DriverDisplayC::INDICATOR state) {
+void setIndicator(INDICATOR state) {
   if (curState == state) {
     printf("Set indicator '%d' off\n", static_cast<int>(state));
-    curState = DriverDisplayC::INDICATOR::OFF;
+    curState = INDICATOR::OFF;
     //DriverDisplayC::indicator_set_and_blink(curState, false);
   } else {
     printf("Set indicator '%d' on\n", static_cast<int>(state));

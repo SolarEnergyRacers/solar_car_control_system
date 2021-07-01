@@ -17,14 +17,16 @@ using namespace std;
 
 extern SemaphoreHandle_t spi_mutex;
 
+// namespace DriverDisplayC {
+// public structures
+enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
+enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+enum class CONSTANT_MODE { SPEED, POWER };
+enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
+
 class DriverDisplayC : public abstract_task {
 
 public:
-  // public structures
-  enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-  enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-  enum class CONSTANT_MODE { SPEED, POWER };
-  enum class DRIVE_DIRECTION { FORWARDS, BACKWARDS };
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
   // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
 
@@ -99,5 +101,5 @@ public:
   void setIndicatorState(bool state);
   void task(void);
 };
-
+//} // namespace DriverDisplayC
 #endif // DRIVER_DISPLAY_C_H

@@ -50,6 +50,7 @@ void app_main(void);
 }
 
 using namespace std;
+//using namespace DriverDisplayC;
 
 void app_main(void) {
   bool startOk = true;

@@ -97,11 +97,11 @@ void _handleIoInterrupt() {
 
   // turn indicator and hazard lights
   if (left && right) {
-    setIndicator(DriverDisplayC::INDICATOR::WARN);
+    setIndicator(INDICATOR::WARN);
   } else if (left && !right) {
-    setIndicator(DriverDisplayC::INDICATOR::LEFT);
+    setIndicator(INDICATOR::LEFT);
   } else if (!left && right) {
-    setIndicator(DriverDisplayC::INDICATOR::RIGHT);
+    setIndicator(INDICATOR::RIGHT);
   }
   if (positionLights) {
     dd->light1OnOff();

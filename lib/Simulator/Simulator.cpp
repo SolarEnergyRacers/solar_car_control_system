@@ -39,21 +39,21 @@ void simulator_task(void *pvParameter) {
     xSemaphoreTake(spi_mutex, portMAX_DELAY);
     switch (counterIndicator++) {
     case 0:
-      dd->write_driver_info("Stop!", DriverDisplayC::INFO_TYPE::ERROR);
+      dd->write_driver_info("Stop!", INFO_TYPE::ERROR);
       dd->arrow_increase(false);
       dd->arrow_decrease(false);
       break;
     case 40:
-      dd->write_driver_info("Go", DriverDisplayC::INFO_TYPE::INFO);
+      dd->write_driver_info("Go", INFO_TYPE::INFO);
       // write_driver_info("0123456789ABCDEF0123456789", ILI9341_WHITE);
       dd->arrow_increase(true);
       break;
     case 80:
-      dd->write_driver_info("Go", DriverDisplayC::INFO_TYPE::INFO);
+      dd->write_driver_info("Go", INFO_TYPE::INFO);
       dd->arrow_decrease(true);
       break;
     case 120:
-      dd->write_driver_info("", DriverDisplayC::INFO_TYPE::INFO);
+      dd->write_driver_info("", INFO_TYPE::INFO);
       dd->arrow_increase(false);
       dd->arrow_decrease(false);
       break;

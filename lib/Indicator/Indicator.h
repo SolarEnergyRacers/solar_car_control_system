@@ -8,8 +8,8 @@
 #include "DriverDisplayC.h"
 
 // public
-DriverDisplayC::INDICATOR getIndicator();
-void setIndicator(DriverDisplayC::INDICATOR state);
+INDICATOR getIndicator();
+void setIndicator(INDICATOR state);
 
 // FreeRTOS - start
 bool init_indicator(void);

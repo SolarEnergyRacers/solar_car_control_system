@@ -25,18 +25,18 @@ void init_command_handler() {
 String commands = "<>lLwudsabpmM:!";
 String helpText = "Available commands (" + commands +
                   "):\n"
+                  "\t:<text>  - display driver info text\n"
+                  "\t!<text>  - display driver warn text\n"
                   "\tu [off]  - speed up arrow (green)\n"
                   "\td [off]  - speed down arrow (red)\n"
                   "\ts ddd    - speed value [0...999]\n"
-                  "\ts f    - drive forwards"
-                  "\ts b    - drive backwards"
+                  "\ts f      - drive forwards\n"
+                  "\ts b      - drive backwards\n"
                   "\ta dd     - acceleration value [0...9]\n"
                   "\tb fff.f  - battary voltage [0...999]\n"
                   "\tp ffff.f - photovoltaics current [-999...+999]\n"
                   "\tm ffff.f - motor current [-999...+999]\n"
                   "\tM ddd    - set motor potentiometer [0...255]\n"
-                  "\t:<text>  - display driver info text\n"
-                  "\t!<text>  - display driver warn text\n"
                   "\t< [off]  - left indicator\n"
                   "\t> [off]  - right indicator\n"
                   "\tw [off]  - hazard warning lights\n"
@@ -74,9 +74,9 @@ void command_handler_task(void *pvParameter) {
       // ---------------- controller commands
       case 's':
         if (input[2] == 'f') {
-          dd->write_drive_direction(DriverDisplayC::DRIVE_DIRECTION::FORWARDS);
+          dd->write_drive_direction(DRIVE_DIRECTION::FORWARD);
         } else if (input[2] == 'b') {
-          dd->write_drive_direction(DriverDisplayC::DRIVE_DIRECTION::BACKWARDS);
+          dd->write_drive_direction(DRIVE_DIRECTION::BACKWARD);
         } else {
           dd->write_speed(atoi(&input[1]));
         }
@@ -114,20 +114,20 @@ void command_handler_task(void *pvParameter) {
         }
         break;
       case ':':
-        dd->write_driver_info(&input[1], DriverDisplayC::INFO_TYPE::INFO);
+        dd->write_driver_info(&input[1], INFO_TYPE::INFO);
         break;
       case '!':
-        dd->write_driver_info(&input[1], DriverDisplayC::INFO_TYPE::WARN);
+        dd->write_driver_info(&input[1], INFO_TYPE::WARN);
         break;
       // -------------- steering wheel input element emulators
       case '<':
-        setIndicator(DriverDisplayC::INDICATOR::LEFT);
+        setIndicator(INDICATOR::LEFT);
         break;
       case '>':
-        setIndicator(DriverDisplayC::INDICATOR::RIGHT);
+        setIndicator(INDICATOR::RIGHT);
         break;
       case 'w':
-        setIndicator(DriverDisplayC::INDICATOR::WARN);
+        setIndicator(INDICATOR::WARN);
         break;
       case 'a':
         dd->write_acceleration(atoi(&input[1]));
@@ -139,10 +139,10 @@ void command_handler_task(void *pvParameter) {
         dd->light2OnOff();
         break;
       case 'c':
-        if (input[2] == 's') {
-          dd->write_constant_mode(DriverDisplayC::CONSTANT_MODE::SPEED);
+        if (input[1] == 's' || (input.length() > 2 && input[2] == 's')) {
+          dd->write_constant_mode(CONSTANT_MODE::SPEED);
         } else {
-          dd->write_constant_mode(DriverDisplayC::CONSTANT_MODE::POWER);
+          dd->write_constant_mode(CONSTANT_MODE::POWER);
         }
         break;
       // usage

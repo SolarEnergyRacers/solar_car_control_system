@@ -28,7 +28,7 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
-
+//namespace DriverDisplayC {
 //==== Driver Display definition ==== START
 // display formats and sizes
 int bgColor = 0x000000;
@@ -468,16 +468,16 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
   tft.setTextSize(driveDirectionTextSize);
   tft.setTextColor(ILI9341_BLACK);
   tft.setCursor(driveDirectionX, driveDirectionY);
-  tft.print("forwards");
+  tft.print("forward");
   tft.setCursor(driveDirectionX, driveDirectionY);
-  tft.print("backwards");
+  tft.print("backward");
 
   tft.setTextColor(ILI9341_YELLOW);
   tft.setCursor(driveDirectionX, driveDirectionY);
-  if (direction == DRIVE_DIRECTION::FORWARDS) {
-    tft.print("forwards");
+  if (direction == DRIVE_DIRECTION::FORWARD) {
+    tft.print("forward");
   } else {
-    tft.print("backwards");
+    tft.print("backward");
   }
 }
 
@@ -723,12 +723,21 @@ void DriverDisplayC ::driver_display_demo_screen() {
   light1OnOff();
   printf(" - light1 on\n");
   light2OnOff();
+  printf(" - constant mode speed\n");
+  write_constant_mode(CONSTANT_MODE::SPEED);
+  printf(" - drive direction forwards\n");
+  write_drive_direction(DRIVE_DIRECTION::FORWARD);
   printf(" - battery\n");
   write_bat(-8888.8);
   printf(" - photovoltaic\n");
   write_pv(-8888.8);
   printf(" - motor\n");
   write_motor(-8888.8);
+  printf(" - constant mode power\n");
+  write_constant_mode(CONSTANT_MODE::POWER);
+  printf(" - drive direction backwards\n");
+  write_drive_direction(DRIVE_DIRECTION::BACKWARD);
+
   printf(" - life sign\n");
   lifeSign();
   printf("ready.\n");
@@ -751,3 +760,4 @@ void DriverDisplayC ::driver_display_demo_screen() {
 //     // this->sleep();
 //   }
 // }
+// } //namespace DriverDisplayC

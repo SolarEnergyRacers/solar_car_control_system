@@ -22,16 +22,17 @@ void init_command_handler() {
   printf("[v] Command handler inited\n");
 }
 
-String commands = "<>lLwudsabpmM:!";
+String commands = "<>lLwudsabpmMRc:!";
 String helpText = "Available commands (" + commands +
                   "):\n"
+                  "\t-------- DRIVER INFO COMMANDS -----------\n"
                   "\t:<text>  - display driver info text\n"
                   "\t!<text>  - display driver warn text\n"
                   "\tu [off]  - speed up arrow (green)\n"
                   "\td [off]  - speed down arrow (red)\n"
+                  "\t-------- TEST COMMANDS ------------------\n"
                   "\ts ddd    - speed value [0...999]\n"
-                  "\ts f      - drive forwards\n"
-                  "\ts b      - drive backwards\n"
+                  "\ts [f|b]  - drive forward|backward\n"
                   "\ta dd     - acceleration value [0...9]\n"
                   "\tb fff.f  - battary voltage [0...999]\n"
                   "\tp ffff.f - photovoltaics current [-999...+999]\n"
@@ -42,8 +43,7 @@ String helpText = "Available commands (" + commands +
                   "\tw [off]  - hazard warning lights\n"
                   "\tl [off]  - position lights on/off\n"
                   "\tL [off]  - beam light on/off\n"
-                  "\tc s      - constant speed mode\n"
-                  "\tc p      - constant power mode\n"
+                  "\tc [s|p]  - constant speed|power mode\n"
                   "\t\n";
 
 void command_handler_task(void *pvParameter) {
@@ -72,6 +72,9 @@ void command_handler_task(void *pvParameter) {
 
       switch (input[0]) {
       // ---------------- controller commands
+      case 'R':
+        dd->re_init();
+        break;
       case 's':
         if (input[2] == 'f') {
           dd->write_drive_direction(DRIVE_DIRECTION::FORWARD);
@@ -139,7 +142,7 @@ void command_handler_task(void *pvParameter) {
         dd->light2OnOff();
         break;
       case 'c':
-        if (input[1] == 's' || (input.length() > 2 && input[2] == 's')) {
+        if (input[2] == 's') {
           dd->write_constant_mode(CONSTANT_MODE::SPEED);
         } else {
           dd->write_constant_mode(CONSTANT_MODE::POWER);

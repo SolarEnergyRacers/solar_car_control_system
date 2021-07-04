@@ -76,13 +76,13 @@ int motorTextSize = 2;
 // ---- voltage and current displays ---- END
 
 // constant mode speed or power display
-int constantModeX = 240;
-int constantModeY = 180;
+int constantModeX = 250;
+int constantModeY = 158;
 int constantModeTextSize = 2;
 
 // constant mode speed or power display
-int driveDirectionX = 240;
-int driveDirectionY = 220;
+int driveDirectionX = 220;
+int driveDirectionY = 178;
 int driveDirectionTextSize = 2;
 
 // turn indicator arrows
@@ -124,6 +124,10 @@ string DriverDisplayC ::getName() { return "Display0 (driver display)"; };
 
 void DriverDisplayC ::init() {
   abstract_task::init();
+  re_init();
+}
+
+void DriverDisplayC ::re_init(void) {
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST,
                          SPI_MISO);
   sleep_polling_ms = 500;
@@ -154,8 +158,6 @@ void DriverDisplayC ::init() {
 }
 
 void DriverDisplayC ::exit() {}
-
-void DriverDisplayC ::re_init(void) {}
 
 // -------------
 // FreeRTOS TASK
@@ -258,11 +260,69 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value,
   return value;
 }
 
+// writes integer value in the range from -99 to +99
+int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value,
+                                    int textSize, int color) {
+  if (value < -99 || value > 999) {
+    printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'",
+           value);
+    return value;
+  }
+  int digitWidth = textSize * 6;
+  int digitHeight = textSize * 8;
+  // determine the sign of new and old value
+  char sign = value < 0 ? '-' : '+';
+  char signOld = valueLast < 0 ? '-' : '+';
+  // determine the four digits and one decimal of the new value
+  int val = abs(value);
+
+  // determine the three digits the stored, new value
+  int d1 = (int)val % 10;
+  int d2 = ((int)val / 10) % 10;
+  // determine the three digits the stored, old value
+  int valLast = abs(valueLast);
+  int d1o = (int)valLast % 10;
+  int d2o = ((int)valLast / 10) % 10;
+
+  // CRITICAL SECTION SPI: start
+  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
+  tft.setTextSize(textSize);
+  tft.setTextColor(color);
+  tft.setCursor(x, y);
+  // if a change in the digit then replace the old with new value by
+  // first deleting the digit area and second write the new value
+  if (d1 != d1o) {
+    tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
+    tft.setCursor(x + (digitWidth + 1) * 2, y);
+    tft.print(d1);
+  }
+  if (d2 != d2o) {
+    tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
+    tft.setCursor(x + (digitWidth + 1) * 1, y);
+    if (abs(value) > 9) {
+      tft.print(d2);
+    }
+  }
+  if (sign != signOld) {
+    tft.fillRect(x, y, (digitWidth + 1), digitHeight, bgColor);
+    tft.setCursor(x, y);
+    // if (sign == '-') {
+    tft.print(sign);
+    //}
+  }
+
+  xSemaphoreGive(spi_mutex);
+  // CRITICAL SECTION SPI: end
+
+  return value;
+}
+
 // writes integer value in the range from 0 to 999
-int DriverDisplayC ::_write_int(int x, int y, int valueLast, int value,
-                                int textSize, int color) {
+int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value,
+                                    int textSize, int color) {
   if (value < 0 || value > 999) {
-    printf("ERROR: call _write_int with a value outside the range: '%d'",
+    printf("ERROR: call _write_nat_999 with a value outside the range: '%d'",
            value);
     return value;
   }
@@ -448,23 +508,32 @@ void DriverDisplayC ::arrow_increase(bool on) {
 }
 
 void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
+  // CRITICAL SECTION SPI: start
+  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
-  tft.setCursor(constantModeX, constantModeX);
+  tft.setCursor(constantModeX, constantModeY);
   tft.print("power");
-  tft.setCursor(constantModeX, constantModeX);
+  tft.setCursor(constantModeX, constantModeY);
   tft.print("speed");
 
   tft.setTextColor(ILI9341_YELLOW);
-  tft.setCursor(constantModeX, constantModeX);
+  tft.setCursor(constantModeX, constantModeY);
   if (mode == CONSTANT_MODE::POWER) {
     tft.print("power");
   } else {
     tft.print("speed");
   }
+  
+  xSemaphoreGive(spi_mutex);
+  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
+  // CRITICAL SECTION SPI: start
+  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+
   tft.setTextSize(driveDirectionTextSize);
   tft.setTextColor(ILI9341_BLACK);
   tft.setCursor(driveDirectionX, driveDirectionY);
@@ -472,13 +541,16 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
   tft.setCursor(driveDirectionX, driveDirectionY);
   tft.print("backward");
 
-  tft.setTextColor(ILI9341_YELLOW);
   tft.setCursor(driveDirectionX, driveDirectionY);
   if (direction == DRIVE_DIRECTION::FORWARD) {
+    tft.setTextColor(ILI9341_YELLOW);
     tft.print("forward");
   } else {
+    tft.setTextColor(ILI9341_RED);
     tft.print("backward");
   }
+  xSemaphoreGive(spi_mutex);
+  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::_turn_Left(int color) {
@@ -585,23 +657,23 @@ void DriverDisplayC ::light2OnOff() {
 
 // Write the speed in the centre frame
 void DriverDisplayC ::write_speed(int value) {
-  speedLast = _write_int(speedFrameX + 9, speedFrameY + 10, speedLast, value,
-                         speedTextSize, ILI9341_WHITE);
+  speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast,
+                             value, speedTextSize, ILI9341_WHITE);
 
   // tft.setFont(&FreeMonoBold24pt7b);
-  // speedLast = _write_int(speedFrameX + 20, speedFrameY + 25, speedLast,
-  // value,
-  //                        2, ILI9341_WHITE);
+  // speedLast = _write_nat_999(speedFrameX + 20, speedFrameY + 25, speedLast,
+  // value, 2, ILI9341_WHITE);
   // tft.setFont();
 }
 
 // acceleration value: 0-255
 void DriverDisplayC ::write_acceleration(int value) {
-  if (value < 0 || value > 999) {
+  if (value < -99 || value > 99) {
     value = 999;
   }
-  accelerationLast = _write_int(accFrameX + 4, accFrameY + 4, accelerationLast,
-                                value, accTextSize, ILI9341_GREENYELLOW);
+  accelerationLast =
+      _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value,
+                     accTextSize, ILI9341_GREENYELLOW);
 }
 
 void DriverDisplayC ::write_bat(float value) {
@@ -740,6 +812,7 @@ void DriverDisplayC ::driver_display_demo_screen() {
 
   printf(" - life sign\n");
   lifeSign();
+  delay(3000);
   printf("ready.\n");
 }
 

@@ -1,10 +1,23 @@
 #
 # TODO: add description & license header
 #
-name: PlatformIO CI - Build Process
+name: Code Format & PlatformIO Build
 on: [push, pull_request]
 jobs:
+  format:
+    name: Clang-Format
+    runs-on: ubuntu-latest
+    steps:
+      - name: install
+        run: sudo apt-get install -y clang-format
+      - name: checkout
+        uses: actions/checkout@v2
+      - name: format
+        run: find . -name "*.cpp" -o -name "*.c" -o -name "*.h"|xargs -I {} clang-format -i {}
+      - name: diff
+        run: git diff --exit-code
   build:
+    name: PlatformIO CI Pipeline
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2

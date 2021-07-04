@@ -2,7 +2,7 @@
 # TODO: add description & license header
 #
 name: PlatformIO CI - Build Process
-on: [push]
+on: [push, pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest

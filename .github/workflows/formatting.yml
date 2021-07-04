@@ -2,9 +2,7 @@
 # TODO: add description & license header
 #
 name: File Formatting Process
-on:
-  pull_request:
-    branches: [master]
+on: [push, pull_request]
 jobs:
   format:
     runs-on: ubuntu-latest
@@ -28,4 +26,3 @@ jobs:
             git commit . -m "Apply prettier and clang-format" &&
             git push origin
           fi
-          

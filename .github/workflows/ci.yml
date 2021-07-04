@@ -2,7 +2,7 @@
 # TODO: add description & license header
 #
 name: Code Format & PlatformIO Build
-on: [push, pull_request]
+on: [push]
 jobs:
   format:
     name: Clang-Format

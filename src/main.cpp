@@ -131,7 +131,7 @@ void app_main(void) {
   if (PWM_ON) {
     init_pwm();
   }
-  if(RTC_ON){
+  if (RTC_ON) {
     init_rtc();
   }
   if (SD_ON) {

@@ -49,9 +49,9 @@ private:
   float _write_float(int x, int y, float valueLast, float value, int textSize,
                      int color);
   int _write_ganz_99(int x, int y, int valueLast, int value, int textSize,
-                 int color);
+                     int color);
   int _write_nat_999(int x, int y, int valueLast, int value, int textSize,
-                 int color);
+                     int color);
   void _arrow_increase(int color);
   void _arrow_decrease(int color);
   void _light1(bool lightOn);

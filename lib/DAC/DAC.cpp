@@ -44,7 +44,7 @@ void set_pot(uint8_t val, pot_chan channel) {
   // setup command
   uint8_t command = get_cmd(channel);
 
-  //printf("Write motor potentiometer %02x to %d\n", command, val);
+  // printf("Write motor potentiometer %02x to %d\n", command, val);
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2c_mutex, portMAX_DELAY);

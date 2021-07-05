@@ -525,7 +525,7 @@ void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
   } else {
     tft.print("speed");
   }
-  
+
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
 }

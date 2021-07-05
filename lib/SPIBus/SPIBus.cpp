@@ -30,6 +30,5 @@ void init_spi(void) {
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
 
-  printf("[v] SPI inited: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK,
-         SPI_MOSI, SPI_MISO);
+  printf("[v] SPI inited: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);
 }

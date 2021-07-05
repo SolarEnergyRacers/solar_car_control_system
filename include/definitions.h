@@ -33,8 +33,7 @@
 #define DS1803_ADDR0 0 // pulled down to ground
 #define DS1803_ADDR1 0 // pulled down to ground
 #define DS1803_ADDR2 0 // pulled down to ground
-#define I2C_ADDRESS_DS1803                                                     \
-  (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
+#define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
  * SERIAL

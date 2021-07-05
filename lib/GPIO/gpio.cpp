@@ -43,16 +43,14 @@ volatile int interrupt_counter = 0;
 void register_gpio_interrupt() {
 
   // report
-  printf("[HW Interrupt] Register gpio interrupt pin %d (falling edge)\n",
-         GPIO_INTERRUPT_PIN);
+  printf("[HW Interrupt] Register gpio interrupt pin %d (falling edge)\n", GPIO_INTERRUPT_PIN);
 
   // set operating mode of interrupt pin to pull-up (i.e. interrupt is generated
   // if pin is getting grounded)
   pinMode(GPIO_INTERRUPT_PIN, INPUT_PULLUP);
 
   // register interrupt routine
-  attachInterrupt(digitalPinToInterrupt(GPIO_INTERRUPT_PIN),
-                  handle_gpio_interrupt, FALLING);
+  attachInterrupt(digitalPinToInterrupt(GPIO_INTERRUPT_PIN), handle_gpio_interrupt, FALLING);
 }
 
 void IRAM_ATTR handle_gpio_interrupt() {

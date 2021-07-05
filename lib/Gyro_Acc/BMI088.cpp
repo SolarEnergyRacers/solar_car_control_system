@@ -47,9 +47,7 @@ void BMI088::initialize(void) {
   setGyroPoweMode(GYRO_NORMAL);
 }
 
-bool BMI088::isConnection(void) {
-  return ((getAccID() == 0x1E) && (getGyroID() == 0x0F));
-}
+bool BMI088::isConnection(void) { return ((getAccID() == 0x1E) && (getGyroID() == 0x0F)); }
 
 void BMI088::resetAcc(void) { write8(ACC, BMI088_ACC_SOFT_RESET, 0xB6); }
 
@@ -119,9 +117,7 @@ void BMI088::setGyroScaleRange(gyro_scale_type_t range) {
   write8(GYRO, BMI088_GYRO_RANGE, (uint8_t)range);
 }
 
-void BMI088::setGyroOutputDataRate(gyro_odr_type_t odr) {
-  write8(GYRO, BMI088_GYRO_BAND_WIDTH, (uint8_t)odr);
-}
+void BMI088::setGyroOutputDataRate(gyro_odr_type_t odr) { write8(GYRO, BMI088_GYRO_BAND_WIDTH, (uint8_t)odr); }
 
 void BMI088::getAcceleration(float *x, float *y, float *z) {
   uint8_t buf[6] = {0};

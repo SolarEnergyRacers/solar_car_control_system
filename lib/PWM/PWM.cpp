@@ -14,8 +14,7 @@
 #define PWM_NUM_PORTS 16
 #define PWM_MAX_VALUE 4096
 
-Adafruit_PWMServoDriver pwm =
-    Adafruit_PWMServoDriver(I2C_ADDRESS_PCA9685, Wire);
+Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(I2C_ADDRESS_PCA9685, Wire);
 
 void init_pwm(void) {
 

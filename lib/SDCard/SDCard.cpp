@@ -24,9 +24,8 @@ void init_sdcard(void) {
     printf("[SDCard] Initialization successful\n");
 
     // open file
-    dataFile = SD.open(
-        FILENAME,
-        FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
+    dataFile = SD.open(FILENAME,
+                       FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
   }
 
   xSemaphoreGive(spi_mutex);

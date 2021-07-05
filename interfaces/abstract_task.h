@@ -27,9 +27,7 @@ public:
   void sleep(void);
 
   void create_task(void);
-  static void init_task(void *pvParams) {
-    ((abstract_task *)pvParams)->task();
-  };
+  static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };
 };
 
 #endif // ABSTRACT_TASK_H

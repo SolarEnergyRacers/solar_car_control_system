@@ -99,8 +99,7 @@ void read_ds_demo_task(void *pvParameter) {
 
     // print previously fetched results
     for (int i = 0; i < get_num_temp_dev(); i++) {
-      printf("[DS18B20] Temperature: %fC / %fF\n", read_tempC_index(i),
-             read_tempF_index(i));
+      printf("[DS18B20] Temperature: %fC / %fF\n", read_tempC_index(i), read_tempF_index(i));
     }
 
     // sleep for 1s

@@ -25,8 +25,7 @@ void init_i2c(void) {
   xSemaphoreGive(i2c_mutex);
   // CRITICAL SECTION I2C: end
 
-  printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA,
-         I2C_SCL, I2C_FREQ);
+  printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA, I2C_SCL, I2C_FREQ);
   // scan_i2c_devices();
 }
 

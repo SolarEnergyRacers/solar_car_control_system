@@ -17,8 +17,7 @@ void init_rtc(void) {
 
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  printf("[RTC] Compile date/time: %02u/%02u/%04u %02u:%02u:%02u\n",
-         compiled.Month(), compiled.Day(), compiled.Year(), compiled.Hour(),
+  printf("[RTC] Compile date/time: %02u/%02u/%04u %02u:%02u:%02u\n", compiled.Month(), compiled.Day(), compiled.Year(), compiled.Hour(),
          compiled.Minute(), compiled.Second());
 
   // CRITICAL SECTION I2C: start
@@ -98,8 +97,7 @@ void read_rtc_demo_task(void *pvParameter) {
 
     // get date & time
     RtcDateTime now = read_rtc_datetime();
-    printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n",
-           now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
+    printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
            now.Second());
 
     // sleep for 1s

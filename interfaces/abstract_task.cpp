@@ -14,14 +14,11 @@ void abstract_task::init() {
   printf(" - init '%s'... ", getInfo().c_str());
 };
 
-void abstract_task::sleep() {
-  vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
-};
+void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
 
 void abstract_task::create_task() {
   printf(" - create task '%s'... ", getInfo().c_str());
-  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 1024,
-              (void *)this, 1, NULL);
+  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 1024, (void *)this, 1, NULL);
 };
 
 void abstract_task::re_init(){

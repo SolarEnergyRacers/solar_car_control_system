@@ -38,8 +38,8 @@ int infoFrameSizeX = -1; // full tft width, calculated beow
 int infoFrameSizeY = 64;
 int infoTextSize = 3;
 
-int mainFrameX =
-    infoFrameSizeY; // frame around value display (exclude text message lines)
+// frame around value display (exclude text message lines)
+int mainFrameX = infoFrameSizeY;
 
 // speed display
 int speedFrameX = -1; // get calculated later: (sizeX - speedFrameCx) / 2;
@@ -128,8 +128,7 @@ void DriverDisplayC ::init() {
 }
 
 void DriverDisplayC ::re_init(void) {
-  tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST,
-                         SPI_MISO);
+  tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   sleep_polling_ms = 500;
   tft.begin();
   printf("done.\n");
@@ -147,8 +146,7 @@ void DriverDisplayC ::re_init(void) {
     printf("Self Diagnostic:    0x%x\n", x);
     infoFrameSizeX = tft.width();
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
-    printf("[v] Display0 (driver display) inited: screen %d x %d.\n",
-           tft.height(), tft.width());
+    printf("[v] Display0 (driver display) inited: screen %d x %d.\n", tft.height(), tft.width());
   } catch (__exception ex) {
     printf("[x] Display0 (driver display): Unable to initialize screen "
            "ILI9341.\n");
@@ -180,12 +178,10 @@ void DriverDisplayC ::task(void) {
 void exit(void) {}
 
 // writes flDriverDisplayC ::oat value  in the range from -9999.9 to 9999.9
-float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value,
-                                    int textSize, int color) {
+float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, int textSize, int color) {
 
   if (value < -9999.9 || value > 9999.9) {
-    printf("ERROR: call _write_float with a value outside the range: '%f'\n",
-           value);
+    printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
     return value;
   }
   int digitWidth = textSize * 6;
@@ -217,8 +213,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value,
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
   if (d0 != d0o) {
-    tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight,
-                 bgColor);
+    tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 5, y);
     tft.printf(".%d", d0);
   }
@@ -261,11 +256,9 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value,
 }
 
 // writes integer value in the range from -99 to +99
-int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value,
-                                    int textSize, int color) {
+int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < -99 || value > 999) {
-    printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'",
-           value);
+    printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'", value);
     return value;
   }
   int digitWidth = textSize * 6;
@@ -319,11 +312,9 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value,
 }
 
 // writes integer value in the range from 0 to 999
-int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value,
-                                    int textSize, int color) {
+int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < 0 || value > 999) {
-    printf("ERROR: call _write_nat_999 with a value outside the range: '%d'",
-           value);
+    printf("ERROR: call _write_nat_999 with a value outside the range: '%d'", value);
     return value;
   }
   int digitWidth = textSize * 6;
@@ -377,8 +368,7 @@ void DriverDisplayC ::draw_display_border(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-  tft.drawRoundRect(0, mainFrameX, tft.width(), tft.height() - mainFrameX, 8,
-                    color);
+  tft.drawRoundRect(0, mainFrameX, tft.width(), tft.height() - mainFrameX, 8, color);
 
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
@@ -389,8 +379,7 @@ void DriverDisplayC ::draw_speed_border(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-  tft.drawRoundRect(speedFrameX, speedFrameY, speedFrameSizeX, speedFrameSizeY,
-                    4, color);
+  tft.drawRoundRect(speedFrameX, speedFrameY, speedFrameSizeX, speedFrameSizeY, 4, color);
 
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
@@ -402,8 +391,7 @@ void DriverDisplayC ::draw_acceleration_border(int color) {
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
   accFrameSizeX = speedFrameX - 3;
-  tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4,
-                    color);
+  tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
 
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
@@ -466,8 +454,7 @@ void DriverDisplayC ::_arrow_increase(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-  tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2,
-                   y - 10, color);
+  tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y - 10, color);
 
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
@@ -480,8 +467,7 @@ void DriverDisplayC ::_arrow_decrease(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
-  tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2,
-                   y + 10, color);
+  tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y + 10, color);
 
   xSemaphoreGive(spi_mutex);
   // CRITICAL SECTION SPI: end
@@ -556,23 +542,18 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
 void DriverDisplayC ::_turn_Left(int color) {
   int x = indicatorLeftX;
   int y = indicatorY;
-  tft.fillTriangle(x, y, x + indicatorWidth, y - indicatorHeight,
-                   x + indicatorWidth, y + indicatorHeight, color);
+  tft.fillTriangle(x, y, x + indicatorWidth, y - indicatorHeight, x + indicatorWidth, y + indicatorHeight, color);
 }
 
 void DriverDisplayC ::_turn_Right(int color) {
   int x = indicatorRightX;
   int y = indicatorY;
-  tft.fillTriangle(x, y, x - indicatorWidth, y - indicatorHeight,
-                   x - indicatorWidth, y + indicatorHeight, color);
+  tft.fillTriangle(x, y, x - indicatorWidth, y - indicatorHeight, x - indicatorWidth, y + indicatorHeight, color);
 }
 
-void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction) {
-  indicator_set_and_blink(direction, true);
-}
+void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction) { indicator_set_and_blink(direction, true); }
 
-void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction,
-                                              bool blinkOn) {
+void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spi_mutex, portMAX_DELAY);
 
@@ -657,8 +638,7 @@ void DriverDisplayC ::light2OnOff() {
 
 // Write the speed in the centre frame
 void DriverDisplayC ::write_speed(int value) {
-  speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast,
-                             value, speedTextSize, ILI9341_WHITE);
+  speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 
   // tft.setFont(&FreeMonoBold24pt7b);
   // speedLast = _write_nat_999(speedFrameX + 20, speedFrameY + 25, speedLast,
@@ -671,27 +651,22 @@ void DriverDisplayC ::write_acceleration(int value) {
   if (value < -99 || value > 99) {
     value = 999;
   }
-  accelerationLast =
-      _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value,
-                     accTextSize, ILI9341_GREENYELLOW);
+  accelerationLast = _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
 }
 
 void DriverDisplayC ::write_bat(float value) {
   int labelOffset = labelLen * batTextSize * 6;
-  batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value,
-                         batTextSize, ILI9341_BLUE);
+  batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value, batTextSize, ILI9341_BLUE);
 }
 
 void DriverDisplayC ::write_pv(float value) {
   int labelOffset = labelLen * pvTextSize * 6;
-  pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value,
-                        pvTextSize, ILI9341_YELLOW);
+  pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value, pvTextSize, ILI9341_YELLOW);
 }
 
 void DriverDisplayC ::write_motor(float value) {
   int labelOffset = labelLen * motorTextSize * 6;
-  motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast,
-                           value, motorTextSize, ILI9341_YELLOW);
+  motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, ILI9341_YELLOW);
 }
 
 void DriverDisplayC ::_drawCentreString(const String &buf, int x, int y) {

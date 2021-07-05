@@ -13,8 +13,7 @@
 
 #define PCF8574_NUM_PORTS 8
 
-PCF8574 IOExt2(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL,
-               I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
+PCF8574 IOExt2(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
 
 // simulation - start (for simulation purpose)
 int speed = 0;
@@ -73,7 +72,7 @@ void _handleIoInterrupt() {
   PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
 
   if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
-    taskSleep = 50; // default value for fast reaction to pressed button
+    taskSleep = 50;            // default value for fast reaction to pressed button
     xSemaphoreGive(i2c_mutex); /// TODO_KSC:move directly after digitalReadAll
     // CRITICAL SECTION I2C: end
     return;
@@ -81,8 +80,7 @@ void _handleIoInterrupt() {
 
   taskSleep = 100; // debounce button
 
-  printf("PCF %ld: %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1,
-         dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
+  printf("PCF %ld: %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
 
   bool left = !dra.p0;
   bool right = !dra.p1;

@@ -14,8 +14,7 @@
 
 #define ADC_NUM_PORTS 4
 
-ADS1015 ads(
-    I2C_ADDRESS_ADS1x15); // for ADS1115 use: ADS1115 ads(I2C_ADDRESS_ADS1x15);
+ADS1015 ads(I2C_ADDRESS_ADS1x15); // for ADS1115 use: ADS1115 ads(I2C_ADDRESS_ADS1x15);
 
 float multiplier = 0;
 int16_t valueLast0 = 9999;

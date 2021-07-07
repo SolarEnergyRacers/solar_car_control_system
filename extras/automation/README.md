@@ -11,4 +11,5 @@ This script allows automatic login to the captive portal using selenium browser 
 ## Required Adjustments
 
 - Adjust the XPATH in the script to match the login fields
+- Possibly add Tems of Use check field
 - Possibly adjust the command for the enter command

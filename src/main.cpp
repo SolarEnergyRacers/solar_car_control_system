@@ -93,7 +93,9 @@ void app_main(void) {
     init_command_handler();
   }
   if (ADC_ON) {
-    init_adc();
+      ADC adc;
+      adc.init();
+      // example: printf("Motor speed is: %d\n", adc.read(ADC::Pin::MOTOR_SPEED));
   }
   if (DS_ON) {
     init_ds();
@@ -159,11 +161,7 @@ void app_main(void) {
     printf(" - blink_demo_task\n");
     xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
-  if (ADC_ON) {
-    // xTaskCreate(&read_adc_demo_task, "read_adc_task",
-    //             CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-    xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  }
+
   if (DS_ON) {
     printf(" - read_ds_demo_task\n");
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);

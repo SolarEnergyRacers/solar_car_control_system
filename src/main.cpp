@@ -17,10 +17,10 @@
 #include <freertos/task.h>
 
 // project variables
-#include "sdkconfig.h"
+#include <sdkconfig.h>
 
 // local definitions
-#include "definitions.h"
+#include <definitions.h>
 
 // local libs
 #include <ADC.h>
@@ -45,8 +45,8 @@
 #include <string>
 #include <system.h>
 
-#include "LocalFunctionsAndDevices.h"
-#include <../interfaces/abstract_task.h>
+#include <LocalFunctionsAndDevices.h>
+#include <abstract_task.h>
 
 // add C linkage definition
 extern "C" {

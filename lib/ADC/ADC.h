@@ -8,6 +8,7 @@
 #include <definitions.h>
 #include <ADS1X15.h> // ADS1x15
 
+void read_adc_acceleration_recuperation(void *pvParameter); // adc does not need its own task, therefore we let this demo task outside of the class structure instead of extending the abstract task class
 
 class ADC {
 

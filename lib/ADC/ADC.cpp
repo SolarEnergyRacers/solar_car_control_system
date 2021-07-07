@@ -14,7 +14,6 @@
 #include "DriverDisplayC.h"
 
 
-
 void ADC::re_init() {
     this->init();
 }
@@ -64,4 +63,59 @@ int16_t ADC::read(ADC::Pin port){
 
 int ADC::normalize(int value, int maxValue) {
     return (int)(maxValue * value / 1024);
+}
+
+
+extern ADC adc;
+
+void read_adc_acceleration_recuperation(void *pvParameter) {
+
+
+    int accelLast = 0, recupLast = 0;
+
+    while (1) {
+        int16_t accel = 0;
+        int16_t recup = 0;
+        int16_t accDisplay = 0;
+
+        int16_t value0 = adc.read(ADC::Pin::STW_ACC);
+        int16_t value1 = adc.read(ADC::Pin::STW_DEC);
+
+        bool accelChanged = abs(accelLast - value0) > 10;
+        bool recupChanged = abs(recupLast - value1) > 10;
+
+        if (accelChanged | recupChanged) {
+
+            if (accelChanged) {
+                accelLast = value0;
+                accel = adc.normalize(value0, 100);
+            }
+            if (recupChanged) {
+                recupLast = value1;
+                recup = adc.normalize(value1, 100);
+            }
+            // priority controll: recuperation wins
+            if (recup > 0) {
+                accDisplay = -recup;
+                accel = 0;
+            } else {
+                accDisplay = accel;
+                recup = 0;
+            }
+            // write console log
+            printf("Acceleration: %4d --> %4d | Recuperation:  %4d --> %4d | "
+                   "ACCEL-DISPLAY: %d\n",
+                   value0, accel, value1, recup, accDisplay);
+//            // write driver display info // TODO: reactivate whenever we can get the display instance similar to extern ADC adc;
+//            write_acceleration(accDisplay);
+//            arrow_increase(accel > 0 ? true : false);
+//            arrow_decrease(recup > 0 ? true : false);
+//            // write motor acceleration and recuperation values
+//            set_pot(accel, pot_chan::POT_CHAN0);
+//            set_pot(recup, pot_chan::POT_CHAN1);
+        }
+
+        // sleep for 1s
+        vTaskDelay(1000 / portTICK_PERIOD_MS);
+    }
 }

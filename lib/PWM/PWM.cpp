@@ -2,7 +2,7 @@
 // 16-Channel Pulse Width Modulation
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <Wire.h>
 

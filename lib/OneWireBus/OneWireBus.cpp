@@ -7,7 +7,7 @@
 
 #include <OneWire.h>
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include "OneWireBus.h"
 

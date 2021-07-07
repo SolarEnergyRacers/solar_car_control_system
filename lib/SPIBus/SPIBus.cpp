@@ -7,7 +7,7 @@
 
 #include <SPI.h>
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include "SPIBus.h"
 

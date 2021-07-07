@@ -2,13 +2,15 @@
 // Helper Functions
 //
 
-#include "../../include/definitions.h"
+#include <stdio.h>
 
-#include "Helper.h"
+#include <definitions.h>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include <stdio.h>
+
+#include "Helper.h"
 
 char *fgets_stdio_blocking(char *str, int n) {
 

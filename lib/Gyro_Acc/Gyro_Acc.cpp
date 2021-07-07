@@ -2,7 +2,7 @@
 // 3-axis Gyroscope & 3-axis Accelerometer
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include "BMI088.h" // gyro & acc lib
 #include <I2CBus.h>

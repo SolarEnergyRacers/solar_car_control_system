@@ -7,7 +7,7 @@
 
 #include <Wire.h> // Arduino I2C library
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include "I2CBus.h"
 

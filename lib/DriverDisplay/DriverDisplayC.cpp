@@ -7,10 +7,10 @@
  *
  ***/
 
-#include "../../include/LocalFunctionsAndDevices.h"
+#include <LocalFunctionsAndDevices.h>
 
-#include "../../include/definitions.h"
-#include "../../interfaces/abstract_task.h"
+#include <definitions.h>
+#include <abstract_task.h>
 
 #include "DriverDisplayC.h"
 #include <SPIBus.h>

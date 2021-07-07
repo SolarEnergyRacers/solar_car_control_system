@@ -2,7 +2,7 @@
 // General Purpose Input / Output
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>

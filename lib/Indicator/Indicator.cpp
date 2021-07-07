@@ -2,7 +2,7 @@
 // Display
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display

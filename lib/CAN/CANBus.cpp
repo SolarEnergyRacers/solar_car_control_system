@@ -3,7 +3,7 @@
 //
 #include <Arduino.h>
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>

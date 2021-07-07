@@ -27,7 +27,7 @@
    IN THE SOFTWARE.
 */
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 #include <I2CBus.h>
 
 #include "BMI088.h"

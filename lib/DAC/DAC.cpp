@@ -2,7 +2,7 @@
 // Digital to Analog Converter
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <Helper.h>
 #include <I2CBus.h>

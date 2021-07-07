@@ -2,7 +2,7 @@
 // Software Serial (Interconnection to Telemetry / PC)
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <SoftwareSerial.h>
 

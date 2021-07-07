@@ -2,7 +2,7 @@
 // PCF8574 I/O Extension over I2C
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 #include "PCF8574.h" // PCF8574
 #include <I2CBus.h>
 #include <Wire.h> // I2C

@@ -2,7 +2,7 @@
 // Display
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <I2CBus.h>
 
@@ -10,8 +10,12 @@
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_SSD1305.h> // display
+
 #define OLED_RESET 9
-Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
+#define OLED_WIDTH 128
+#define OLED_HEIGHT 64
+
+Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET);
 
 void init_display(void) {
 

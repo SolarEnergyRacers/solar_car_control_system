@@ -2,7 +2,7 @@
 // Command Receiver and Handler
 //
 // reads commands from serial console and deploy it
-#include "../../include/definitions.h"
+#include <definitions.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 

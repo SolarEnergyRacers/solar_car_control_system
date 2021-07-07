@@ -2,7 +2,7 @@
 // Analog to Digital Converter
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <ADS1X15.h> // ADS1x15
 #include <I2CBus.h>

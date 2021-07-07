@@ -3,7 +3,7 @@
 //
 
 #include "Simulator.h"
-#include "../../include/definitions.h"
+#include <definitions.h>
 #include "DriverDisplayC.h"
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>

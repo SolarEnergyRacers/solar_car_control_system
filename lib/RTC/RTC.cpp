@@ -2,7 +2,7 @@
 // Real-Time Clock
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <I2CBus.h>
 

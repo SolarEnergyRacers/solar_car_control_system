@@ -2,7 +2,7 @@
 // SD Card
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <SD.h> // sd card
 

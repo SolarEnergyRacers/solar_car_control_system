@@ -15,15 +15,20 @@
 
 
 void ADC::re_init() {
-    this->init();
+    ADC::init();
 }
 
 void ADC::init() {
     // CRITICAL SECTION I2C: start
     xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
+    // instantiate the devices with their corresponding address
+    ads[0] = ADS1015(I2C_ADDRESS_ADS1x15_0);
+    ads[1] = ADS1015(I2C_ADDRESS_ADS1x15_1);
+    ads[2] = ADS1015(I2C_ADDRESS_ADS1x15_2);
+
     // init library
-    for (auto ads : this->ads) {
+    for (auto ads : ADC::ads) {
 
         ads.begin();
 
@@ -52,7 +57,7 @@ int16_t ADC::read(ADC::Pin port){
     // CRITICAL SECTION I2C: start
     xSemaphoreTake(i2c_mutex, portMAX_DELAY);
 
-    int16_t value = ads[port >> 4].readADC(port & 0xf);
+    int16_t value = ADC::ads[port >> 4].readADC(port & 0xf);
     // TODO: should re return value depending on pin? (i.e. MOTOR_SPEED returns actual speed)
 
     xSemaphoreGive(i2c_mutex);

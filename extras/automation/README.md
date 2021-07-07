@@ -14,4 +14,5 @@ Hints e.g here: [how-do-i-install-geckodriver](https://stackoverflow.com/questio
 ## Required Adjustments
 
 - [ ] Adjust the XPATH in the script to match the login fields
+- [ ] Possibly add `Terms of Use` check field
 - [ ] Possibly adjust the command for the enter command

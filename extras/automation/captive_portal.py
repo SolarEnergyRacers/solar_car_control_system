@@ -25,9 +25,9 @@ if __name__ == "__main__":
     browser.get(login_url)
 
     # find user and password field in DOM
-    user = browser.find_element_by_name("username")
-    password = browser.find_element_by_name("password")
-    termsofuse = browser.find_element_by_name("visitor_accept_terms")
+    user = browser.find_element_by_name(config.get("username__Name"))
+    password = browser.find_element_by_name(config.get("password__Name"))
+    termsofuse = browser.find_element_by_name(config.get("accept_terms__Name"))
 
 
     # clear the input fields

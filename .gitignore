@@ -10,6 +10,6 @@ include/LocalFunctionsAndDevices.h
 extras/automation/geckodriver-v0.29.1-linux64.tar.gz
 extras/automation/geckodriver
 extras/automation/geckodriver.log
-geckodriver.log
-loginGuest.html
 extras/automation/config-bg.yaml
+extras/automation/howto-BG.md
+extras/automation/loginGuest.html

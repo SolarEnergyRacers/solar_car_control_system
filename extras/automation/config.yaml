@@ -1,3 +1,6 @@
-"url": "https://guest.yyy.com/guest"
-"username": "x@y.com"
-"password": 12345
+url: "https://xxx.yyy"
+username__Name: "usernanme"
+password__Name: "password"
+accept_terms__Name: "visitor_accept_terms"
+username: "x@y.com"
+password: 12345

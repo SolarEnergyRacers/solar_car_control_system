@@ -21,12 +21,14 @@ if __name__ == "__main__":
     browser = webdriver.Firefox(webdriver.FirefoxProfile())
 
     # go to site
-    login_url = "https://www.swisspass.ch/oevlogin/login"
+    login_url = config.get("url")
     browser.get(login_url)
 
     # find user and password field in DOM
-    user = browser.find_element_by_name("USERNAME")
-    password = browser.find_element_by_name("PASSWORD")
+    user = browser.find_element_by_name("username")
+    password = browser.find_element_by_name("password")
+    termsofuse = browser.find_element_by_name("visitor_accept_terms")
+
 
     # clear the input fields
     user.clear()
@@ -35,18 +37,20 @@ if __name__ == "__main__":
     # add user/password from config
     user.send_keys(config.get("username"))
     password.send_keys(config.get("password"))
+    termsofuse.click()
 
     # click login button
-    login_btn = browser.find_element_by_name("LOGIN")
+    # login_btn = browser.find_element_by_name("LOGIN")
+    login_btn = browser.find_element_by_type("SUBMIT")
     login_btn.click()
 
     time.sleep(debug_sleep)
 
     # go to site
-    logout_url = "https://www.sbb.ch/public/logout"
-    browser.get(logout_url)
+    # logout_url = "https://www.sbb.ch/public/logout"
+    # browser.get(logout_url)
 
-    time.sleep(debug_sleep)
+    # time.sleep(debug_sleep)
 
     # browser cleanup and close
     browser.delete_all_cookies()

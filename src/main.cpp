@@ -104,6 +104,10 @@ IOExt ioExt;
 PWM pwm;
 //#endif
 
+//#if DISPLAY_ON
+Display disp;
+//#endif
+
 void app_main(void) {
     bool startOk = true;
 
@@ -164,7 +168,7 @@ void app_main(void) {
         register_gpio_interrupt();
     }
     if (DISPLAY_ON) {
-        init_display();
+        disp.init();
     }
     if (IOEXT_ON) {
         ioExt.init();
@@ -193,8 +197,7 @@ void app_main(void) {
     // ---- create tasks ----
     if (DISPLAY_ON) {
         printf(" - draw_display_demo_task\n");
-        xTaskCreate(&draw_display_demo_task, "draw_display_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5,
-                    NULL);
+        disp.create_task();
     }
     if (DISPLAY_LARGE_ON) {
         DriverDisplayC::instance()->create_task();

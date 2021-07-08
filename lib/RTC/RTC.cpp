@@ -11,11 +11,18 @@
 #include "RTC.h"
 
 #include <RtcDS1307.h>
-RtcDS1307<TwoWire> Rtc(Wire);
 
 extern I2CBus i2cBus;
 
-void init_rtc(void) {
+void RTC::re_init() {
+    init();
+}
+
+void RTC::exit() {
+    // TODO
+}
+
+void RTC::init(void) {
 
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
@@ -66,7 +73,7 @@ void init_rtc(void) {
   // CRITICAL SECTION I2C: end
 }
 
-RtcDateTime read_rtc_datetime(void) {
+RtcDateTime RTC::read_rtc_datetime(void) {
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
@@ -93,7 +100,7 @@ RtcDateTime read_rtc_datetime(void) {
   return now;
 }
 
-void read_rtc_demo_task(void *pvParameter) {
+void RTC::task() {
 
   while (1) {
 

@@ -108,6 +108,11 @@ PWM pwm;
 Display disp;
 //#endif
 
+//#if RTC_ON
+RTC rtc;
+//#endif
+
+
 void app_main(void) {
     bool startOk = true;
 
@@ -159,7 +164,7 @@ void app_main(void) {
         pwm.init();
     }
     if (RTC_ON) {
-        init_rtc();
+        rtc.init();
     }
     if (SD_ON) {
         sdCard.init();
@@ -231,7 +236,7 @@ void app_main(void) {
     }
     if (RTC_ON) {
         printf(" - read_rtc_demo_task\n");
-        xTaskCreate(&read_rtc_demo_task, "read_adc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        rtc.create_task();
     }
     if (SD_ON) {
         printf(" - write_sdcard_demo_task\n");

@@ -41,7 +41,7 @@
 #include <Serial.h>
 #include <Simulator.h>
 #include <Temp.h>
-#include <gpio.h>
+#include <GPIO.h>
 #include <string>
 #include <system.h>
 
@@ -112,6 +112,9 @@ Display disp;
 RTC rtc;
 //#endif
 
+//#if INT_ON
+GPInputOutput gpio;
+//#endif
 
 void app_main(void) {
     bool startOk = true;
@@ -170,7 +173,8 @@ void app_main(void) {
         sdCard.init();
     }
     if (INT_ON) {
-        register_gpio_interrupt();
+        gpio.init();
+        gpio.register_gpio_interrupt();
     }
     if (DISPLAY_ON) {
         disp.init();
@@ -213,10 +217,10 @@ void app_main(void) {
         printf(" - indicator_task\n");
         indicator.create_task();
     }
-    if (BLINK_ON) {
-        printf(" - blink_demo_task\n");
-        xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-    }
+//    if (BLINK_ON) { // not activated
+//        printf(" - blink_demo_task\n");
+//        xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+//    }
     if (ADC_ON) {
         xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task",
                     CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
@@ -245,8 +249,7 @@ void app_main(void) {
     }
     if (INT_ON) {
         printf(" - int_report_demo_task\n");
-        xTaskCreate(&int_report_demo_task, "int_report_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5,
-                    NULL);
+        gpio.create_task();
     }
     if (SIMULATOR_ON) {
         printf(" - simulator_task\n");

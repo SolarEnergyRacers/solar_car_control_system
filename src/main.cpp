@@ -88,6 +88,10 @@ DAC dac;
 Uart uart;
 //#endif
 
+//#if GYRO_ACC_ON
+GyroAcc gyroAcc;
+//#endif
+
 void app_main(void) {
     bool startOk = true;
 
@@ -132,7 +136,7 @@ void app_main(void) {
         ds.init();
     }
     if (GYRO_ACC_ON) {
-        init_gyro_acc();
+        gyroAcc.init();
     }
     if (PWM_ON) {
         init_pwm();

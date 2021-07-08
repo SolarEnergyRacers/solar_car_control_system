@@ -11,7 +11,11 @@
 
 extern I2CBus i2cBus;
 
-void init_gyro_acc(void) {
+void GyroAcc::re_init() {
+    init();
+}
+
+void GyroAcc::init(void) {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
@@ -31,7 +35,7 @@ void init_gyro_acc(void) {
   // CRITICAL SECTION I2C: end
 }
 
-Float3D read_gyroscope(void) {
+Float3D GyroAcc::read_gyroscope(void) {
 
   // allocate struct
   Float3D data;
@@ -48,7 +52,7 @@ Float3D read_gyroscope(void) {
   return data;
 }
 
-Float3D read_acceleration(void) {
+Float3D GyroAcc::read_acceleration(void) {
 
   // allocate struct
   Float3D data;
@@ -65,6 +69,7 @@ Float3D read_acceleration(void) {
   return data;
 }
 
+extern GyroAcc gyroAcc;
 void read_gyro_acc_demo_task(void *pvParameter) {
 
   // define data structs
@@ -73,10 +78,10 @@ void read_gyro_acc_demo_task(void *pvParameter) {
   while (1) {
 
     // read the accel
-    gyro = read_gyroscope();
+    gyro = gyroAcc.read_gyroscope();
 
     // read the gyro
-    acc = read_acceleration();
+    acc = gyroAcc.read_acceleration();
 
     // print result
     printf("[BMI088] ax=%f, ay=%f, az=%f\n", acc.x, acc.y, acc.z);

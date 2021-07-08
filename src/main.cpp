@@ -100,6 +100,9 @@ Indicator indicator;
 IOExt ioExt;
 //#endif
 
+//#if PWM_ON
+PWM pwm;
+//#endif
 
 void app_main(void) {
     bool startOk = true;
@@ -149,7 +152,7 @@ void app_main(void) {
         gyroAcc.init();
     }
     if (PWM_ON) {
-        init_pwm();
+        pwm.init();
     }
     if (RTC_ON) {
         init_rtc();
@@ -221,8 +224,7 @@ void app_main(void) {
     }
     if (PWM_ON) {
         printf(" - update_pwm_demo_task\n");
-        xTaskCreate(&update_pwm_demo_task, "update_pwm_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5,
-                    NULL);
+        pwm.create_task();
     }
     if (RTC_ON) {
         printf(" - read_rtc_demo_task\n");

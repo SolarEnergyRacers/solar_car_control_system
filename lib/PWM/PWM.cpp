@@ -11,14 +11,9 @@
 
 #include <Adafruit_PWMServoDriver.h>
 
-#define PWM_NUM_PORTS 16
-#define PWM_MAX_VALUE 4096
-
-Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(I2C_ADDRESS_PCA9685, Wire);
-
 extern I2CBus i2cBus;
 
-void init_pwm(void) {
+void PWM::init(void) {
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
@@ -34,7 +29,15 @@ void init_pwm(void) {
   // CRITICAL SECTION I2C: end
 }
 
-void update_pwm(int channel, int value) {
+void PWM::re_init() {
+    init();
+}
+
+void PWM::exit() {
+    // TODO
+}
+
+void PWM::update_pwm(int channel, int value) {
 
   // check valid port
   if (channel < 0 || channel >= PWM_NUM_PORTS) {
@@ -54,7 +57,7 @@ void update_pwm(int channel, int value) {
   // CRITICAL SECTION I2C: end
 }
 
-void update_pwm_demo_task(void *pvParameter) {
+void PWM::task() {
 
   while (1) {
 

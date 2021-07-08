@@ -13,30 +13,38 @@
 
 #include "CANBus.h"
 
-CAN_device_t CAN_cfg;
 
-SemaphoreHandle_t can_mutex;
 
-void init_can(void) {
-  can_mutex = xSemaphoreCreateBinary();
-
-  CAN_cfg.speed = CAN_SPEED; // MPPT & BMS are both running on 125KBPS by default
-  CAN_cfg.tx_pin_id = CAN_TX;
-  CAN_cfg.rx_pin_id = CAN_RX;
-  CAN_cfg.rx_queue = xQueueCreate(CAN_RX_QUEUE, sizeof(CAN_frame_t));
-  ESP32Can.CANInit();
-
-  xSemaphoreGive(can_mutex);
+void CanBus::re_init() {
+    CanBus::init();
 }
 
+void CanBus::init() {
+
+  mutex = xSemaphoreCreateBinary();
+
+  cfg.speed = CAN_SPEED; // MPPT & BMS are both running on 125KBPS by default
+  cfg.tx_pin_id = CAN_TX;
+  cfg.rx_pin_id = CAN_RX;
+  cfg.rx_queue = xQueueCreate(CAN_RX_QUEUE, sizeof(CAN_frame_t));
+  ESP32Can.CANInit();
+
+  xSemaphoreGive(mutex);
+}
+
+extern CanBus can;
 void read_can_demo_task(void *pvParameter) {
+
+  can.init();
+
   CAN_frame_t rx_frame;
 
   while (1) {
     Serial.println("CAN While");
-    xSemaphoreTake(can_mutex, portMAX_DELAY);
+    xSemaphoreTake(can.mutex, portMAX_DELAY);
+
     Serial.println("Take Mutex");
-    if (xQueueReceive(CAN_cfg.rx_queue, &rx_frame, 3 * portTICK_PERIOD_MS) == pdTRUE) {
+    if (xQueueReceive(can.cfg.rx_queue, &rx_frame, 3 * portTICK_PERIOD_MS) == pdTRUE) {
       if (rx_frame.FIR.B.FF == CAN_frame_std) {
         Serial.println("New standard frame");
       } else {
@@ -53,7 +61,7 @@ void read_can_demo_task(void *pvParameter) {
       }
       Serial.println("--------------------");
     }
-    xSemaphoreGive(can_mutex);
+    xSemaphoreGive(can.mutex);
 
     vTaskDelay(200 / portTICK_PERIOD_MS);
   }

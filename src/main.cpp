@@ -60,6 +60,11 @@ using namespace std;
 ADC adc;
 #endif
 
+//#if CAN_ON // TODO: gets a linking-error if we set CAN_ON to true
+CanBus can;
+//#endif
+
+
 void app_main(void) {
   bool startOk = true;
 
@@ -133,9 +138,8 @@ void app_main(void) {
   if (SIMULATOR_ON) {
     init_simulator();
   }
-
   if (CAN_ON) {
-    init_can();
+    can.init();
   }
 
   if (!startOk) {

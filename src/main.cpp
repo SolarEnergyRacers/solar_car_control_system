@@ -76,6 +76,10 @@ Temp ds;
 SDCard sdCard;
 //#endif
 
+//#if COMMANDHANDLER_ON
+CmdHandler cmdHandler;
+//#endif
+
 
 
 void app_main(void) {
@@ -112,7 +116,7 @@ void app_main(void) {
         startOk &= init_indicator();
     }
     if (COMMANDHANDLER_ON) {
-        init_command_handler();
+        cmdHandler.init();
     }
     if (ADC_ON) {
         adc.init();
@@ -227,8 +231,7 @@ void app_main(void) {
     }
     if (COMMANDHANDLER_ON) {
         printf(" - command_handler_task\n");
-        xTaskCreate(&command_handler_task, "command_handler_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5,
-                    NULL);
+        cmdHandler.create_task();
     }
     if (SERIAL_ON) {
         printf(" - serial_demo_task\n");

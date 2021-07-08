@@ -11,12 +11,14 @@
 
 #include "SPIBus.h"
 
-SemaphoreHandle_t spi_mutex;
+void SPIBus::re_init() {
+    init();
+}
 
-void init_spi(void) {
+void SPIBus::init(void) {
 
   //   // init mutex (it is acquired)
-  spi_mutex = xSemaphoreCreateBinary();
+  mutex = xSemaphoreCreateBinary();
 
   //   // CRITICAL SECTION SPI: start
   //   xSemaphoreTake(spi_mutex, portMAX_DELAY);
@@ -27,7 +29,7 @@ void init_spi(void) {
   //   SPI.setDataMode(SPI_MODE0); // configuration of SPI communication in mode
   //   0 SPI.setClockDivider(SPI_CLOCK_DIV16); // configuration of clock at 1MHz
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(mutex);
   // CRITICAL SECTION SPI: end
 
   printf("[v] SPI inited: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);

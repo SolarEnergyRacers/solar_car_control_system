@@ -65,10 +65,13 @@ CanBus can;
 //#endif
 
 OneWireBus oneWireBus;
+SPIBus spiBus;
 
 //#if DS_ON
 Temp ds;
 //#endif
+
+
 
 
 void app_main(void) {
@@ -91,7 +94,7 @@ void app_main(void) {
   // init buses
   oneWireBus.init();
   init_i2c();
-  init_spi();
+  spiBus.init();
 
   scan_i2c_devices();
 

@@ -27,6 +27,8 @@
 #include <Fonts/FreeSans24pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
 
+extern SPIBus spiBus;
+
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // namespace DriverDisplayC {
 //==== Driver Display definition ==== START
@@ -205,7 +207,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
   int d0o = (valOld - (int)valOld) * 10;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(textSize);
   tft.setTextColor(color);
@@ -249,7 +251,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
     tft.print(sign);
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 
   return value;
@@ -278,7 +280,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
   int d2o = ((int)valLast / 10) % 10;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(textSize);
   tft.setTextColor(color);
@@ -305,7 +307,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
     //}
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 
   return value;
@@ -330,7 +332,7 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
   int d3o = ((int)valueLast / 100) % 10;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(textSize);
   tft.setTextColor(color);
@@ -357,7 +359,7 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
     }
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 
   return value;
@@ -366,34 +368,34 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
 // write color of the border of the main display
 void DriverDisplayC ::draw_display_border(int color) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.drawRoundRect(0, mainFrameX, tft.width(), tft.height() - mainFrameX, 8, color);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
 // write color of the border of the speed display
 void DriverDisplayC ::draw_speed_border(int color) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.drawRoundRect(speedFrameX, speedFrameY, speedFrameSizeX, speedFrameSizeY, 4, color);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
 // write color of the border of the speed display
 void DriverDisplayC ::draw_acceleration_border(int color) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   accFrameSizeX = speedFrameX - 3;
   tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -406,13 +408,13 @@ void DriverDisplayC ::lifeSign() {
   }
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   lifeSignX = tft.width() - lifeSignRadius - 6;
   lifeSignY = tft.height() - lifeSignRadius - 6;
   tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, color);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 
   lifeSignState = !lifeSignState;
@@ -420,7 +422,7 @@ void DriverDisplayC ::lifeSign() {
 
 void DriverDisplayC ::draw_display_background() {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setRotation(0);
   tft.fillScreen(bgColor);
@@ -436,7 +438,7 @@ void DriverDisplayC ::draw_display_background() {
   tft.setCursor(motorFrameX, motorFrameY);
   tft.print("Motor(A):");
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 
   infoFrameSizeX = tft.width();
@@ -452,11 +454,11 @@ void DriverDisplayC ::_arrow_increase(int color) {
   int y = speedFrameY - 3;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y - 10, color);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -465,11 +467,11 @@ void DriverDisplayC ::_arrow_decrease(int color) {
   int y = speedFrameY + speedFrameSizeY + 3;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y + 10, color);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -495,7 +497,7 @@ void DriverDisplayC ::arrow_increase(bool on) {
 
 void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
@@ -512,13 +514,13 @@ void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
     tft.print("speed");
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(driveDirectionTextSize);
   tft.setTextColor(ILI9341_BLACK);
@@ -535,7 +537,7 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
     tft.setTextColor(ILI9341_RED);
     tft.print("backward");
   }
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -555,7 +557,7 @@ void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction) { indicator_s
 
 void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   _turn_Left(bgColor);
   _turn_Right(bgColor);
@@ -580,7 +582,7 @@ void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn)
     }
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -604,14 +606,14 @@ void DriverDisplayC ::light1OnOff() {
   light1On = !light1On;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextColor(color);
   tft.setTextSize(lightTextSize);
   tft.setCursor(light1OnX, light1OnY);
   tft.print("Light");
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -625,14 +627,14 @@ void DriverDisplayC ::light2OnOff() {
   light2On = !light2On;
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextColor(color);
   tft.setTextSize(lightTextSize);
   tft.setCursor(light2OnX, light2OnY);
   tft.print("LIGTH");
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -671,7 +673,7 @@ void DriverDisplayC ::write_motor(float value) {
 
 void DriverDisplayC ::_drawCentreString(const String &buf, int x, int y) {
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   int16_t x1, y1;
   uint16_t w, h;
@@ -679,7 +681,7 @@ void DriverDisplayC ::_drawCentreString(const String &buf, int x, int y) {
   tft.setCursor(x - w / 2, y);
   tft.print(buf);
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -712,7 +714,7 @@ void DriverDisplayC ::write_driver_info(String msg, INFO_TYPE type) {
   // comments are preparation for font usage
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   int textSize = 4;
   // int textSize = 1;
@@ -735,7 +737,7 @@ void DriverDisplayC ::write_driver_info(String msg, INFO_TYPE type) {
   }
   // tft.setFont();
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 

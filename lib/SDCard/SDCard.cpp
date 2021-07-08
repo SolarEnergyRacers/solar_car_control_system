@@ -13,10 +13,12 @@
 #define FILENAME "/test.txt"
 File dataFile;
 
+extern SPIBus spiBus;
+
 void init_sdcard(void) {
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   if (!SD.begin(SPI_CS_SDCARD)) {
     printf("[SDCard] Initialization failed\n");
@@ -28,7 +30,7 @@ void init_sdcard(void) {
                        FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
@@ -40,7 +42,7 @@ void write_sdcard_demo_task(void *pvParameter) {
   while (1) {
 
     // CRITICAL SECTION SPI: start
-    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
     // check file open
     if (dataFile) {
@@ -53,7 +55,7 @@ void write_sdcard_demo_task(void *pvParameter) {
     }
     dataFile.flush(); // ensure write-back
 
-    xSemaphoreGive(spi_mutex);
+    xSemaphoreGive(spiBus.mutex);
     // CRITICAL SECTION SPI: end
 
     // sleep for 1s

@@ -84,6 +84,10 @@ CmdHandler cmdHandler;
 DAC dac;
 //#endif
 
+//#if SERIAL_ON
+Uart uart;
+//#endif
+
 void app_main(void) {
     bool startOk = true;
 
@@ -152,7 +156,7 @@ void app_main(void) {
         dac.init();
     }
     if (SERIAL_ON) {
-        init_serial();
+        uart.init();
     }
     if (SIMULATOR_ON) {
         init_simulator();
@@ -237,7 +241,7 @@ void app_main(void) {
     }
     if (SERIAL_ON) {
         printf(" - serial_demo_task\n");
-        xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        //xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     }
     if (CAN_ON) {
         printf(" - read_can_demo_task\n");

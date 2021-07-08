@@ -71,6 +71,9 @@ SPIBus spiBus;
 Temp ds;
 //#endif
 
+//#if SD_ON
+SDCard sdCard;
+//#endif
 
 
 
@@ -127,7 +130,7 @@ void app_main(void) {
     init_rtc();
   }
   if (SD_ON) {
-    init_sdcard();
+    sdCard.init();
   }
   if (INT_ON) {
     register_gpio_interrupt();

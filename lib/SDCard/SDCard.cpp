@@ -11,11 +11,14 @@
 #include "SDCard.h"
 
 #define FILENAME "/test.txt"
-File dataFile;
 
 extern SPIBus spiBus;
 
-void init_sdcard(void) {
+void SDCard::re_init() {
+    init();
+}
+
+void SDCard::init(){
 
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
@@ -34,6 +37,7 @@ void init_sdcard(void) {
   // CRITICAL SECTION SPI: end
 }
 
+extern SDCard sdCard;
 void write_sdcard_demo_task(void *pvParameter) {
 
   // demo counter (written to file)
@@ -45,15 +49,15 @@ void write_sdcard_demo_task(void *pvParameter) {
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
     // check file open
-    if (dataFile) {
+    if (sdCard.dataFile) {
       // write counter value
-      dataFile.print(counter);
-      dataFile.println("");
+      sdCard.dataFile.print(counter);
+      sdCard.dataFile.println("");
       printf("[SDCard] Write to sdcard: %d\n", counter++);
     } else {
       printf("[SDCard] Error opening file.\n");
     }
-    dataFile.flush(); // ensure write-back
+    sdCard.dataFile.flush(); // ensure write-back
 
     xSemaphoreGive(spiBus.mutex);
     // CRITICAL SECTION SPI: end

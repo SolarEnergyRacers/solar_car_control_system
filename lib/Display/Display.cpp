@@ -17,10 +17,12 @@
 
 Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET);
 
+extern I2CBus i2cBus;
+
 void init_display(void) {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   if (!display.begin(I2C_ADDRESS_SSD1305)) {
     printf("[Display] Unable to initialize OLED screen.\n");
@@ -31,19 +33,20 @@ void init_display(void) {
   // init done
   display.display(); // show splashscreen
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   vTaskDelay(1000 / portTICK_PERIOD_MS);
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   display.clearDisplay(); // clears the screen and buffer
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
+
 
 void draw_display_demo_task(void *pvParameter) {
 
@@ -51,7 +54,7 @@ void draw_display_demo_task(void *pvParameter) {
   while (1) {
 
     // CRITICAL SECTION I2C: start
-    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
     // clears the screen and buffer
     display.clearDisplay();
@@ -74,7 +77,7 @@ void draw_display_demo_task(void *pvParameter) {
     }
     display.display();
 
-    xSemaphoreGive(i2c_mutex);
+    xSemaphoreGive(i2cBus.mutex);
     // CRITICAL SECTION I2C: end
 
     // sleep for 1s

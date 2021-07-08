@@ -9,9 +9,11 @@
 
 #include "Gyro_Acc.h"
 
+extern I2CBus i2cBus;
+
 void init_gyro_acc(void) {
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // check connection & report
   if (bmi088.isConnection()) {
@@ -25,7 +27,7 @@ void init_gyro_acc(void) {
     printf("[BMI088] is not connected\n");
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
@@ -35,12 +37,12 @@ Float3D read_gyroscope(void) {
   Float3D data;
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // read the gyro
   bmi088.getGyroscope(&data.x, &data.y, &data.z);
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return data;
@@ -52,12 +54,12 @@ Float3D read_acceleration(void) {
   Float3D data;
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // read the gyro
   bmi088.getAcceleration(&data.x, &data.y, &data.z);
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return data;

@@ -8,10 +8,14 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
-extern SemaphoreHandle_t i2c_mutex;
-
-void init_i2c(void);
-bool i2c_available(uint8_t adr);
-void scan_i2c_devices();
+class I2CBus {
+private:
+public:
+    SemaphoreHandle_t mutex; // TODO: maybe we want to hide the mutex behind a lock() / unlock() function?
+    void init();
+    void re_init();
+    bool i2c_available(uint8_t adr);
+    void scan_i2c_devices();
+};
 
 #endif // I2CBUS_H

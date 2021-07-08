@@ -14,6 +14,8 @@
 #define PCF8574_NUM_PORTS 8
 
 PCF8574 IOExt2(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
+extern I2CBus i2cBus;
+
 
 // simulation - start (for simulation purpose)
 int speed = 0;
@@ -24,7 +26,7 @@ int taskSleep = 50;
 void init_IOExt2() {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // setup pins
   IOExt2.pinMode(P0, INPUT); // left indicator
@@ -44,7 +46,7 @@ void init_IOExt2() {
     // TODO: action for init error?
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
@@ -67,13 +69,13 @@ void _speedCheck(int speed) {
 
 void _handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
 
   if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
     taskSleep = 50;            // default value for fast reaction to pressed button
-    xSemaphoreGive(i2c_mutex); /// TODO_KSC:move directly after digitalReadAll
+    xSemaphoreGive(i2cBus.mutex); /// TODO_KSC:move directly after digitalReadAll
     // CRITICAL SECTION I2C: end
     return;
   }
@@ -133,7 +135,7 @@ void _handleIoInterrupt() {
     }
     dd->write_acceleration(acceleration);
   }
-  xSemaphoreGive(i2c_mutex); // TODO_KSC: remove
+  xSemaphoreGive(i2cBus.mutex); // TODO_KSC: remove
   // CRITICAL SECTION I2C: end
 }
 
@@ -144,11 +146,11 @@ void set_ioext(int port, bool value) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   IOExt2.digitalWrite(port, value);
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
@@ -159,11 +161,11 @@ int get_ioext(int port) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   int value = IOExt2.digitalRead(P0);
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return value;

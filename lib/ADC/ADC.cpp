@@ -13,6 +13,7 @@
 #include "DAC.h"
 #include "DriverDisplayC.h"
 
+extern I2CBus i2cBus;
 
 void ADC::re_init() {
     ADC::init();
@@ -20,7 +21,7 @@ void ADC::re_init() {
 
 void ADC::init() {
     // CRITICAL SECTION I2C: start
-    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
     // instantiate the devices with their corresponding address
     ads[0] = ADS1015(I2C_ADDRESS_ADS1x15_0);
@@ -49,18 +50,18 @@ void ADC::init() {
             printf("[ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
         }
     }
-    xSemaphoreGive(i2c_mutex);
+    xSemaphoreGive(i2cBus.mutex);
     // CRITICAL SECTION I2C: end
 }
 
 int16_t ADC::read(ADC::Pin port){
     // CRITICAL SECTION I2C: start
-    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
     int16_t value = ADC::ads[port >> 4].readADC(port & 0xf);
     // TODO: should re return value depending on pin? (i.e. MOTOR_SPEED returns actual speed)
 
-    xSemaphoreGive(i2c_mutex);
+    xSemaphoreGive(i2cBus.mutex);
     // CRITICAL SECTION I2C: end
 
     return value;

@@ -13,6 +13,8 @@
 #include <RtcDS1307.h>
 RtcDS1307<TwoWire> Rtc(Wire);
 
+extern I2CBus i2cBus;
+
 void init_rtc(void) {
 
   // print compile time
@@ -21,7 +23,7 @@ void init_rtc(void) {
          compiled.Minute(), compiled.Second());
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Rtc.Begin();
 
@@ -60,14 +62,14 @@ void init_rtc(void) {
   // set pin
   Rtc.SetSquareWavePin(DS1307SquareWaveOut_Low);
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
 RtcDateTime read_rtc_datetime(void) {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // check connection & confidence
   if (!Rtc.IsDateTimeValid()) {
@@ -85,7 +87,7 @@ RtcDateTime read_rtc_datetime(void) {
   // get datetime
   RtcDateTime now = Rtc.GetDateTime();
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return now;

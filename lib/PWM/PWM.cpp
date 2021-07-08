@@ -16,10 +16,12 @@
 
 Adafruit_PWMServoDriver pwm = Adafruit_PWMServoDriver(I2C_ADDRESS_PCA9685, Wire);
 
+extern I2CBus i2cBus;
+
 void init_pwm(void) {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // init device
   pwm.begin();
@@ -28,7 +30,7 @@ void init_pwm(void) {
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(1600); // max pwm freq
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
@@ -44,11 +46,11 @@ void update_pwm(int channel, int value) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   pwm.setPWM(channel, 0, value);
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 

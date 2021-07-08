@@ -96,6 +96,11 @@ GyroAcc gyroAcc;
 Indicator indicator;
 //#endif
 
+//#if IOEXT_ON
+IOExt ioExt;
+//#endif
+
+
 void app_main(void) {
     bool startOk = true;
 
@@ -159,7 +164,7 @@ void app_main(void) {
         init_display();
     }
     if (IOEXT_ON) {
-        init_IOExt2();
+        ioExt.init();
     }
     if (DAC_ON) {
         dac.init();
@@ -239,7 +244,7 @@ void app_main(void) {
     }
     if (IOEXT_ON) {
         printf(" - IOExt2_task\n");
-        xTaskCreate(&IOExt2_task, "IOExt2_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        ioExt.create_task();
     }
     if (DAC_ON) {
         printf(" - DAC DAC DAC\n");

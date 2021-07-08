@@ -11,9 +11,9 @@
 class SPIBus {
 private:
 public:
-    SemaphoreHandle_t mutex;
-    void init();
-    void re_init();
+  SemaphoreHandle_t mutex;
+  void init();
+  void re_init();
 };
 
 #endif // SPIBUS_H

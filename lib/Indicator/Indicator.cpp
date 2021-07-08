@@ -25,13 +25,9 @@ void Indicator::setIndicator(INDICATOR state) {
   }
 }
 
-void Indicator::re_init() {
-    init();
-}
+void Indicator::re_init() { init(); }
 
-string Indicator::getName(void){
-    return "Indicator";
-};
+string Indicator::getName(void) { return "Indicator"; };
 
 void Indicator::exit(void){
     // TODO

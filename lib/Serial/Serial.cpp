@@ -8,14 +8,11 @@
 
 #include "Serial.h"
 
-
-void Uart::re_init() {
-    init();
-}
+void Uart::re_init() { init(); }
 
 void Uart::init() {
-    serial.begin(SERIAL_BAUDRATE, SWSERIAL_8N1, SERIAL_RX, SERIAL_TX);
-    serial.enableIntTx(false);
+  serial.begin(SERIAL_BAUDRATE, SWSERIAL_8N1, SERIAL_RX, SERIAL_TX);
+  serial.enableIntTx(false);
 }
 
 extern Uart uart;

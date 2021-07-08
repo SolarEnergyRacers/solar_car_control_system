@@ -9,7 +9,6 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-
 #include "Helper.h"
 
 char *fgets_stdio_blocking(char *str, int n) {

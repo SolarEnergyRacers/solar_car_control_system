@@ -14,9 +14,7 @@
 extern I2CBus i2cBus;
 Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET); // TODO: remove & add to class
 
-void Display::re_init() {
-    init();
-}
+void Display::re_init() { init(); }
 
 void Display::init(void) {
 
@@ -47,7 +45,7 @@ void Display::init(void) {
 }
 
 void Display::exit() {
-    // TODO
+  // TODO
 }
 
 void Display::task() {

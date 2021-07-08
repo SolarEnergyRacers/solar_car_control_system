@@ -22,9 +22,7 @@
 
 extern I2CBus i2cBus;
 
-void DAC::re_init() {
-    init();
-}
+void DAC::re_init() { init(); }
 
 uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;

@@ -13,11 +13,7 @@
 
 #include "CANBus.h"
 
-
-
-void CanBus::re_init() {
-    CanBus::init();
-}
+void CanBus::re_init() { CanBus::init(); }
 
 void CanBus::init() {
 

@@ -9,8 +9,8 @@
 
 #include <LocalFunctionsAndDevices.h>
 
-#include <definitions.h>
 #include <abstract_task.h>
+#include <definitions.h>
 
 #include "DriverDisplayC.h"
 #include <SPIBus.h>

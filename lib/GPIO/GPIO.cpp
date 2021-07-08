@@ -12,7 +12,7 @@
 
 #include "GPIO.h"
 
-//void blink_demo_task(void *pvParameter) {
+// void blink_demo_task(void *pvParameter) {
 //
 //  // configure the IOMUX register for pad LED_BUILTIN
 //  gpio_pad_select_gpio(LED_BUILTIN);
@@ -37,16 +37,14 @@
 //  }
 //}
 
-void GPInputOutput::re_init() {
-    init();
-}
+void GPInputOutput::re_init() { init(); }
 
 void GPInputOutput::init() {
-    // TODO
+  // TODO
 }
 
 void GPInputOutput::exit() {
-    // TODO
+  // TODO
 }
 
 void GPInputOutput::register_gpio_interrupt() {

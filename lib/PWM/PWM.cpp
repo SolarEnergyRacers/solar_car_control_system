@@ -29,12 +29,10 @@ void PWM::init(void) {
   // CRITICAL SECTION I2C: end
 }
 
-void PWM::re_init() {
-    init();
-}
+void PWM::re_init() { init(); }
 
 void PWM::exit() {
-    // TODO
+  // TODO
 }
 
 void PWM::update_pwm(int channel, int value) {

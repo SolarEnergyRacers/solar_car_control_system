@@ -14,12 +14,10 @@
 
 extern I2CBus i2cBus;
 
-void RTC::re_init() {
-    init();
-}
+void RTC::re_init() { init(); }
 
 void RTC::exit() {
-    // TODO
+  // TODO
 }
 
 void RTC::init(void) {

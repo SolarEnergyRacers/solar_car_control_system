@@ -11,9 +11,7 @@
 
 extern I2CBus i2cBus;
 
-void GyroAcc::re_init() {
-    init();
-}
+void GyroAcc::re_init() { init(); }
 
 void GyroAcc::init(void) {
   // CRITICAL SECTION I2C: start

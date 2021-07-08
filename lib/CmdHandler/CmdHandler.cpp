@@ -20,9 +20,7 @@
 extern DAC dac;
 extern Indicator indicator;
 
-void CmdHandler::re_init() {
-    init();
-}
+void CmdHandler::re_init() { init(); }
 
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
@@ -30,7 +28,7 @@ void CmdHandler::init() {
 }
 
 void CmdHandler::exit() {
-    // TODO
+  // TODO
 }
 
 void CmdHandler::task() {
@@ -42,7 +40,8 @@ void CmdHandler::task() {
       // read the incoming chars:
       String input = Serial.readString();
 
-#if DEBUGGINGLEVEL_VERBOSED == true // TODO: we could add a global debug level macro (i.e. depending on verbosity a number and activate/deactive printf statements at compile-time)
+#if DEBUGGINGLEVEL_VERBOSED == true // TODO: we could add a global debug level macro (i.e. depending on verbosity a number and
+                                    // activate/deactive printf statements at compile-time)
       printf("Received: %s\n", input.c_str());
 #endif
       Serial.flush();
@@ -111,13 +110,13 @@ void CmdHandler::task() {
         break;
       // -------------- steering wheel input element emulators
       case '<':
-          indicator.setIndicator(INDICATOR::LEFT);
+        indicator.setIndicator(INDICATOR::LEFT);
         break;
       case '>':
-          indicator.setIndicator(INDICATOR::RIGHT);
+        indicator.setIndicator(INDICATOR::RIGHT);
         break;
       case 'w':
-          indicator.setIndicator(INDICATOR::WARN);
+        indicator.setIndicator(INDICATOR::WARN);
         break;
       case 'a':
         dd->write_acceleration(atoi(&input[1]));

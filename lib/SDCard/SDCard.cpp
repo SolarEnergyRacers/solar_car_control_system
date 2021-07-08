@@ -14,11 +14,9 @@
 
 extern SPIBus spiBus;
 
-void SDCard::re_init() {
-    init();
-}
+void SDCard::re_init() { init(); }
 
-void SDCard::init(){
+void SDCard::init() {
 
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);

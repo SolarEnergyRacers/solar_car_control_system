@@ -8,16 +8,16 @@
 class DAC {
 private:
 public:
-    enum pot_chan {
-        POT_CHAN0 = 0,
-        POT_CHAN1 = 1,
-        POT_CHAN_ALL = 2,
-    };
-    void init();
-    void re_init();
-    void set_pot(uint8_t val, pot_chan channel);
-    uint16_t get_pot(pot_chan channel);
-    uint8_t get_cmd(pot_chan channel);
+  enum pot_chan {
+    POT_CHAN0 = 0,
+    POT_CHAN1 = 1,
+    POT_CHAN_ALL = 2,
+  };
+  void init();
+  void re_init();
+  void set_pot(uint8_t val, pot_chan channel);
+  uint16_t get_pot(pot_chan channel);
+  uint8_t get_cmd(pot_chan channel);
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_DAC_H

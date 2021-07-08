@@ -10,9 +10,7 @@
 
 extern OneWireBus oneWireBus;
 
-void Temp::re_init() {
-    init();
-}
+void Temp::re_init() { init(); }
 
 void Temp::init(void) {
 
@@ -55,7 +53,6 @@ void Temp::init(void) {
   xSemaphoreGive(oneWireBus.mutex);
   // CRITICAL SECTION ONEWIRE: end
 }
-
 
 void Temp::request_temperatures(void) {
 

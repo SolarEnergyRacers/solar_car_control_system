@@ -11,9 +11,7 @@
 
 #include "SPIBus.h"
 
-void SPIBus::re_init() {
-    init();
-}
+void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
 

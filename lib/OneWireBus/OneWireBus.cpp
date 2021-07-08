@@ -11,19 +11,17 @@
 
 #include "OneWireBus.h"
 
-SemaphoreHandle_t onewire_mutex;
-OneWire oneWire;
 
-void init_onewire(void) {
+void OneWireBus::init(void) {
 
   // init mutex (it is acquired)
-  onewire_mutex = xSemaphoreCreateBinary();
+  mutex = xSemaphoreCreateBinary();
 
   // init
-  OneWire oneWire(ONEWIRE_PIN);
+  oneWire = OneWire(ONEWIRE_PIN);
 
   // release mutex
-  xSemaphoreGive(onewire_mutex);
+  xSemaphoreGive(mutex);
 
   printf("[v] OneWire inited: ONEWIRE_PIN=%d.\n", ONEWIRE_PIN);
 }

@@ -10,9 +10,13 @@
 
 #include <OneWire.h> // 1-Wire
 
-extern SemaphoreHandle_t onewire_mutex;
-extern OneWire oneWire;
-
-void init_onewire(void);
+class OneWireBus {
+private:
+public:
+    SemaphoreHandle_t mutex;
+    OneWire oneWire;
+    void init();
+    void re_init();
+};
 
 #endif // ONEWIREBUS_H

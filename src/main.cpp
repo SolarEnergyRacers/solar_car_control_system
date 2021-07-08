@@ -3,8 +3,7 @@
  * initialize devices, ..
  *
  * clang style:
- *    find . -name "*.cpp" -o -name "*.c" -o -name "*.h" | grep '\./lib' | xargs
- * -I {} clang-format -i {}
+ *    ./extras/format.sh
  */
 
 // standard libraries

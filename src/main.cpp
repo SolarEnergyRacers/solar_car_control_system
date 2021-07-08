@@ -116,6 +116,10 @@ RTC rtc;
 GPInputOutput gpio;
 //#endif
 
+//#if SIMULATOR_ON
+Simulator simulator;
+//#endif
+
 void app_main(void) {
     bool startOk = true;
 
@@ -189,7 +193,7 @@ void app_main(void) {
         uart.init();
     }
     if (SIMULATOR_ON) {
-        init_simulator();
+        simulator.init();
     }
     if (CAN_ON) {
         can.init();
@@ -253,7 +257,7 @@ void app_main(void) {
     }
     if (SIMULATOR_ON) {
         printf(" - simulator_task\n");
-        xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        simulator.create_task();
     }
     if (IOEXT_ON) {
         printf(" - IOExt2_task\n");

@@ -9,7 +9,7 @@
 #include <abstract_task.h>
 #include <driver/gpio.h>
 
-class GPInputOutput : public abstract_task {
+class GPInputOutput : public abstract_task { // Note: This class is called weirdly due to a naming conflict. Suggestions are welcome :)
 private:
     // add local variables required for the handler
 public:

@@ -17,6 +17,8 @@
 #include "Helper.h"
 #include "Indicator.h"
 
+extern DAC dac;
+
 void CmdHandler::re_init() {
     init();
 }
@@ -79,7 +81,7 @@ void CmdHandler::task() {
         break;
       case 'm':
         dd->write_speed(atoi(&input[1]));
-        set_pot(atoi(&input[1]), POT_CHAN0);
+        dac.set_pot(atoi(&input[1]), DAC::POT_CHAN0);
         break;
       // -------------- chase car commands
       case 'u':

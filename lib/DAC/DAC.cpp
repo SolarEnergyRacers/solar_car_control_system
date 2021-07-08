@@ -22,8 +22,11 @@
 
 extern I2CBus i2cBus;
 
+void DAC::re_init() {
+    init();
+}
 
-uint8_t get_cmd(pot_chan channel) {
+uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {
   case POT_CHAN0:
@@ -42,7 +45,7 @@ uint8_t get_cmd(pot_chan channel) {
   return command;
 }
 
-void set_pot(uint8_t val, pot_chan channel) {
+void DAC::set_pot(uint8_t val, pot_chan channel) {
 
   // setup command
   uint8_t command = get_cmd(channel);
@@ -64,7 +67,7 @@ void set_pot(uint8_t val, pot_chan channel) {
   // CRITICAL SECTION I2C: end
 }
 
-uint16_t get_pot(pot_chan channel) {
+uint16_t DAC::get_pot(pot_chan channel) {
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
@@ -85,4 +88,4 @@ uint16_t get_pot(pot_chan channel) {
   }
 }
 
-void init_dac() {}
+void DAC::init() {}

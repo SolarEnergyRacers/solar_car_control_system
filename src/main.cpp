@@ -80,7 +80,9 @@ SDCard sdCard;
 CmdHandler cmdHandler;
 //#endif
 
-
+//#if DAC_ON
+DAC dac;
+//#endif
 
 void app_main(void) {
     bool startOk = true;
@@ -147,7 +149,7 @@ void app_main(void) {
         init_IOExt2();
     }
     if (DAC_ON) {
-        init_dac();
+        dac.init();
     }
     if (SERIAL_ON) {
         init_serial();

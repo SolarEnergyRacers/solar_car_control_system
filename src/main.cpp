@@ -92,6 +92,10 @@ Uart uart;
 GyroAcc gyroAcc;
 //#endif
 
+//#if DISPLAY_LARGE_INDICATOR_ON
+Indicator indicator;
+//#endif
+
 void app_main(void) {
     bool startOk = true;
 
@@ -123,7 +127,8 @@ void app_main(void) {
         DriverDisplayC::instance()->init();
     }
     if (DISPLAY_LARGE_INDICATOR_ON) {
-        startOk &= init_indicator();
+        // startOk &= init_indicator(); // TODO: restore this functionality
+        indicator.init();
     }
     if (COMMANDHANDLER_ON) {
         cmdHandler.init();
@@ -190,7 +195,7 @@ void app_main(void) {
 
     if (DISPLAY_LARGE_INDICATOR_ON) {
         printf(" - indicator_task\n");
-        xTaskCreate(&indicator_task, "indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+        indicator.create_task();
     }
     if (BLINK_ON) {
         printf(" - blink_demo_task\n");

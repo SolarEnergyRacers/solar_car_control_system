@@ -18,6 +18,7 @@
 #include "Indicator.h"
 
 extern DAC dac;
+extern Indicator indicator;
 
 void CmdHandler::re_init() {
     init();
@@ -110,13 +111,13 @@ void CmdHandler::task() {
         break;
       // -------------- steering wheel input element emulators
       case '<':
-        setIndicator(INDICATOR::LEFT);
+          indicator.setIndicator(INDICATOR::LEFT);
         break;
       case '>':
-        setIndicator(INDICATOR::RIGHT);
+          indicator.setIndicator(INDICATOR::RIGHT);
         break;
       case 'w':
-        setIndicator(INDICATOR::WARN);
+          indicator.setIndicator(INDICATOR::WARN);
         break;
       case 'a':
         dd->write_acceleration(atoi(&input[1]));

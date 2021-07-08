@@ -15,7 +15,7 @@
 
 PCF8574 IOExt2(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
 extern I2CBus i2cBus;
-
+extern Indicator indicator;
 
 // simulation - start (for simulation purpose)
 int speed = 0;
@@ -97,11 +97,11 @@ void _handleIoInterrupt() {
 
   // turn indicator and hazard lights
   if (left && right) {
-    setIndicator(INDICATOR::WARN);
+      indicator.setIndicator(INDICATOR::WARN);
   } else if (left && !right) {
-    setIndicator(INDICATOR::LEFT);
+      indicator.setIndicator(INDICATOR::LEFT);
   } else if (!left && right) {
-    setIndicator(INDICATOR::RIGHT);
+      indicator.setIndicator(INDICATOR::RIGHT);
   }
   if (positionLights) {
     dd->light1OnOff();

@@ -64,6 +64,12 @@ ADC adc;
 CanBus can;
 //#endif
 
+OneWireBus oneWireBus;
+
+//#if DS_ON
+Temp ds;
+//#endif
+
 
 void app_main(void) {
   bool startOk = true;
@@ -83,7 +89,7 @@ void app_main(void) {
   chip_info();
 
   // init buses
-  init_onewire();
+  oneWireBus.init();
   init_i2c();
   init_spi();
 
@@ -106,7 +112,7 @@ void app_main(void) {
       // example: printf("Motor speed is: %d\n", adc.read(ADC::Pin::MOTOR_SPEED));
   }
   if (DS_ON) {
-    init_ds();
+    ds.init();
   }
   if (GYRO_ACC_ON) {
     init_gyro_acc();

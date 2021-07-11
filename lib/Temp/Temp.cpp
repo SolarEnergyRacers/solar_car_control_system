@@ -7,25 +7,29 @@
 #include "Temp.h"
 
 #include <DallasTemperature.h> // DS18B20
-DallasTemperature ds(&oneWire);
 
-void init_ds(void) {
+extern OneWireBus oneWireBus;
+
+void Temp::re_init() { init(); }
+
+void Temp::init(void) {
 
   // CRITICAL SECTION ONEWIRE: start
-  xSemaphoreTake(onewire_mutex, portMAX_DELAY);
+  xSemaphoreTake(oneWireBus.mutex, portMAX_DELAY);
 
   // init devices
+  ds = DallasTemperature(&oneWireBus.oneWire);
   ds.begin();
 
   // report devices found
   printf("[OneWire] num devices on bus: %d\n", ds.getDeviceCount());
 
   // clear old search
-  oneWire.reset_search();
+  oneWireBus.oneWire.reset_search();
 
   // report details of all devices (address, resolution, power mode, ..)
   DeviceAddress device_addr;
-  while (oneWire.search(device_addr)) {
+  while (oneWireBus.oneWire.search(device_addr)) {
 
     printf("[DS18B20] Address:");
     for (uint8_t i = 0; i < 8; i++) {
@@ -46,28 +50,28 @@ void init_ds(void) {
     printf("\n");
   }
 
-  xSemaphoreGive(onewire_mutex);
+  xSemaphoreGive(oneWireBus.mutex);
   // CRITICAL SECTION ONEWIRE: end
 }
 
-void request_temperatures(void) {
+void Temp::request_temperatures(void) {
 
   // CRITICAL SECTION ONEWIRE: start
-  xSemaphoreTake(onewire_mutex, portMAX_DELAY);
+  xSemaphoreTake(oneWireBus.mutex, portMAX_DELAY);
 
   // request all temperature sensor readings
   ds.requestTemperatures();
 
-  xSemaphoreGive(onewire_mutex);
+  xSemaphoreGive(oneWireBus.mutex);
   // CRITICAL SECTION ONEWIRE: end
 }
 
-int get_num_temp_dev(void) {
+int Temp::get_num_temp_dev(void) {
   return ds.getDeviceCount(); // no mutex required, since it does not actually
                               // communicate with the sensor
 }
 
-float read_tempC_index(int index) {
+float Temp::read_tempC_index(int index) {
 
   // check bound
   if (index < 0 || index >= get_num_temp_dev()) {
@@ -78,7 +82,7 @@ float read_tempC_index(int index) {
                                     // actually communicate with the sensor
 }
 
-float read_tempF_index(int index) {
+float Temp::read_tempF_index(int index) {
 
   // check bound
   if (index < 0 || index >= get_num_temp_dev()) {
@@ -89,17 +93,18 @@ float read_tempF_index(int index) {
                                     // actually communicate with the sensor
 }
 
+extern Temp ds;
 void read_ds_demo_task(void *pvParameter) {
 
   // polling loop
   while (1) {
 
     // request all temperature sensor readings
-    request_temperatures();
+    ds.request_temperatures();
 
     // print previously fetched results
-    for (int i = 0; i < get_num_temp_dev(); i++) {
-      printf("[DS18B20] Temperature: %fC / %fF\n", read_tempC_index(i), read_tempF_index(i));
+    for (int i = 0; i < ds.get_num_temp_dev(); i++) {
+      printf("[DS18B20] Temperature: %fC / %fF\n", ds.read_tempC_index(i), ds.read_tempF_index(i));
     }
 
     // sleep for 1s

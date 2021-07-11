@@ -2,7 +2,7 @@
 // Command Receiver and Handler
 //
 // reads commands from serial console and deploy it
-#include "../../include/definitions.h"
+#include <definitions.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -17,36 +17,21 @@
 #include "Helper.h"
 #include "Indicator.h"
 
-void init_command_handler() {
+extern DAC dac;
+extern Indicator indicator;
+
+void CmdHandler::re_init() { init(); }
+
+void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
   printf("[v] Command handler inited\n");
 }
 
-String commands = "<>lLwudsabpmMRc:!";
-String helpText = "Available commands (" + commands +
-                  "):\n"
-                  "\t-------- DRIVER INFO COMMANDS -----------\n"
-                  "\t:<text>  - display driver info text\n"
-                  "\t!<text>  - display driver warn text\n"
-                  "\tu [off]  - speed up arrow (green)\n"
-                  "\td [off]  - speed down arrow (red)\n"
-                  "\t-------- TEST COMMANDS ------------------\n"
-                  "\ts ddd    - speed value [0...999]\n"
-                  "\ts [f|b]  - drive forward|backward\n"
-                  "\ta dd     - acceleration value [0...9]\n"
-                  "\tb fff.f  - battary voltage [0...999]\n"
-                  "\tp ffff.f - photovoltaics current [-999...+999]\n"
-                  "\tm ffff.f - motor current [-999...+999]\n"
-                  "\tM ddd    - set motor potentiometer [0...255]\n"
-                  "\t< [off]  - left indicator\n"
-                  "\t> [off]  - right indicator\n"
-                  "\tw [off]  - hazard warning lights\n"
-                  "\tl [off]  - position lights on/off\n"
-                  "\tL [off]  - beam light on/off\n"
-                  "\tc [s|p]  - constant speed|power mode\n"
-                  "\t\n";
+void CmdHandler::exit() {
+  // TODO
+}
 
-void command_handler_task(void *pvParameter) {
+void CmdHandler::task() {
 
   DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
@@ -55,7 +40,8 @@ void command_handler_task(void *pvParameter) {
       // read the incoming chars:
       String input = Serial.readString();
 
-#if DEBUGGINGLEVEL_VERBOSED == true
+#if DEBUGGINGLEVEL_VERBOSED == true // TODO: we could add a global debug level macro (i.e. depending on verbosity a number and
+                                    // activate/deactive printf statements at compile-time)
       printf("Received: %s\n", input.c_str());
 #endif
       Serial.flush();
@@ -95,7 +81,7 @@ void command_handler_task(void *pvParameter) {
         break;
       case 'm':
         dd->write_speed(atoi(&input[1]));
-        set_pot(atoi(&input[1]), POT_CHAN0);
+        dac.set_pot(atoi(&input[1]), DAC::POT_CHAN0);
         break;
       // -------------- chase car commands
       case 'u':
@@ -124,13 +110,13 @@ void command_handler_task(void *pvParameter) {
         break;
       // -------------- steering wheel input element emulators
       case '<':
-        setIndicator(INDICATOR::LEFT);
+        indicator.setIndicator(INDICATOR::LEFT);
         break;
       case '>':
-        setIndicator(INDICATOR::RIGHT);
+        indicator.setIndicator(INDICATOR::RIGHT);
         break;
       case 'w':
-        setIndicator(INDICATOR::WARN);
+        indicator.setIndicator(INDICATOR::WARN);
         break;
       case 'a':
         dd->write_acceleration(atoi(&input[1]));

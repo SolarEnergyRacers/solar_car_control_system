@@ -2,21 +2,24 @@
 // Display
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
+
+#include <Adafruit_GFX.h>     // graphics library
+#include <Adafruit_SSD1305.h> // display
 
 #include <I2CBus.h>
 
 #include "Display.h"
 
-#include <Adafruit_GFX.h>     // graphics library
-#include <Adafruit_SSD1305.h> // display
-#define OLED_RESET 9
-Adafruit_SSD1305 display(128, 64, &Wire, OLED_RESET);
+extern I2CBus i2cBus;
+Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET); // TODO: remove & add to class
 
-void init_display(void) {
+void Display::re_init() { init(); }
+
+void Display::init(void) {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   if (!display.begin(I2C_ADDRESS_SSD1305)) {
     printf("[Display] Unable to initialize OLED screen.\n");
@@ -27,27 +30,31 @@ void init_display(void) {
   // init done
   display.display(); // show splashscreen
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   vTaskDelay(1000 / portTICK_PERIOD_MS);
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   display.clearDisplay(); // clears the screen and buffer
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
-void draw_display_demo_task(void *pvParameter) {
+void Display::exit() {
+  // TODO
+}
+
+void Display::task() {
 
   // polling loop
   while (1) {
 
     // CRITICAL SECTION I2C: start
-    xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
     // clears the screen and buffer
     display.clearDisplay();
@@ -70,7 +77,7 @@ void draw_display_demo_task(void *pvParameter) {
     }
     display.display();
 
-    xSemaphoreGive(i2c_mutex);
+    xSemaphoreGive(i2cBus.mutex);
     // CRITICAL SECTION I2C: end
 
     // sleep for 1s

@@ -27,10 +27,12 @@
    IN THE SOFTWARE.
 */
 
-#include "../../include/definitions.h"
 #include <I2CBus.h>
+#include <definitions.h>
 
 #include "BMI088.h"
+
+extern I2CBus i2cBus;
 
 BMI088::BMI088(void) {
   devAddrAcc = BMI088_ACC_ADDRESS;
@@ -256,14 +258,14 @@ void BMI088::write8(device_type_t dev, uint8_t reg, uint8_t val) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(addr);
   Wire.write(reg);
   Wire.write(val);
   Wire.endTransmission();
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
@@ -277,7 +279,7 @@ uint8_t BMI088::read8(device_type_t dev, uint8_t reg) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(addr);
   Wire.write(reg);
@@ -288,7 +290,7 @@ uint8_t BMI088::read8(device_type_t dev, uint8_t reg) {
     data = Wire.read();
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return data;
@@ -305,7 +307,7 @@ uint16_t BMI088::read16(device_type_t dev, uint8_t reg) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(addr);
   Wire.write(reg);
@@ -317,7 +319,7 @@ uint16_t BMI088::read16(device_type_t dev, uint8_t reg) {
     msb = Wire.read();
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return (lsb | (msb << 8));
@@ -334,7 +336,7 @@ uint16_t BMI088::read16Be(device_type_t dev, uint8_t reg) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(addr);
   Wire.write(reg);
@@ -346,7 +348,7 @@ uint16_t BMI088::read16Be(device_type_t dev, uint8_t reg) {
     lsb = Wire.read();
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return (lsb | (msb << 8));
@@ -363,7 +365,7 @@ uint32_t BMI088::read24(device_type_t dev, uint8_t reg) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(addr);
   Wire.write(reg);
@@ -376,7 +378,7 @@ uint32_t BMI088::read24(device_type_t dev, uint8_t reg) {
     hsb = Wire.read();
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   return (lsb | (msb << 8) | (hsb << 16));
@@ -392,7 +394,7 @@ void BMI088::read(device_type_t dev, uint8_t reg, uint8_t *buf, uint16_t len) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(addr);
   Wire.write(reg);
@@ -405,7 +407,7 @@ void BMI088::read(device_type_t dev, uint8_t reg, uint8_t *buf, uint16_t len) {
     }
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 

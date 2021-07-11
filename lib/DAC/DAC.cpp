@@ -2,7 +2,7 @@
 // Digital to Analog Converter
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <Helper.h>
 #include <I2CBus.h>
@@ -20,7 +20,11 @@
 
 #define BASE_ADDR_CMD 0xA8
 
-uint8_t get_cmd(pot_chan channel) {
+extern I2CBus i2cBus;
+
+void DAC::re_init() { init(); }
+
+uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {
   case POT_CHAN0:
@@ -39,7 +43,7 @@ uint8_t get_cmd(pot_chan channel) {
   return command;
 }
 
-void set_pot(uint8_t val, pot_chan channel) {
+void DAC::set_pot(uint8_t val, pot_chan channel) {
 
   // setup command
   uint8_t command = get_cmd(channel);
@@ -47,7 +51,7 @@ void set_pot(uint8_t val, pot_chan channel) {
   // printf("Write motor potentiometer %02x to %d\n", command, val);
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(I2C_ADDRESS_DS1803);
   Wire.write(command);
@@ -57,20 +61,20 @@ void set_pot(uint8_t val, pot_chan channel) {
   }
   Wire.endTransmission();
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
-uint16_t get_pot(pot_chan channel) {
+uint16_t DAC::get_pot(pot_chan channel) {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.requestFrom(I2C_ADDRESS_DS1803, 2); // request 2 bytes
   uint8_t pot0 = Wire.read();              // get pot0
   uint8_t pot1 = Wire.read();              // get pot1
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 
   if (channel == POT_CHAN_ALL) {
@@ -82,4 +86,4 @@ uint16_t get_pot(pot_chan channel) {
   }
 }
 
-void init_dac() {}
+void DAC::init() {}

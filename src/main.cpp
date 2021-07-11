@@ -3,8 +3,7 @@
  * initialize devices, ..
  *
  * clang style:
- *    find . -name "*.cpp" -o -name "*.c" -o -name "*.h" | grep '\./lib' | xargs
- * -I {} clang-format -i {}
+ *    ./extras/format.sh
  */
 
 // standard libraries
@@ -17,10 +16,10 @@
 #include <freertos/task.h>
 
 // project variables
-#include "sdkconfig.h"
+#include <sdkconfig.h>
 
 // local definitions
-#include "definitions.h"
+#include <definitions.h>
 
 // local libs
 #include <ADC.h>
@@ -29,6 +28,7 @@
 #include <DAC.h>
 #include <Display.h>
 #include <DriverDisplayC.h>
+#include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
 #include <IOExt.h>
@@ -41,12 +41,11 @@
 #include <Serial.h>
 #include <Simulator.h>
 #include <Temp.h>
-#include <gpio.h>
 #include <string>
 #include <system.h>
 
-#include "LocalFunctionsAndDevices.h"
-#include <../interfaces/abstract_task.h>
+#include <LocalFunctionsAndDevices.h>
+#include <abstract_task.h>
 
 // add C linkage definition
 extern "C" {
@@ -55,6 +54,70 @@ void app_main(void);
 
 using namespace std;
 // using namespace DriverDisplayC;
+
+#if ADC_ON
+ADC adc;
+#endif
+
+//#if CAN_ON // TODO: gets a linking-error if we set CAN_ON to true
+CanBus can;
+//#endif
+
+OneWireBus oneWireBus;
+SPIBus spiBus;
+I2CBus i2cBus;
+
+//#if DS_ON
+Temp ds;
+//#endif
+
+//#if SD_ON
+SDCard sdCard;
+//#endif
+
+//#if COMMANDHANDLER_ON
+CmdHandler cmdHandler;
+//#endif
+
+//#if DAC_ON
+DAC dac;
+//#endif
+
+//#if SERIAL_ON
+Uart uart;
+//#endif
+
+//#if GYRO_ACC_ON
+GyroAcc gyroAcc;
+//#endif
+
+//#if DISPLAY_LARGE_INDICATOR_ON
+Indicator indicator;
+//#endif
+
+//#if IOEXT_ON
+IOExt ioExt;
+//#endif
+
+//#if PWM_ON
+PWM pwm;
+//#endif
+
+//#if DISPLAY_ON
+Display disp;
+//#endif
+
+//#if RTC_ON
+RTC rtc;
+//#endif
+
+//#if INT_ON
+GPInputOutput gpio;
+//#endif
+
+//#if SIMULATOR_ON
+Simulator simulator;
+//#endif
 
 void app_main(void) {
   bool startOk = true;
@@ -74,11 +137,11 @@ void app_main(void) {
   chip_info();
 
   // init buses
-  init_onewire();
-  init_i2c();
-  init_spi();
+  oneWireBus.init();
+  i2cBus.init();
+  spiBus.init();
 
-  scan_i2c_devices();
+  i2cBus.scan_i2c_devices();
 
   // ---- init modules ----
   if (BLINK_ON) {
@@ -87,50 +150,52 @@ void app_main(void) {
     DriverDisplayC::instance()->init();
   }
   if (DISPLAY_LARGE_INDICATOR_ON) {
-    startOk &= init_indicator();
+    // startOk &= init_indicator(); // TODO: restore this functionality
+    indicator.init();
   }
   if (COMMANDHANDLER_ON) {
-    init_command_handler();
+    cmdHandler.init();
   }
   if (ADC_ON) {
-    init_adc();
+    adc.init();
+    // example: printf("Motor speed is: %d\n", adc.read(ADC::Pin::MOTOR_SPEED));
   }
   if (DS_ON) {
-    init_ds();
+    ds.init();
   }
   if (GYRO_ACC_ON) {
-    init_gyro_acc();
+    gyroAcc.init();
   }
   if (PWM_ON) {
-    init_pwm();
+    pwm.init();
   }
   if (RTC_ON) {
-    init_rtc();
+    rtc.init();
   }
   if (SD_ON) {
-    init_sdcard();
+    sdCard.init();
   }
   if (INT_ON) {
-    register_gpio_interrupt();
+    gpio.init();
+    gpio.register_gpio_interrupt();
   }
   if (DISPLAY_ON) {
-    init_display();
+    disp.init();
   }
   if (IOEXT_ON) {
-    init_IOExt2();
+    ioExt.init();
   }
   if (DAC_ON) {
-    init_dac();
+    dac.init();
   }
   if (SERIAL_ON) {
-    init_serial();
+    uart.init();
   }
   if (SIMULATOR_ON) {
-    init_simulator();
+    simulator.init();
   }
-
   if (CAN_ON) {
-    init_can();
+    can.init();
   }
 
   if (!startOk) {
@@ -144,7 +209,7 @@ void app_main(void) {
   // ---- create tasks ----
   if (DISPLAY_ON) {
     printf(" - draw_display_demo_task\n");
-    xTaskCreate(&draw_display_demo_task, "draw_display_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    disp.create_task();
   }
   if (DISPLAY_LARGE_ON) {
     DriverDisplayC::instance()->create_task();
@@ -153,15 +218,13 @@ void app_main(void) {
 
   if (DISPLAY_LARGE_INDICATOR_ON) {
     printf(" - indicator_task\n");
-    xTaskCreate(&indicator_task, "indicator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    indicator.create_task();
   }
-  if (BLINK_ON) {
-    printf(" - blink_demo_task\n");
-    xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  }
+  //    if (BLINK_ON) { // not activated
+  //        printf(" - blink_demo_task\n");
+  //        xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  //    }
   if (ADC_ON) {
-    // xTaskCreate(&read_adc_demo_task, "read_adc_task",
-    //             CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
     xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DS_ON) {
@@ -174,11 +237,11 @@ void app_main(void) {
   }
   if (PWM_ON) {
     printf(" - update_pwm_demo_task\n");
-    xTaskCreate(&update_pwm_demo_task, "update_pwm_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    pwm.create_task();
   }
   if (RTC_ON) {
     printf(" - read_rtc_demo_task\n");
-    xTaskCreate(&read_rtc_demo_task, "read_adc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    rtc.create_task();
   }
   if (SD_ON) {
     printf(" - write_sdcard_demo_task\n");
@@ -186,26 +249,26 @@ void app_main(void) {
   }
   if (INT_ON) {
     printf(" - int_report_demo_task\n");
-    xTaskCreate(&int_report_demo_task, "int_report_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    gpio.create_task();
   }
   if (SIMULATOR_ON) {
     printf(" - simulator_task\n");
-    xTaskCreate(&simulator_task, "simulator_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    simulator.create_task();
   }
   if (IOEXT_ON) {
     printf(" - IOExt2_task\n");
-    xTaskCreate(&IOExt2_task, "IOExt2_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    ioExt.create_task();
   }
   if (DAC_ON) {
     printf(" - DAC DAC DAC\n");
   }
   if (COMMANDHANDLER_ON) {
     printf(" - command_handler_task\n");
-    xTaskCreate(&command_handler_task, "command_handler_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    cmdHandler.create_task();
   }
   if (SERIAL_ON) {
     printf(" - serial_demo_task\n");
-    xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
     printf(" - read_can_demo_task\n");

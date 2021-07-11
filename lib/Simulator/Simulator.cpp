@@ -3,21 +3,16 @@
 //
 
 #include "Simulator.h"
-#include "../../include/definitions.h"
 #include "DriverDisplayC.h"
+#include <definitions.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
 
-// counters for demo display
-int counterIndicator = 0;
-int counterSpeed = 0;
-int counterPV = 0;
-
 // ------------------
 // FreeRTOS INIT TASK
 // ------------------
-void init_simulator(void) {
+void Simulator::init(void) {
   DriverDisplayC *dd = DriverDisplayC::instance();
 
   dd->driver_display_demo_screen();
@@ -27,10 +22,16 @@ void init_simulator(void) {
   vTaskDelay(1000 / portTICK_PERIOD_MS);
 }
 
+void Simulator::re_init() { init(); }
+
+void Simulator::exit() {
+  // TODO
+}
+
 // -------------
 // FreeRTOS TASK
 // -------------
-void simulator_task(void *pvParameter) {
+void Simulator::task() {
   // polling loop
   DriverDisplayC *dd = DriverDisplayC::instance();
 

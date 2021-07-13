@@ -1,6 +1,8 @@
-url: "https://xxx.yyy"
-username__Name: "usernanme"
+url: "https://guest..."
+username__Name: "username"
 password__Name: "password"
 accept_terms__Name: "visitor_accept_terms"
-username: "x@y.com"
-password: 12345
+submit_button__Xpath: "//*[@id[contains(.,'weblogin_submit')]]"
+wlan_name: "guest"
+username: "x@y.ch"
+password: 123456

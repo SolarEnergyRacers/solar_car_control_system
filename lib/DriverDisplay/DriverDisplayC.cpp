@@ -31,80 +31,6 @@ extern SPIBus spiBus;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // namespace DriverDisplayC {
-//==== Driver Display definition ==== START
-// display formats and sizes
-int bgColor = 0x000000;
-int infoFrameX = 0;
-int infoFrameY = 0;
-int infoFrameSizeX = -1; // full tft width, calculated beow
-int infoFrameSizeY = 64;
-int infoTextSize = 3;
-
-// frame around value display (exclude text message lines)
-int mainFrameX = infoFrameSizeY;
-
-// speed display
-int speedFrameX = -1; // get calculated later: (sizeX - speedFrameCx) / 2;
-int speedFrameY = 80;
-int speedFrameSizeX = 156;
-int speedFrameSizeY = 76;
-int speedTextSize = 8;
-
-// acceleration display
-int accFrameX = 2;
-int accFrameY = 118;    // speedFrameY + speedFrameSizeY / 2
-int accFrameSizeX = -1; // get calculated later: speedFrameX - 4
-int accFrameSizeY = 38; // speedFrameSizeY / 2
-int accTextSize = 4;    // speedTextSize / 2
-
-// ---- voltage and current displays ---- START
-int labelLen = 9; // label length for all 3 voltage/current displays
-
-// battery voltage display
-int batFrameX = 10;
-int batFrameY = 180;
-int batTextSize = 2;
-int lightTextSize = 2;
-
-// photovoltaics voltage display
-int pvFrameX = 10;
-int pvFrameY = 200;
-int pvTextSize = 2;
-
-// motor current display
-int motorFrameX = 10;
-int motorFrameY = 220;
-int motorTextSize = 2;
-// ---- voltage and current displays ---- END
-
-// constant mode speed or power display
-int constantModeX = 250;
-int constantModeY = 158;
-int constantModeTextSize = 2;
-
-// constant mode speed or power display
-int driveDirectionX = 220;
-int driveDirectionY = 178;
-int driveDirectionTextSize = 2;
-
-// turn indicator arrows
-int indicatorLeftX = 10;
-int indicatorY = 92;
-int indicatorRightX = 310;
-int indicatorWidth = 30;
-int indicatorHeight = 20;
-
-// light on indicator
-int light1OnX = 250;
-int light1OnY = 118;
-int light2OnX = 250;
-int light2OnY = 138;
-
-// life sign for connection to microprocessor via rtx
-int lifeSignX = -1;
-int lifeSignY = -1;
-int lifeSignRadius = 4;
-//==== Driver Display definition ==== END
 
 //==== display cache =====================
 // ... to avoid flickering
@@ -130,22 +56,25 @@ void DriverDisplayC ::init() {
 }
 
 void DriverDisplayC ::re_init(void) {
+  // CRITICAL SECTION SPI: start
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   sleep_polling_ms = 500;
   tft.begin();
   printf("done.\n");
   try {
-    printf("[v] Display0 (driver display) initializing...\n");
+    printf("  Display0 (driver display) initializing...\n");
     uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-    printf("Display Power Mode: 0x%x\n", x);
+    printf("    Display Power Mode: 0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDMADCTL);
-    printf("MADCTL Mode:        0x%x\n", x);
+    printf("    MADCTL Mode:        0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDPIXFMT);
-    printf("Pixel Format:       0x%x\n", x);
+    printf("    Pixel Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDIMGFMT);
-    printf("Image Format:       0x%x\n", x);
+    printf("    Image Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDSELFDIAG);
-    printf("Self Diagnostic:    0x%x\n", x);
+    printf("    Self Diagnostic:    0x%x\n", x);
     infoFrameSizeX = tft.width();
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
     printf("[v] Display0 (driver display) inited: screen %d x %d.\n", tft.height(), tft.width());
@@ -153,6 +82,10 @@ void DriverDisplayC ::re_init(void) {
     printf("[x] Display0 (driver display): Unable to initialize screen "
            "ILI9341.\n");
   }
+
+  xSemaphoreGive(spiBus.mutex);
+  // CRITICAL SECTION SPI: end
+
   driver_display_demo_screen();
   draw_display_background();
 }
@@ -173,7 +106,7 @@ void DriverDisplayC ::task(void) {
     lifeSignCounter++;
 
     // sleep for sleep_polling_ms
-    // this->sleep();
+    this->sleep();
   }
 }
 
@@ -263,6 +196,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
     printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'", value);
     return value;
   }
+  debug_printf("valueLast: %d, value: %d\n", valueLast, value);
   int digitWidth = textSize * 6;
   int digitHeight = textSize * 8;
   // determine the sign of new and old value
@@ -279,7 +213,6 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
   int d1o = (int)valLast % 10;
   int d2o = ((int)valLast / 10) % 10;
 
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(textSize);
@@ -287,11 +220,13 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
+  debug_printf("d1: %d\n", d1);
   if (d1 != d1o) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
   }
+  debug_printf("d2: %d\n", d2);
   if (d2 != d2o) {
     tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 1, y);
@@ -299,6 +234,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
       tft.print(d2);
     }
   }
+  debug_printf("sign: %c\n", sign);
   if (sign != signOld) {
     tft.fillRect(x, y, (digitWidth + 1), digitHeight, bgColor);
     tft.setCursor(x, y);
@@ -306,9 +242,9 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
     tft.print(sign);
     //}
   }
+  debug_printf("%c\n",'$');
 
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 
   return value;
 }
@@ -447,6 +383,30 @@ void DriverDisplayC ::draw_display_background() {
   draw_display_border(ILI9341_GREEN);
   draw_speed_border(ILI9341_YELLOW);
   draw_acceleration_border(ILI9341_YELLOW);
+
+  lifeSignCounter = 0;
+  lifeSignState = false;
+
+  String infoLast = "";
+  write_driver_info(infoLast = "", INFO_TYPE::STATUS);
+
+  speedLast = -1;
+  write_speed(0);
+
+  accelerationLast = -1;
+  write_acceleration(0);
+
+  batLast = -1;
+  write_bat(0);
+
+  pvLast = -1;
+  write_pv(0);
+
+  motorLast = -1;
+  write_motor(0);
+
+  light1On = false;
+  light2On = false;
 }
 
 void DriverDisplayC ::_arrow_increase(int color) {
@@ -510,7 +470,7 @@ void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
   tft.setCursor(constantModeX, constantModeY);
   if (mode == CONSTANT_MODE::POWER) {
     tft.print("power");
-  } else {
+  } else if (mode == CONSTANT_MODE::SPEED) {
     tft.print("speed");
   }
 
@@ -544,21 +504,24 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
 void DriverDisplayC ::_turn_Left(int color) {
   int x = indicatorLeftX;
   int y = indicatorY;
+
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.fillTriangle(x, y, x + indicatorWidth, y - indicatorHeight, x + indicatorWidth, y + indicatorHeight, color);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::_turn_Right(int color) {
   int x = indicatorRightX;
   int y = indicatorY;
+
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.fillTriangle(x, y, x - indicatorWidth, y - indicatorHeight, x - indicatorWidth, y + indicatorHeight, color);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction) { indicator_set_and_blink(direction, true); }
 
 void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
-  // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   _turn_Left(bgColor);
   _turn_Right(bgColor);
   if (blinkOn) {
@@ -581,9 +544,6 @@ void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn)
       break;
     }
   }
-
-  xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::_light1(bool lightOn) {
@@ -742,72 +702,58 @@ void DriverDisplayC ::write_driver_info(String msg, INFO_TYPE type) {
 }
 
 void DriverDisplayC ::driver_display_demo_screen() {
-  printf("Draw demo screen:\n");
+  printf("  Draw demo screen:\n");
 #ifdef POWERMEASUREMENT
   // ---- for power measurement: start
+  // CRITICAL SECTION SPI: start
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   printf(" - black background\n");
   tft.fillScreen(ILI9341_BLACK);
   delay(15000);
   printf(" - white background\n");
   tft.fillScreen(ILI9341_WHITE);
   delay(15000);
+  xSemaphoreGive(spiBus.mutex);
+  // CRITICAL SECTION SPI: end
   // ---- for power measurement: end
 #endif
 
-  printf(" - background\n");
+  printf("   - background\n");
   draw_display_background();
-  printf(" - driver info\n");
+  printf("   - driver info\n");
   write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
-  printf(" - hazzard warn\n");
+  printf("   - hazzard warn\n");
   indicator_set_and_blink(INDICATOR::WARN, true);
-  printf(" - spped\n");
+  printf("   - spped\n");
   write_speed(888);
-  printf(" - acceleration\n");
+  printf("   - acceleration\n");
   write_acceleration(888);
-  printf(" - increase arrow\n");
+  printf("   - increase arrow\n");
   _arrow_increase(ILI9341_YELLOW);
-  printf(" - decrease arrow\n");
+  printf("   - decrease arrow\n");
   _arrow_decrease(ILI9341_RED);
-  printf(" - light1 on\n");
+  printf("   - light1 on\n");
   light1OnOff();
-  printf(" - light1 on\n");
+  printf("   - light1 on\n");
   light2OnOff();
-  printf(" - constant mode speed\n");
+  printf("   - constant mode speed\n");
   write_constant_mode(CONSTANT_MODE::SPEED);
-  printf(" - drive direction forwards\n");
+  printf("   - drive direction forwards\n");
   write_drive_direction(DRIVE_DIRECTION::FORWARD);
-  printf(" - battery\n");
+  printf("   - battery\n");
   write_bat(-8888.8);
-  printf(" - photovoltaic\n");
+  printf("   - photovoltaic\n");
   write_pv(-8888.8);
-  printf(" - motor\n");
+  printf("   - motor\n");
   write_motor(-8888.8);
-  printf(" - constant mode power\n");
+  printf("   - constant mode power\n");
   write_constant_mode(CONSTANT_MODE::POWER);
-  printf(" - drive direction backwards\n");
+  printf("   - drive direction backwards\n");
   write_drive_direction(DRIVE_DIRECTION::BACKWARD);
-
-  printf(" - life sign\n");
+  printf("   - life sign\n");
   lifeSign();
-  delay(3000);
-  printf("ready.\n");
+  delay(0);
+  printf("  End of demo screen.\n");
 }
 
-// // -------------
-// // FreeRTOS TASK
-// // -------------
-// void DriverDisplayC ::task(void) {
-//   // polling loop
-//   while (1) {
-
-//     if (lifeSignCounter > 10) {
-//       lifeSign();
-//       lifeSignCounter = 0;
-//     }
-//     lifeSignCounter++;
-
-//     // sleep for sleep_polling_ms
-//     // this->sleep();
-//   }
-// }
 // } //namespace DriverDisplayC

@@ -202,22 +202,19 @@ void app_main(void) {
     printf("ERROR in init sequence(s). System halted!\n");
     exit(0);
   }
-  printf("-----------------------------------------------------------------\n");
+  printf("\n-----------------------------------------------------------------\n");
   printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
   printf("-----------------------------------------------------------------\n");
 
   // ---- create tasks ----
   if (DISPLAY_ON) {
-    printf(" - draw_display_demo_task\n");
     disp.create_task();
   }
   if (DISPLAY_LARGE_ON) {
     DriverDisplayC::instance()->create_task();
-    printf("done\n");
   }
 
   if (DISPLAY_LARGE_INDICATOR_ON) {
-    printf(" - indicator_task\n");
     indicator.create_task();
   }
   //    if (BLINK_ON) { // not activated
@@ -225,6 +222,7 @@ void app_main(void) {
   //        xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   //    }
   if (ADC_ON) {
+    printf(" - read_adc_task\n");
     xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (DS_ON) {
@@ -240,7 +238,6 @@ void app_main(void) {
     pwm.create_task();
   }
   if (RTC_ON) {
-    printf(" - read_rtc_demo_task\n");
     rtc.create_task();
   }
   if (SD_ON) {
@@ -248,22 +245,18 @@ void app_main(void) {
     xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
-    printf(" - int_report_demo_task\n");
     gpio.create_task();
   }
   if (SIMULATOR_ON) {
-    printf(" - simulator_task\n");
     simulator.create_task();
   }
   if (IOEXT_ON) {
-    printf(" - IOExt2_task\n");
     ioExt.create_task();
   }
   if (DAC_ON) {
     printf(" - DAC DAC DAC\n");
   }
   if (COMMANDHANDLER_ON) {
-    printf(" - command_handler_task\n");
     cmdHandler.create_task();
   }
   if (SERIAL_ON) {

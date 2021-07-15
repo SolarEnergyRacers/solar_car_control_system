@@ -40,13 +40,11 @@ void CmdHandler::task() {
       // read the incoming chars:
       String input = Serial.readString();
 
-#if DEBUGGINGLEVEL_VERBOSED == true // TODO: we could add a global debug level macro (i.e. depending on verbosity a number and
-                                    // activate/deactive printf statements at compile-time)
-      printf("Received: %s\n", input.c_str());
-#endif
+      debug_printf("Received: %s\n", input.c_str());
+
       Serial.flush();
       if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
-        input = "help";
+        input = "h"; // help
       }
 
       if (input.endsWith("\n")) {
@@ -55,7 +53,7 @@ void CmdHandler::task() {
       if (input.endsWith("\r")) {
         input = input.substring(0, input.length() - 1);
       }
-
+      int accValue;
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
@@ -81,24 +79,38 @@ void CmdHandler::task() {
         break;
       case 'm':
         dd->write_speed(atoi(&input[1]));
-        dac.set_pot(atoi(&input[1]), DAC::POT_CHAN0);
+        break;
+      case 'a':
+        accValue = atoi(&input[1]);
+        dd->write_acceleration(accValue);
+        // TODO: where to put in this important
+        // if (accValue > 0) {
+        //   dac.set_pot(accValue, DAC::POT_CHAN0);
+        //   dac.set_pot(0, DAC::POT_CHAN1);
+        // } else if (accValue > 0) {
+        //   dac.set_pot(0, DAC::POT_CHAN0);
+        //   dac.set_pot(accValue, DAC::POT_CHAN1);
+        // } else {
+        //   dac.set_pot(0, DAC::POT_CHAN0);
+        //   dac.set_pot(0, DAC::POT_CHAN1);
+        // }
         break;
       // -------------- chase car commands
       case 'u':
         if (String("off") == String(&input[2])) {
-          printf("%s:%s-->off\n", input.c_str(), &input[2]);
+          debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
           dd->arrow_increase(false);
         } else {
-          printf("%s:%s-->on\n", input.c_str(), &input[2]);
+          debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
           dd->arrow_increase(true);
         }
         break;
       case 'd':
         if (String("off") == String(&input[2])) {
-          printf("%s:%s-->off\n", input.c_str(), &input[2]);
+          debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
           dd->arrow_decrease(false);
         } else {
-          printf("%s:%s-->off\n", input.c_str(), &input[2]);
+          debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
           dd->arrow_decrease(true);
         }
         break;
@@ -118,9 +130,6 @@ void CmdHandler::task() {
       case 'w':
         indicator.setIndicator(INDICATOR::WARN);
         break;
-      case 'a':
-        dd->write_acceleration(atoi(&input[1]));
-        break;
       case 'l':
         dd->light1OnOff();
         break;
@@ -130,15 +139,18 @@ void CmdHandler::task() {
       case 'c':
         if (input[2] == 's') {
           dd->write_constant_mode(CONSTANT_MODE::SPEED);
-        } else {
+        } else if (input[2] == 'p') {
           dd->write_constant_mode(CONSTANT_MODE::POWER);
+        } else {
+          dd->write_constant_mode(CONSTANT_MODE::NONE);
         }
         break;
       // usage
-      case 'h':
       default:
-        printf("Unknown command '%s'\n", input.c_str());
+        printf("ERROR:: Unknown command '%s'\n", input.c_str());
+      case 'h':
         printf("%s", helpText.c_str());
+        break;
       }
     }
     // sleep for some seconds

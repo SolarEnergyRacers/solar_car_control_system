@@ -1,15 +1,15 @@
 //
 // Display
 //
-#include "../../include/LocalFunctionsAndDevices.h"
+#include "LocalFunctionsAndDevices.h"
 
 #ifndef DRIVER_DISPLAY_C_H
 #define DRIVER_DISPLAY_C_H
 
 #define ILI9341 // (320x240)
 
-#include "../../interfaces/abstract_task.h"
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
+#include <abstract_task.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
@@ -21,10 +21,86 @@ extern SemaphoreHandle_t spi_mutex;
 // public structures
 enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-enum class CONSTANT_MODE { SPEED, POWER };
+enum class CONSTANT_MODE { NONE, SPEED, POWER };
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 
 class DriverDisplayC : public abstract_task {
+
+private:
+  //==== Driver Display definition ==== START
+  // display formats and sizes
+  int bgColor = 0x000000;
+  int infoFrameX = 0;
+  int infoFrameY = 0;
+  int infoFrameSizeX = -1; // full tft width, calculated beow
+  int infoFrameSizeY = 64;
+  int infoTextSize = 3;
+
+  // frame around value display (exclude text message lines)
+  int mainFrameX = infoFrameSizeY;
+
+  // speed display
+  int speedFrameX = -1; // get calculated later: (sizeX - speedFrameCx) / 2;
+  int speedFrameY = 80;
+  int speedFrameSizeX = 156;
+  int speedFrameSizeY = 76;
+  int speedTextSize = 8;
+
+  // acceleration display
+  int accFrameX = 2;
+  int accFrameY = 118;    // speedFrameY + speedFrameSizeY / 2
+  int accFrameSizeX = -1; // get calculated later: speedFrameX - 4
+  int accFrameSizeY = 38; // speedFrameSizeY / 2
+  int accTextSize = 4;    // speedTextSize / 2
+
+  // ---- voltage and current displays ---- START
+  int labelLen = 9; // label length for all 3 voltage/current displays
+
+  // battery voltage display
+  int batFrameX = 10;
+  int batFrameY = 180;
+  int batTextSize = 2;
+  int lightTextSize = 2;
+
+  // photovoltaics voltage display
+  int pvFrameX = 10;
+  int pvFrameY = 200;
+  int pvTextSize = 2;
+
+  // motor current display
+  int motorFrameX = 10;
+  int motorFrameY = 220;
+  int motorTextSize = 2;
+  // ---- voltage and current displays ---- END
+
+  // constant mode speed or power display
+  int constantModeX = 250;
+  int constantModeY = 158;
+  int constantModeTextSize = 2;
+
+  // constant mode speed or power display
+  int driveDirectionX = 220;
+  int driveDirectionY = 178;
+  int driveDirectionTextSize = 2;
+
+  // turn indicator arrows
+  int indicatorLeftX = 10;
+  int indicatorY = 92;
+  int indicatorRightX = 310;
+  int indicatorWidth = 30;
+  int indicatorHeight = 20;
+
+  // light on indicator
+  int light1OnX = 250;
+  int light1OnY = 118;
+  int light2OnX = 250;
+  int light2OnY = 138;
+
+  // life sign for connection to microprocessor via rtx
+  int lifeSignX = -1;
+  int lifeSignY = -1;
+  int lifeSignRadius = 4;
+  //==== Driver Display definition ==== END
 
 public:
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
@@ -55,18 +131,17 @@ private:
   void _light2(bool lightOn);
   void _drawCentreString(const String &buf, int x, int y);
   int _getColorForInfoType(INFO_TYPE type);
-  void _turn_Left(int);
-  void _turn_Right(int);
+  void _turn_Left(int color);
+  void _turn_Right(int color);
   bool init_driver_display(void);
 
 public:
   string getName(void);
 
-  void re_init(void);
-  void exit(void);
-
   // RTOS task
   void init(void);
+  void re_init(void);
+  void exit(void);
 
   // public functions
   void draw_display_border(int color);

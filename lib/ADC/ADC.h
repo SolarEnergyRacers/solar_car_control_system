@@ -13,7 +13,7 @@ void read_adc_acceleration_recuperation(void *pvParameter); // adc does not need
 
 class ADC {
 private:
-  ADS1015 ads[NUM_ADC_DEVICES]; // for ADS1115 use: ADS1115 ads[NUM_ADS_DEVICES];
+  ADS1015 adcs[NUM_ADC_DEVICES]; // for ADS1115 use: ADS1115 ads[NUM_ADS_DEVICES];
 public:
   enum Pin { // high nibble: device number, low nibble: port
     // ADC0

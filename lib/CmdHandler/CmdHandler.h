@@ -17,6 +17,7 @@ private:
                     "\t!<text>  - display driver warn text\n"
                     "\tu [off]  - speed up arrow (green)\n"
                     "\td [off]  - speed down arrow (red)\n"
+                    "\tR        - reset and reinit display\n"
                     "\t-------- TEST COMMANDS ------------------\n"
                     "\ts ddd    - speed value [0...999]\n"
                     "\ts [f|b]  - drive forward|backward\n"

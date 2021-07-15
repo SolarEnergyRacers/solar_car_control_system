@@ -10,23 +10,24 @@
 using namespace std;
 
 void abstract_task::init() {
-  // do initialization here
+  // do initialization in implementation here
   printf(" - init '%s'... ", getInfo().c_str());
 };
 
 void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
 
 void abstract_task::create_task() {
-  printf(" - create task '%s'... ", getInfo().c_str());
-  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 1024, (void *)this, 1, NULL);
+  printf(" - create task '%s'...", getInfo().c_str());
+  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, 1, NULL);
+  printf(" done.\n");
 };
 
 void abstract_task::re_init(){
-    // handle reset here
+    // handle reset in implementation here
 };
 
 void abstract_task::exit(){
-    // handle exit here
+    // handle exit in implementation here
 };
 
 string abstract_task::getInfo() { return getName(); }

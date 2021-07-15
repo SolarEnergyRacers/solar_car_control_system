@@ -20,6 +20,6 @@
 #define SIMULATOR_ON false              // Display simulator [TODO]
 #define CAN_ON false                    // CAN bus (MPPT, BMS, ..)
 
-#define DEBUGLEVEL_VERBOSE true
+#define DEBUGLEVEL_VERBOSED true
 
 #endif // LocalFunctionsAndDevices_H

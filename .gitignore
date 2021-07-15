@@ -7,3 +7,5 @@ cmake-build-debug
 # exclude generated config
 sdkconfig
 include/LocalFunctionsAndDevices.h
+src/sdkconfig.h
+sdkconfig.esp32dev

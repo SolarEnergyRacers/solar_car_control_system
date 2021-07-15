@@ -2,48 +2,54 @@
 // Display
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 #include <SPIBus.h>
 
-#include "DriverDisplay.h"
+#include "DriverDisplayC.h"
 #include "Indicator.h"
 
-volatile bool blinkState = false;
-volatile INDICATOR curState = INDICATOR_OFF;
+INDICATOR Indicator::getIndicator() { return curState; }
 
-INDICATOR getIndicator() { return curState; }
-
-void setIndicator(INDICATOR state) {
+void Indicator::setIndicator(INDICATOR state) {
   if (curState == state) {
-    printf("Set indicator '%d' off\n", state);
-    curState = INDICATOR_OFF;
-    indicator_set_and_blink(curState, false);
+    debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
+    curState = INDICATOR::OFF;
+    // DriverDisplayC::indicator_set_and_blink(curState, false);
   } else {
-    printf("Set indicator '%d' on\n", state);
+    debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
     curState = state;
-    indicator_set_and_blink(curState, true);
+    // DriverDisplayC::indicator_set_and_blink(curState, true);
   }
 }
+
+void Indicator::re_init() { init(); }
+
+string Indicator::getName(void) { return "Indicator"; };
+
+void Indicator::exit(void){
+    // TODO
+};
 
 // ------------------
 // FreeRTOS INIT TASK
 // ------------------
-bool init_indicator(void) {
+void Indicator::init(void) {
   printf("[v] Indicator handler inited\n");
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-  return true;
+  vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: why sleep here?
+  // return true; // TODO: restore functionality
 }
 // -------------
 // FreeRTOS TASK
 // -------------
-void indicator_task(void *pvParameter) {
-  // do not add code here -- only controlling the blink frequence
+void Indicator::task() {
+  // do not add code here -- only controlling the blink frequency
   // polling loop
+  DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
-    indicator_set_and_blink(curState, blinkState);
+    dd->indicator_set_and_blink(curState, blinkState);
     blinkState = !blinkState;
 
     // sleep

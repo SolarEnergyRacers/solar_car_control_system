@@ -153,7 +153,7 @@ void CmdHandler::task() {
         break;
       }
     }
-    // sleep for some seconds
-    vTaskDelay(200 / portTICK_PERIOD_MS);
+    // sleep for sleep_polling_ms
+    this->sleep(200);
   }
 }

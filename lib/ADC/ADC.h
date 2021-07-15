@@ -8,8 +8,8 @@
 #include <ADS1X15.h> // ADS1x15
 #include <definitions.h>
 
-void read_adc_acceleration_recuperation(void *pvParameter); // adc does not need its own task, therefore we let this demo task outside of
-                                                            // the class structure instead of extending the abstract task class
+// void read_adc_acceleration_recuperation(void *pvParameter); // adc does not need its own task, therefore we let this demo task outside of
+//                                                             // the class structure instead of extending the abstract task class
 
 class ADC {
 private:
@@ -31,7 +31,9 @@ public:
   void init();
   void re_init();
   int16_t read(Pin port);
+  int read_adc_acceleration_recuperation(void);
   int normalize(int value, int maxValue);
+  int normalize2(int value, int maxValue, int min, int max);
 };
 
 #endif // ADC_H

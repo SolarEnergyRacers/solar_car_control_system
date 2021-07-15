@@ -8,8 +8,10 @@
 
 #define ILI9341 // (320x240)
 
+#include <ADS1X15.h>          // ADS1x15
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
 #include <abstract_task.h>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
@@ -121,6 +123,7 @@ private:
   static DriverDisplayC *_instance;
 
   // put private/internal variables/functions here
+  void _setup(void);
   uint32_t sleep_polling_ms = 1000;
   float _write_float(int x, int y, float valueLast, float value, int textSize, int color);
   int _write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color);

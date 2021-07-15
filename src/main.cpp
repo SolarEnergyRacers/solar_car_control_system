@@ -55,9 +55,9 @@ void app_main(void);
 using namespace std;
 // using namespace DriverDisplayC;
 
-#if ADC_ON
+//#if ADC_ON
 ADC adc;
-#endif
+//#endif
 
 //#if CAN_ON // TODO: gets a linking-error if we set CAN_ON to true
 CanBus can;
@@ -221,10 +221,10 @@ void app_main(void) {
   //        printf(" - blink_demo_task\n");
   //        xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   //    }
-  if (ADC_ON) {
-    printf(" - read_adc_task\n");
-    xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  }
+  // if (ADC_ON) {
+  //   printf(" - read_adc_task\n");
+  //   xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  // }
   if (DS_ON) {
     printf(" - read_ds_demo_task\n");
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);

@@ -25,6 +25,7 @@ public:
   string getInfo(void);
 
   void sleep(void);
+  void sleep(int polling_ms);
 
   void create_task(void);
   static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };

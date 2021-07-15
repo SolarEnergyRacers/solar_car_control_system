@@ -15,6 +15,7 @@ void abstract_task::init() {
 };
 
 void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
+void abstract_task::sleep(int polling_ms) { vTaskDelay(polling_ms / portTICK_PERIOD_MS); };
 
 void abstract_task::create_task() {
   printf(" - create task '%s'...", getInfo().c_str());

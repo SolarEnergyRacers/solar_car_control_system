@@ -126,7 +126,7 @@ int ADC::read_adc_acceleration_recuperation() {
     //            // write motor acceleration and recuperation values
     //            set_pot(accel, pot_chan::POT_CHAN0);
     //            set_pot(recup, pot_chan::POT_CHAN1);
-   accDisplayLast = (int)((accDisplayLast * 4 + accDisplay) / 5);
+    accDisplayLast = (int)((accDisplayLast * 4 + accDisplay) / 5);
   }
   return accDisplayLast;
 }

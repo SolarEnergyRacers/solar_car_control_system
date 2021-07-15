@@ -106,7 +106,7 @@ int ADC::read_adc_acceleration_recuperation() {
     if (recupChanged) {
       recupLast = value1;
       // recup = adc.normalize(value1, 100);
-      recup = adc.normalize2(value1, 10, 350, 1000);
+      recup = adc.normalize2(value1, 30, 300, 800);
     }
     // priority controll: recuperation wins
     if (recup > 0) {
@@ -115,7 +115,7 @@ int ADC::read_adc_acceleration_recuperation() {
       if (accelChanged) {
         accelLast = value0;
         // accel = adc.normalize(value0, 100);
-        accel = adc.normalize2(value0, 10, 350, 1000);
+        accel = adc.normalize2(value0, 30, 600, 1000);
       }
       accDisplay = accel;
     }

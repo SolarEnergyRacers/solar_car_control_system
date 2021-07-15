@@ -241,7 +241,6 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
     tft.print(sign);
     //}
   }
-
   xSemaphoreGive(spiBus.mutex);
 
   return value;

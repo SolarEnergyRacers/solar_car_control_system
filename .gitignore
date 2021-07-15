@@ -13,3 +13,5 @@ extras/automation/geckodriver.log
 extras/automation/config-bg.yaml
 extras/automation/howto-BG.md
 extras/automation/loginGuest.html
+extras/automation/geckodriver.exe
+extras/automation/config.yaml

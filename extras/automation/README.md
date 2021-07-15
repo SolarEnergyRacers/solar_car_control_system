@@ -1,3 +1,7 @@
+# Autologin Guest WLAN
+
+[TOC]
+
 ## Captive Portal Login
 
 This script allows automatic login to the captive portal using selenium browser automation.
@@ -16,3 +20,19 @@ Hints e.g here: [how-do-i-install-geckodriver](https://stackoverflow.com/questio
 - [ ] Adjust the XPATH in the script to match the login fields
 - [ ] Possibly add `Terms of Use` check field
 - [ ] Possibly adjust the command for the enter command
+
+## Python Packages
+
+```bash
+pip install pyyaml
+
+pip install selenium
+```
+
+
+
+## Scheduler
+
+```bash
+C:\Users\SER\guestLogin>schtasks /create /tn "Guest relogin" /tr "python captive_portal.py" /sc hourly /mo 6 /st 00:05
+```

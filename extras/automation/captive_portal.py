@@ -17,6 +17,11 @@ if __name__ == "__main__":
     with open(os.path.join(os.path.dirname(__file__), "config.yaml")) as file:
         config = yaml.load(file, Loader=yaml.FullLoader)
 
+    # connect to WLAN
+    wlan = config.get("wlan_name")
+    os.system(f'''netsh wlan connect name="{wlan}"''')
+    print(f'''connected to {wlan}''')
+
     # get browser control instance
     browser = webdriver.Firefox(webdriver.FirefoxProfile())
 
@@ -40,8 +45,7 @@ if __name__ == "__main__":
     termsofuse.click()
 
     # click login button
-    # login_btn = browser.find_element_by_name("LOGIN")
-    login_btn = browser.find_element_by_type("SUBMIT")
+    login_btn = browser.find_element_by_xpath(config.get("submit_button__Xpath"))
     login_btn.click()
 
     time.sleep(debug_sleep)
@@ -53,5 +57,13 @@ if __name__ == "__main__":
     # time.sleep(debug_sleep)
 
     # browser cleanup and close
-    browser.delete_all_cookies()
-    browser.close()
+    try:
+        browser.delete_all_cookies()
+    except:
+        print("ERROR: delete all cookies faild.")
+    try:
+        browser.close()
+    except:
+        print("ERROR: browser close faild.")
+    
+    print("fin.")

@@ -242,7 +242,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
     tft.print(sign);
     //}
   }
-  debug_printf("%c\n",'$');
+  debug_printf("%c\n", '$');
 
   xSemaphoreGive(spiBus.mutex);
 

@@ -148,6 +148,10 @@ int ADC::read_adc_acceleration_recuperation() {
                    "ACCEL-DISPLAY: %d\n",
                    valueRec, recupNorm, valueAcc, accelNorm, accDisplayLast);
     }
+
+    // write motor acceleration and recuperation values
+    //            set_pot(accel, pot_chan::POT_CHAN0);
+    //            set_pot(recup, pot_chan::POT_CHAN1);
   }
   justInited = false;
   return accDisplayLast;

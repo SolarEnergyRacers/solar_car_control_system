@@ -5,7 +5,7 @@
 #ifndef IOEXT_H
 #define IOEXT_H
 
-#include <PCF8574.h> // PCF8574
+#include <PCF8574.h>
 #include <definitions.h>
 
 class IOExt : public abstract_task {

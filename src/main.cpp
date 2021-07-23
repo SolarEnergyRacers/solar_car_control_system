@@ -55,72 +55,29 @@ void app_main(void);
 using namespace std;
 // using namespace DriverDisplayC;
 
-//#if ADC_ON
 ADC adc;
-//#endif
-
-//#if CAN_ON // TODO: gets a linking-error if we set CAN_ON to true
-CanBus can;
-//#endif
-
+CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
 OneWireBus oneWireBus;
 SPIBus spiBus;
 I2CBus i2cBus;
-
-//#if DS_ON
-Temp ds;
-//#endif
-
-//#if SD_ON
+Temp ds; // temperature
 SDCard sdCard;
-//#endif
-
-//#if COMMANDHANDLER_ON
 CmdHandler cmdHandler;
-//#endif
-
-//#if DAC_ON
 DAC dac;
-//#endif
-
-//#if SERIAL_ON
-Uart uart;
-//#endif
-
-//#if GYRO_ACC_ON
+Uart uart; // SERIAL
 GyroAcc gyroAcc;
-//#endif
-
-//#if DISPLAY_LARGE_INDICATOR_ON
-Indicator indicator;
-//#endif
-
-//#if IOEXT_ON
+Indicator indicator; // DISPLAY_LARGE_INDICATOR_ON
 IOExt ioExt;
-//#endif
-
-//#if PWM_ON
 PWM pwm;
-//#endif
-
-//#if DISPLAY_ON
 Display disp;
-//#endif
-
-//#if RTC_ON
 RTC rtc;
-//#endif
-
-//#if INT_ON
-GPInputOutput gpio;
-//#endif
-
-//#if SIMULATOR_ON
+GPInputOutput gpio; // I2C Interrupts
 Simulator simulator;
-//#endif
+
+bool startOk = true;
+bool systemOk = false;
 
 void app_main(void) {
-  bool startOk = true;
 
   // init arduino library
   initArduino();
@@ -267,6 +224,9 @@ void app_main(void) {
     printf(" - read_can_demo_task\n");
     xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
+
+  systemOk = true;
+
   printf("-----------------------------------------------------------------\n");
   printf("Creating FreeRTOS tasks successful. System running.\n");
   printf("-----------------------------------------------------------------\n\n");

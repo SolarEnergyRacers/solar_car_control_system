@@ -19,114 +19,136 @@ extern ADC adc;
 void ADC::re_init() { ADC::init(); }
 
 void ADC::init() {
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // instantiate the devices with their corresponding address
-  adcs[2] = ADS1015(I2C_ADDRESS_ADS1x15_0);
-  adcs[1] = ADS1015(I2C_ADDRESS_ADS1x15_1);
-  adcs[0] = ADS1015(I2C_ADDRESS_ADS1x15_2);
+  ads_addrs[0] = 0; // I2C_ADDRESS_ADS1x15_0;
+  ads_addrs[1] = 0; // I2C_ADDRESS_ADS1x15_1;
+  ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
 
-  // init library
-  // for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-  for (int idx = 0; idx < 1; idx++) {
-    // for (auto ads : ADC::adcs) {
-    ADS1015 ads = adcs[idx];
-    printf("  Initializing ADS[%d] ...\n", idx);
-    bool result = ads.begin();
-    if (!result) {
-      printf("ERROR\n");
+  for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
+    if (ads_addrs[idx] == 0) {
       continue;
     }
+    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+    adss[idx] = ADS1115(ads_addrs[idx]);
+
+    printf("  Initializing ADC[%d] with address 0x%x ...", idx, ads_addrs[idx]);
+    bool result = adss[idx].begin();
+    if (!result) {
+      printf(" ERROR: Wrong ADS1x15 address 0x%x.\n", ads_addrs[idx]);
+      xSemaphoreGive(i2cBus.mutex);
+      continue;
+    }
+    printf("\n");
     // set gain amplifier value
     // 2/3x gain +/- 6.144V
     // 1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
-    ads.setGain(0);
+    adss[idx].setGain(0);
 
     // conversion factor:
     // bit-value -> mV: 2/3x gain +/- 6.144V
     // 1 bit = 3mV (ADS1015) 0.1875mV (ADS1115)
-    float multiplier = ads.toVoltage(1); // voltage factor
+    float multiplier = adss[idx].toVoltage(1); // voltage factor
 
-    printf("    Max voltage: %f\n", ads.getMaxVoltage());
+    printf("    Max voltage=%f with multiplier=%f\n", adss[idx].getMaxVoltage(), multiplier);
     // read all inputs & report
     for (int i = 0; i < 4; i++) {
-      int16_t value = ads.readADC(i);
-      printf("    [ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
+      int16_t value = adss[idx].readADC(i);
+      printf("      [ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
     }
-    printf("[v] ADS[%d] initialized.\n", idx);
+    adss[idx].setDataRate(3);
+    xSemaphoreGive(i2cBus.mutex);
+
+    adjustMin_acceleration_recuperation();
+    printf("[v] ADC[%d] initialized.\n", idx);
   }
-  xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
+}
+
+void ADC::adjustMin_acceleration_recuperation() {
+  ads_min_acceleration = adc.read(ADC::Pin::STW_ACC) + minAdjustGap;
+  ads_min_recuperation = adc.read(ADC::Pin::STW_DEC) + minAdjustGap;
+  accDisplayLast = 0;
+  justInited = false;
+  printf("MIN values set recuperation: %5d, acceleration: %5d\n", ads_min_recuperation, ads_min_acceleration);
+}
+
+void ADC::adjustMax_acceleration_recuperation() {
+  ads_max_acceleration = adc.read(ADC::Pin::STW_ACC) + maxAdjustGap;
+  ads_max_recuperation = adc.read(ADC::Pin::STW_DEC) + maxAdjustGap;
+  accDisplayLast = 0;
+  justInited = false;
+  printf("MAX values set recuperation: %5d, acceleration: %5d\n", ads_max_recuperation, ads_max_acceleration);
 }
 
 int16_t ADC::read(ADC::Pin port) {
 
-  int index = port >> 4;
+  int idx = port >> 4;
   int pin = port & 0xf;
   // debug_printf("index: %d, pin: %d\n", index, pin);
 
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  int16_t value = ADC::adcs[index].readADC(pin);
+  int16_t value = ADC::adss[idx].readADC(pin);
   xSemaphoreGive(i2cBus.mutex);
 
   return value;
 }
 
 int ADC::normalize(int value, int maxValue) { return (int)(maxValue * value / 1024); }
+
 int ADC::normalize2(int value, int maxValue, int min, int max) {
   int delta = max - min;
   int v = value - min;
-  return (int)(v * maxValue / delta);
+  int retValue = (int)(v * maxValue / delta);
+  if (abs(retValue) < 5) {
+    retValue = 0;
+  }
+  return retValue;
 }
 
-int16_t accelLast = 0;
-int16_t recupLast = 0;
-int16_t accDisplayLast = 0;
-
 int ADC::read_adc_acceleration_recuperation() {
-  int16_t accel = 0;
-  int16_t recup = 0;
+  int16_t accelNorm = 0;
+  int16_t recupNorm = 0;
   int16_t accDisplay = 0;
 
-  int16_t value0 = adc.read(ADC::Pin::STW_ACC);
-  int16_t value1 = adc.read(ADC::Pin::STW_DEC);
-
-  if (value0 < 0 || value0 > 2000 || value1 < 0 || value1 > 2000) {
+  int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
+  int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
+  // debug_printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
+  if (valueRec < ads_min_recuperation || valueRec > ads_max_recuperation) {
     // filter artefacts
-    value0 = accelLast;
-    value1 = recupLast;
+    valueRec = recupLast;
   }
 
-  bool accelChanged = abs(accelLast - value0) > 10;
-  bool recupChanged = abs(recupLast - value1) > 10;
+  if (valueAcc < ads_min_acceleration || valueAcc > ads_max_acceleration) {
+    // filter artefacts
+    valueAcc = accelLast;
+  }
 
-  if (accelChanged | recupChanged) {
+  bool accelChanged = abs(accelLast - valueAcc) > 3;
+  bool recupChanged = abs(recupLast - valueRec) > 3;
 
+  if (accelChanged | recupChanged | justInited) {
     if (recupChanged) {
-      recupLast = value1;
-      // recup = adc.normalize(value1, 100);
-      recup = adc.normalize2(value1, 30, 300, 800);
+      recupLast = valueRec;
+      recupNorm = adc.normalize2(valueRec, 99, ads_min_recuperation, ads_max_recuperation);
     }
     // priority controll: recuperation wins
-    if (recup > 0) {
-      accDisplay = -recup;
+    if (recupNorm > 0) {
+      accDisplay = -recupNorm;
     } else {
       if (accelChanged) {
-        accelLast = value0;
-        // accel = adc.normalize(value0, 100);
-        accel = adc.normalize2(value0, 30, 600, 1000);
+        accelLast = valueAcc;
+        accelNorm = adc.normalize2(valueAcc, 99, ads_min_acceleration, ads_max_acceleration);
       }
-      accDisplay = accel;
+      accDisplay = accelNorm;
     }
-    debug_printf("Recuperation:  %4d --> %4d | Acceleration: %4d --> %4d | ACCEL-DISPLAY: %d\n", value1, recup, value0, accel, accDisplay);
-    //            // write driver display info // TODO: reactivate whenever we can get the display instance similar to extern ADC adc;
-    //            arrow_increase(accel > 0 ? true : false);
-    //            arrow_decrease(recup > 0 ? true : false);
-    //            // write motor acceleration and recuperation values
-    //            set_pot(accel, pot_chan::POT_CHAN0);
-    //            set_pot(recup, pot_chan::POT_CHAN1);
-   accDisplayLast = (int)((accDisplayLast * 4 + accDisplay) / 5);
+
+    if (accDisplay != accDisplayLast) {
+      accDisplayLast = (int)((accDisplayLast * 0 + accDisplay) / 1);
+      debug_printf("Recu (v0):  %5d --> %3d | Accel (v1): %5d --> %3d | "
+                   "ACCEL-DISPLAY: %d\n",
+                   valueRec, recupNorm, valueAcc, accelNorm, accDisplayLast);
+    }
   }
+  justInited = false;
   return accDisplayLast;
 }

@@ -7,17 +7,23 @@
 #include <freertos/task.h>
 
 #include <Arduino.h>
+#include <I2CBus.h>
 #include <Wire.h> // I2C
 #include <inttypes.h>
 #include <stdio.h>
 
+#include "ADC.h"
 #include "CmdHandler.h"
 #include "DAC.h"
 #include "DriverDisplayC.h"
 #include "Helper.h"
+#include "IOExt.h"
 #include "Indicator.h"
 
+extern I2CBus i2cBus;
 extern DAC dac;
+extern ADC adc;
+extern IOExt ioExt;
 extern Indicator indicator;
 
 void CmdHandler::re_init() { init(); }
@@ -37,6 +43,7 @@ void CmdHandler::task() {
   while (1) {
 
     while (Serial.available() > 0) {
+      int value = 0;
       // read the incoming chars:
       String input = Serial.readString();
 
@@ -59,6 +66,15 @@ void CmdHandler::task() {
       case 'R':
         dd->re_init();
         break;
+      case 'S':
+        printSystemValues();
+        break;
+      case '-':
+        adc.adjustMin_acceleration_recuperation();
+        break;
+      case '=':
+        adc.adjustMax_acceleration_recuperation();
+        break;
       case 's':
         if (input[2] == 'f') {
           dd->write_drive_direction(DRIVE_DIRECTION::FORWARD);
@@ -74,11 +90,8 @@ void CmdHandler::task() {
       case 'p':
         dd->write_pv(atof(&input[1]));
         break;
-      case 'M':
-        dd->write_motor(atof(&input[1]));
-        break;
       case 'm':
-        dd->write_speed(atoi(&input[1]));
+        dd->write_motor(atof(&input[1]));
         break;
       case 'a':
         accValue = atoi(&input[1]);
@@ -95,6 +108,20 @@ void CmdHandler::task() {
         //   dac.set_pot(0, DAC::POT_CHAN1);
         // }
         break;
+      case 'A':
+        value = atoi(&input[1]);
+        if (value > 0) {
+          dac.set_pot(value, DAC::POT_CHAN0);
+          dac.set_pot(0, DAC::POT_CHAN1);
+        } else if (value < 0) {
+          dac.set_pot(0, DAC::POT_CHAN0);
+          dac.set_pot(value, DAC::POT_CHAN1);
+        } else {
+          dac.set_pot(0, DAC::POT_CHAN0);
+          dac.set_pot(0, DAC::POT_CHAN1);
+        }
+        break;
+
       // -------------- chase car commands
       case 'u':
         if (String("off") == String(&input[2])) {
@@ -156,4 +183,18 @@ void CmdHandler::task() {
     // sleep for sleep_polling_ms
     this->sleep(200);
   }
+}
+
+void CmdHandler::printSystemValues() {
+
+  int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
+  int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
+  printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
+
+  printf("IOExt2:");
+  for (int idx = 0; idx < 8; idx++) {
+    printf(" %d", ioExt.get_ioext(idx));
+    if(idx == 3) {printf(" - ");}
+  }
+  printf("\n");
 }

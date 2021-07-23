@@ -120,7 +120,12 @@ protected:
   DriverDisplayC() {}
 
 private:
+  enum class DISPLAY_STATUS { SETUP, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
+  template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
+    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
+  }
   static DriverDisplayC *_instance;
+  static DISPLAY_STATUS status;
 
   // put private/internal variables/functions here
   void _setup(void);

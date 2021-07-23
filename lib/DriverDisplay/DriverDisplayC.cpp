@@ -31,6 +31,7 @@
 
 extern SPIBus spiBus;
 extern ADC adc;
+extern bool systemOk;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // namespace DriverDisplayC {
@@ -50,19 +51,19 @@ bool light2On = false;
 //=======================================
 
 DriverDisplayC *DriverDisplayC::_instance = 0;
+DriverDisplayC::DISPLAY_STATUS DriverDisplayC::status = DISPLAY_STATUS::SETUP;
 
 string DriverDisplayC ::getName() { return "Display0 (driver display)"; };
 
 void DriverDisplayC ::init() {
   abstract_task::init();
-  _setup();
-  driver_display_demo_screen();
-  draw_display_background();
+  re_init();
+  status = DISPLAY_STATUS::DISPLAY_DEMOSCREEN;
 }
 
 void DriverDisplayC ::re_init(void) {
   _setup();
-  draw_display_background();
+  status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
 }
 
 void DriverDisplayC ::_setup() {
@@ -86,8 +87,7 @@ void DriverDisplayC ::_setup() {
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
     printf("[v] Display0 (driver display) inited: screen %d x %d.\n", tft.height(), tft.width());
   } catch (__exception ex) {
-    printf("[x] Display0 (driver display): Unable to initialize screen "
-           "ILI9341.\n");
+    printf("[x] Display0 (driver display): Unable to initialize screen ILI9341.\n");
   }
   xSemaphoreGive(spiBus.mutex);
 }
@@ -100,14 +100,35 @@ void DriverDisplayC ::exit() {}
 void DriverDisplayC ::task(void) {
   // polling loop
   while (1) {
-
-    if (lifeSignCounter > 10) {
-      lifeSign();
-      lifeSignCounter = 0;
-      int accDisplayValue = adc.read_adc_acceleration_recuperation();
-      write_acceleration(accDisplayValue);
+    switch (status) {
+    case DISPLAY_STATUS::DISPLAY_DEMOSCREEN:
+      draw_display_background();
+      driver_display_demo_screen();
+      status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
+      break;
+    case DISPLAY_STATUS::DISPLAY_BACKGROUND:
+      draw_display_background();
+      status = DISPLAY_STATUS::WORK;
+      break;
+    default:
+      if (lifeSignCounter > 10) {
+        lifeSign();
+        lifeSignCounter = 0;
+        int accDisplayValue = adc.read_adc_acceleration_recuperation();
+        write_acceleration(accDisplayValue);
+        // write driver display info // TODO: reactivate whenever we can get the display instance similar to extern ADC adc;
+        if (accDisplayValue > 0) {
+          arrow_increase(true);
+        } else if (accDisplayValue < 0) {
+          arrow_decrease(true);
+        } else {
+          arrow_increase(false);
+          arrow_decrease(false);
+        }
+      }
+      lifeSignCounter++;
+      break;
     }
-    lifeSignCounter++;
     // sleep for sleep_polling_ms
     this->sleep(20);
   }
@@ -150,7 +171,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d0 != d0o || d0o == 0) {
+  if (d0 != d0o){   // || d0o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 5, y);
     tft.printf(".%d", d0);
@@ -199,8 +220,6 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
     printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'", value);
     return value;
   }
-  int digitWidth = textSize * 6;
-  int digitHeight = textSize * 8;
   // determine the sign of new and old value
   char sign = value < 0 ? '-' : '+';
   char signOld = valueLast < 0 ? '-' : '+';
@@ -220,9 +239,11 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
+  int digitWidth = textSize * 6;
+  int digitHeight = textSize * 8;
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o || d1o == 0) {
+  if (d1 != d1o ){//|| d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
@@ -271,7 +292,7 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o || d1o == 0) {
+  if (d1 != d1o){ //} || d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
@@ -710,9 +731,6 @@ void DriverDisplayC ::driver_display_demo_screen() {
   // CRITICAL SECTION SPI: end
   // ---- for power measurement: end
 #endif
-
-  printf("   - background\n");
-  draw_display_background();
   printf("   - driver info\n");
   write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
   printf("   - hazzard warn\n");

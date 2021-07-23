@@ -13,7 +13,19 @@
 
 class ADC {
 private:
-  ADS1015 adcs[NUM_ADC_DEVICES]; // for ADS1115 use: ADS1115 ads[NUM_ADS_DEVICES];
+  ADS1115 adss[NUM_ADC_DEVICES]; // for ADS1115 use: ADS1115 ads[NUM_ADS_DEVICES];
+  int ads_addrs[NUM_ADC_DEVICES];
+  int16_t ads_min_recuperation = 8000;
+  int16_t ads_min_acceleration = 10000;
+  int16_t ads_max_recuperation = 12000;
+  int16_t ads_max_acceleration = 15000;
+  int minAdjustGap = 10; // 0...Gap units show 0 (real reachable null point)
+  int maxAdjustGap = 10; // max ... max+Gap to avoid max higher then adjusted max
+  int16_t accelLast = 0;
+  int16_t recupLast = 0;
+  int16_t accDisplayLast = 0;
+  bool justInited = true;
+
 public:
   enum Pin { // high nibble: device number, low nibble: port
     // ADC0
@@ -31,6 +43,8 @@ public:
   void init();
   void re_init();
   int16_t read(Pin port);
+  void adjustMin_acceleration_recuperation();
+  void adjustMax_acceleration_recuperation();
   int read_adc_acceleration_recuperation(void);
   int normalize(int value, int maxValue);
   int normalize2(int value, int maxValue, int min, int max);

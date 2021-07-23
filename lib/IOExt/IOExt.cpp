@@ -65,13 +65,11 @@ void IOExt::speedCheck(int speed) {
 void IOExt::handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
   PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
+  xSemaphoreGive(i2cBus.mutex);
 
   if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
-    taskSleep = 50;               // default value for fast reaction to pressed button
-    xSemaphoreGive(i2cBus.mutex); /// TODO_KSC:move directly after digitalReadAll
-    // CRITICAL SECTION I2C: end
+    taskSleep = 50; // default value for fast reaction to pressed button
     return;
   }
 
@@ -130,8 +128,6 @@ void IOExt::handleIoInterrupt() {
     }
     dd->write_acceleration(acceleration);
   }
-  xSemaphoreGive(i2cBus.mutex); // TODO_KSC: remove
-                                // CRITICAL SECTION I2C: end
 }
 
 void IOExt::set_ioext(int port, bool value) {
@@ -140,13 +136,9 @@ void IOExt::set_ioext(int port, bool value) {
     return;
   }
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
   IOExt2.digitalWrite(port, value);
-
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 }
 
 int IOExt::get_ioext(int port) {
@@ -155,13 +147,9 @@ int IOExt::get_ioext(int port) {
     return -1;
   }
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
-  int value = IOExt2.digitalRead(P0);
-
+  int value = IOExt2.digitalRead(port);
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 
   return value;
 }

@@ -171,7 +171,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d0 != d0o){   // || d0o == 0) {
+  if (d0 != d0o) { // || d0o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 5, y);
     tft.printf(".%d", d0);
@@ -243,7 +243,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
   int digitHeight = textSize * 8;
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o ){//|| d1o == 0) {
+  if (d1 != d1o) { //|| d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
@@ -292,7 +292,7 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o){ //} || d1o == 0) {
+  if (d1 != d1o) { //} || d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);

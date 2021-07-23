@@ -194,7 +194,9 @@ void CmdHandler::printSystemValues() {
   printf("IOExt2:");
   for (int idx = 0; idx < 8; idx++) {
     printf(" %d", ioExt.get_ioext(idx));
-    if(idx == 3) {printf(" - ");}
+    if (idx == 3) {
+      printf(" - ");
+    }
   }
   printf("\n");
 }

@@ -98,7 +98,7 @@ void app_main(void) {
   i2cBus.init();
   spiBus.init();
 
-  //i2cBus.scan_i2c_devices();
+  // i2cBus.scan_i2c_devices();
 
   // ---- init modules ----
   if (BLINK_ON) {

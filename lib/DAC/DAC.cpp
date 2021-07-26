@@ -44,7 +44,7 @@ uint8_t DAC::get_cmd(pot_chan channel) {
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
-channel = POT_CHAN_ALL;
+  channel = POT_CHAN_ALL;
   // setup command
   uint8_t command = get_cmd(channel);
 

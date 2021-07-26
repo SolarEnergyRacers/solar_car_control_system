@@ -77,7 +77,7 @@ int16_t ADC::read(ADC::Pin port) {
   xSemaphoreGive(i2cBus.mutex);
 
   debug_printf_l2("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
-  delay(10); //TODO: necessary?
+  delay(10); // TODO: necessary?
   return value;
 }
 

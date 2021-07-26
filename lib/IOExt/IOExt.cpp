@@ -15,6 +15,9 @@
 extern I2CBus i2cBus;
 extern Indicator indicator;
 
+extern CONSTANT_MODE constant_drive_mode;
+extern bool constant_drive_set;
+
 void IOExt::re_init() { init(); }
 
 void IOExt::init() {
@@ -75,15 +78,16 @@ void IOExt::handleIoInterrupt() {
 
   taskSleep = 100; // debounce button
 
-  printf("PCF %ld: %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
+  debug_printf("PCF (%ldms): %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
 
+  // PCF8574:2 pin assignment
   bool left = !dra.p0;
-  bool right = !dra.p1;
-  bool speedPowerControlOnOff = !dra.p2;
-  bool speedPowerControlMode = !dra.p3;
-  bool horn = !dra.p4;
-  bool positionLights = !dra.p5;
-  bool drivingLights = !dra.p6;
+  bool right = !dra.p3;
+  bool speedPowerControlOnOff = !dra.p5;
+  bool speedPowerControlMode = !dra.p4;
+  bool horn = !dra.p6;
+  bool positionLights = !dra.p2;
+  bool drivingLights = !dra.p1;
   bool nextScreen = !dra.p7;
 
   DriverDisplayC *dd = DriverDisplayC::instance();
@@ -97,37 +101,63 @@ void IOExt::handleIoInterrupt() {
     indicator.setIndicator(INDICATOR::RIGHT);
   }
   if (positionLights) {
+    printf("Position lights on/off\n");
     dd->light1OnOff();
   }
   if (drivingLights) {
+    printf("Driving lights on/off\n");
     dd->light2OnOff();
   }
-
-  // Simulation
   if (speedPowerControlOnOff) {
-    speed += 10;
-    dd->write_speed(speed);
-    speedCheck(speed);
+    if (constant_drive_set) {
+      dd->constant_drive_off();
+      printf("Constand mode OFF\n");
+    } else {
+      dd->constant_drive_on();
+      printf("Constand mode ON\n");
+    }
   }
   if (speedPowerControlMode) {
-    speed -= 10;
-    if (speed < 0) {
-      speed = 0;
+    if (constant_drive_mode == CONSTANT_MODE::SPEED) {
+      dd->constant_drive_mode_set(CONSTANT_MODE::POWER);
+      printf("Constant mode switch to POWER\n");
+    } else {
+      dd->constant_drive_mode_set(CONSTANT_MODE::SPEED);
+      printf("Constant mode switch to SPEED\n");
     }
-    dd->write_speed(speed);
-    speedCheck(speed);
   }
   if (horn) {
-    acceleration += 10;
-    dd->write_acceleration(acceleration);
+    printf("Horn\n");
   }
   if (nextScreen) {
-    acceleration -= 10;
-    if (acceleration < 0) {
-      acceleration = 0;
-    }
-    dd->write_acceleration(acceleration);
+    printf("Next screen\n");
   }
+
+  // // Simulation
+  // if (speedPowerControlOnOff) {
+  //   speed += 10;
+  //   dd->write_speed(speed);
+  //   speedCheck(speed);
+  // }
+  // if (speedPowerControlMode) {
+  //   speed -= 10;
+  //   if (speed < 0) {
+  //     speed = 0;
+  //   }
+  //   dd->write_speed(speed);
+  //   speedCheck(speed);
+  // }
+  // if (horn) {
+  //   acceleration += 10;
+  //   dd->write_acceleration(acceleration);
+  // }
+  // if (nextScreen) {
+  //   acceleration -= 10;
+  //   if (acceleration < 0) {
+  //     acceleration = 0;
+  //   }
+  //   dd->write_acceleration(acceleration);
+  // }
 }
 
 void IOExt::set_ioext(int port, bool value) {
@@ -164,7 +194,7 @@ void IOExt::task() {
     if (ioInterruptRequest && !isInInterruptHandler) {
       isInInterruptHandler = true;
       handleIoInterrupt();
-      // ioInterruptRequest = false;
+      ioInterruptRequest = false;
       isInInterruptHandler = false;
     }
     // sleep

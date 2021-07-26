@@ -11,7 +11,7 @@ using namespace std;
 
 void abstract_task::init() {
   // do initialization in implementation here
-  printf(" - init '%s'... ", getInfo().c_str());
+  printf("    Init '%s'... ", getInfo().c_str());
 };
 
 void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };

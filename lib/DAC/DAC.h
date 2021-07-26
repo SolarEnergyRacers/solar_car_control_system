@@ -9,8 +9,8 @@ class DAC {
 private:
 public:
   enum pot_chan {
-    POT_CHAN0 = 0,
-    POT_CHAN1 = 1,
+    POT_CHAN0 = 0,  //acceleration input
+    POT_CHAN1 = 1,  //deceleration (recuperation) input
     POT_CHAN_ALL = 2,
   };
   void init();

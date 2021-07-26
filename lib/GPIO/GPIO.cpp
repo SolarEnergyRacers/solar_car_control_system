@@ -12,31 +12,6 @@
 
 #include "GPIO.h"
 
-// void blink_demo_task(void *pvParameter) {
-//
-//  // configure the IOMUX register for pad LED_BUILTIN
-//  gpio_pad_select_gpio(LED_BUILTIN);
-//
-//  // set the GPInputOutput as a push/pull output
-//  gpio_set_direction(LED_BUILTIN, GPIO_MODE_OUTPUT);
-//
-//  // polling loop
-//  while (1) {
-//
-//    // blink off (output low)
-//    gpio_set_level(LED_BUILTIN, 0);
-//
-//    // sleep for 1s
-//    vTaskDelay(1000 / portTICK_PERIOD_MS);
-//
-//    // blink on (output high)
-//    gpio_set_level(LED_BUILTIN, 1);
-//
-//    // sleep for 1s
-//    vTaskDelay(1000 / portTICK_PERIOD_MS);
-//  }
-//}
-
 void GPInputOutput::re_init() { init(); }
 
 void GPInputOutput::init() {

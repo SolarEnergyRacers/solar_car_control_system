@@ -48,6 +48,8 @@ float pvLast = -1;
 float motorLast = -1;
 bool light1On = false;
 bool light2On = false;
+CONSTANT_MODE constant_drive_mode = CONSTANT_MODE::SPEED;
+bool constant_drive_set = false;
 //=======================================
 
 DriverDisplayC *DriverDisplayC::_instance = 0;
@@ -72,20 +74,20 @@ void DriverDisplayC ::_setup() {
   tft.begin();
   printf("done.\n");
   try {
-    printf("  Display0 (driver display) initializing...\n");
+    printf("      Display0 (driver display) initializing...\n");
     uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-    printf("    Display Power Mode: 0x%x\n", x);
+    printf("      Display Power Mode: 0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDMADCTL);
-    printf("    MADCTL Mode:        0x%x\n", x);
+    printf("      MADCTL Mode:        0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDPIXFMT);
-    printf("    Pixel Format:       0x%x\n", x);
+    printf("      Pixel Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDIMGFMT);
-    printf("    Image Format:       0x%x\n", x);
+    printf("      Image Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDSELFDIAG);
-    printf("    Self Diagnostic:    0x%x\n", x);
+    printf("      Self Diagnostic:    0x%x\n", x);
     infoFrameSizeX = tft.width();
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
-    printf("[v] Display0 (driver display) inited: screen %d x %d.\n", tft.height(), tft.width());
+    printf("[v] Display0 (driver display) inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
   } catch (__exception ex) {
     printf("[x] Display0 (driver display): Unable to initialize screen ILI9341.\n");
   }
@@ -107,14 +109,14 @@ void DriverDisplayC ::task(void) {
       status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
       break;
     case DISPLAY_STATUS::DISPLAY_BACKGROUND:
-      draw_display_background();
+      // draw_display_background();
       status = DISPLAY_STATUS::WORK;
       break;
     default:
       if (lifeSignCounter > 10) {
         lifeSign();
         lifeSignCounter = 0;
-        int accDisplayValue = adc.read_adc_acceleration_recuperation();
+        int accDisplayValue = adc.read_adc_acc_dec();
         write_acceleration(accDisplayValue);
         // write driver display info // TODO: reactivate whenever we can get the display instance similar to extern ADC adc;
         if (accDisplayValue > 0) {
@@ -171,7 +173,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d0 != d0o){   // || d0o == 0) {
+  if (d0 != d0o) { // || d0o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 5, y);
     tft.printf(".%d", d0);
@@ -243,7 +245,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
   int digitHeight = textSize * 8;
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o ){//|| d1o == 0) {
+  if (d1 != d1o) { //|| d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
@@ -292,7 +294,7 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
   tft.setCursor(x, y);
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o){ //} || d1o == 0) {
+  if (d1 != d1o) { //} || d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
@@ -469,8 +471,24 @@ void DriverDisplayC ::arrow_increase(bool on) {
   _arrow_increase(color);
 }
 
-void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
-  // CRITICAL SECTION SPI: start
+void DriverDisplayC ::constant_drive_mode_set(CONSTANT_MODE mode) {
+  constant_drive_mode = mode;
+  if (constant_drive_set == true) {
+    constant_drive_mode_show();
+  }
+}
+
+void DriverDisplayC ::constant_drive_on() {
+  constant_drive_set = true;
+  constant_drive_mode_show();
+}
+
+void DriverDisplayC ::constant_drive_off() {
+  constant_drive_set = false;
+  constant_drive_mode_hide();
+}
+
+void DriverDisplayC ::constant_drive_mode_hide(){
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(constantModeTextSize);
@@ -479,17 +497,33 @@ void DriverDisplayC ::write_constant_mode(CONSTANT_MODE mode) {
   tft.print("power");
   tft.setCursor(constantModeX, constantModeY);
   tft.print("speed");
+  // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
+    xSemaphoreGive(spiBus.mutex);
+}
+
+void DriverDisplayC ::constant_drive_mode_show() {
+
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+
+  tft.setTextSize(constantModeTextSize);
+  tft.setTextColor(ILI9341_BLACK);
+  tft.setCursor(constantModeX, constantModeY);
+  tft.print("power");
+  tft.setCursor(constantModeX, constantModeY);
+  tft.print("speed");
+  // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
 
   tft.setTextColor(ILI9341_YELLOW);
   tft.setCursor(constantModeX, constantModeY);
-  if (mode == CONSTANT_MODE::POWER) {
+  if (constant_drive_mode == CONSTANT_MODE::POWER) {
     tft.print("power");
-  } else if (mode == CONSTANT_MODE::SPEED) {
+  } else if (constant_drive_mode == CONSTANT_MODE::SPEED) {
     tft.print("speed");
+  } else {
+    // off
   }
 
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
@@ -740,15 +774,16 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("   - acceleration\n");
   write_acceleration(888);
   printf("   - increase arrow\n");
-  _arrow_increase(ILI9341_YELLOW);
+  arrow_increase(true);
   printf("   - decrease arrow\n");
-  _arrow_decrease(ILI9341_RED);
+  arrow_decrease(true);
   printf("   - light1 on\n");
   light1OnOff();
   printf("   - light1 on\n");
   light2OnOff();
   printf("   - constant mode speed\n");
-  write_constant_mode(CONSTANT_MODE::SPEED);
+  constant_drive_mode_set(CONSTANT_MODE::SPEED);
+  constant_drive_mode_show();
   printf("   - drive direction forwards\n");
   write_drive_direction(DRIVE_DIRECTION::FORWARD);
   printf("   - battery\n");
@@ -758,11 +793,31 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("   - motor\n");
   write_motor(-8888.8);
   printf("   - constant mode power\n");
-  write_constant_mode(CONSTANT_MODE::POWER);
+  constant_drive_mode_set(CONSTANT_MODE::POWER);
+  constant_drive_mode_show();
   printf("   - drive direction backwards\n");
   write_drive_direction(DRIVE_DIRECTION::BACKWARD);
   printf("   - life sign\n");
   lifeSign();
+
+  write_driver_info("", INFO_TYPE::INFO);
+  indicator_set_and_blink(INDICATOR::WARN, false);
+  write_speed(0);
+  write_acceleration(0);
+  arrow_increase(false);
+  arrow_decrease(false);
+  light1OnOff();
+  light2OnOff();
+  constant_drive_mode_set(CONSTANT_MODE::SPEED);
+  constant_drive_mode_show();
+  write_drive_direction(DRIVE_DIRECTION::FORWARD);
+  write_bat(0.0);
+  write_pv(0.0);
+  write_motor(0.0);
+  constant_drive_mode_set(CONSTANT_MODE::NONE);
+  constant_drive_mode_show();
+  write_drive_direction(DRIVE_DIRECTION::FORWARD);
+
   printf("  End of demo screen.\n");
 }
 

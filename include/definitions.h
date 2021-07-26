@@ -7,8 +7,8 @@
 /*
  *  GPIO
  */
-#define LED_BUILTIN (gpio_num_t)13
-#define GPIO_INTERRUPT_PIN 25
+//#define LED_BUILTIN (gpio_num_t)13
+#define GPIO_INTERRUPT_PIN 33 //25
 
 /*
  * OneWire
@@ -38,7 +38,7 @@
 
 #define PCF8574_NUM_PORTS 8
 #define I2C_ADDRESS_PCF8574_IOExt2 0x20
-#define I2C_INTERRUPT_PIN_PCF8574 14
+#define I2C_INTERRUPT_PIN_PCF8574 33
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
 #define DS1803_BASE_ADDR 0x28
@@ -51,7 +51,7 @@
  * SERIAL
  */
 #define SERIAL_RX 16
-#define SERIAL_TX 15
+#define SERIAL_TX 17
 #define SERIAL_BAUDRATE 115200
 
 /*
@@ -106,10 +106,17 @@
  */
 
 #define DEBUG true
-#define debug_printf(fmt, ...)                                                                                                             \
-  do {                                                                                                                                     \
-    if (DEBUG)                                                                                                                             \
-      fprintf(stderr, "%s:%d:%s():: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                     \
+#define debug_printf(fmt, ...)                                                                \
+  do {                                                                                        \
+    if (DEBUG)                                                                                \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__); \
+  } while (0)
+
+#define DEBUG2 false
+#define debug_printf_l2(fmt, ...)                                                                \
+  do {                                                                                        \
+    if (DEBUG2)                                                                                \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__); \
   } while (0)
 
 #endif // DEFINITIONS_H

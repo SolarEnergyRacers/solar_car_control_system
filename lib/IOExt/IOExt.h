@@ -30,8 +30,10 @@ public:
   void set_ioext(int port, bool value);
   int get_ioext(int port);
 
-  static volatile bool ioInterruptRequest;
   static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
+
+private:
+  static volatile bool ioInterruptRequest;
 };
 
 #endif // IOEXT_H

@@ -26,6 +26,7 @@ void I2CBus::init(void) {
   // CRITICAL SECTION I2C: end
 
   printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA, I2C_SCL, I2C_FREQ);
+  scan_i2c_devices();
 }
 
 // test if the i2c bus is available and ready for transaction at address adr
@@ -56,7 +57,7 @@ void I2CBus::scan_i2c_devices() {
       * Connect a 2.4k resistor between SDA and Vcc
       * Connect a 2.4k resistor between SCL and Vcc
   */
-  printf("Scanning I2C Addresses:\n");
+  printf("    Scanning I2C addresses:\n    ");
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(mutex, portMAX_DELAY);
@@ -72,12 +73,12 @@ void I2CBus::scan_i2c_devices() {
       printf("-- ");
     }
     if ((i & 0x0f) == 0x0f) {
-      printf("\n");
+      printf("\n    ");
     }
   }
 
   xSemaphoreGive(mutex);
   // CRITICAL SECTION I2C: end
 
-  printf("Scan Completed, %d I2C Devices found.\n", cnt);
+  printf("Scan completed: %d I2C devices found.\n", cnt);
 }

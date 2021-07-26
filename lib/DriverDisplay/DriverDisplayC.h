@@ -158,7 +158,12 @@ public:
   void lifeSign();
   void draw_display_background();
 
-  void write_constant_mode(CONSTANT_MODE);
+  void constant_drive_mode_set(CONSTANT_MODE mode);
+  void constant_drive_on();
+  void constant_drive_off();
+  void constant_drive_mode_show();
+  void constant_drive_mode_hide();
+
   void write_drive_direction(DRIVE_DIRECTION);
   void write_driver_info(String msg, INFO_TYPE type);
   void write_speed(int speed);

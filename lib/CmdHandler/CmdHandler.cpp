@@ -46,13 +46,7 @@ void CmdHandler::task() {
       int value = 0;
       // read the incoming chars:
       String input = Serial.readString();
-
-      debug_printf("Received: %s\n", input.c_str());
-
       Serial.flush();
-      if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
-        input = "h"; // help
-      }
 
       if (input.endsWith("\n")) {
         input = input.substring(0, input.length() - 1);
@@ -60,20 +54,28 @@ void CmdHandler::task() {
       if (input.endsWith("\r")) {
         input = input.substring(0, input.length() - 1);
       }
+
+      debug_printf("Received: %s\n", input.c_str());
+
+      if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
+        input = "h"; // help
+      }
+
       int accValue;
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
         dd->re_init();
+        dd->draw_display_background();
         break;
       case 'S':
         printSystemValues();
         break;
       case '-':
-        adc.adjustMin_acceleration_recuperation();
+        adc.adjust_min_acc_dec();
         break;
       case '=':
-        adc.adjustMax_acceleration_recuperation();
+        adc.adjust_max_acc_dec();
         break;
       case 's':
         if (input[2] == 'f') {
@@ -97,16 +99,16 @@ void CmdHandler::task() {
         accValue = atoi(&input[1]);
         dd->write_acceleration(accValue);
         // TODO: where to put in this important
-        // if (accValue > 0) {
-        //   dac.set_pot(accValue, DAC::POT_CHAN0);
-        //   dac.set_pot(0, DAC::POT_CHAN1);
-        // } else if (accValue > 0) {
-        //   dac.set_pot(0, DAC::POT_CHAN0);
-        //   dac.set_pot(accValue, DAC::POT_CHAN1);
-        // } else {
-        //   dac.set_pot(0, DAC::POT_CHAN0);
-        //   dac.set_pot(0, DAC::POT_CHAN1);
-        // }
+        if (accValue > 0) {
+          dac.set_pot(accValue, DAC::POT_CHAN0);
+          dac.set_pot(0, DAC::POT_CHAN1);
+        } else if (accValue > 0) {
+          dac.set_pot(0, DAC::POT_CHAN0);
+          dac.set_pot(accValue, DAC::POT_CHAN1);
+        } else {
+          dac.set_pot(0, DAC::POT_CHAN0);
+          dac.set_pot(0, DAC::POT_CHAN1);
+        }
         break;
       case 'A':
         value = atoi(&input[1]);
@@ -165,16 +167,20 @@ void CmdHandler::task() {
         break;
       case 'c':
         if (input[2] == 's') {
-          dd->write_constant_mode(CONSTANT_MODE::SPEED);
+          dd->constant_drive_mode_set(CONSTANT_MODE::SPEED);
+          dd->constant_drive_mode_show();
         } else if (input[2] == 'p') {
-          dd->write_constant_mode(CONSTANT_MODE::POWER);
+          dd->constant_drive_mode_set(CONSTANT_MODE::POWER);
+          dd->constant_drive_mode_show();
         } else {
-          dd->write_constant_mode(CONSTANT_MODE::NONE);
+          dd->constant_drive_mode_set(CONSTANT_MODE::NONE);
+          dd->constant_drive_mode_show();
         }
         break;
       // usage
       default:
-        printf("ERROR:: Unknown command '%s'\n", input.c_str());
+        printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
+        break;
       case 'h':
         printf("%s", helpText.c_str());
         break;
@@ -197,4 +203,5 @@ void CmdHandler::printSystemValues() {
     if(idx == 3) {printf(" - ");}
   }
   printf("\n");
+  printf("POT0 (accel)= %4d, POT1 (recup)= %4d\n", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
 }

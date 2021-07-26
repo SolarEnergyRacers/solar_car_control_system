@@ -98,7 +98,7 @@ void app_main(void) {
   i2cBus.init();
   spiBus.init();
 
-  i2cBus.scan_i2c_devices();
+  //i2cBus.scan_i2c_devices();
 
   // ---- init modules ----
   if (BLINK_ON) {
@@ -180,7 +180,7 @@ void app_main(void) {
   //    }
   // if (ADC_ON) {
   //   printf(" - read_adc_task\n");
-  //   xTaskCreate(&read_adc_acceleration_recuperation, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  //   xTaskCreate(&read_adc_acc_dec, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   // }
   if (DS_ON) {
     printf(" - read_ds_demo_task\n");

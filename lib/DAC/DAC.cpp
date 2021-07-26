@@ -44,11 +44,11 @@ uint8_t DAC::get_cmd(pot_chan channel) {
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
-
+channel = POT_CHAN_ALL;
   // setup command
   uint8_t command = get_cmd(channel);
 
-  // printf("Write motor potentiometer %02x to %d\n", command, val);
+  debug_printf_l2("Write motor potentiometer %02x to %d\n", command, val);
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);

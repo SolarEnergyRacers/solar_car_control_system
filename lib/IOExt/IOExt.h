@@ -19,7 +19,7 @@ private:
   // simulation - end
   int taskSleep = 50;
   void handleIoInterrupt(void);
-  
+
 public:
   string getName(void) { return "IOExt"; };
   void init(void);

@@ -119,7 +119,7 @@ void DriverDisplayC ::task(void) {
         lifeSignCounter = 0;
         int accDisplayValue = adc.read_adc_acc_dec();
         write_acceleration(accDisplayValue);
-        //speedCheck(speedLast);
+        // speedCheck(speedLast);
       }
       lifeSignCounter++;
       break;

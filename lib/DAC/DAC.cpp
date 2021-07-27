@@ -28,30 +28,26 @@ uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {
   case POT_CHAN0:
-    command |= 0x01;
+    command |= 0x1;
     break;
   case POT_CHAN1:
-    command |= 0x10;
+    command |= 0x2;
     break;
   case POT_CHAN_ALL:
-    command |= 0x11;
+    command |= 0x3;
     break;
   default:
-    command |= 0x01;
+    command |= 0x1;
     break;
   }
   return command;
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
-  channel = POT_CHAN_ALL;
   // setup command
   uint8_t command = get_cmd(channel);
 
-  debug_printf("Write motor potentiometer %02x to %d\n", command, val);
-
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
   Wire.beginTransmission(I2C_ADDRESS_DS1803);
   Wire.write(command);
   Wire.write(val); // first pot value
@@ -59,8 +55,9 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     Wire.write(val); // second pot value
   }
   Wire.endTransmission();
-
   xSemaphoreGive(i2cBus.mutex);
+
+  debug_printf("Write motor potentiometer [0x%02x] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, command, val, get_pot(channel));
 }
 
 uint16_t DAC::get_pot(pot_chan channel) {

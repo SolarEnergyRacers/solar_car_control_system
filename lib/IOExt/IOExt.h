@@ -19,8 +19,7 @@ private:
   // simulation - end
   int taskSleep = 50;
   void handleIoInterrupt(void);
-  void speedCheck(int speed);
-
+  
 public:
   string getName(void) { return "IOExt"; };
   void init(void);

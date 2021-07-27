@@ -48,9 +48,8 @@ channel = POT_CHAN_ALL;
   // setup command
   uint8_t command = get_cmd(channel);
 
-  debug_printf_l2("Write motor potentiometer %02x to %d\n", command, val);
+  debug_printf("Write motor potentiometer %02x to %d\n", command, val);
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.beginTransmission(I2C_ADDRESS_DS1803);
@@ -62,12 +61,10 @@ channel = POT_CHAN_ALL;
   Wire.endTransmission();
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 }
 
 uint16_t DAC::get_pot(pot_chan channel) {
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   Wire.requestFrom(I2C_ADDRESS_DS1803, 2); // request 2 bytes
@@ -75,7 +72,6 @@ uint16_t DAC::get_pot(pot_chan channel) {
   uint8_t pot1 = Wire.read();              // get pot1
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 
   if (channel == POT_CHAN_ALL) {
     return pot0 | (pot1 << 8);

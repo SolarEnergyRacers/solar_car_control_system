@@ -22,8 +22,8 @@ private:
   int ads_addrs[NUM_ADC_DEVICES];
   int16_t ads_min_dec = 8000;
   int16_t ads_min_acc = 10000;
-  int16_t ads_max_dec = 20000;
-  int16_t ads_max_acc = 20000;
+  int16_t ads_max_dec = 12000;
+  int16_t ads_max_acc = 15000;
   int16_t accelLast = 0;
   int16_t recupLast = 0;
   int16_t valueDisplayLast = 0;

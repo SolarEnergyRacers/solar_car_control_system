@@ -17,7 +17,6 @@
 #define RTC_ON false                    // real time clock, I2C
 #define SERIAL_ON false                 // write/read to/from console
 #define SD_ON false                     // SD card
-#define SIMULATOR_ON false              // Display simulator [TODO]
 #define CAN_ON false                    // CAN bus (MPPT, BMS, ..)
 
 #define DEBUGLEVEL_VERBOSED true

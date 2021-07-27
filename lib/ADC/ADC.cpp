@@ -175,9 +175,9 @@ int ADC::read_adc_acc_dec() {
   int valueDecPot = 0;
   int valueAccPot = 0;
   if (valueDisplay < 0) {
-    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 255);
+    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
   } else {
-    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 255);
+    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
   }
 
   if (valueDisplayLast != valueDisplay) {
@@ -188,8 +188,8 @@ int ADC::read_adc_acc_dec() {
                  ads_min_acc, ads_max_acc);
 
     valueDisplayLast = valueDisplay;
-    // dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
-    // dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
+    dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
+    dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   }
 
   return valueDisplayLast;

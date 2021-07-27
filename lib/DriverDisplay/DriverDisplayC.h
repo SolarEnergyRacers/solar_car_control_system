@@ -176,6 +176,7 @@ public:
   void light1OnOff();
   void light2OnOff();
 
+  void speedCheck(int speed);
   void arrow_increase(bool on);
   void arrow_decrease(bool on);
 

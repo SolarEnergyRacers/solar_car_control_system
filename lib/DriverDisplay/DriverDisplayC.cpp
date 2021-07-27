@@ -110,6 +110,7 @@ void DriverDisplayC ::task(void) {
       break;
     case DISPLAY_STATUS::DISPLAY_BACKGROUND:
       // draw_display_background();
+
       status = DISPLAY_STATUS::WORK;
       break;
     default:
@@ -118,21 +119,27 @@ void DriverDisplayC ::task(void) {
         lifeSignCounter = 0;
         int accDisplayValue = adc.read_adc_acc_dec();
         write_acceleration(accDisplayValue);
-        // write driver display info // TODO: reactivate whenever we can get the display instance similar to extern ADC adc;
-        if (accDisplayValue > 0) {
-          arrow_increase(true);
-        } else if (accDisplayValue < 0) {
-          arrow_decrease(true);
-        } else {
-          arrow_increase(false);
-          arrow_decrease(false);
-        }
+        //speedCheck(speedLast);
       }
       lifeSignCounter++;
       break;
     }
     // sleep for sleep_polling_ms
     this->sleep(20);
+  }
+}
+
+void DriverDisplayC::speedCheck(int speed) {
+  DriverDisplayC *dd = DriverDisplayC::instance();
+  if (speed < 50) {
+    dd->arrow_increase(true);
+  } else {
+    dd->arrow_increase(false);
+  }
+  if (speed > 80) {
+    dd->arrow_decrease(true);
+  } else {
+    dd->arrow_decrease(false);
   }
 }
 
@@ -429,26 +436,18 @@ void DriverDisplayC ::_arrow_increase(int color) {
   int x = speedFrameX;
   int y = speedFrameY - 3;
 
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y - 10, color);
-
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::_arrow_decrease(int color) {
   int x = speedFrameX;
   int y = speedFrameY + speedFrameSizeY + 3;
 
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y + 10, color);
-
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 // show the slower arrow (red under the speed display)
@@ -517,10 +516,8 @@ void DriverDisplayC ::constant_drive_mode_show() {
   tft.setCursor(constantModeX, constantModeY);
   if (constant_drive_mode == CONSTANT_MODE::POWER) {
     tft.print("power");
-  } else if (constant_drive_mode == CONSTANT_MODE::SPEED) {
-    tft.print("speed");
   } else {
-    // off
+    tft.print("speed");
   }
 
   xSemaphoreGive(spiBus.mutex);
@@ -753,7 +750,6 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("  Draw demo screen:\n");
 #ifdef POWERMEASUREMENT
   // ---- for power measurement: start
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   printf(" - black background\n");
   tft.fillScreen(ILI9341_BLACK);
@@ -762,7 +758,6 @@ void DriverDisplayC ::driver_display_demo_screen() {
   tft.fillScreen(ILI9341_WHITE);
   delay(15000);
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
   // ---- for power measurement: end
 #endif
   printf("   - driver info\n");
@@ -800,22 +795,22 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("   - life sign\n");
   lifeSign();
 
+  // set default initial dosplay values
   write_driver_info("", INFO_TYPE::INFO);
   indicator_set_and_blink(INDICATOR::WARN, false);
   write_speed(0);
   write_acceleration(0);
   arrow_increase(false);
   arrow_decrease(false);
+  light1On = true;
   light1OnOff();
+  light2On = true;
   light2OnOff();
   constant_drive_mode_set(CONSTANT_MODE::SPEED);
-  constant_drive_mode_show();
-  write_drive_direction(DRIVE_DIRECTION::FORWARD);
+  constant_drive_mode_hide();
   write_bat(0.0);
   write_pv(0.0);
   write_motor(0.0);
-  constant_drive_mode_set(CONSTANT_MODE::NONE);
-  constant_drive_mode_show();
   write_drive_direction(DRIVE_DIRECTION::FORWARD);
 
   printf("  End of demo screen.\n");

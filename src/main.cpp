@@ -39,7 +39,6 @@
 #include <SDCard.h>
 #include <SPIBus.h>
 #include <Serial.h>
-#include <Simulator.h>
 #include <Temp.h>
 #include <string>
 #include <system.h>
@@ -72,7 +71,6 @@ PWM pwm;
 Display disp;
 RTC rtc;
 GPInputOutput gpio; // I2C Interrupts
-Simulator simulator;
 
 bool startOk = true;
 bool systemOk = false;
@@ -148,9 +146,6 @@ void app_main(void) {
   if (SERIAL_ON) {
     uart.init();
   }
-  if (SIMULATOR_ON) {
-    simulator.init();
-  }
   if (CAN_ON) {
     can.init();
   }
@@ -203,9 +198,6 @@ void app_main(void) {
   }
   if (INT_ON) {
     gpio.create_task();
-  }
-  if (SIMULATOR_ON) {
-    simulator.create_task();
   }
   if (IOEXT_ON) {
     ioExt.create_task();

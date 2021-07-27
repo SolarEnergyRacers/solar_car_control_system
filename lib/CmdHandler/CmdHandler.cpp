@@ -139,7 +139,7 @@ void CmdHandler::task() {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
           dd->arrow_decrease(false);
         } else {
-          debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
+          debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
           dd->arrow_decrease(true);
         }
         break;

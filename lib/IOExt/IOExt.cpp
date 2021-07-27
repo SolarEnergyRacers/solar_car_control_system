@@ -51,20 +51,6 @@ void IOExt::exit(void) {
   // TODO
 }
 
-void IOExt::speedCheck(int speed) {
-  DriverDisplayC *dd = DriverDisplayC::instance();
-  if (speed < 50) {
-    dd->arrow_increase(true);
-  } else {
-    dd->arrow_increase(false);
-  }
-  if (speed > 80) {
-    dd->arrow_decrease(true);
-  } else {
-    dd->arrow_decrease(false);
-  }
-}
-
 void IOExt::handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
@@ -132,32 +118,6 @@ void IOExt::handleIoInterrupt() {
   if (nextScreen) {
     printf("Next screen\n");
   }
-
-  // // Simulation
-  // if (speedPowerControlOnOff) {
-  //   speed += 10;
-  //   dd->write_speed(speed);
-  //   speedCheck(speed);
-  // }
-  // if (speedPowerControlMode) {
-  //   speed -= 10;
-  //   if (speed < 0) {
-  //     speed = 0;
-  //   }
-  //   dd->write_speed(speed);
-  //   speedCheck(speed);
-  // }
-  // if (horn) {
-  //   acceleration += 10;
-  //   dd->write_acceleration(acceleration);
-  // }
-  // if (nextScreen) {
-  //   acceleration -= 10;
-  //   if (acceleration < 0) {
-  //     acceleration = 0;
-  //   }
-  //   dd->write_acceleration(acceleration);
-  // }
 }
 
 void IOExt::set_ioext(int port, bool value) {

@@ -8,7 +8,7 @@
  *  GPIO
  */
 //#define LED_BUILTIN (gpio_num_t)13
-#define GPIO_INTERRUPT_PIN 33 //25
+#define GPIO_INTERRUPT_PIN 33 // 25
 
 /*
  * OneWire
@@ -106,17 +106,17 @@
  */
 
 #define DEBUG true
-#define debug_printf(fmt, ...)                                                                \
-  do {                                                                                        \
-    if (DEBUG)                                                                                \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__); \
+#define debug_printf(fmt, ...)                                                                                                             \
+  do {                                                                                                                                     \
+    if (DEBUG)                                                                                                                             \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 
 #define DEBUG2 false
-#define debug_printf_l2(fmt, ...)                                                                \
-  do {                                                                                        \
-    if (DEBUG2)                                                                                \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__); \
+#define debug_printf_l2(fmt, ...)                                                                                                          \
+  do {                                                                                                                                     \
+    if (DEBUG2)                                                                                                                            \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 
 #endif // DEFINITIONS_H

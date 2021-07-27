@@ -1,9 +1,8 @@
+<img src="media/logo/logo_green.svg" alt="SER Logo" width="150"/> SolarEnergyRacers
 
-<img src="media/logo/logo_green.svg" alt="SER Logo" width="150"/>  SolarEnergyRacers
+---
 
------
-
-# Solar Car Control System 
+# Solar Car Control System
 
 ![PlatformIO CI - Build Process](https://github.com/SolarEnergyRacers/solar_car_control_system/workflows/PlatformIO%20CI%20-%20Build%20Process/badge.svg?branch=master) [![License: GPL v3](https://img.shields.io/badge/License-GPLv3-blue.svg)](https://www.gnu.org/licenses/gpl-3.0)
 
@@ -16,27 +15,27 @@
 
 ![Device Diagram](media/device_diagram.svg "Device Diagram")
 
-| Device:Port  | Functionality                                                |
-| :----------- | :----------------------------------------------------------- |
-| **_ESP32_**  | main micro processor                                         |
-| ESP32:2      | 1Wire                                                        |
-| ESP32:22     | I2C:SCL                                                      |
-| ESP32:23     | I2C:SDA                                                      |
-| **ESP32:15** | SERIAL:TX                                                    |
-| ESP32:16     | SERIAL:RX                                                    |
-| ESP32:18     | SPI:MOSI                                                     |
-| ESP32:19     | SPI:MISO                                                     |
-| ESP32:5      | SPI:CLK                                                      |
-| ESP32:12     |                                                              |
-| **ESP32:13** | GPIO:LED_BUILTIN                                             |
+| Device:Port  | Functionality                                                           |
+| :----------- | :---------------------------------------------------------------------- |
+| **_ESP32_**  | main micro processor                                                    |
+| ESP32:2      | 1Wire                                                                   |
+| ESP32:22     | I2C:SCL                                                                 |
+| ESP32:23     | I2C:SDA                                                                 |
+| **ESP32:15** | SERIAL:TX                                                               |
+| ESP32:16     | SERIAL:RX                                                               |
+| ESP32:18     | SPI:MOSI                                                                |
+| ESP32:19     | SPI:MISO                                                                |
+| ESP32:5      | SPI:CLK                                                                 |
+| ESP32:12     |                                                                         |
+| **ESP32:13** | GPIO:LED_BUILTIN                                                        |
 | ESP32:33     | GPIO:PCF8574_INTERRUPT (TODO: fix collision with CS_SD_CARD - ESP32:14) |
-| **ESP32:14** | SPI:CS_SD_CARD                                               |
-| ESP32:36     | SPI:CS_TFT_SCREEN                                            |
-| ESP32:4      | SPI:DC                                                       |
-| ESP32:21     | SPI:RST                                                      |
-| ESP32:25     | GPIO:INTERRUPT (TODO: fix collision with CAN:TX !!)          |
-| ESP32:25     | CAN:TX                                                       |
-| ESP32:26     | CAN:RX                                                       |
+| **ESP32:14** | SPI:CS_SD_CARD                                                          |
+| ESP32:36     | SPI:CS_TFT_SCREEN                                                       |
+| ESP32:4      | SPI:DC                                                                  |
+| ESP32:21     | SPI:RST                                                                 |
+| ESP32:25     | GPIO:INTERRUPT (TODO: fix collision with CAN:TX !!)                     |
+| ESP32:25     | CAN:TX                                                                  |
+| ESP32:26     | CAN:RX                                                                  |
 
 | **_ADS1x15_**                            |    Analog to digital converter     |
 | :--------------------------------------- | :--------------------------------: |

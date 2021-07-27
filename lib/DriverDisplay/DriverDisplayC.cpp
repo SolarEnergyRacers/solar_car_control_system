@@ -487,7 +487,7 @@ void DriverDisplayC ::constant_drive_off() {
   constant_drive_mode_hide();
 }
 
-void DriverDisplayC ::constant_drive_mode_hide(){
+void DriverDisplayC ::constant_drive_mode_hide() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(constantModeTextSize);
@@ -497,7 +497,7 @@ void DriverDisplayC ::constant_drive_mode_hide(){
   tft.setCursor(constantModeX, constantModeY);
   tft.print("speed");
   // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
-    xSemaphoreGive(spiBus.mutex);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::constant_drive_mode_show() {

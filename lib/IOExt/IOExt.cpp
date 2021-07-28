@@ -2,30 +2,28 @@
 // PCF8574 I/O Extension over I2C
 //
 
-#include "../../include/definitions.h"
-#include "PCF8574.h" // PCF8574
+#include <PCF8574.h> // PCF8574
+#include <Wire.h>    // I2C
+#include <definitions.h>
+
+#include <DriverDisplayC.h>
 #include <I2CBus.h>
-#include <Wire.h> // I2C
+#include <Indicator.h>
 
-#include "DriverDisplay.h"
 #include "IOExt.h"
-#include "Indicator.h"
 
-#define PCF8574_NUM_PORTS 8
+extern I2CBus i2cBus;
+extern Indicator indicator;
 
-PCF8574 IOExt2(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL,
-               I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
+extern CONSTANT_MODE constant_drive_mode;
+extern bool constant_drive_set;
 
-// simulation - start (for simulation purpose)
-int speed = 0;
-int acceleration = 0;
-// simulation - end
-int taskSleep = 50;
+void IOExt::re_init() { init(); }
 
-void init_IOExt2() {
+void IOExt::init() {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   // setup pins
   IOExt2.pinMode(P0, INPUT); // left indicator
@@ -45,138 +43,117 @@ void init_IOExt2() {
     // TODO: action for init error?
   }
 
-  xSemaphoreGive(i2c_mutex);
+  xSemaphoreGive(i2cBus.mutex);
   // CRITICAL SECTION I2C: end
 }
 
-volatile bool ioInterruptRequest = false;
-void keyPressedInterruptHandler() { ioInterruptRequest = true; }
-
-void _speedCheck(int speed) {
-  if (speed < 50) {
-    arrow_increase(true);
-  } else {
-    arrow_increase(false);
-  }
-  if (speed > 80) {
-    arrow_decrease(true);
-  } else {
-    arrow_decrease(false);
-  }
+void IOExt::exit(void) {
+  // TODO
 }
 
-void _handleIoInterrupt() {
+void IOExt::handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
-
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
   PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
+  xSemaphoreGive(i2cBus.mutex);
 
   if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
     taskSleep = 50; // default value for fast reaction to pressed button
-    xSemaphoreGive(i2c_mutex);
-    // CRITICAL SECTION I2C: end
     return;
   }
 
   taskSleep = 100; // debounce button
 
-  printf("PCF %ld: %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1,
-         dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
+  debug_printf("PCF (%ldms): %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
 
+  // PCF8574:2 pin assignment
   bool left = !dra.p0;
-  bool right = !dra.p1;
-  bool speedPowerControlOnOff = !dra.p2;
-  bool speedPowerControlMode = !dra.p3;
-  bool horn = !dra.p4;
-  bool positionLights = !dra.p5;
-  bool drivingLights = !dra.p6;
+  bool right = !dra.p3;
+  bool speedPowerControlOnOff = !dra.p5;
+  bool speedPowerControlMode = !dra.p4;
+  bool horn = !dra.p6;
+  bool positionLights = !dra.p2;
+  bool drivingLights = !dra.p1;
   bool nextScreen = !dra.p7;
+
+  DriverDisplayC *dd = DriverDisplayC::instance();
 
   // turn indicator and hazard lights
   if (left && right) {
-    setIndicator(INDICATOR_WARN);
+    indicator.setIndicator(INDICATOR::WARN);
   } else if (left && !right) {
-    setIndicator(INDICATOR_LEFT);
+    indicator.setIndicator(INDICATOR::LEFT);
   } else if (!left && right) {
-    setIndicator(INDICATOR_RIGHT);
+    indicator.setIndicator(INDICATOR::RIGHT);
   }
   if (positionLights) {
-    light1OnOff();
+    printf("Position lights on/off\n");
+    dd->light1OnOff();
   }
   if (drivingLights) {
-    light2OnOff();
+    printf("Driving lights on/off\n");
+    dd->light2OnOff();
   }
-
-  // Simulation
   if (speedPowerControlOnOff) {
-    speed += 10;
-    write_speed(speed);
-    _speedCheck(speed);
+    if (constant_drive_set) {
+      dd->constant_drive_off();
+      printf("Constand mode OFF\n");
+    } else {
+      dd->constant_drive_on();
+      printf("Constand mode ON\n");
+    }
   }
   if (speedPowerControlMode) {
-    speed -= 10;
-    if (speed < 0) {
-      speed = 0;
+    if (constant_drive_mode == CONSTANT_MODE::SPEED) {
+      dd->constant_drive_mode_set(CONSTANT_MODE::POWER);
+      printf("Constant mode switch to POWER\n");
+    } else {
+      dd->constant_drive_mode_set(CONSTANT_MODE::SPEED);
+      printf("Constant mode switch to SPEED\n");
     }
-    write_speed(speed);
-    _speedCheck(speed);
   }
   if (horn) {
-    acceleration += 10;
-    write_acceleration(acceleration);
+    printf("Horn\n");
   }
   if (nextScreen) {
-    acceleration -= 10;
-    if (acceleration < 0) {
-      acceleration = 0;
-    }
-    write_acceleration(acceleration);
+    printf("Next screen\n");
   }
-  xSemaphoreGive(i2c_mutex);
-  // CRITICAL SECTION I2C: end
 }
 
-void set_ioext(int port, bool value) {
+void IOExt::set_ioext(int port, bool value) {
   // check port
   if (port < 0 || port >= PCF8574_NUM_PORTS) {
     return;
   }
 
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
-
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
   IOExt2.digitalWrite(port, value);
-
-  xSemaphoreGive(i2c_mutex);
-  // CRITICAL SECTION I2C: end
+  xSemaphoreGive(i2cBus.mutex);
 }
 
-int get_ioext(int port) {
+int IOExt::get_ioext(int port) {
   // check port
   if (port < 0 || port >= PCF8574_NUM_PORTS) {
     return -1;
   }
 
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2c_mutex, portMAX_DELAY);
-
-  int value = IOExt2.digitalRead(P0);
-
-  xSemaphoreGive(i2c_mutex);
-  // CRITICAL SECTION I2C: end
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  int value = IOExt2.digitalRead(port);
+  xSemaphoreGive(i2cBus.mutex);
 
   return value;
 }
 
-bool isInInterruptHandler = false;
-void IOExt2_task(void *pvParameter) {
+volatile bool IOExt::ioInterruptRequest = false;
+
+void IOExt::task() {
 
   // polling loop
   while (1) {
     // handle input interrupts
     if (ioInterruptRequest && !isInInterruptHandler) {
       isInInterruptHandler = true;
-      _handleIoInterrupt();
+      handleIoInterrupt();
       ioInterruptRequest = false;
       isInInterruptHandler = false;
     }

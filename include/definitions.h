@@ -7,8 +7,8 @@
 /*
  *  GPIO
  */
-#define LED_BUILTIN (gpio_num_t)13
-#define GPIO_INTERRUPT_PIN 25
+//#define LED_BUILTIN (gpio_num_t)13
+#define GPIO_INTERRUPT_PIN 33 // 25
 
 /*
  * OneWire
@@ -22,25 +22,36 @@
 #define I2C_SCL 22
 #define I2C_FREQ 100000 // 100kHz
 
-#define I2C_ADDRESS_ADS1x15 0x48
+#define NUM_ADC_DEVICES 3
+#define I2C_ADDRESS_ADS1x15_0 0x4A
+#define I2C_ADDRESS_ADS1x15_1 0x48
+#define I2C_ADDRESS_ADS1x15_2 0x49
+
+#define PWM_NUM_PORTS 16
+#define PWM_MAX_VALUE 4096
 #define I2C_ADDRESS_PCA9685 0x42
+
+#define OLED_RESET 9
+#define OLED_WIDTH 128
+#define OLED_HEIGHT 64
 #define I2C_ADDRESS_SSD1305 0x3C
+
+#define PCF8574_NUM_PORTS 8
 #define I2C_ADDRESS_PCF8574_IOExt2 0x20
-#define I2C_INTERRUPT_PIN_PCF8574 14
+#define I2C_INTERRUPT_PIN_PCF8574 33
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
 #define DS1803_BASE_ADDR 0x28
 #define DS1803_ADDR0 0 // pulled down to ground
 #define DS1803_ADDR1 0 // pulled down to ground
 #define DS1803_ADDR2 0 // pulled down to ground
-#define I2C_ADDRESS_DS1803                                                     \
-  (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
+#define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
  * SERIAL
  */
 #define SERIAL_RX 16
-#define SERIAL_TX 15
+#define SERIAL_TX 17
 #define SERIAL_BAUDRATE 115200
 
 /*
@@ -93,5 +104,19 @@
  *  General ESP32 Pinout:
  * https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
  */
+
+#define DEBUG true
+#define debug_printf(fmt, ...)                                                                                                             \
+  do {                                                                                                                                     \
+    if (DEBUG)                                                                                                                             \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
+  } while (0)
+
+#define DEBUG2 false
+#define debug_printf_l2(fmt, ...)                                                                                                          \
+  do {                                                                                                                                     \
+    if (DEBUG2)                                                                                                                            \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
+  } while (0)
 
 #endif // DEFINITIONS_H

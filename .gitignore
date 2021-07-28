@@ -15,3 +15,5 @@ extras/automation/howto-BG.md
 extras/automation/loginGuest.html
 extras/automation/geckodriver.exe
 extras/automation/config.yaml
+src/sdkconfig.h
+sdkconfig.esp32dev

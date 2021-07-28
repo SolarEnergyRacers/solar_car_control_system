@@ -2,7 +2,7 @@
 // SD Card
 //
 
-#include "../../include/definitions.h"
+#include <definitions.h>
 
 #include <SD.h> // sd card
 
@@ -11,12 +11,15 @@
 #include "SDCard.h"
 
 #define FILENAME "/test.txt"
-File dataFile;
 
-void init_sdcard(void) {
+extern SPIBus spiBus;
+
+void SDCard::re_init() { init(); }
+
+void SDCard::init() {
 
   // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spi_mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   if (!SD.begin(SPI_CS_SDCARD)) {
     printf("[SDCard] Initialization failed\n");
@@ -24,15 +27,15 @@ void init_sdcard(void) {
     printf("[SDCard] Initialization successful\n");
 
     // open file
-    dataFile = SD.open(
-        FILENAME,
-        FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
+    dataFile = SD.open(FILENAME,
+                       FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
   }
 
-  xSemaphoreGive(spi_mutex);
+  xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
+extern SDCard sdCard;
 void write_sdcard_demo_task(void *pvParameter) {
 
   // demo counter (written to file)
@@ -41,20 +44,20 @@ void write_sdcard_demo_task(void *pvParameter) {
   while (1) {
 
     // CRITICAL SECTION SPI: start
-    xSemaphoreTake(spi_mutex, portMAX_DELAY);
+    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
     // check file open
-    if (dataFile) {
+    if (sdCard.dataFile) {
       // write counter value
-      dataFile.print(counter);
-      dataFile.println("");
+      sdCard.dataFile.print(counter);
+      sdCard.dataFile.println("");
       printf("[SDCard] Write to sdcard: %d\n", counter++);
     } else {
       printf("[SDCard] Error opening file.\n");
     }
-    dataFile.flush(); // ensure write-back
+    sdCard.dataFile.flush(); // ensure write-back
 
-    xSemaphoreGive(spi_mutex);
+    xSemaphoreGive(spiBus.mutex);
     // CRITICAL SECTION SPI: end
 
     // sleep for 1s

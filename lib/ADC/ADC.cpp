@@ -52,7 +52,6 @@ void ADC::init() {
     // bit-value -> mV: 2/3x gain +/- 6.144V
     // 1 bit = 3mV (ADS1015) 0.1875mV (ADS1115)
     float multiplier = adss[idx].toVoltage(1); // voltage factor
-
     printf("    Max voltage=%f with multiplier=%f\n", adss[idx].getMaxVoltage(), multiplier);
     // read all inputs & report
     for (int i = 0; i < 4; i++) {
@@ -77,8 +76,7 @@ int16_t ADC::read(ADC::Pin port) {
   xSemaphoreGive(i2cBus.mutex);
 
   debug_printf_l2("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
-  delay(10); // TODO: necessary?
-  return value;
+   return value;
 }
 
 void ADC::adjust_min_acc_dec() {

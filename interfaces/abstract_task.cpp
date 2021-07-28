@@ -9,33 +9,26 @@
 
 using namespace std;
 
-void abstract_task::init(){
-    // do initialization here
+void abstract_task::init() {
+  // do initialization in implementation here
+  printf("    Init '%s'... ", getInfo().c_str());
 };
+
+void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
+void abstract_task::sleep(int polling_ms) { vTaskDelay(polling_ms / portTICK_PERIOD_MS); };
 
 void abstract_task::create_task() {
-
-  void run(void *pvParams) { ((MyClass *)pcParams)->runInner(); }
-  xTaskCreate((void (*)(void *))task<MyClass>, taskName, stackDepth, x,
-              taskPrio, taskHandle);
-  // xTaskCreate(&task, getName().c_str(),
-  // CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-};
-
-void abstract_task::sleep() {
-  vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
-};
-
-static void abstract_task::task(void *pvParameter) {
-  ((MyClass *)pcParams)->task();
+  printf(" - create task '%s'...", getInfo().c_str());
+  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, 1, NULL);
+  printf(" done.\n");
 };
 
 void abstract_task::re_init(){
-    // handle reset here
+    // handle reset in implementation here
 };
 
 void abstract_task::exit(){
-    // handle exit here
+    // handle exit in implementation here
 };
 
 string abstract_task::getInfo() { return getName(); }

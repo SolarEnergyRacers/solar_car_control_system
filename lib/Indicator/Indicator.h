@@ -5,13 +5,21 @@
 #ifndef INDICATOR_H
 #define INDICATOR_H
 
-// public
-INDICATOR getIndicator();
-void setIndicator(INDICATOR state);
+#include "DriverDisplayC.h"
 
-// FreeRTOS - start
-bool init_indicator(void);
-void indicator_task(void *pvParameter);
-// FreeRTOS - end
+class Indicator : public abstract_task {
+private:
+  volatile bool blinkState = false;
+  volatile INDICATOR curState = INDICATOR::OFF;
+
+public:
+  string getName(void);
+  void init(void);
+  void re_init(void);
+  void exit(void);
+  void task(void); // this is the actual task
+  INDICATOR getIndicator();
+  void setIndicator(INDICATOR state);
+};
 
 #endif // INDICATOR_H

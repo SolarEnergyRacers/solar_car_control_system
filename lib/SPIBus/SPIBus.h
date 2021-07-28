@@ -8,8 +8,12 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
-extern SemaphoreHandle_t spi_mutex;
-
-void init_spi(void);
+class SPIBus {
+private:
+public:
+  SemaphoreHandle_t mutex;
+  void init();
+  void re_init();
+};
 
 #endif // SPIBUS_H

@@ -19,3 +19,4 @@ src/sdkconfig.h
 sdkconfig.esp32dev
 docs/electroCad/*.sch-bak
 docs/electroCad/*.kicad_pcb-bak
+docs/electroCad/fp-info-cache

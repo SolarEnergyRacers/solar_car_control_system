@@ -17,3 +17,5 @@ extras/automation/geckodriver.exe
 extras/automation/config.yaml
 src/sdkconfig.h
 sdkconfig.esp32dev
+docs/electroCad/*.sch-bak
+docs/electroCad/*.kicad_pcb-bak

@@ -1,4 +1,4 @@
-update=Tue 03 Aug 2021 10:56:42 PM CEST
+update=Sat 07 Aug 2021 04:20:55 PM CEST
 version=1
 last_client=kicad
 [cvpcb]
@@ -9,10 +9,20 @@ version=1
 LibDir=
 [general]
 version=1
+[schematic_editor]
+version=1
+PageLayoutDescrFile=
+PlotDirectoryName=
+SubpartIdSeparator=0
+SubpartFirstId=65
+NetFmtName=Pcbnew
+SpiceAjustPassiveValues=0
+LabSize=50
+ERC_TestSimilarLabels=1
 [pcbnew]
 version=1
 PageLayoutDescrFile=
-LastNetListRead=
+LastNetListRead=ser4.net
 CopperLayerCount=2
 BoardThickness=1.6
 AllowMicroVias=0
@@ -54,7 +64,7 @@ OthersTextUpright=1
 SolderMaskClearance=0.2
 SolderMaskMinWidth=0
 SolderPasteClearance=0
-SolderPasteRatio=-0
+SolderPasteRatio=0
 [pcbnew/Layer.F.Cu]
 Name=F.Cu
 Type=0

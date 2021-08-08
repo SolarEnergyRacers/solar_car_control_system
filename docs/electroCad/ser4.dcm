@@ -1,0 +1,15 @@
+EESchema-DOCLIB  Version 2.0
+#
+$CMP ADS1115Grove
+K SER4
+$ENDCMP
+#
+$CMP Huzzah32feather
+K SER4
+$ENDCMP
+#
+$CMP PCF8574Wave
+K SER4
+$ENDCMP
+#
+#End Doc Library

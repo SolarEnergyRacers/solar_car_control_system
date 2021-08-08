@@ -3,7 +3,7 @@ EELAYER 30 0
 EELAYER END
 $Descr A4 11693 8268
 encoding utf-8
-Sheet 1 3
+Sheet 1 4
 Title "SER4"
 Date "2021-08-07"
 Rev "0.1"
@@ -24,5 +24,11 @@ S 950  3300 2850 1400
 U 611353D7
 F0 "SteeringWheel" 50
 F1 "SteeringWheel.sch" 50
+$EndSheet
+$Sheet
+S 4900 950  3000 1400
+U 611C1B43
+F0 "Sheet611C1B42" 50
+F1 "SandBox.sch" 50
 $EndSheet
 $EndSCHEMATC

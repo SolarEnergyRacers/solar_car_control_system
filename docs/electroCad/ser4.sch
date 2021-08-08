@@ -31,4 +31,6 @@ U 611C1B43
 F0 "Sheet611C1B42" 50
 F1 "SandBox.sch" 50
 $EndSheet
+Text Notes 950  5800 0    50   ~ 0
+Hinweise:\n- Das Huzzah32 ESP32 featherbord wird mit zwei parallelen Leisten gesteckt\n- Die WaveShare PCF8574 werden gesteckt (zwei 90° verdrehte Leisten mit 9 und 4 Pins)\n- Die Grove ADS1115 werden gesteckt (zwei 90° verdrehte Leisten mit 9 und 4 Pins)
 $EndSCHEMATC

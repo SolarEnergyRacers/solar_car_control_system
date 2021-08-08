@@ -14,25 +14,82 @@ Comment3 ""
 Comment4 "Main Unit"
 $EndDescr
 $Comp
-L Connector:DB15_Male J201
-U 1 1 611932EE
-P 3200 3050
-F 0 "J201" H 3355 3096 50  0000 L CNN
-F 1 "DB15_Male" H 3355 3005 50  0000 L CNN
-F 2 "" H 3200 3050 50  0001 C CNN
-F 3 " ~" H 3200 3050 50  0001 C CNN
-	1    3200 3050
-	1    0    0    -1  
-$EndComp
-$Comp
-L ser4:Huzzah32feather U?
+L ser4:Huzzah32feather ESP32
 U 1 1 611BAF24
 P 7750 2250
-F 0 "U?" H 7750 2365 50  0000 C CNN
+F 0 "ESP32" H 7750 2365 50  0000 C CNN
 F 1 "Huzzah32feather" H 7750 2274 50  0000 C CNN
 F 2 "" H 7750 2250 50  0001 C CNN
 F 3 "" H 7750 2250 50  0001 C CNN
 	1    7750 2250
+	1    0    0    -1  
+$EndComp
+$Comp
+L ser4:PCF8574Wave IOExt0
+U 1 1 6110207B
+P 2250 5800
+F 0 "IOExt0" H 2308 5865 50  0000 C CNN
+F 1 "PCF8574Wave" H 2308 5774 50  0000 C CNN
+F 2 "" H 2250 5800 50  0001 C CNN
+F 3 "" H 2250 5800 50  0001 C CNN
+	1    2250 5800
+	1    0    0    -1  
+$EndComp
+$Comp
+L ser4:PCF8574Wave IOExt1
+U 1 1 61102B5B
+P 3700 5800
+F 0 "IOExt1" H 3758 5865 50  0000 C CNN
+F 1 "PCF8574Wave" H 3758 5774 50  0000 C CNN
+F 2 "" H 3700 5800 50  0001 C CNN
+F 3 "" H 3700 5800 50  0001 C CNN
+	1    3700 5800
+	1    0    0    -1  
+$EndComp
+$Comp
+L Sensor_Temperature:DS1804 U?
+U 1 1 61103AA7
+P 7600 5100
+F 0 "U?" H 7600 5581 50  0000 C CNN
+F 1 "DS1804" H 7600 5490 50  0000 C CNN
+F 2 "" H 7600 5100 50  0001 C CNN
+F 3 "" H 7600 5100 50  0001 C CNN
+	1    7600 5100
+	1    0    0    -1  
+$EndComp
+$Comp
+L ser4:ADS1115Grove ADC1
+U 1 1 611014BF
+P 3600 4400
+F 0 "ADC1" H 3658 4515 50  0000 C CNN
+F 1 "ADS1115Grove" H 3658 4424 50  0000 C CNN
+F 2 "" H 3600 4400 50  0001 C CNN
+F 3 "" H 3600 4400 50  0001 C CNN
+	1    3600 4400
+	1    0    0    -1  
+$EndComp
+$Comp
+L ser4:ADS1115Grove ADC0
+U 1 1 6110100E
+P 2300 4450
+F 0 "ADC0" H 2358 4565 50  0000 C CNN
+F 1 "ADS1115Grove" H 2358 4474 50  0000 C CNN
+F 2 "" H 2300 4450 50  0001 C CNN
+F 3 "" H 2300 4450 50  0001 C CNN
+	1    2300 4450
+	1    0    0    -1  
+$EndComp
+Text Notes 800  1350 0    50   ~ 0
+Neu angelegte Ser4 Elemente sind mit dem Tag SER4 versehen.\nNoch nicht in Library gefunden oder angelegt:\n- Micro SD Card SSD1306\n- RTC\n- Can Transeiver sn65hcd232\n- Digipot DS1803\n- Gyro&Acc BM088\nDiverse Stecker/Buchsen
+$Comp
+L Connector:DB15_Male_HighDensity J?
+U 1 1 6111C69C
+P 2000 3300
+F 0 "J?" H 2000 4167 50  0000 C CNN
+F 1 "DB15_Male_HighDensity" H 2000 4076 50  0000 C CNN
+F 2 "" H 1050 3700 50  0001 C CNN
+F 3 " ~" H 1050 3700 50  0001 C CNN
+	1    2000 3300
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC

@@ -71,10 +71,10 @@ $EndComp
 Text Notes 800  1350 0    50   ~ 0
 Neu angelegte Ser4 Elemente sind mit dem Tag SER4 versehen.\nNoch nicht in Library gefunden oder angelegt:\n- Micro SD Card SSD1306\n- RTC\n- Can Transeiver sn65hcd232\n- Digipot DS1803\n- Gyro&Acc BM088\nDiverse Stecker/Buchsen
 $Comp
-L Connector:DB15_Male_HighDensity J?
+L Connector:DB15_Male_HighDensity J201
 U 1 1 6111C69C
 P 2000 3300
-F 0 "J?" H 2000 4167 50  0000 C CNN
+F 0 "J201" H 2000 4167 50  0000 C CNN
 F 1 "DB15_Male_HighDensity" H 2000 4076 50  0000 C CNN
 F 2 "" H 1050 3700 50  0001 C CNN
 F 3 " ~" H 1050 3700 50  0001 C CNN
@@ -82,10 +82,10 @@ F 3 " ~" H 1050 3700 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L DS18030-100+:DS18030-100+ IC?
+L DS18030-100+:DS18030-100+ DigiPot201
 U 1 1 611299BB
 P 5100 4550
-F 0 "IC?" H 5650 4815 50  0000 C CNN
+F 0 "DigiPot201" H 5650 4815 50  0000 C CNN
 F 1 "DS18030-100+" H 5650 4724 50  0000 C CNN
 F 2 "DIP762W56P254L1918H457Q16N" H 6050 4650 50  0001 L CNN
 F 3 "http://docs-emea.rs-online.com/webdocs/0a29/0900766b80a29b9d.pdf" H 6050 4550 50  0001 L CNN

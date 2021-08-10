@@ -47,17 +47,6 @@ F 3 "" H 3700 5800 50  0001 C CNN
 	1    0    0    -1  
 $EndComp
 $Comp
-L Sensor_Temperature:DS1804 U?
-U 1 1 61103AA7
-P 7600 5100
-F 0 "U?" H 7600 5581 50  0000 C CNN
-F 1 "DS1804" H 7600 5490 50  0000 C CNN
-F 2 "" H 7600 5100 50  0001 C CNN
-F 3 "" H 7600 5100 50  0001 C CNN
-	1    7600 5100
-	1    0    0    -1  
-$EndComp
-$Comp
 L ser4:ADS1115Grove ADC1
 U 1 1 611014BF
 P 3600 4400
@@ -90,6 +79,25 @@ F 1 "DB15_Male_HighDensity" H 2000 4076 50  0000 C CNN
 F 2 "" H 1050 3700 50  0001 C CNN
 F 3 " ~" H 1050 3700 50  0001 C CNN
 	1    2000 3300
+	1    0    0    -1  
+$EndComp
+$Comp
+L DS18030-100+:DS18030-100+ IC?
+U 1 1 611299BB
+P 5100 4550
+F 0 "IC?" H 5650 4815 50  0000 C CNN
+F 1 "DS18030-100+" H 5650 4724 50  0000 C CNN
+F 2 "DIP762W56P254L1918H457Q16N" H 6050 4650 50  0001 L CNN
+F 3 "http://docs-emea.rs-online.com/webdocs/0a29/0900766b80a29b9d.pdf" H 6050 4550 50  0001 L CNN
+F 4 "DS18030-100+, Digital Potentiometer 100 k 256-Position Linear 2-channel Serial-2 Wire 16-Pin PDIP N" H 6050 4450 50  0001 L CNN "Description"
+F 5 "4.572" H 6050 4350 50  0001 L CNN "Height"
+F 6 "Maxim Integrated" H 6050 4250 50  0001 L CNN "Manufacturer_Name"
+F 7 "DS18030-100+" H 6050 4150 50  0001 L CNN "Manufacturer_Part_Number"
+F 8 "700-DS18030-100" H 6050 4050 50  0001 L CNN "Mouser Part Number"
+F 9 "https://www.mouser.co.uk/ProductDetail/Maxim-Integrated/DS18030-100%2b?qs=wTZ%2FFzl837ZzSoi8Pd5T4g%3D%3D" H 6050 3950 50  0001 L CNN "Mouser Price/Stock"
+F 10 "" H 6050 3850 50  0001 L CNN "Arrow Part Number"
+F 11 "" H 6050 3750 50  0001 L CNN "Arrow Price/Stock"
+	1    5100 4550
 	1    0    0    -1  
 $EndComp
 $EndSCHEMATC

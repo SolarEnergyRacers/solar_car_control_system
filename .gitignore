@@ -17,3 +17,11 @@ extras/automation/geckodriver.exe
 extras/automation/config.yaml
 src/sdkconfig.h
 sdkconfig.esp32dev
+docs/electroCad/*.*-bak
+docs/electroCad/*.bck
+docs/electroCad/fp-info-cache
+docs/electroCad/test/test-cache.lib
+docs/electroCad/test/test.kicad_pcb
+docs/electroCad/test/test.pro
+docs/electroCad/test/test.sch
+docs/electroCad/test/test.sch-bak

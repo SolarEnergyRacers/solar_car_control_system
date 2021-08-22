@@ -28,3 +28,7 @@ Usage in car hull:
 - GND, VCC, I2C (SDA,SCL), Interrupt
 
 ![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/IO-Ext-CurcuitDiagram.drawio.png)
+
+### Board Assembly
+
+![image-20210822221312715](.PCF8574--IOExt0_IOExt1_IOExt2-infos/image-20210822221312715.png)

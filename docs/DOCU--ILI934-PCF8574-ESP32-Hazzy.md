@@ -82,3 +82,12 @@ It was measured at full screen black and full screen white (without any addition
 |     5.0     |         83         |         80         |       415       |       400        |
 
 ![image-20210327121949117](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/image-20210327121949117.png)
+
+## Mechanical Construction
+
+![2021-08-23 20.14.35](.DOCU--ILI934-PCF8574-ESP32-Hazzy/2021-08-23 20.14.35.jpg)
+
+
+
+![Untitled Diagram.drawio](.DOCU--ILI934-PCF8574-ESP32-Hazzy/Untitled Diagram.drawio.png)
+

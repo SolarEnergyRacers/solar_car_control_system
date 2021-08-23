@@ -89,5 +89,5 @@ It was measured at full screen black and full screen white (without any addition
 
 
 
-![Untitled Diagram.drawio](.DOCU--ILI934-PCF8574-ESP32-Hazzy/Untitled Diagram.drawio.png)
+![Untitled Diagram.drawio](.DOCU--ILI934-PCF8574-ESP32-Hazzy/mechanicalDimensions.drawio.png)
 

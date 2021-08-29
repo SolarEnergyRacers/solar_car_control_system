@@ -15,27 +15,26 @@
 
 ![Device Diagram](media/device_diagram.svg "Device Diagram")
 
-| Device:Port  | Functionality                                                           |
-| :----------- | :---------------------------------------------------------------------- |
-| **_ESP32_**  | main micro processor                                                    |
-| ESP32:2      | 1Wire                                                                   |
-| ESP32:22     | I2C:SCL                                                                 |
-| ESP32:23     | I2C:SDA                                                                 |
-| **ESP32:15** | SERIAL:TX                                                               |
-| ESP32:16     | SERIAL:RX                                                               |
-| ESP32:18     | SPI:MOSI                                                                |
-| ESP32:19     | SPI:MISO                                                                |
-| ESP32:5      | SPI:CLK                                                                 |
-| ESP32:12     |                                                                         |
-| **ESP32:13** | GPIO:LED_BUILTIN                                                        |
-| ESP32:33     | GPIO:PCF8574_INTERRUPT (TODO: fix collision with CS_SD_CARD - ESP32:14) |
-| **ESP32:14** | SPI:CS_SD_CARD                                                          |
-| ESP32:36     | SPI:CS_TFT_SCREEN                                                       |
-| ESP32:4      | SPI:DC                                                                  |
-| ESP32:21     | SPI:RST                                                                 |
-| ESP32:25     | GPIO:INTERRUPT (TODO: fix collision with CAN:TX !!)                     |
-| ESP32:25     | CAN:TX                                                                  |
-| ESP32:26     | CAN:RX                                                                  |
+| Device:Port  | Functionality          |
+| :----------- | :--------------------- |
+| **_ESP32_**  | main micro processor   |
+| ESP32:22     | I2C:SCL                |
+| ESP32:23     | I2C:SDA                |
+| **ESP32:15** | SERIAL:TX              |
+| ESP32:16     | SERIAL:RX              |
+| ESP32:18     | SPI:MOSI               |
+| ESP32:19     | SPI:MISO               |
+| ESP32:5      | SPI:CLK                |
+| ESP32:12     | 1Wire                  |
+| **ESP32:13** | GPIO:LED_BUILTIN       |
+| ESP32:33     | GPIO:PCF8574_INTERRUPT |
+| **ESP32:14** | SPI:CS_SD_CARD         |
+| ESP32:36     | SPI:CS_TFT_SCREEN      |
+| ESP32:4      | SPI:DC                 |
+| ESP32:21     | SPI:RST                |
+| ESP32:25     | GPIO:INTERRUPT         |
+| ESP32:25 DAC | CAN:TX                 |
+| ESP32:26 DAC | CAN:RX                 |
 
 | **_ADS1x15_**                            |    Analog to digital converter     |
 | :--------------------------------------- | :--------------------------------: |
@@ -55,35 +54,35 @@
 | ADC2:2                                   |                                    |
 | ADC2:3                                   |                                    |
 
-| **_PCF8574_**           |  Input/Output extender  |
-| :---------------------- | :---------------------: |
-| IOExt0, I2C Addr (TODO) |                         |
-| IOExt0:0                | switch: battery on/off  |
-| IOExt0:1                |    switch: PV on/off    |
-| IOExt0:2                |  switch: motor on/off   |
-| IOExt0:3                |      mc: eco/power      |
-| IOExt0:4                |       mc: on/off        |
-| IOExt0:5                |       mc: fwd/rwd       |
-| IOExt0:6                |       pv: on/off        |
-| IOExt0:7                |   battery fan on/off    |
-| IOExt1, I2C Addr (TODO) |                         |
-| IOExt1:0                | output: left indicator  |
-| IOExt1:1                | output: right indicator |
-| IOExt1:2                |      output: horn       |
-| IOExt1:3                |   output: head light    |
-| IOExt1:4                |      output: light      |
-| IOExt1:5                |                         |
-| IOExt1:6                |                         |
-| IOExt1:7                |                         |
-| IOExt2, I2C Addr (TODO) | steering wheel buttons  |
-| IOExt2:0                | button: left indicator  |
-| IOExt2:1                | button: right indicator |
-| IOExt2:2                |   button: head light    |
-| IOExt2:3                |      button: light      |
-| IOExt2:4                |      button: horn       |
-| IOExt2:5                |      button: next       |
-| IOExt2:6                |   button: power/speed   |
-| IOExt2:7                |    button: set/reset    |
+| **_PCF8574_**           |      Input/Output extender      |
+| :---------------------- | :-----------------------------: |
+| IOExt0, I2C Addr (TODO) |                                 |
+| IOExt0:0 in             | switch (status): battery on/off |
+| IOExt0:1 in             |   switch (status): PV on/off    |
+| IOExt0:2 in             |  switch (status): motor on/off  |
+| IOExt0:3                |        ~~mc: eco/power~~        |
+| IOExt0:4                |         ~~mc: on/off~~          |
+| IOExt0:5 in             |    switch (status): fwd/rwd     |
+| IOExt0:6                |         ~~pv: on/off~~          |
+| IOExt0:7                |   output: battery fan on/off    |
+| IOExt1, I2C Addr (TODO) |                                 |
+| IOExt1:0                |     output: left indicator      |
+| IOExt1:1                |     output: right indicator     |
+| IOExt1:2                |          output: horn           |
+| IOExt1:3                |       output: head light        |
+| IOExt1:4                |          output: light          |
+| IOExt1:5                |                                 |
+| IOExt1:6                |                                 |
+| IOExt1:7                |                                 |
+| IOExt2, I2C Addr (TODO) |     steering wheel buttons      |
+| IOExt2:0                |     button: left indicator      |
+| IOExt2:1                |     button: right indicator     |
+| IOExt2:2                |       button: head light        |
+| IOExt2:3                |          button: light          |
+| IOExt2:4                |          button: horn           |
+| IOExt2:5                |          button: next           |
+| IOExt2:6                |       button: power/speed       |
+| IOExt2:7                |        button: set/reset        |
 
 | **_ILI9341_** |            3.2" 320x240 display             |
 | :------------ | :-----------------------------------------: |

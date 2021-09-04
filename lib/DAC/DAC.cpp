@@ -15,8 +15,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "DAC.h"
-#include "DriverDisplayC.h"
+#include <DAC.h>
+#include <DriverDisplayC.h>
 
 #define BASE_ADDR_CMD 0xA8
 

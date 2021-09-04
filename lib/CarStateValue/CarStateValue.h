@@ -9,8 +9,6 @@
 
 using namespace std;
 
-
-
 class CarStateValue {
 
   // pyhsical car data

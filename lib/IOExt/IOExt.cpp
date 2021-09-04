@@ -10,7 +10,7 @@
 #include <I2CBus.h>
 #include <Indicator.h>
 
-#include "IOExt.h"
+#include <IOExt.h>
 
 extern I2CBus i2cBus;
 extern Indicator indicator;

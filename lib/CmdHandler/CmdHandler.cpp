@@ -12,13 +12,13 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "ADC.h"
-#include "CmdHandler.h"
-#include "DAC.h"
-#include "DriverDisplayC.h"
-#include "Helper.h"
-#include "IOExt.h"
-#include "Indicator.h"
+#include <ADC.h>
+#include <CmdHandler.h>
+#include <DAC.h>
+#include <DriverDisplayC.h>
+#include <Helper.h>
+#include <IOExt.h>
+#include <Indicator.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;

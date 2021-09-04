@@ -6,10 +6,6 @@
 
 #include <CarState.h>
 
-#include <DriverDisplayC.h>
-#include <IOExt.h>
-#include <Indicator.h>
-
 using namespace std;
 
 extern CONSTANT_MODE constant_drive_mode;

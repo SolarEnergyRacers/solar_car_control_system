@@ -6,7 +6,7 @@
 
 #include <Wire.h>
 
-#include "PWM.h"
+#include <PWM.h>
 #include <I2CBus.h>
 
 #include <Adafruit_PWMServoDriver.h>

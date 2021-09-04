@@ -12,8 +12,8 @@
 #include <abstract_task.h>
 #include <definitions.h>
 
-#include "ADC.h"
-#include "DriverDisplayC.h"
+#include <ADC.h>
+#include <DriverDisplayC.h>
 
 #include <SPIBus.h>
 

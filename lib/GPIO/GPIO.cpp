@@ -10,7 +10,7 @@
 
 #include <driver/gpio.h>
 
-#include "GPIO.h"
+#include <GPIO.h>
 
 void GPInputOutput::re_init() { init(); }
 

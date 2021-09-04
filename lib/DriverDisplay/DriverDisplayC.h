@@ -1,7 +1,7 @@
 //
 // Display
 //
-#include "LocalFunctionsAndDevices.h"
+#include <LocalFunctionsAndDevices.h>
 
 #ifndef DRIVER_DISPLAY_C_H
 #define DRIVER_DISPLAY_C_H

@@ -5,7 +5,7 @@
 #ifndef INDICATOR_H
 #define INDICATOR_H
 
-#include "DriverDisplayC.h"
+#include <DriverDisplayC.h>
 
 class Indicator : public abstract_task {
 private:

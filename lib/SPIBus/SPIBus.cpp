@@ -9,7 +9,7 @@
 
 #include <definitions.h>
 
-#include "SPIBus.h"
+#include <SPIBus.h>
 
 void SPIBus::re_init() { init(); }
 

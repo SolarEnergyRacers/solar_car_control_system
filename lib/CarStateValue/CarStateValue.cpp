@@ -3,12 +3,12 @@
 //
 
 #include <definitions.h>
-
 #include <CarStateValue.h>
+#include <stdio.h>      /* printf */
+#include <stdlib.h>     /* abs */
 
-#include <DriverDisplayC.h>
-#include <IOExt.h>
-#include <Indicator.h>
+
+using namespace std;
 
 // set the new mesured speed and returns the last set speed
 int CarStateValue::set(int theValue) {

@@ -8,8 +8,8 @@
 #include <Adafruit_ILI9341.h> // display
 #include <SPIBus.h>
 
-#include "DriverDisplayC.h"
-#include "Indicator.h"
+#include <DriverDisplayC.h>
+#include <Indicator.h>
 
 INDICATOR Indicator::getIndicator() { return curState; }
 

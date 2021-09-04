@@ -9,7 +9,7 @@
 
 #include <I2CBus.h>
 
-#include "Display.h"
+#include <Display.h>
 
 extern I2CBus i2cBus;
 Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET); // TODO: remove & add to class

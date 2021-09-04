@@ -9,9 +9,9 @@
 #include <I2CBus.h>
 #include <Wire.h> // I2C
 
-#include "ADC.h"
-#include "DAC.h"
-#include "DriverDisplayC.h"
+#include <ADC.h>
+#include <DAC.h>
+#include <DriverDisplayC.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;

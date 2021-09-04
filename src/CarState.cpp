@@ -2,9 +2,10 @@
 // Car State with all car information
 //
 
+#include <string>
 #include <definitions.h>
-
 #include <CarState.h>
+#include <DriverDisplayC.h>
 
 using namespace std;
 

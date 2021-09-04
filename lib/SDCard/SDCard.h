@@ -2,8 +2,8 @@
 // SD Card
 //
 
-#ifndef SDCARD_H
-#define SDCARD_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H
+#define SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H
 
 #include <SD.h>
 
@@ -17,4 +17,4 @@ public:
   void init();
   void re_init();
 };
-#endif // SDCARD_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H

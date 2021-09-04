@@ -1,8 +1,8 @@
 /*
  * Global definitions (pinout, device settings, ..)
  */
-#ifndef DEFINITIONS_H
-#define DEFINITIONS_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_DEFINITIONS_H
+#define SOLAR_CAR_CONTROL_SYSTEM_DEFINITIONS_H
 
 /*
  *  GPIO
@@ -119,4 +119,4 @@
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 
-#endif // DEFINITIONS_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_DEFINITIONS_H

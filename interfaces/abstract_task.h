@@ -2,8 +2,8 @@
 // This is an example class
 //
 
-#ifndef ABSTRACT_TASK_H
-#define ABSTRACT_TASK_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_ABSTRACT_TASK_H
+#define SOLAR_CAR_CONTROL_SYSTEM_ABSTRACT_TASK_H
 
 #include <stdint.h>
 #include <string>
@@ -31,4 +31,4 @@ public:
   static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };
 };
 
-#endif // ABSTRACT_TASK_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_ABSTRACT_TASK_H

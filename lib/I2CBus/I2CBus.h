@@ -2,8 +2,8 @@
 // I2C Bus
 //
 
-#ifndef I2CBUS_H
-#define I2CBUS_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_I2CBUS_H
+#define SOLAR_CAR_CONTROL_SYSTEM_I2CBUS_H
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -18,4 +18,4 @@ public:
   void scan_i2c_devices();
 };
 
-#endif // I2CBUS_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_I2CBUS_H

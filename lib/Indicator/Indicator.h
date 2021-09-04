@@ -2,8 +2,8 @@
 // Indicators LEFT, RIGTH, WARN
 //
 
-#ifndef INDICATOR_H
-#define INDICATOR_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
+#define SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
 
 #include <DriverDisplayC.h>
 
@@ -22,4 +22,4 @@ public:
   void setIndicator(INDICATOR state);
 };
 
-#endif // INDICATOR_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H

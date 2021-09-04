@@ -2,8 +2,8 @@
 // Display
 //
 
-#ifndef DISPLAY_H
-#define DISPLAY_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_DISPLAY_H
+#define SOLAR_CAR_CONTROL_SYSTEM_DISPLAY_H
 
 #include <Wire.h>
 #include <abstract_task.h>
@@ -21,4 +21,4 @@ public:
   void task(void);
 };
 
-#endif // DISPLAY_H
+#endif //SOLAR_CAR_CONTROL_SYSTEM_ DISPLAY_H

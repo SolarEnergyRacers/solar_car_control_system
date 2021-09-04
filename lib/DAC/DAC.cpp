@@ -4,19 +4,19 @@
 
 #include <definitions.h>
 
-#include <Helper.h>
-#include <I2CBus.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include <Arduino.h>
-#include <SPI.h>
-#include <Wire.h> // I2C
 #include <inttypes.h>
 #include <stdio.h>
 
+#include <Arduino.h>
+#include <Helper.h>
+#include <I2CBus.h>
+#include <SPI.h>
+#include <Wire.h> // I2C
+
 #include <DAC.h>
-#include <DriverDisplayC.h>
 
 #define BASE_ADDR_CMD 0xA8
 

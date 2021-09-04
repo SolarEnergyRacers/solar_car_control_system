@@ -2,8 +2,8 @@
 // CAN Bus
 //
 
-#ifndef CAN_H
-#define CAN_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_CAN_H
+#define SOLAR_CAR_CONTROL_SYSTEM_CAN_H
 
 #include <CAN_config.h>
 #include <ESP32CAN.h>
@@ -19,4 +19,4 @@ public:
   void re_init();
 };
 
-#endif // CAN_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_CAN_H

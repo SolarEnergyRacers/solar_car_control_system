@@ -2,8 +2,8 @@
 // PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
 //
 
-#ifndef IOEXT_H
-#define IOEXT_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
+#define SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
 
 #include <PCF8574.h>
 #include <definitions.h>
@@ -35,4 +35,4 @@ private:
   static volatile bool ioInterruptRequest;
 };
 
-#endif // IOEXT_H
+#endif //SOLAR_CAR_CONTROL_SYSTEM_ IOEXT_H

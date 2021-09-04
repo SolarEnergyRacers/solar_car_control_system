@@ -2,8 +2,8 @@
 // Command Receiver and Handler
 //
 
-#ifndef CMDHANDLER_H
-#define CMDHANDLER_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H
+#define SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H
 
 #include <abstract_task.h>
 
@@ -50,4 +50,4 @@ public:
   void task(void); // this is the actual task
 };
 
-#endif // CMDHANDLER_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H

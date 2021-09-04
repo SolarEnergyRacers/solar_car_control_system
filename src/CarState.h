@@ -2,9 +2,10 @@
 // Car State with all car information
 //
 
-#ifndef CARSTATE_H
-#define CARSTATE_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H
+#define SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H
 
+#include <string>
 #include <definitions.h>
 #include <CarStateValue.h>
 
@@ -29,4 +30,4 @@ public:
   string serializedState();
 };
 
-#endif // CARSTATE_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H

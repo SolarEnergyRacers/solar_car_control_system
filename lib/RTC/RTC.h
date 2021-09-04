@@ -2,8 +2,8 @@
 // Real-Time Clock
 //
 
-#ifndef RTC_H
-#define RTC_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_RTC_H
+#define SOLAR_CAR_CONTROL_SYSTEM_RTC_H
 
 #include <RtcDS1307.h>
 #include <Wire.h>
@@ -22,4 +22,4 @@ public:
   RtcDateTime read_rtc_datetime(void);
 };
 
-#endif // RTC_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_RTC_H

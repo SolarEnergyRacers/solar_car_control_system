@@ -13,21 +13,40 @@ using namespace std;
 
 class CarState {
 
-  // pyhsical car data
-
 public:
-  // set the new mesured speed and returns the last set speed
-  CarStateValue Speed;
-  CarStateValue Acceleration;
-  CarStateValue Deceleration;
+  // CarState();
+  // virtual ~CarState();
   
-  // logical car data
-  CarStateValue TargetSpeed;
-  CarStateValue TargetPower;
+  // pyhsical car data (measurment values)
+  CarStateValue<int> Speed;
+  CarStateValue<int> Acceleration;
+  CarStateValue<int> Deceleration;
+  
+  CarStateValue<float> Battery;
+  CarStateValue<float> PhotoVoltaic;
+  CarStateValue<float> Motor;
+
+  // logical car data (values set by driver or chase car)
+  CarStateValue<int> TargetSpeed;
+  CarStateValue<int> TargetPower;
+  CarStateValue<string> infoLast;
+  CarStateValue<bool> light1On;
+  CarStateValue<bool> light2On;
+  CarStateValue<bool> indicatorLeft;
+  CarStateValue<bool> indicatorRigth;
 
   // tools
   string printableState();
   string serializedState();
+
 };
+
+// void TemporaryFunction2 ()
+// {
+//     CarStateValue<int> tmpInt;
+//     CarStateValue<float> tmpFloat;
+//     CarStateValue<bool> tmpBool;
+//     CarState tempCs;
+// }
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H

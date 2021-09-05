@@ -46,6 +46,8 @@
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
 
+#include <CarState.h>
+
 // add C linkage definition
 extern "C" {
 void app_main(void);
@@ -90,6 +92,13 @@ void app_main(void) {
 
   // report chip info
   chip_info();
+
+  CarState cs;
+  cs.Speed.set(123);
+  cs.Battery.set(3.21);
+  printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
+  // printf("All %s\n", cs.printableState().c_str());
+  printf("========================================================================================\n");
 
   // init buses
   oneWireBus.init();

@@ -2,21 +2,24 @@
 // CAN Bus
 //
 
-#ifndef CAN_H
-#define CAN_H
+#ifndef CANBUS_H
+#define CANBUS_H
 
-#include <CAN_config.h>
-#include <ESP32CAN.h>
-
-void read_can_demo_task(void *pvParameter);
-
-class CanBus {
+#include <abstract_task.h>
+#include <definitions.h>
+class CanBus : public abstract_task {
 private:
+  uint64_t bus_freq = 125E3; // 125kbit/s
 public:
   SemaphoreHandle_t mutex;
-  CAN_device_t cfg;
+  string getName(void);
   void init();
   void re_init();
+  void read_poll();
+  void write(uint64_t address, char* data, uint64_t length);
+  void write_extended(uint64_t address, char* data, uint64_t length);
+  void exit();
+  void task();
 };
 
-#endif // CAN_H
+#endif // CANBUS_H

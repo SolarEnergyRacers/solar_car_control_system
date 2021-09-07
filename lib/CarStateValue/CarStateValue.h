@@ -30,6 +30,7 @@ public:
   T get_last() { return _ValueLast; }
   // makes the recent value to the valueLast
   void overtake_recent_to_last() { _ValueLast = _Value; }
+  void set_epsilon(T theEpsilon) { _epsilon = theEpsilon; }
   // check if there is a vaue difference bettween current and last
   bool is_changed() { return abs(_Value - _ValueLast) > _epsilon; }
 };

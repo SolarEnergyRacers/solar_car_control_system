@@ -199,7 +199,7 @@ void CmdHandler::printSystemValues() {
 
   printf("IOExt2:");
   for (int idx = 0; idx < 8; idx++) {
-    printf(" %d", ioExt.get_ioext(idx));
+    printf(" %d", ioExt.get((IOExt::Pin)(0x20 | idx))); // all pins of IOExt2
     if (idx == 3) {
       printf(" - ");
     }

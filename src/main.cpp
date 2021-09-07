@@ -87,17 +87,25 @@ void app_main(void) {
   Serial.begin(115200);
   delay(2000);
   printf("\n--------------------\n");
-  Serial.println("esp32dev + free RTOS\n");
+  Serial.println("esp32dev + free RTOS");
   printf("--------------------\n");
 
   // report chip info
   chip_info();
+  printf("--------------------\n");
 
   CarState cs;
+  printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
   cs.Speed.set(123);
   cs.Battery.set(3.21);
   printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
+  printf("All %s\n", cs.printableState());
+  // CarState* cs = new CarState();
+  // cs->Speed.set(123);
+  // cs.Battery.set(3.21);
+  // printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
   // printf("All %s\n", cs.printableState().c_str());
+
   printf("========================================================================================\n");
 
   // init buses

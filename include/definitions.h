@@ -36,8 +36,11 @@
 #define OLED_HEIGHT 64
 #define I2C_ADDRESS_SSD1305 0x3C
 
+#define PCF8574_NUM_DEVICES 3
 #define PCF8574_NUM_PORTS 8
-#define I2C_ADDRESS_PCF8574_IOExt2 0x20
+#define I2C_ADDRESS_PCF8574_IOExt0 0x20 // TODO: add correct address!!!
+#define I2C_ADDRESS_PCF8574_IOExt1 0x20 // TODO: add correct address!!!
+#define I2C_ADDRESS_PCF8574_IOExt2 0x20 // TODO: add correct address!!!
 #define I2C_INTERRUPT_PIN_PCF8574 33
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}

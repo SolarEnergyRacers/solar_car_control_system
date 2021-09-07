@@ -22,8 +22,8 @@ void ADC::re_init() { ADC::init(); }
 void ADC::init() {
 
   // instantiate the devices with their corresponding address
-  ads_addrs[0] = 0; // I2C_ADDRESS_ADS1x15_0;
-  ads_addrs[1] = 0; // I2C_ADDRESS_ADS1x15_1;
+  ads_addrs[0] = I2C_ADDRESS_ADS1x15_0;
+  ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
 
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {

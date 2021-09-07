@@ -1,33 +1,65 @@
-//
-// PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
-//
+/*
+ * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
+ */
 
 #ifndef IOEXT_H
 #define IOEXT_H
 
 #include <PCF8574.h>
 #include <definitions.h>
+#include <abstract_task.h>
 
 class IOExt : public abstract_task {
 private:
-  // TODO: is there an IOExt1? If yes: we should integrate this here too, see ADC multi device as a reference, Else: remove '2'
-  PCF8574 IOExt2 = PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler);
+
+  PCF8574 IOExt[3] = {
+    PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+    PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+    PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler)
+  };
   bool isInInterruptHandler = false;
-  // simulation - start (for simulation purpose)
-  int speed = 0;
-  int acceleration = 0;
-  // simulation - end
   int taskSleep = 50;
   void handleIoInterrupt(void);
 
 public:
-  string getName(void) { return "IOExt"; };
+
+  enum Pin { // high nibble: device number, low nibble: port
+    // IOExt0
+    DUMMY01 = 0x00, // TODO: add human readeable name
+    DUMMY02 = 0x01,
+    DUMMY03 = 0x02,
+    DUMMY04 = 0x03,
+    DUMMY05 = 0x04,
+    DUMMY06 = 0x05,
+    DUMMY07 = 0x06,
+    DUMMY08 = 0x07,
+    // IOExt1
+    DUMMY11 = 0x10,
+    DUMMY12 = 0x11,
+    DUMMY13 = 0x12,
+    DUMMY14 = 0x13,
+    DUMMY15 = 0x14,
+    DUMMY16 = 0x15,
+    DUMMY17 = 0x16,
+    DUMMY18 = 0x17,
+    // IOExt2
+    DUMMY21 = 0x20,
+    DUMMY22 = 0x21,
+    DUMMY23 = 0x22,
+    DUMMY24 = 0x23,
+    DUMMY25 = 0x24,
+    DUMMY26 = 0x25,
+    DUMMY27 = 0x26,
+    DUMMY28 = 0x27  
+  };
+  string getName(void) { return string("IOExt"); };
   void init(void);
   void re_init(void);
   void exit(void);
   void task(void);
-  void set_ioext(int port, bool value);
-  int get_ioext(int port);
+  void setMode(Pin port, uint8_t mode);
+  void set(Pin port, bool value);
+  int get(Pin port);
 
   static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
 
@@ -36,3 +68,42 @@ private:
 };
 
 #endif // IOEXT_H
+
+/*
+
+= {
+    PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+    PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+    PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler)
+  };
+
+  enum Pin { // high nibble: device number, low nibble: port
+    // IOExt0
+    DUMMY01 = 0x00, // TODO: add human readeable name
+    DUMMY02 = 0x01,
+    DUMMY03 = 0x02,
+    DUMMY04 = 0x03,
+    DUMMY05 = 0x04,
+    DUMMY06 = 0x05,
+    DUMMY07 = 0x06,
+    DUMMY08 = 0x07,
+    // IOExt1
+    DUMMY11 = 0x10,
+    DUMMY12 = 0x11,
+    DUMMY13 = 0x12,
+    DUMMY14 = 0x13,
+    DUMMY15 = 0x14,
+    DUMMY16 = 0x15,
+    DUMMY17 = 0x16,
+    DUMMY18 = 0x17,
+    // IOExt2
+    DUMMY21 = 0x20,
+    DUMMY22 = 0x21,
+    DUMMY23 = 0x22,
+    DUMMY24 = 0x23,
+    DUMMY25 = 0x24,
+    DUMMY26 = 0x25,
+    DUMMY27 = 0x26,
+    DUMMY28 = 0x27  
+  };
+  */

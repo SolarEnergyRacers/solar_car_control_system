@@ -12,6 +12,7 @@
 #include <inttypes.h>
 #include <stdio.h>
 
+#include <CarState.h>
 #include <ADC.h>
 #include <CmdHandler.h>
 #include <DAC.h>
@@ -19,12 +20,15 @@
 #include <Helper.h>
 #include <IOExt.h>
 #include <Indicator.h>
+#include <sstream>
+#include <string>
 
 extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
 extern IOExt ioExt;
 extern Indicator indicator;
+extern CarState carState;
 
 void CmdHandler::re_init() { init(); }
 
@@ -70,6 +74,7 @@ void CmdHandler::task() {
         break;
       case 'S':
         printSystemValues();
+        debug_printf("%s\n", carState.print("Recent State").c_str());
         break;
       case '-':
         adc.adjust_min_acc_dec();
@@ -79,11 +84,14 @@ void CmdHandler::task() {
         break;
       case 's':
         if (input[2] == 'f') {
+          carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
           dd->write_drive_direction(DRIVE_DIRECTION::FORWARD);
         } else if (input[2] == 'b') {
+          carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
           dd->write_drive_direction(DRIVE_DIRECTION::BACKWARD);
         } else {
-          dd->write_speed(atoi(&input[1]));
+          carState.Speed.set(atoi(&input[1]));
+          dd->write_speed();
         }
         break;
       case 'b':

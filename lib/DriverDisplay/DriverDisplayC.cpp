@@ -15,6 +15,7 @@
 #include <ADC.h>
 #include <DriverDisplayC.h>
 
+#include <CarState.h>
 #include <SPIBus.h>
 
 #include <Adafruit_GFX.h>     // graphics library
@@ -32,6 +33,7 @@
 extern SPIBus spiBus;
 extern ADC adc;
 extern bool systemOk;
+extern CarState carState;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // namespace DriverDisplayC {
@@ -644,6 +646,11 @@ void DriverDisplayC ::light2OnOff() {
 }
 
 // Write the speed in the centre frame
+void DriverDisplayC ::write_speed() {
+  int value = carState.Speed.get();
+  write_speed(value);
+}
+
 void DriverDisplayC ::write_speed(int value) {
   speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 

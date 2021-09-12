@@ -10,7 +10,7 @@
 class Indicator : public abstract_task {
 private:
   volatile bool blinkState = false;
-  volatile INDICATOR curState = INDICATOR::OFF;
+  //volatile INDICATOR curState = INDICATOR::OFF;
 
 public:
   string getName(void);

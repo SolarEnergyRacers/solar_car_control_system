@@ -12,6 +12,7 @@
 #include <ADS1X15.h>          // ADS1x15
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
 #include <abstract_task.h>
+#include <CarState.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -21,11 +22,11 @@ using namespace std;
 extern SemaphoreHandle_t spi_mutex;
 
 // namespace DriverDisplayC {
-// public structures
-enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-enum class CONSTANT_MODE { NONE, SPEED, POWER };
-enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
+// // public structures
+// enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
+// enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+// enum class CONSTANT_MODE { NONE, SPEED, POWER };
+// enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 
 class DriverDisplayC : public abstract_task {
 
@@ -167,7 +168,8 @@ public:
 
   void write_drive_direction(DRIVE_DIRECTION);
   void write_driver_info(String msg, INFO_TYPE type);
-  void write_speed(int speed);
+  void write_speed();
+  void write_speed(int value);
   void write_bat(float voltage);
   void write_motor(float ampers);
   void write_pv(float voltage);

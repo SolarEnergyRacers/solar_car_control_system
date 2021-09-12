@@ -11,17 +11,29 @@
 #include <DriverDisplayC.h>
 #include <Indicator.h>
 
-INDICATOR Indicator::getIndicator() { return curState; }
+extern CarState carState;
+
+// INDICATOR Indicator::getIndicator() { return curState; }
+
+// void Indicator::setIndicator(INDICATOR state) {
+//   if (curState == state) {
+//     debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
+//     curState = INDICATOR::OFF;
+//   } else {
+//     debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
+//     curState = state;
+//   }
+// }
+
+INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
 
 void Indicator::setIndicator(INDICATOR state) {
-  if (curState == state) {
+  if (carState.Indicator.get() == state) {
     debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
-    curState = INDICATOR::OFF;
-    // DriverDisplayC::indicator_set_and_blink(curState, false);
+    carState.Indicator.set(INDICATOR::OFF);
   } else {
     debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
-    curState = state;
-    // DriverDisplayC::indicator_set_and_blink(curState, true);
+    carState.Indicator.set(state);
   }
 }
 
@@ -49,7 +61,7 @@ void Indicator::task() {
   // polling loop
   DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
-    dd->indicator_set_and_blink(curState, blinkState);
+    dd->indicator_set_and_blink(carState.Indicator.get(), blinkState);
     blinkState = !blinkState;
 
     // sleep

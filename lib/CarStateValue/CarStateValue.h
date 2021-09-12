@@ -14,9 +14,9 @@ using namespace std;
 template <typename T> class CarStateValue {
 
 private:
-  T _epsilon = 0;
-  T _Value = 0;
-  T _ValueLast = 0;
+  T _epsilon;
+  T _Value;
+  T _ValueLast;
 
 public:
   // set the new value and returns the last set value

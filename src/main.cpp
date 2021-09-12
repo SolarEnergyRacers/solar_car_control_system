@@ -40,6 +40,7 @@
 #include <SPIBus.h>
 #include <Serial.h>
 #include <Temp.h>
+#include <iostream>
 #include <string>
 #include <system.h>
 
@@ -73,6 +74,7 @@ PWM pwm;
 Display disp;
 RTC rtc;
 GPInputOutput gpio; // I2C Interrupts
+CarState carState;
 
 bool startOk = true;
 bool systemOk = false;
@@ -94,18 +96,9 @@ void app_main(void) {
   chip_info();
   printf("--------------------\n");
 
-  CarState cs;
-  printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
-  cs.Speed.set(123);
-  cs.Battery.set(3.21);
-  printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
-  printf("All %s\n", cs.printableState());
-  // CarState* cs = new CarState();
-  // cs->Speed.set(123);
-  // cs.Battery.set(3.21);
-  // printf("Speed: %d, Battery: %f\n", cs.Speed.get(), cs.Battery.get());
-  // printf("All %s\n", cs.printableState().c_str());
+  cout << carState.print("Recent values:");
 
+  cout << carState.serialize("") << endl;
   printf("========================================================================================\n");
 
   // init buses

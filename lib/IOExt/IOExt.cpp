@@ -21,7 +21,9 @@ void IOExt::init() {
 
   for(int i = 0; i < PCF8574_NUM_DEVICES; i++){
     if(IOExt[i].begin()){
-      printf("Initialization of IOExt0%u failed.\n", i);
+        printf("Initialization of IOExt0%u failed.\n", i);
+    } else {
+        printf("Initialization of IOExt0%u successful.\n", i);
     }
   }
 

@@ -57,10 +57,11 @@ void CanBus::init() {
   // TODO: CAN.setPins(int cs, int irq);
 
   // start the CAN bus at 125 kbps
-  if(!CAN.begin(bus_freq)) {
-    Serial.println("Starting CAN failed!");
+  if(CAN.begin(bus_freq)) {
+      Serial.println("CAN initialization succeeded..");
+  } else {
+      Serial.println("CAN initialization failed.");
   }
-  Serial.println("CAN initialized.");
 
   xSemaphoreGive(mutex);
 }

@@ -2,8 +2,8 @@
 // CAN Bus
 //
 
-#ifndef CANBUS_H
-#define CANBUS_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_CANBUS_H
+#define SOLAR_CAR_CONTROL_SYSTEM_CANBUS_H
 
 #include <abstract_task.h>
 #include <definitions.h>
@@ -22,4 +22,4 @@ public:
   void task();
 };
 
-#endif // CANBUS_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_CANBUS_H

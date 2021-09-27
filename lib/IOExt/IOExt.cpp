@@ -41,10 +41,23 @@ void IOExt::handleIoInterrupt() {
 
   // read all
   PCF8574::DigitalInput dra[PCF8574_NUM_DEVICES];
+
+#ifdef USE_LEGACY_PIN_READ
   for(int i = 0; i < PCF8574_NUM_DEVICES; i++){
     dra[i] = IOExt[i].digitalReadAll();
   }
-
+#elif
+    for(int i = 0; i < PCF8574_NUM_DEVICES; i++){
+        dra[i].p0 = IOExt[i].digitalRead(0);
+        dra[i].p1 = IOExt[i].digitalRead(1);
+        dra[i].p2 = IOExt[i].digitalRead(2);
+        dra[i].p3 = IOExt[i].digitalRead(3);
+        dra[i].p4 = IOExt[i].digitalRead(4);
+        dra[i].p5 = IOExt[i].digitalRead(5);
+        dra[i].p6 = IOExt[i].digitalRead(6);
+        dra[i].p7 = IOExt[i].digitalRead(7);
+    }
+#endif
   xSemaphoreGive(i2cBus.mutex);
 
   // TODO: handle all 

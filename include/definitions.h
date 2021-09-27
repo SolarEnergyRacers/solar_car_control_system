@@ -43,6 +43,7 @@
 #define I2C_ADDRESS_PCF8574_IOExt2 0x22 // TODO: set jumpers accordingly
 #define I2C_ADDRESS_PCF8574_IOExt3 0x23 // TODO: set jumpers accordingly
 #define I2C_INTERRUPT_PIN_PCF8574 33
+#define USE_LEGACY_PIN_READ
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
 #define DS1803_BASE_ADDR 0x28

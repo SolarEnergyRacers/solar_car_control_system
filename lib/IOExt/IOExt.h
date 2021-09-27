@@ -53,14 +53,14 @@ public:
     DUMMY27 = 0x26,
     DUMMY28 = 0x27,
     // IOExt3
-    DUMMY21 = 0x30,
-    DUMMY22 = 0x31,
-    DUMMY23 = 0x32,
-    DUMMY24 = 0x33,
-    DUMMY25 = 0x34,
-    DUMMY26 = 0x35,
-    DUMMY27 = 0x36,
-    DUMMY28 = 0x37
+    DUMMY31 = 0x30,
+    DUMMY32 = 0x31,
+    DUMMY33 = 0x32,
+    DUMMY34 = 0x33,
+    DUMMY35 = 0x34,
+    DUMMY36 = 0x35,
+    DUMMY37 = 0x36,
+    DUMMY38 = 0x37
   };
   string getName(void) { return string("IOExt"); };
   void init(void);

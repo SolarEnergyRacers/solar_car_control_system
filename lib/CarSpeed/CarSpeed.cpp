@@ -17,6 +17,7 @@
 
 #include <PID_v1.h>
 
+extern CarSpeed carSpeed;
 extern ADC adc;
 extern DAC dac;
 

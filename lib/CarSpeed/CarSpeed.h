@@ -5,10 +5,11 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H
 #define SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H
 
-class CarSpeed {
+#include <PID_v1.h>
+
+class CarSpeed : public abstract_task {
 private:
     uint32_t sleep_polling_ms = 200;
-    float target_speed;
     double target_speed, input_value, output_setpoint;
     double Kp=2, Ki=5, Kd=1;
     PID pid(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);

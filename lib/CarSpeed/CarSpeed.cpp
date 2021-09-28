@@ -47,7 +47,7 @@ float get_current_speed() {
     int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
 
     // convert value to voltage
-    float voltage = value * 5 / 65536; // TODO: check if we really use 16bit ADS1115
+    float voltage = value * 5.0 / 65536; // TODO: check if we really use 16bit ADS1115
 
     // convert value from voltage to revolutions per minute: 370rpm / V
     float wheel_circumference = 1.0 // TODO: set circumference = diameter*pi, in meters
@@ -65,7 +65,7 @@ void IOExt::task() {
 
         // update pid controller
         input_value = get_current_speed();
-        myPID.Compute();
+        pid.Compute();
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // TOOD: check that the value is in range
 
         // sleep

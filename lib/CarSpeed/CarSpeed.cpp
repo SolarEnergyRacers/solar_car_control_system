@@ -28,19 +28,19 @@ void CarSpeed::init(){
     printf("CarSpeed successfully initialized")
 }
 
-void exit(void){
+void CarSpeed::exit(void){
     set_target_speed(0);
 }
 
-void set_target_speed(float speed){
+void CarSpeed::set_target_speed(float speed){
     target_speed = speed;
 }
 
-void get_target_speed() {
+void CarSpeed::get_target_speed() {
     return target_speed;
 }
 
-float get_current_speed() {
+float CarSpeed::get_current_speed() {
     // TODO: this function can be heavily optimized (i.e. use int instead of float, use less arithmetic operations
 
     // read analog value
@@ -54,11 +54,11 @@ float get_current_speed() {
     return 370*wheel_circumference /  60.0;
 }
 
-void update_pid(double Kp, double Ki, double Kd){
+void CarSpeed::update_pid(double Kp, double Ki, double Kd){
     pid.SetTunings(Kp, Ki, Kd)
 }
 
-void IOExt::task() {
+void CarSpeed::task() {
 
     // polling loop
     while (1) {

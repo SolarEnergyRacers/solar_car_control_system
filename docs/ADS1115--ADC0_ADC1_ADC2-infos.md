@@ -5,7 +5,7 @@
 
 ## Pinout and Usage
 
-![image-20210605181710276](.ADS1115--ADC0_ADC1_ADC2-infos/image-20210605181710276.png)
+![image-20210605181710276](.ADS1115--ADC0_ADC1_ADC2-infos/GroveADS1115-front-back.png)
 
 Board size: 42x24, height with jumpers and plugs : 14
 
@@ -25,10 +25,10 @@ Usage in car hull:
 
 ### Board Assembly
 
-![image-20210823130410331](.ADS1115--ADC0_ADC1_ADC2-infos/image-20210823130410331.png)
+![image-20210823130410331](.ADS1115--ADC0_ADC1_ADC2-infos/GroveADS1115-usedPins.png)
 
-![image-20210823130639854](.ADS1115--ADC0_ADC1_ADC2-infos/image-20210823130639854.png)
+![image-20210823130639854](.ADS1115--ADC0_ADC1_ADC2-infos/GroveADS1115-rastersize.png)
 
 ## Hints and Discussion
 
-- [ ] # May be we can desolder the screw clamp and the plugs and use smaller plugs or soldered wires
+- [ ] May be we can desolder the screw clamp and the plugs and use smaller plugs or soldered wires

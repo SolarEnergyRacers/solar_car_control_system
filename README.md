@@ -32,7 +32,6 @@
 | ESP32:36     | SPI:CS_TFT_SCREEN      |
 | ESP32:4      | SPI:DC                 |
 | ESP32:21     | SPI:RST                |
-| ESP32:25     | GPIO:INTERRUPT         |
 | ESP32:25 DAC | CAN:TX                 |
 | ESP32:26 DAC | CAN:RX                 |
 

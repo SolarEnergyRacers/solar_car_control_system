@@ -5,7 +5,7 @@
 
 ## Pinout and Usage
 
-![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/FLYUZMLJPSNYFFX.jpg)
+![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-ModulPinout.jpg)
 
 Board size: 49x16, height with jumpers and pins : 11
 
@@ -20,7 +20,7 @@ Usage in car hull:
 
 ## Daisy-Chain
 
-![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/FRLI1IMJPSNYF2K.jpg)
+![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-chaining.jpg)
 
 ## Diagram
 
@@ -31,5 +31,5 @@ Usage in car hull:
 
 ### Board Assembly
 
-![image-20210823131457974](.PCF8574--IOExt0_IOExt1_IOExt2-infos/image-20210823131457974.png)
+![image-20210823131457974](.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-assembly.png)
 

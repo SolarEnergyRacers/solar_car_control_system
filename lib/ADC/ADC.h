@@ -8,9 +8,6 @@
 #include <ADS1X15.h> // ADS1x15
 #include <definitions.h>
 
-// void read_adc_acc_dec(void *pvParameter); // adc does not need its own task, therefore we let this demo task outside of
-//                                                             // the class structure instead of extending the abstract task class
-
 class ADC {
 private:
   const int MIN_ADJUST_GAP = 10; // 0...Gap units show 0 (real reachable null point)

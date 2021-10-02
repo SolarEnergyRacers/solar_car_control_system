@@ -6,17 +6,11 @@
 #include <Wire.h>    // I2C
 #include <definitions.h>
 
-#include <DriverDisplayC.h>
 #include <I2CBus.h>
-#include <Indicator.h>
 
 #include "IOExt.h"
 
 extern I2CBus i2cBus;
-extern Indicator indicator;
-
-extern CONSTANT_MODE constant_drive_mode;
-extern bool constant_drive_set;
 
 void IOExt::re_init() { init(); }
 
@@ -25,22 +19,12 @@ void IOExt::init() {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
-  // setup pins
-  IOExt2.pinMode(P0, INPUT); // left indicator
-  IOExt2.pinMode(P1, INPUT); // right indicator
-  IOExt2.pinMode(P2, INPUT); // set tempomat/poweromat
-  IOExt2.pinMode(P3, INPUT); // set tempo or power mode
-  IOExt2.pinMode(P4, INPUT); // horn
-  IOExt2.pinMode(P5, INPUT); // position lights
-  IOExt2.pinMode(P6, INPUT); // driving lights
-  IOExt2.pinMode(P7, INPUT); // next screen
-
-  // start
-  if (IOExt2.begin()) {
-    printf("[v] IOExt2 inited.\n");
-  } else {
-    printf("[x] IOExt2 init failed.\n");
-    // TODO: action for init error?
+  for(int i = 0; i < PCF8574_NUM_DEVICES; i++){
+    if(IOExt[i].begin()){
+        printf("Initialization of IOExt0%u failed.\n", i);
+    } else {
+        printf("Initialization of IOExt0%u successful.\n", i);
+    }
   }
 
   xSemaphoreGive(i2cBus.mutex);
@@ -54,91 +38,60 @@ void IOExt::exit(void) {
 void IOExt::handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
+
+  // read all
+  PCF8574::DigitalInput dra[PCF8574_NUM_DEVICES];
+
+#ifdef USE_LEGACY_PIN_READ
+  for(int i = 0; i < PCF8574_NUM_DEVICES; i++){
+    dra[i] = IOExt[i].digitalReadAll();
+  }
+#elif
+    for(int i = 0; i < PCF8574_NUM_DEVICES; i++){
+        dra[i].p0 = IOExt[i].digitalRead(0);
+        dra[i].p1 = IOExt[i].digitalRead(1);
+        dra[i].p2 = IOExt[i].digitalRead(2);
+        dra[i].p3 = IOExt[i].digitalRead(3);
+        dra[i].p4 = IOExt[i].digitalRead(4);
+        dra[i].p5 = IOExt[i].digitalRead(5);
+        dra[i].p6 = IOExt[i].digitalRead(6);
+        dra[i].p7 = IOExt[i].digitalRead(7);
+    }
+#endif
   xSemaphoreGive(i2cBus.mutex);
 
-  if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
-    taskSleep = 50; // default value for fast reaction to pressed button
-    return;
-  }
-
-  taskSleep = 100; // debounce button
-
-  debug_printf("PCF (%ldms): %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
-
-  // PCF8574:2 pin assignment
-  bool left = !dra.p0;
-  bool right = !dra.p3;
-  bool speedPowerControlOnOff = !dra.p5;
-  bool speedPowerControlMode = !dra.p4;
-  bool horn = !dra.p6;
-  bool positionLights = !dra.p2;
-  bool drivingLights = !dra.p1;
-  bool nextScreen = !dra.p7;
-
-  DriverDisplayC *dd = DriverDisplayC::instance();
-
-  // turn indicator and hazard lights
-  if (left && right) {
-    indicator.setIndicator(INDICATOR::WARN);
-  } else if (left && !right) {
-    indicator.setIndicator(INDICATOR::LEFT);
-  } else if (!left && right) {
-    indicator.setIndicator(INDICATOR::RIGHT);
-  }
-  if (positionLights) {
-    printf("Position lights on/off\n");
-    dd->light1OnOff();
-  }
-  if (drivingLights) {
-    printf("Driving lights on/off\n");
-    dd->light2OnOff();
-  }
-  if (speedPowerControlOnOff) {
-    if (constant_drive_set) {
-      dd->constant_drive_off();
-      printf("Constand mode OFF\n");
-    } else {
-      dd->constant_drive_on();
-      printf("Constand mode ON\n");
-    }
-  }
-  if (speedPowerControlMode) {
-    if (constant_drive_mode == CONSTANT_MODE::SPEED) {
-      dd->constant_drive_mode_set(CONSTANT_MODE::POWER);
-      printf("Constant mode switch to POWER\n");
-    } else {
-      dd->constant_drive_mode_set(CONSTANT_MODE::SPEED);
-      printf("Constant mode switch to SPEED\n");
-    }
-  }
-  if (horn) {
-    printf("Horn\n");
-  }
-  if (nextScreen) {
-    printf("Next screen\n");
-  }
+  // TODO: handle all 
 }
 
-void IOExt::set_ioext(int port, bool value) {
-  // check port
-  if (port < 0 || port >= PCF8574_NUM_PORTS) {
-    return;
-  }
+void IOExt::setMode(Pin port, uint8_t mode){
+
+  // get device & port
+  int idx = port >> 4;
+  int pin = port & 0xf;
 
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  IOExt2.digitalWrite(port, value);
+  IOExt[idx].pinMode(pin, mode);
+  xSemaphoreGive(i2cBus.mutex);
+
+}
+
+void IOExt::set(Pin port, bool value) {
+  // get device & port
+  int idx = port >> 4;
+  int pin = port & 0xf;
+
+  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  IOExt[idx].digitalWrite(pin, value);
   xSemaphoreGive(i2cBus.mutex);
 }
 
-int IOExt::get_ioext(int port) {
-  // check port
-  if (port < 0 || port >= PCF8574_NUM_PORTS) {
-    return -1;
-  }
+int IOExt::get(Pin port) {
+  // get device & port
+  int idx = port >> 4;
+  int pin = port & 0xf;
 
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  int value = IOExt2.digitalRead(port);
+  int value = IOExt[idx].digitalRead(pin);
   xSemaphoreGive(i2cBus.mutex);
 
   return value;

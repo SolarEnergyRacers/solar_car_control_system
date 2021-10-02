@@ -2,14 +2,9 @@
 // Display
 //
 
-#include <definitions.h>
-
-#include <Adafruit_GFX.h>     // graphics library
-#include <Adafruit_ILI9341.h> // display
-#include <SPIBus.h>
-
 #include <DriverDisplayC.h>
 #include <Indicator.h>
+#include <definitions.h>
 
 extern CarState carState;
 

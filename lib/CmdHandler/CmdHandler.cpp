@@ -75,6 +75,9 @@ void CmdHandler::task() {
       case 'S':
         printSystemValues();
         debug_printf("%s\n", carState.print("Recent State").c_str());
+        if(input[1] == 'J'){
+          debug_printf("%s\n", carState.serialize("Recent State").c_str());
+        }
         break;
       case '-':
         adc.adjust_min_acc_dec();

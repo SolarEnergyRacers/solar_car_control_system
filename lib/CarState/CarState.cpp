@@ -39,6 +39,7 @@ const string CarState::serialize(string msg) {
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
   cJSON_AddNumberToObject(dynData, "speed", Speed.get());
   cJSON_AddNumberToObject(dynData, "battery", Battery.get());
+  cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator.get())]);
 
   cJSON_AddItemToObject(carData, "controlData", ctrData);
   cJSON_AddNumberToObject(ctrData, "TargetSpeed", TargetSpeed.get());

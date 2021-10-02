@@ -28,12 +28,22 @@ void IOExt::init() {
   // setup pins
   IOExt2.pinMode(P0, INPUT); // left indicator
   IOExt2.pinMode(P1, INPUT); // right indicator
-  IOExt2.pinMode(P2, INPUT); // set tempomat/poweromat
-  IOExt2.pinMode(P3, INPUT); // set tempo or power mode
+  IOExt2.pinMode(P2, INPUT); // driving lights
+  IOExt2.pinMode(P3, INPUT); // position lights
   IOExt2.pinMode(P4, INPUT); // horn
-  IOExt2.pinMode(P5, INPUT); // position lights
-  IOExt2.pinMode(P6, INPUT); // driving lights
-  IOExt2.pinMode(P7, INPUT); // next screen
+  IOExt2.pinMode(P5, INPUT); // next screen
+  IOExt2.pinMode(P6, INPUT); // set speed or power mode
+  IOExt2.pinMode(P7, INPUT); // set tempomat/poweromat
+
+  // setup pins
+  IOExt3.pinMode(P0, INPUT);
+  IOExt3.pinMode(P1, INPUT); 
+  IOExt3.pinMode(P2, INPUT); 
+  IOExt3.pinMode(P3, INPUT); 
+  IOExt3.pinMode(P4, INPUT); 
+  IOExt3.pinMode(P5, INPUT); 
+  IOExt3.pinMode(P6, INPUT); 
+  IOExt3.pinMode(P7, INPUT); 
 
   // start
   if (IOExt2.begin()) {
@@ -54,27 +64,31 @@ void IOExt::exit(void) {
 void IOExt::handleIoInterrupt() {
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  PCF8574::DigitalInput dra = IOExt2.digitalReadAll();
+  PCF8574::DigitalInput dra2 = IOExt2.digitalReadAll();
+  PCF8574::DigitalInput dra3 = IOExt3.digitalReadAll();
   xSemaphoreGive(i2cBus.mutex);
 
-  if (dra.p0 & dra.p1 & dra.p2 & dra.p3 & dra.p4 & dra.p5 & dra.p6 & dra.p7) {
+  if (dra2.p0 & dra2.p1 & dra2.p2 & dra2.p3 & dra2.p4 & dra2.p5 & dra2.p6 & dra2.p7
+     &dra3.p0 & dra3.p1 & dra3.p2 & dra3.p3 & dra3.p4 & dra3.p5 & dra3.p6 & dra3.p7) {
     taskSleep = 50; // default value for fast reaction to pressed button
     return;
   }
 
   taskSleep = 100; // debounce button
 
-  debug_printf("PCF (%ldms): %d %d %d %d - %d %d %d %d\n", millis(), dra.p0, dra.p1, dra.p2, dra.p3, dra.p4, dra.p5, dra.p6, dra.p7);
+  //debug_printf("(%ldms)\t", millis());
+  debug_printf("PCF2: %d %d %d %d - %d %d %d %d\n", dra2.p0, dra2.p1, dra2.p2, dra2.p3, dra2.p4, dra2.p5, dra2.p6, dra2.p7);
+  debug_printf("PCF3: %d %d %d %d - %d %d %d %d\n", dra3.p0, dra3.p1, dra3.p2, dra3.p3, dra3.p4, dra3.p5, dra3.p6, dra3.p7);
 
   // PCF8574:2 pin assignment
-  bool left = !dra.p0;
-  bool right = !dra.p3;
-  bool speedPowerControlOnOff = !dra.p5;
-  bool speedPowerControlMode = !dra.p4;
-  bool horn = !dra.p6;
-  bool positionLights = !dra.p2;
-  bool drivingLights = !dra.p1;
-  bool nextScreen = !dra.p7;
+  bool left = !dra2.p0;
+  bool right = !dra2.p1;
+  bool drivingLights = !dra2.p2;
+  bool positionLights = !dra2.p3;
+  bool horn = !dra2.p4;
+  bool nextScreen = !dra2.p5;
+  bool speedPowerControlMode = !dra2.p6;
+  bool speedPowerControlOnOff = !dra2.p7;
 
   DriverDisplayC *dd = DriverDisplayC::instance();
 

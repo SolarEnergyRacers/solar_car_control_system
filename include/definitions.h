@@ -8,7 +8,7 @@
  *  GPIO
  */
 //#define LED_BUILTIN (gpio_num_t)13
-#define GPIO_INTERRUPT_PIN 33 // 25
+#define GPIO_INTERRUPT_PIN 0 //33 // 25
 
 /*
  * OneWire
@@ -24,8 +24,8 @@
 
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x4A
-#define I2C_ADDRESS_ADS1x15_1 0x48
-#define I2C_ADDRESS_ADS1x15_2 0x49
+#define I2C_ADDRESS_ADS1x15_1 0x49
+#define I2C_ADDRESS_ADS1x15_2 0x48
 
 #define PWM_NUM_PORTS 16
 #define PWM_MAX_VALUE 4096
@@ -37,7 +37,10 @@
 #define I2C_ADDRESS_SSD1305 0x3C
 
 #define PCF8574_NUM_PORTS 8
-#define I2C_ADDRESS_PCF8574_IOExt2 0x20
+#define I2C_ADDRESS_PCF8574_IOExt0 0x20
+#define I2C_ADDRESS_PCF8574_IOExt1 0x21
+#define I2C_ADDRESS_PCF8574_IOExt2 0x22
+#define I2C_ADDRESS_PCF8574_IOExt3 0x23
 #define I2C_INTERRUPT_PIN_PCF8574 33
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
@@ -85,8 +88,8 @@
 #define SPI_RST 21
 
 #define SPI_CS_TFT 36
-#define SPI_CS_POTI 33
-#define SPI_CS_SDCARD 14
+#define SPI_CS_POTI 0 //33
+#define SPI_CS_SDCARD 0 //14
 
 /*
  * ESP32 JTAG Debug Probe Wiring

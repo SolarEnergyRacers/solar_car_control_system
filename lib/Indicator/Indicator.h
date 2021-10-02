@@ -5,12 +5,13 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
 #define SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
 
-#include <DriverDisplayC.h>
+#include <CarState.h>
+#include <abstract_task.h>
 
 class Indicator : public abstract_task {
 private:
   volatile bool blinkState = false;
-  //volatile INDICATOR curState = INDICATOR::OFF;
+  // volatile INDICATOR curState = INDICATOR::OFF;
 
 public:
   string getName(void);

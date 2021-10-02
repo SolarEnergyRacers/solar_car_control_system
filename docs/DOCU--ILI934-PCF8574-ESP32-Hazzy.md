@@ -25,7 +25,7 @@ Display SPI mode: connect **IM1**, **IM2** and **IM3** pins to 3.3V. Do not sold
 >
 > [Adafruit](https://learn.adafruit.com/adafruit-2-8-and-3-2-color-tft-touchscreen-breakout-v2/pinouts)
 
-![pinout circuit view](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/ILI9341-backside.png)
+![pinout circuit view](assets.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/ILI9341-backside.png)
 
 #### Wiring
 
@@ -57,7 +57,7 @@ No need to connect the **RST**.
   - IO Extender PCF8574 (8 bit) (7 buttons and 1 LED)
   - Analogue-digital converter (12bit) and potentiometer
 
-![wired](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/ILI9341-wired.jpg)
+![wired](assets.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/ILI9341-wired.jpg)
 
 ## U-I diagram when changing the base voltage Vcc
 
@@ -81,13 +81,13 @@ It was measured at full screen black and full screen white (without any addition
 |     4.0     |         63         |         62         |       252       |       248        |
 |     5.0     |         83         |         80         |       415       |       400        |
 
-![diagram](.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/power-voltage-diagram.png)
+![diagram](assets.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/power-voltage-diagram.png)
 
 ## Mechanical Construction
 
-![mech assembly](.DOCU--ILI934-PCF8574-ESP32-Hazzy/mechanicalConstruction.jpg)
+![mech assembly](assets.DOCU--ILI934-PCF8574-ESP32-Hazzy/mechanicalConstruction.jpg)
 
 
 
-![dimensions](.DOCU--ILI934-PCF8574-ESP32-Hazzy/mechanicalDimensions.drawio.png)
+![dimensions](assets.DOCU--ILI934-PCF8574-ESP32-Hazzy/mechanicalDimensions.drawio.png)
 

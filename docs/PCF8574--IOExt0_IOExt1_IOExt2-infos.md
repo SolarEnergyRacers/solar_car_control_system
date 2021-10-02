@@ -5,7 +5,7 @@
 
 ## Pinout and Usage
 
-![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-ModulPinout.jpg)
+![img](assets.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-ModulPinout.jpg)
 
 Board size: 49x16, height with jumpers and pins : 11
 
@@ -20,16 +20,16 @@ Usage in car hull:
 
 ## Daisy-Chain
 
-![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-chaining.jpg)
+![img](assets.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-chaining.jpg)
 
 ## Diagram
 
 - Push buttons for steering wheel
 - GND, VCC, I2C (SDA,SCL), Interrupt
 
-![img](.PCF8574--IOExt0_IOExt1_IOExt2-infos/IO-Ext-CurcuitDiagram.drawio.png)
+![img](assets.PCF8574--IOExt0_IOExt1_IOExt2-infos/IO-Ext-CurcuitDiagram.drawio.png)
 
 ### Board Assembly
 
-![image-20210823131457974](.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-assembly.png)
+![image-20210823131457974](assets.PCF8574--IOExt0_IOExt1_IOExt2-infos/PCF8574-assembly.png)
 

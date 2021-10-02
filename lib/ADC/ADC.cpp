@@ -23,11 +23,12 @@ void ADC::init() {
 
   // instantiate the devices with their corresponding address
   ads_addrs[0] = I2C_ADDRESS_ADS1x15_0;
-  ads_addrs[1] = 0; // I2C_ADDRESS_ADS1x15_1;
+  ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
 
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-    if (ads_addrs[idx] == 0) {
+    //TODO: remove address overjumps!
+    if (ads_addrs[idx] == 0x49 || ads_addrs[idx] == 0x4a) {
       continue;
     }
     printf("    Init 'ADC[%d]' with address 0x%x ...", idx, ads_addrs[idx]);
@@ -63,7 +64,7 @@ void ADC::init() {
 
     justInited = true;
     printf("[v] ADC[%d] initialized.\n", idx);
-    char msg[100]; 
+    char msg[100];
     sprintf(msg, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
     DriverDisplayC::instance()->print(msg);
   }

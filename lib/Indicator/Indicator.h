@@ -20,6 +20,7 @@ public:
   void exit(void);
   void task(void); // this is the actual task
   INDICATOR getIndicator();
+  void setIndicator2(int state);
   void setIndicator(INDICATOR state);
 };
 

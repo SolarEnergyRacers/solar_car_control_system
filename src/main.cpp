@@ -43,6 +43,7 @@
 #include <iostream>
 #include <string>
 #include <system.h>
+#include <CarSpeed.h>
 
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
@@ -75,6 +76,7 @@ Display disp;
 RTC rtc;
 GPInputOutput gpio; // I2C Interrupts
 CarState carState;
+CarSpeed carSpeed;
 
 bool startOk = true;
 bool systemOk = false;
@@ -225,6 +227,10 @@ void app_main(void) {
   if (CAN_ON) {
     printf(" - read_can_demo_task\n");
     xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  }
+
+  if (CARSPEED_ON){
+      carSpeed.create_task();
   }
 
   systemOk = true;

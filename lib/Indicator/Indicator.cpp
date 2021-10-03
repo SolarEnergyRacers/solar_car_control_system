@@ -22,6 +22,16 @@ extern CarState carState;
 
 INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
 
+void Indicator::setIndicator2(int state) {
+  if (carState.Indicator.get() == (INDICATOR)state) {
+    debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
+    carState.Indicator.set(INDICATOR::OFF);
+  } else {
+    debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
+    carState.Indicator.set((INDICATOR)state);
+  }
+}
+
 void Indicator::setIndicator(INDICATOR state) {
   if (carState.Indicator.get() == state) {
     debug_printf("Set indicator '%d' off\n", static_cast<int>(state));

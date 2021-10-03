@@ -12,8 +12,8 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include <CarState.h>
 #include <ADC.h>
+#include <CarState.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <DriverDisplayC.h>
@@ -75,7 +75,7 @@ void CmdHandler::task() {
       case 'S':
         printSystemValues();
         debug_printf("%s\n", carState.print("Recent State").c_str());
-        if(input[1] == 'J'){
+        if (input[1] == 'J') {
           debug_printf("%s\n", carState.serialize("Recent State").c_str());
         }
         break;
@@ -207,14 +207,14 @@ void CmdHandler::printSystemValues() {
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
   printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
-
-  printf("IOExt2:");
-  for (int idx = 0; idx < 8; idx++) {
-    printf(" %d", ioExt.get_ioext(idx));
-    if (idx == 3) {
-      printf(" - ");
+  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
+    for (int pin = 0; pin < PCF8574_NUM_PORTS; pin++) {
+      int port = (devNr << 4) + pin;
+      int idx = devNr * 8 + pin;
+      if (ioExt.pins[idx].value == 0) {
+        printf("%s: SET 0x%02x\n", ioExt.pins[idx].name.c_str(), port);
+      }
     }
   }
-  printf("\n");
   printf("POT0 (accel)= %4d, POT1 (recup)= %4d\n", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
 }

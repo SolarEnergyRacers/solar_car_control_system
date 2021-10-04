@@ -12,6 +12,7 @@
 
 #include <map>
 #include <string>
+#include <list>
 
 class Pin {
 public:
@@ -19,11 +20,17 @@ public:
   int mode;
   int value;
   string name;
-  void (*handlerFunction)(int);
+  void (*handlerFunction)();
 };
 
-void demoHandler(int);
-void setIndicator(int);
+//void (*handlerFunction[32])(int);
+
+// known pin handler
+void batteryOnOffHandler();
+void mcOnOffHandler();
+void pvOnOffHandler();
+void indicatorHandler();
+// end pin handler
 
 class IOExt : public abstract_task {
 private:
@@ -38,13 +45,13 @@ private:
 
 public:
   static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
-
+  //static list<void (*)()> pinHandlerList;
   // high nibble: device number, low nibble: port
   // TODO: add human readeable name
 
-  Pin pins[IOExtPINCOUNT] = {{0x00, INPUT_PULLUP, 0, "BatOnOff", demoHandler},
-                             {0x01, INPUT_PULLUP, 0, "PvOnOff", NULL},
-                             {0x02, INPUT_PULLUP, 0, "McOnOff", NULL},
+  Pin pins[IOExtPINCOUNT] = {{0x00, INPUT_PULLUP, 0, "BatOnOff", batteryOnOffHandler},
+                             {0x01, INPUT_PULLUP, 0, "PvOnOff", pvOnOffHandler},
+                             {0x02, INPUT_PULLUP, 0, "McOnOff", mcOnOffHandler},
                              {0x03, INPUT_PULLUP, 0, "EcoPower", NULL},
                              {0x04, INPUT_PULLUP, 0, "FwdBwd", NULL},
                              {0x05, INPUT_PULLUP, 0, "DUMMY06", NULL},
@@ -60,8 +67,8 @@ public:
                              {0x16, INPUT_PULLUP, 0, "unused", NULL},
                              {0x17, INPUT_PULLUP, 0, "unused", NULL},
                              // IOExt2
-                             {0x20, INPUT_PULLUP, 0, "IndicatorLeft", setIndicator},
-                             {0x21, INPUT_PULLUP, 0, "IndicatorRight", setIndicator},
+                             {0x20, INPUT_PULLUP, 0, "IndicatorLeft", indicatorHandler},
+                             {0x21, INPUT_PULLUP, 0, "IndicatorRight", indicatorHandler},
                              {0x22, INPUT_PULLUP, 0, "DUMMY23", NULL},
                              {0x23, INPUT_PULLUP, 0, "DUMMY24", NULL},
                              {0x24, INPUT_PULLUP, 0, "DUMMY25", NULL},

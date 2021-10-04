@@ -55,11 +55,15 @@ void IOExt::handleIoInterrupt() {
     dra[i] = IOExt[i].digitalReadAll();
   }
 #else
+  list<void (*)()> pinHandlerList;
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     for (int pin = 0; pin < PCF8574_NUM_PORTS; pin++) {
       int idx = devNr * 8 + pin;
       if (pins[idx].mode != OUTPUT) {
         pins[idx].value = IOExt[devNr].digitalRead(pin);
+        if (pins[idx].handlerFunction != NULL) {
+          pinHandlerList.push_back(pins[idx].handlerFunction);
+        }
       }
     }
   }
@@ -69,7 +73,6 @@ void IOExt::handleIoInterrupt() {
     printf("0x%02x: ", devNr);
     for (int pin = 0; pin < PCF8574_NUM_PORTS; pin++) {
       string color = "";
-      // int port = (devNr << 4) + pin;
       int idx = devNr * 8 + pin;
       if (pins[idx].mode == OUTPUT)
         color = "\033[1;31m";
@@ -82,30 +85,30 @@ void IOExt::handleIoInterrupt() {
   }
   printf("\n");
 
-  for (int idx = 0; idx < 32; idx++) {
-    if (pins[idx].mode != OUTPUT && pins[idx].value == 0 && pins[idx].handlerFunction != NULL)
-      pins[idx].handlerFunction(pins[idx].port);
+  pinHandlerList.unique();
+  for (void (*pinHandler)() : pinHandlerList) {
+    pinHandler();
   }
-}
+  pinHandlerList.clear();
 
-void demoHandler(int dummy) { printf("Battery On\n"); }
+  // for (int idx = 0; idx < 32; idx++) {
+  //   if (pins[idx].mode != OUTPUT && pins[idx].value == 0 && pins[idx].handlerFunction != NULL)
+  //     pins[idx].handlerFunction(pins[idx].port);
+  // }
+}
 
 extern IOExt ioExt;
 extern Indicator indicator;
 
 int IOExt::getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); }
-
-void setIndicator(int port) {
-  // int idx = (port >> 4) * 8 + (port & 0x0F);
-  // if (ioExt.pins[idx].name.compare("IndicatorLeft") == 0) {
-  //   indicator.setIndicator(INDICATOR::LEFT);
-  // }
-  //  if (ioExt.pins[idx].name.compare("IndicatorRight") == 0) {
-  //   indicator.setIndicator(INDICATOR::RIGHT);
-  // }
+// known pin handler
+void batteryOnOffHandler() { printf("Battery %s\n", (ioExt.pins[0].value == 1 ? "On" : "Off")); }
+void pvOnOffHandler() { printf("PV %s\n", (ioExt.pins[1].value == 1 ? "On" : "Off")); }
+void mcOnOffHandler() { printf("MC %s\n", (ioExt.pins[2].value == 1 ? "On" : "Off")); }
+void indicatorHandler() {
   int left = ioExt.pins[ioExt.getIdx(0x20)].value;
   int right = ioExt.pins[ioExt.getIdx(0x21)].value;
-  printf("idx: %d -- %d\n", ioExt.getIdx(0x20), ioExt.getIdx(0x21));
+  //printf("idx: %d -- %d\n", ioExt.getIdx(0x20), ioExt.getIdx(0x21));
   if (left == 0 && right == 0)
     indicator.setIndicator(INDICATOR::WARN);
   else if (left == 0)
@@ -113,6 +116,7 @@ void setIndicator(int port) {
   else if (right == 0)
     indicator.setIndicator(INDICATOR::RIGHT);
 }
+// end pin handler
 
 void IOExt::setMode(int port, uint8_t mode) {
 

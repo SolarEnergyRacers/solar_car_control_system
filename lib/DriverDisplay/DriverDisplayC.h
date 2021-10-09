@@ -7,12 +7,12 @@
 #define DRIVER_DISPLAY_C_H
 
 #define ILI9341
- // (320x240)
+// (320x240)
 
 #include <ADS1X15.h>          // ADS1x15
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
-#include <abstract_task.h>
 #include <CarState.h>
+#include <abstract_task.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -106,6 +106,10 @@ private:
   int lifeSignRadius = 4;
   //==== Driver Display definition ==== END
 
+  void setupScrollArea(uint16_t TFA, uint16_t BFA);
+  int scroll(int lines);
+  void scrollAddress(uint16_t VSP);
+
 public:
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
   // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
@@ -122,7 +126,7 @@ protected:
   DriverDisplayC() {}
 
 private:
-  enum class DISPLAY_STATUS { SETUP, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
+  enum class DISPLAY_STATUS { SETUP, DISPLAY_CONSOLE, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
   template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
     return static_cast<typename std::underlying_type<Enumeration>::type>(value);
   }
@@ -139,7 +143,7 @@ private:
   void _arrow_decrease(int color);
   void _light1(bool lightOn);
   void _light2(bool lightOn);
-  void _drawCentreString(const String &buf, int x, int y);
+  void _drawCentreString(const string &buf, int x, int y);
   int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int color);
   void _turn_Right(int color);
@@ -153,6 +157,13 @@ public:
   void re_init(void);
   void exit(void);
 
+  void setConsoleMode() { status = DISPLAY_STATUS::DISPLAY_CONSOLE; };
+  void setScreen0Mode() {
+    status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
+    _setup();
+  };
+  void print(string msg);
+  
   // public functions
   void draw_display_border(int color);
   void draw_speed_border(int);
@@ -167,7 +178,7 @@ public:
   void constant_drive_mode_hide();
 
   void write_drive_direction(DRIVE_DIRECTION);
-  void write_driver_info(String msg, INFO_TYPE type);
+  void write_driver_info(string msg, INFO_TYPE type);
   void write_speed();
   void write_speed(int value);
   void write_bat(float voltage);

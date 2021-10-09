@@ -11,7 +11,6 @@
 class Indicator : public abstract_task {
 private:
   volatile bool blinkState = false;
-  // volatile INDICATOR curState = INDICATOR::OFF;
 
 public:
   string getName(void);
@@ -20,8 +19,8 @@ public:
   void exit(void);
   void task(void); // this is the actual task
   INDICATOR getIndicator();
-  void setIndicator2(int state);
   void setIndicator(INDICATOR state);
+  void setIndicator(int left, int right);
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H

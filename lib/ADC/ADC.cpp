@@ -11,6 +11,7 @@
 
 #include <ADC.h>
 #include <DAC.h>
+#include <DriverDisplayC.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;
@@ -62,6 +63,9 @@ void ADC::init() {
 
     justInited = true;
     printf("[v] ADC[%d] initialized.\n", idx);
+    char msg[100]; 
+    sprintf(msg, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
+    DriverDisplayC::instance()->print(msg);
   }
 }
 

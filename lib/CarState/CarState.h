@@ -52,8 +52,8 @@ public:
     InfoLast.set("ok.");
     Light1On.set(false);
     Light2On.set(false);
-    //IndicatorLeft.set(false);
-    //IndicatorRight.set(false);
+    // IndicatorLeft.set(false);
+    // IndicatorRight.set(false);
   }
   ~CarState(){};
 
@@ -76,8 +76,10 @@ public:
   CarStateValue<string> InfoLast;
   CarStateValue<bool> Light1On;
   CarStateValue<bool> Light2On;
-  //CarStateValue<bool> IndicatorLeft;
-  //CarStateValue<bool> IndicatorRight;
+  // CarStateValue<bool> IndicatorLeft;
+  // CarStateValue<bool> IndicatorRight;
+
+  //Pin *pins;
 
   // tools
   const string print(string msg);

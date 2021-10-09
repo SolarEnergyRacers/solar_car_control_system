@@ -9,8 +9,8 @@
 
 class CmdHandler : public abstract_task {
 private:
-  String commands = "RS-=:!udsaAbpm<>wlLc";
-  String helpText = "Available commands (" + commands +
+  string commands = "RS-=:!udsaAbpm<>wlLc";
+  string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
                     "\tR        - reset and reinit display\n"

@@ -8,29 +8,7 @@
 
 extern CarState carState;
 
-// INDICATOR Indicator::getIndicator() { return curState; }
-
-// void Indicator::setIndicator(INDICATOR state) {
-//   if (curState == state) {
-//     debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
-//     curState = INDICATOR::OFF;
-//   } else {
-//     debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
-//     curState = state;
-//   }
-// }
-
 INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
-
-void Indicator::setIndicator2(int state) {
-  if (carState.Indicator.get() == (INDICATOR)state) {
-    debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
-    carState.Indicator.set(INDICATOR::OFF);
-  } else {
-    debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
-    carState.Indicator.set((INDICATOR)state);
-  }
-}
 
 void Indicator::setIndicator(INDICATOR state) {
   if (carState.Indicator.get() == state) {
@@ -40,6 +18,15 @@ void Indicator::setIndicator(INDICATOR state) {
     debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
     carState.Indicator.set(state);
   }
+}
+
+void Indicator::setIndicator(int left, int right) {
+  if (left == 0 && right == 0)
+    setIndicator(INDICATOR::WARN);
+  else if (left == 0)
+    setIndicator(INDICATOR::LEFT);
+  else if (right == 0)
+    setIndicator(INDICATOR::RIGHT);
 }
 
 void Indicator::re_init() { init(); }
@@ -55,8 +42,8 @@ void Indicator::exit(void){
 // ------------------
 void Indicator::init(void) {
   printf("[v] Indicator handler inited\n");
+  DriverDisplayC::instance()->print("[v] " + getName() + " initialized.\n");
   vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: why sleep here?
-  // return true; // TODO: restore functionality
 }
 // -------------
 // FreeRTOS TASK

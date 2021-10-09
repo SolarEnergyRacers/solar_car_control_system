@@ -35,6 +35,7 @@ void CmdHandler::re_init() { init(); }
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
   printf("[v] Command handler inited\n");
+  DriverDisplayC::instance()->print("[v] " + getName() + " initialized.\n");
 }
 
 void CmdHandler::exit() {
@@ -61,7 +62,7 @@ void CmdHandler::task() {
 
       debug_printf("Received: %s\n", input.c_str());
 
-      if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
+      if (input.length() < 1 || commands.find(input[0], 0) == -1) {
         input = "h"; // help
       }
 
@@ -70,6 +71,7 @@ void CmdHandler::task() {
       // ---------------- controller commands
       case 'R':
         dd->re_init();
+        DriverDisplayC::instance()->setScreen0Mode();
         dd->draw_display_background();
         break;
       case 'S':
@@ -137,7 +139,7 @@ void CmdHandler::task() {
 
       // -------------- chase car commands
       case 'u':
-        if (String("off") == String(&input[2])) {
+        if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
           dd->arrow_increase(false);
         } else {
@@ -146,7 +148,7 @@ void CmdHandler::task() {
         }
         break;
       case 'd':
-        if (String("off") == String(&input[2])) {
+        if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
           dd->arrow_decrease(false);
         } else {
@@ -208,11 +210,10 @@ void CmdHandler::printSystemValues() {
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
   printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    for (int pin = 0; pin < PCF8574_NUM_PORTS; pin++) {
-      int port = (devNr << 4) + pin;
-      int idx = devNr * 8 + pin;
-      if (ioExt.pins[idx].value == 0) {
-        printf("%s: SET 0x%02x\n", ioExt.pins[idx].name.c_str(), port);
+    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
+      Pin* pin = ioExt.getPin(devNr, pinNr);
+      if (pin->value == 0) {
+        printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
       }
     }
   }

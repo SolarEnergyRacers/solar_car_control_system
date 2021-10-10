@@ -7,6 +7,7 @@
 #include <PCF8574.h> // PCF8574
 #include <Wire.h>    // I2C
 
+#include <DriverDisplayC.h>
 #include <I2CBus.h>
 #include <IOExt.h>
 #include <definitions.h>
@@ -185,7 +186,6 @@ void constantModeHandler() {
     printf("Constant mode toggle\n");
     DriverDisplayC::instance()->constant_drive_mode_show();
   }
-
 }
 // end IO pin handler -----------------------------------------
 

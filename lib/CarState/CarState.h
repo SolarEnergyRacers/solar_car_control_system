@@ -2,32 +2,27 @@
 // Car State with all car information
 //
 
-#ifndef SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H
-#define SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H
+#ifndef CARSTATE_H
+#define CARSTATE_H
 
-#include <CarStateValue.h>
 #include <cJSON.h>
-#include <definitions.h>
 #include <sstream>
 #include <string>
+#include <map>
+
+
+#include <CarStatePin.h>
+#include <CarStateValue.h>
+
+#include <definitions.h>
+
+using namespace std;
 
 // public structures
 enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-static const char *INDICATOR_str[] = {"off", "left", "right", "HAZARD FLASHR"};
-
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-static const char *INFO_TYPE_str[] = {"Info", "Status", "Warning", "Error"};
-
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
-static const char *CONSTANT_MODE_str[] = {"none", "speed", "power"};
-
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
-static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
-
-static const char *BOOL_str[] = {"false", "true"};
-static const char *ON_OFF_str[] = {"off", "on"};
-
-using namespace std;
 
 class CarState {
 
@@ -52,8 +47,6 @@ public:
     InfoLast.set("ok.");
     Light1On.set(false);
     Light2On.set(false);
-    // IndicatorLeft.set(false);
-    // IndicatorRight.set(false);
   }
   ~CarState(){};
 
@@ -76,14 +69,20 @@ public:
   CarStateValue<string> InfoLast;
   CarStateValue<bool> Light1On;
   CarStateValue<bool> Light2On;
-  // CarStateValue<bool> IndicatorLeft;
-  // CarStateValue<bool> IndicatorRight;
 
-  //Pin *pins;
+  // All IO pins
+  static CarStatePin pins[IOExtPINCOUNT];
+  int getIdx(string pinName);
+  CarStatePin *getPin(int devNr, int pinNr);
+  CarStatePin *getPin(int port);
+  CarStatePin *getPin(string pinName);
 
+  std::map<string, int> idxOfPin;
+  // std::map<int, Pin> pins; // pins by index
+  
   // tools
   const string print(string msg);
   const string serialize(string msg);
 };
 
-#endif // SOLAR_CAR_CONTROL_SYSTEM_CARSTATE_H
+#endif // CARSTATE_H

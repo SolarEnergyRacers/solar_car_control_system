@@ -2,12 +2,13 @@
 // Car State Values
 //
 
-#ifndef SOLAR_CAR_CONTROL_SYSTEM_CARSTATEVALUE_H
-#define SOLAR_CAR_CONTROL_SYSTEM_CARSTATEVALUE_H
+#ifndef CARSTATEVALUE_H
+#define CARSTATEVALUE_H
 
-#include <definitions.h>
 #include <stdio.h>  /* printf */
 #include <stdlib.h> /* abs */
+
+#include <definitions.h>
 
 using namespace std;
 
@@ -35,4 +36,4 @@ public:
   bool is_changed() { return abs(_Value - _ValueLast) > _epsilon; }
 };
 
-#endif // SOLAR_CAR_CONTROL_SYSTEM_CARSTATEVALUE_H
+#endif // CARSTATEVALUE_H

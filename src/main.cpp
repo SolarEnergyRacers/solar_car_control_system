@@ -48,6 +48,8 @@
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
 
+#include <CarStatePin.h>
+#include <CarStateValue.h>
 #include <CarState.h>
 
 // add C linkage definition

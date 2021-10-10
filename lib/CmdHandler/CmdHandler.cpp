@@ -14,6 +14,8 @@
 
 #include <ADC.h>
 #include <CarState.h>
+#include <CarStatePin.h>
+#include <CarStateValue.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <DriverDisplayC.h>
@@ -211,7 +213,7 @@ void CmdHandler::printSystemValues() {
   printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-      Pin* pin = ioExt.getPin(devNr, pinNr);
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->value == 0) {
         printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
       }

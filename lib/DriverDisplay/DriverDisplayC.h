@@ -6,11 +6,11 @@
 #ifndef DRIVER_DISPLAY_C_H
 #define DRIVER_DISPLAY_C_H
 
-#define ILI9341
-// (320x240)
+#define ILI9341 // (320x240)
 
-#include <ADS1X15.h>          // ADS1x15
+#include <ADS1X15.h> 
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
+
 #include <CarState.h>
 #include <abstract_task.h>
 

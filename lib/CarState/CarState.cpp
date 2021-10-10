@@ -2,10 +2,24 @@
 // Car State with all car information
 //
 
-#include <CarState.h>
 #include <definitions.h>
+#include <CarState.h>
+#include <IOExt.h>
+#include <Indicator.h>
 
 using namespace std;
+
+extern CarState carState;
+
+int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
+CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
+CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(port)]); }
+CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
+
+static const char *INDICATOR_str[] = {"off", "left", "right", "HAZARD FLASHR"};
+static const char *CONSTANT_MODE_str[] = {"none", "speed", "power"};
+static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
+static const char *BOOL_str[] = {"false", "true"};
 
 const string CarState::print(string msg) {
   stringstream ss(msg);
@@ -26,8 +40,8 @@ const string CarState::print(string msg) {
   ss << "Info Last ....... " << InfoLast.get() << endl;
   ss << "Light 1 On ...... " << BOOL_str[Light1On.get()] << endl;
   ss << "Light 2 On ...... " << BOOL_str[Light2On.get()] << endl;
-  //ss << "Indicator Left .. " << ON_OFF_str[IndicatorLeft.get()] << endl;
-  //ss << "Indicator Right . " << ON_OFF_str[IndicatorRight.get()] << endl;
+  // ss << "Indicator Left .. " << ON_OFF_str[IndicatorLeft.get()] << endl;
+  // ss << "Indicator Right . " << ON_OFF_str[IndicatorRight.get()] << endl;
   ss << "=======================" << endl;
   return ss.str();
 }

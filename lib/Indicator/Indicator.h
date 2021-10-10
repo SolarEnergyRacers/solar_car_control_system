@@ -2,8 +2,8 @@
 // Indicators LEFT, RIGTH, WARN
 //
 
-#ifndef SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
-#define SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
+#ifndef INDICATOR_H
+#define INDICATOR_H
 
 #include <CarState.h>
 #include <abstract_task.h>
@@ -23,4 +23,4 @@ public:
   void setIndicator(int left, int right);
 };
 
-#endif // SOLAR_CAR_CONTROL_SYSTEM_INDICATOR_H
+#endif // INDICATOR_H

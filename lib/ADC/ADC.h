@@ -5,7 +5,7 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_ADC_H
 #define SOLAR_CAR_CONTROL_SYSTEM_ADC_H
 
-#include <ADS1X15.h> // ADS1x15
+#include <ADS1X15.h>
 #include <definitions.h>
 
 // void read_adc_acc_dec(void *pvParameter); // adc does not need its own task, therefore we let this demo task outside of

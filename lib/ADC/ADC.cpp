@@ -5,7 +5,7 @@
 #include <abstract_task.h>
 #include <definitions.h>
 
-#include <ADS1X15.h> // ADS1x15
+#include <ADS1X15.h>
 #include <I2CBus.h>
 #include <Wire.h> // I2C
 

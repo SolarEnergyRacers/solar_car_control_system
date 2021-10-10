@@ -2,10 +2,10 @@
 // Car State with all car information
 //
 
-#include <definitions.h>
 #include <CarState.h>
 #include <IOExt.h>
 #include <Indicator.h>
+#include <definitions.h>
 
 using namespace std;
 
@@ -23,7 +23,8 @@ static const char *BOOL_str[] = {"false", "true"};
 
 const string CarState::print(string msg) {
   stringstream ss(msg);
-  ss << msg << endl;
+  if (msg.length() > 0)
+    ss << msg << endl;
   // ss << ss.fixed << ss.precision(3) << ss.width(7);
   ss << "Speed ........... " << Speed.get() << endl;
   ss << "Acceleration .... " << Acceleration.get() << endl;
@@ -40,9 +41,8 @@ const string CarState::print(string msg) {
   ss << "Info Last ....... " << InfoLast.get() << endl;
   ss << "Light 1 On ...... " << BOOL_str[Light1On.get()] << endl;
   ss << "Light 2 On ...... " << BOOL_str[Light2On.get()] << endl;
-  // ss << "Indicator Left .. " << ON_OFF_str[IndicatorLeft.get()] << endl;
-  // ss << "Indicator Right . " << ON_OFF_str[IndicatorRight.get()] << endl;
   ss << "=======================" << endl;
+  ss << printIOs("");
   return ss.str();
 }
 
@@ -59,4 +59,34 @@ const string CarState::serialize(string msg) {
   cJSON_AddNumberToObject(ctrData, "TargetSpeed", TargetSpeed.get());
   cJSON_AddStringToObject(ctrData, "InfoLast", InfoLast.get().c_str());
   return cJSON_Print(carData);
+}
+
+const string CarState::printIOs(string msg) {
+  stringstream ss(msg);
+  if (msg.length() > 0)
+    ss << msg << endl;
+  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
+    // printf("0x%2x0: ", devNr);
+    ss << devNr << ": ";
+    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
+      string color = "";
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
+      if (pin->mode == OUTPUT) {
+        // printf(" \033[1;31m%d\033[0;39m", pin->value);
+        ss << " \033[1;31m" << pin->value << "\033[0;39m";
+      } else {
+        // printf(" %d", pin->value);
+        ss << pin->value;
+      }
+      if ((IOExt::getIdx(devNr, pinNr) + 1) % 8 == 0)
+        // printf(" | ");
+        ss << " | ";
+      else if ((IOExt::getIdx(devNr, pinNr) + 1) % 4 == 0)
+        // printf(" - ");
+        ss << " - ";
+    }
+  }
+  // printf("\n");
+  ss << endl;
+  return ss.str();
 }

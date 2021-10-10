@@ -82,6 +82,7 @@ public:
   
   // tools
   const string print(string msg);
+  const string printIOs(string msg);
   const string serialize(string msg);
 };
 

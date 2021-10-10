@@ -41,8 +41,8 @@ void IOExt::init() {
         ioExt.IOExtDevs[devNr].pinMode(pinNr, pin.mode);
         xSemaphoreGive(i2cBus.mutex);
         pin.value = pin.oldValue = 1;
-        sprintf(msg, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin.port, carState.getIdx(pin.name), pin.mode != OUTPUT ? "INPUT " : "OUTPUT",
-                pin.value, pin.name.c_str());
+        sprintf(msg, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin.port, carState.getIdx(pin.name),
+                pin.mode != OUTPUT ? "INPUT " : "OUTPUT", pin.value, pin.name.c_str());
         printf(msg);
         // DriverDisplayC::instance()->print(msg);
       }
@@ -124,24 +124,7 @@ void IOExt::handleIoInterrupt() {
   xSemaphoreGive(i2cBus.mutex);
 
 #ifdef DEBUGIOEXT
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    printf("0x%2x0: ", devNr);
-    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-      string color = "";
-      CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->mode == OUTPUT) {
-        printf(" \033[1;31m%d\033[0;39m", pin->value);
-      } else {
-        // printf(" %d.%d\033[0;39m", pin->value, pin->oldValue);
-        printf(" %d", pin->value);
-      }
-      if ((getIdx(devNr, pinNr) + 1) % 8 == 0)
-        printf(" | ");
-      else if ((getIdx(devNr, pinNr) + 1) % 4 == 0)
-        printf(" - ");
-    }
-  }
-  printf("\n");
+  printf("%s", carState.printIOs("").c_str());
 #endif
 
   pinHandlerList.unique();
@@ -150,8 +133,6 @@ void IOExt::handleIoInterrupt() {
   }
   pinHandlerList.clear();
 }
-
-
 
 // IO pin handler -----------------------------------------
 void batteryOnOffHandler() { printf("Battery %s\n", (carState.getPin(PinBatOnOff)->value == 1 ? "On" : "Off")); }

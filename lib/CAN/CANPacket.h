@@ -1,43 +1,32 @@
 #include <Arduino.h>
 
 class CANPacket {
-private:
-  uint16_t id;
-  uint64_t data;
+    private:
+        uint16_t id;
+        uint64_t data;
 
-public:
-  CANPacket();
-  CANPacket(uint16_t id, uint8_t data[]);
-  CANPacket(uint16_t id, uint64_t data);
+    public:
+        CANPacket();
+        CANPacket(uint16_t id, uint8_t data[]);
+        CANPacket(uint16_t id, uint64_t data);
 
-  CANPacket &operator=(const CANPacket &that) {
-    if (this != &that) {
-      this->id = that.id;
-      this->data = that.data;
-    }
+        void setID(uint16_t id);
+        uint16_t getID();
 
-    return *this;
-  };
+        void setData(uint8_t data[]);
+        void setData(uint64_t data);
 
-  void setID(uint16_t id);
-  uint16_t getID();
+        uint64_t getData_ui64();
+        int64_t getData_i64();
 
-  void setData(uint8_t data[]);
-  void setData(uint64_t data);
+        uint32_t getData_ui32(uint8_t index);
+        int32_t getData_i32(uint8_t index);
 
-  uint64_t getData_ui64();
-  int64_t getData_i64();
+        uint16_t getData_ui16(uint8_t index);
+        int16_t getData_i16(uint8_t index);
 
-  uint32_t getData_ui32(uint8_t index);
-  int32_t getData_i32(uint8_t index);
+        uint8_t getData_ui8(uint8_t index);
+        int8_t getData_i8(uint8_t index);
 
-  uint16_t getData_ui16(uint8_t index);
-  int16_t getData_i16(uint8_t index);
-
-  uint8_t getData_ui8(uint8_t index);
-  int8_t getData_i8(uint8_t index);
-
-  bool getData_b(uint8_t index);
-
-  float getData_f32(uint8_t index);
+        float getData_f32(uint8_t index);
 };

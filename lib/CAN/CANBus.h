@@ -1,22 +1,25 @@
 //
 // CAN Bus
 //
+#include "CANPacket.h"
 
-#ifndef CAN_H
-#define CAN_H
-
-#include <CAN_config.h>
-#include <ESP32CAN.h>
+//#ifndef CAN_TX
+//#define CAN_TX
 
 void read_can_demo_task(void *pvParameter);
 
-class CanBus {
-private:
-public:
-  SemaphoreHandle_t mutex;
-  CAN_device_t cfg;
-  void init();
-  void re_init();
+class CANBus {
+  private:
+    CANPacket rxBuffer[CAN_RX_BUFFER_SIZE];
+    
+  public:
+    void re_init();
+    void init();
+
+    void onReceive(int packetSize);
+    
+    SemaphoreHandle_t mutex;
+
 };
 
-#endif // CAN_H
+//#endif // CAN_H

@@ -1,64 +1,66 @@
 //
 // CAN Bus
 //
-#include <Arduino.h>
-
 #include <definitions.h>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 
-#include <CAN_config.h>
-#include <ESP32CAN.h>
+#include <Arduino.h>
+#include <CAN.h>
 
 #include "CANBus.h"
+#include "CANPacket.h"
 
-void CanBus::re_init() { CanBus::init(); }
+extern CANBus can;
 
-void CanBus::init() {
+void CANBus::re_init() { 
+  CAN.end();
+  CANBus::init(); 
+}
 
+void CANBus::init() {
   mutex = xSemaphoreCreateBinary();
 
-  cfg.speed = CAN_SPEED; // MPPT & BMS are both running on 125KBPS by default
-  cfg.tx_pin_id = CAN_TX;
-  cfg.rx_pin_id = CAN_RX;
-  cfg.rx_queue = xQueueCreate(CAN_RX_QUEUE, sizeof(CAN_frame_t));
-  ESP32Can.CANInit();
+  CAN.setPins(CAN_RX, CAN_TX);
+  CAN.onReceive(can.onReceive); //ToDo Fix
+
+  if(!CAN.begin(CAN_SPEED)){
+    //opening CAN failed :,(
+  }
 
   xSemaphoreGive(mutex);
 }
 
-extern CanBus can;
-void read_can_demo_task(void *pvParameter) {
 
-  can.init();
+void CANBus::onReceive(int packetSize){
 
-  CAN_frame_t rx_frame;
+  CANPacket packet;
+  uint8_t receivedData[packetSize];
 
-  while (1) {
-    Serial.println("CAN While");
-    xSemaphoreTake(can.mutex, portMAX_DELAY);
+  packet.setID(CAN.packetId());
 
-    Serial.println("Take Mutex");
-    if (xQueueReceive(can.cfg.rx_queue, &rx_frame, 3 * portTICK_PERIOD_MS) == pdTRUE) {
-      if (rx_frame.FIR.B.FF == CAN_frame_std) {
-        Serial.println("New standard frame");
-      } else {
-        Serial.println("New extended Frame");
-      }
-
-      Serial.println("from: ");
-      Serial.println(rx_frame.MsgID);
-      Serial.println("DLC: ");
-      Serial.println(rx_frame.FIR.B.DLC);
-
-      for (int i = 0; i < rx_frame.FIR.B.DLC; i++) {
-        Serial.println(rx_frame.data.u8[i]);
-      }
-      Serial.println("--------------------");
+  for(int i = 0; i < packetSize; i++){
+    if(CAN.available()){
+      receivedData[i] = (uint8_t) CAN.read();
     }
-    xSemaphoreGive(can.mutex);
-
-    vTaskDelay(200 / portTICK_PERIOD_MS);
   }
+
+  packet.setData(receivedData);
+
+  //Check if packet is relevant for board computer
+  switch(packet.getID()){
+    case BMS_BASE_ADDR | 0xFB:
+      //Battery Pack Status
+      break;
+    case BMS_BASE_ADDR | 0xF1:
+      break;
+    default:
+      break;
+  }
+
+}
+
+
+void read_can_demo_task(void *pvParameter) {
 }

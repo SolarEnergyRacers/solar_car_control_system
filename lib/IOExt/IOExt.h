@@ -1,6 +1,6 @@
-//
-// PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
-//
+/*
+ * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
+ */
 
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
 #define SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
@@ -13,6 +13,7 @@
 
 #include <definitions.h>
 #include <abstract_task.h>
+
 #include <CarStateValue.h>
 #include <CarStatePin.h>
 #include <CarState.h>
@@ -76,6 +77,7 @@ public:
   static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
 
   string getName(void) { return "IOExt"; };
+
   void init(void);
   void re_init(void);
   void exit(void);

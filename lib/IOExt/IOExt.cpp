@@ -7,7 +7,6 @@
 #include <PCF8574.h> // PCF8574
 #include <Wire.h>    // I2C
 
-#include <DriverDisplayC.h>
 #include <I2CBus.h>
 #include <IOExt.h>
 #include <definitions.h>
@@ -186,10 +185,12 @@ void constantModeHandler() {
     printf("Constant mode toggle\n");
     DriverDisplayC::instance()->constant_drive_mode_show();
   }
+
 }
 // end IO pin handler -----------------------------------------
 
 void IOExt::setMode(int port, uint8_t mode) {
+
   // get device & port
   int idx = port >> 4;
   int pin = port & 0xf;
@@ -200,6 +201,7 @@ void IOExt::setMode(int port, uint8_t mode) {
 }
 
 void IOExt::set(int port, bool value) {
+
   // get device & port
   int idx = port >> 4;
   int pin = port & 0xf;

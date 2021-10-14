@@ -72,21 +72,17 @@ const string CarState::printIOs(string msg) {
       string color = "";
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->mode == OUTPUT) {
-        // printf(" \033[1;31m%d\033[0;39m", pin->value);
         ss << " \033[1;31m" << pin->value << "\033[0;39m";
       } else {
-        // printf(" %d", pin->value);
         ss << pin->value;
       }
       if ((IOExt::getIdx(devNr, pinNr) + 1) % 8 == 0)
-        // printf(" | ");
         ss << " | ";
       else if ((IOExt::getIdx(devNr, pinNr) + 1) % 4 == 0)
         // printf(" - ");
         ss << " - ";
     }
   }
-  // printf("\n");
   ss << endl;
   return ss.str();
 }

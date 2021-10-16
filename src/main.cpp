@@ -71,7 +71,7 @@ DriverDisplay dd;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
 I2CBus i2cBus;
-Indicator indicator; // DISPLAY_LARGE_INDICATOR_ON
+Indicator indicator; // INDICATOR_ON
 IOExt ioExt;
 OneWireBus oneWireBus;
 PWM pwm;
@@ -117,7 +117,7 @@ void app_main(void) {
   }
   if (BLINK_ON) {
   }
-  if (DISPLAY_LARGE_INDICATOR_ON) {
+  if (INDICATOR_ON) {
     indicator.init();
   }
   if (COMMANDHANDLER_ON) {
@@ -181,7 +181,7 @@ void app_main(void) {
     dd.print("[v] " + dd.getName() + "task initialized.\n");
   }
 
-  if (DISPLAY_LARGE_INDICATOR_ON) {
+  if (INDICATOR_ON) {
     indicator.create_task();
     dd.print("[v] " + indicator.getName() + "task initialized.\n");
   }

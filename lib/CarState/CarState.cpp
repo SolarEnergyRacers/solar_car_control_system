@@ -56,8 +56,11 @@ const string CarState::serialize(string msg) {
   cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator.get())]);
 
   cJSON_AddItemToObject(carData, "controlData", ctrData);
-  cJSON_AddNumberToObject(ctrData, "TargetSpeed", TargetSpeed.get());
-  cJSON_AddStringToObject(ctrData, "InfoLast", InfoLast.get().c_str());
+  cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed.get());
+  cJSON_AddStringToObject(ctrData, "infoLast", InfoLast.get().c_str());
+  cJSON_AddBoolToObject(ctrData, "light1", Light1On.get());
+  cJSON_AddBoolToObject(ctrData, "light2", Light2On.get());
+  cJSON_AddStringToObject(ctrData, "ios:", printIOs("").c_str());
   return cJSON_Print(carData);
 }
 

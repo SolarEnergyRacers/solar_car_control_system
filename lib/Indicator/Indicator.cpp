@@ -10,6 +10,7 @@
 #include <Indicator.h>
 
 extern CarState carState;
+extern DriverDisplayC dd;
 
 INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
 
@@ -45,7 +46,7 @@ void Indicator::exit(void){
 // ------------------
 void Indicator::init(void) {
   printf("[v] Indicator handler inited\n");
-  DriverDisplayC::instance()->print("[v] " + getName() + " initialized.\n");
+  dd.print("[v] " + getName() + " initialized.\n");
   vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: why sleep here?
 }
 // -------------
@@ -54,9 +55,8 @@ void Indicator::init(void) {
 void Indicator::task() {
   // do not add code here -- only controlling the blink frequency
   // polling loop
-  DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
-    dd->indicator_set_and_blink(carState.Indicator.get(), blinkState);
+    dd.indicator_set_and_blink(carState.Indicator.get(), blinkState);
     blinkState = !blinkState;
 
     // sleep

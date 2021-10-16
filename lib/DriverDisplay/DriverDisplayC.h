@@ -8,7 +8,7 @@
 
 #define ILI9341 // (320x240)
 
-#include <ADS1X15.h> 
+#include <ADS1X15.h>
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
 
 #include <CarState.h>
@@ -114,15 +114,7 @@ public:
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
   // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
 
-  static DriverDisplayC *instance() {
-    if (!_instance) {
-      _instance = new DriverDisplayC();
-    }
-    return _instance;
-  }
-  virtual ~DriverDisplayC() { _instance = 0; }
-
-protected:
+  virtual ~DriverDisplayC() {}
   DriverDisplayC() {}
 
 private:
@@ -130,7 +122,6 @@ private:
   template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
     return static_cast<typename std::underlying_type<Enumeration>::type>(value);
   }
-  static DriverDisplayC *_instance;
   static DISPLAY_STATUS status;
 
   // put private/internal variables/functions here
@@ -163,7 +154,7 @@ public:
     _setup();
   };
   void print(string msg);
-  
+
   // public functions
   void draw_display_border(int color);
   void draw_speed_border(int);

@@ -16,6 +16,7 @@ extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt ioExt;
 extern CarState carState;
+extern DriverDisplayC dd;
 
 #define DEBUGIOEXT
 
@@ -44,11 +45,11 @@ void IOExt::init() {
         sprintf(msg, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin.port, carState.getIdx(pin.name),
                 pin.mode != OUTPUT ? "INPUT " : "OUTPUT", pin.value, pin.name.c_str());
         printf(msg);
-        // DriverDisplayC::instance()->print(msg);
+        // dd.print(msg);
       }
       sprintf(msg, "[v] %s[%d] initialized.\n", getName().c_str(), devNr);
       printf(msg);
-      DriverDisplayC::instance()->print(msg);
+      dd.print(msg);
     }
   }
 }
@@ -157,14 +158,14 @@ void lightHandler() {
   int value = carState.getPin(PinLight)->value;
   if (value == 0) {
     printf("Light toggle\n");
-    DriverDisplayC::instance()->light1OnOff();
+    dd.light1OnOff();
   }
 }
 void driveLightHandler() {
   int value = carState.getPin(PinDriveLight)->value;
   if (value == 0) {
     printf("Drive Light toggle\n");
-    DriverDisplayC::instance()->light2OnOff();
+    dd.light2OnOff();
   }
 }
 void nextScreenHandler() {
@@ -177,14 +178,14 @@ void constantSetHandler() {
   int value = carState.getPin(PinConstantSet)->value;
   if (value == 0) {
     printf("Constant set toggle\n");
-    DriverDisplayC::instance()->constant_drive_mode_set(CONSTANT_MODE::POWER);
+    dd.constant_drive_mode_set(CONSTANT_MODE::POWER);
   }
 }
 void constantModeHandler() {
   int value = carState.getPin(PinConstantMode)->value;
   if (value == 0) {
     printf("Constant mode toggle\n");
-    DriverDisplayC::instance()->constant_drive_mode_show();
+    dd.constant_drive_mode_show();
   }
 }
 // end IO pin handler -----------------------------------------

@@ -31,7 +31,7 @@ extern ADC adc;
 extern IOExt ioExt;
 extern Indicator indicator;
 extern CarState carState;
-extern DriverDisplayC dd;
+extern DriverDisplay dd;
 
 void CmdHandler::re_init() { init(); }
 

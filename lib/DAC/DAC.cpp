@@ -22,7 +22,7 @@
 #define BASE_ADDR_CMD 0xA8
 
 extern I2CBus i2cBus;
-extern DriverDisplayC dd;
+extern DriverDisplay dd;
 
 void DAC::re_init() { init(); }
 

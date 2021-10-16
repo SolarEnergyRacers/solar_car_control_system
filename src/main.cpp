@@ -58,7 +58,7 @@ void app_main(void);
 }
 
 using namespace std;
-// using namespace DriverDisplayC;
+// using namespace DriverDisplay;
 
 ADC adc;
 CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
@@ -67,7 +67,7 @@ CarState carState;
 CmdHandler cmdHandler;
 DAC dac;
 Display disp;
-DriverDisplayC dd;
+DriverDisplay dd;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
 I2CBus i2cBus;

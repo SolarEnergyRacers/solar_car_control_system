@@ -34,10 +34,10 @@ extern SPIBus spiBus;
 extern ADC adc;
 extern bool systemOk;
 extern CarState carState;
-extern DriverDisplayC dd;
+extern DriverDisplay dd;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
-// namespace DriverDisplayC {
+// namespace DriverDisplay {
 
 //==== display cache =====================
 // ... to avoid flickering
@@ -55,20 +55,20 @@ CONSTANT_MODE constant_drive_mode = CONSTANT_MODE::SPEED;
 bool constant_drive_set = false;
 //=======================================
 
-// DriverDisplayC *DriverDisplayC::_instance = 0;
-DriverDisplayC::DISPLAY_STATUS DriverDisplayC::status = DISPLAY_STATUS::SETUP;
+// DriverDisplay *DriverDisplay::_instance = 0;
+DriverDisplay::DISPLAY_STATUS DriverDisplay::status = DISPLAY_STATUS::SETUP;
 
-string DriverDisplayC ::getName() { return "Display0 (driver display)"; };
+string DriverDisplay ::getName() { return "Display0 (driver display)"; };
 
-void DriverDisplayC ::init() {
+void DriverDisplay ::init() {
   abstract_task::init();
   status = DISPLAY_STATUS::DISPLAY_CONSOLE;
   re_init();
 }
 
-void DriverDisplayC ::re_init(void) { _setup(); }
+void DriverDisplay ::re_init(void) { _setup(); }
 
-void DriverDisplayC ::_setup() {
+void DriverDisplay ::_setup() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   tft.begin();
@@ -103,12 +103,12 @@ void DriverDisplayC ::_setup() {
   printf("[v] Display0 (driver display) inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
 }
 
-void DriverDisplayC ::exit() {}
+void DriverDisplay ::exit() {}
 
 // -------------
 // FreeRTOS TASK
 // -------------
-void DriverDisplayC ::task(void) {
+void DriverDisplay ::task(void) {
   // polling loop
   while (1) {
     switch (status) {
@@ -140,7 +140,7 @@ void DriverDisplayC ::task(void) {
   }
 }
 
-void DriverDisplayC::print(string msg) {
+void DriverDisplay::print(string msg) {
   if (status == DISPLAY_STATUS::DISPLAY_CONSOLE) {
     tft.print(msg.c_str());
   } else {
@@ -149,7 +149,7 @@ void DriverDisplayC::print(string msg) {
 }
 
 //------------------------------------------------------------------------
-void DriverDisplayC::setupScrollArea(uint16_t TFA, uint16_t BFA) {
+void DriverDisplay::setupScrollArea(uint16_t TFA, uint16_t BFA) {
   tft.writeCommand(ILI9341_VSCRDEF); // Vertical scroll definition
   tft.write(TFA >> 8);
   tft.write(TFA);
@@ -159,7 +159,7 @@ void DriverDisplayC::setupScrollArea(uint16_t TFA, uint16_t BFA) {
   tft.write(BFA);
 }
 
-int DriverDisplayC::scroll(int lines) {
+int DriverDisplay::scroll(int lines) {
   int TEXT_HEIGHT = 8;    // Height of text to be printed and scrolled
   int BOT_FIXED_AREA = 0; // Number of lines in bottom fixed area (lines counted from bottom of screen)
   int TOP_FIXED_AREA = 0;
@@ -176,7 +176,7 @@ int DriverDisplayC::scroll(int lines) {
   return yTemp;
 }
 
-void DriverDisplayC::scrollAddress(uint16_t VSP) {
+void DriverDisplay::scrollAddress(uint16_t VSP) {
   tft.writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
   tft.write(VSP >> 8);
   tft.write(VSP);
@@ -184,7 +184,7 @@ void DriverDisplayC::scrollAddress(uint16_t VSP) {
 
 //________________________________________________________________________
 
-void DriverDisplayC::speedCheck(int speed) {
+void DriverDisplay::speedCheck(int speed) {
    if (speed < 50) {
     dd.arrow_increase(true);
   } else {
@@ -200,7 +200,7 @@ void DriverDisplayC::speedCheck(int speed) {
 void exit(void) {}
 
 // writes flDriverDisplayC ::oat value  in the range from -9999.9 to 9999.9
-float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, int textSize, int color) {
+float DriverDisplay ::_write_float(int x, int y, float valueLast, float value, int textSize, int color) {
 
   if (value < -9999.9 || value > 9999.9) {
     printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
@@ -278,7 +278,7 @@ float DriverDisplayC ::_write_float(int x, int y, float valueLast, float value, 
 }
 
 // writes integer value in the range from -99 to +99
-int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
+int DriverDisplay ::_write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < -99 || value > 999) {
     printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'", value);
     return value;
@@ -331,7 +331,7 @@ int DriverDisplayC ::_write_ganz_99(int x, int y, int valueLast, int value, int 
 }
 
 // writes integer value in the range from 0 to 999
-int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
+int DriverDisplay ::_write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < 0 || value > 999) {
     printf("ERROR: call _write_nat_999 with a value outside the range: '%d'", value);
     return value;
@@ -381,7 +381,7 @@ int DriverDisplayC ::_write_nat_999(int x, int y, int valueLast, int value, int 
 }
 
 // write color of the border of the main display
-void DriverDisplayC ::draw_display_border(int color) {
+void DriverDisplay ::draw_display_border(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
@@ -392,7 +392,7 @@ void DriverDisplayC ::draw_display_border(int color) {
 }
 
 // write color of the border of the speed display
-void DriverDisplayC ::draw_speed_border(int color) {
+void DriverDisplay ::draw_speed_border(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
@@ -403,7 +403,7 @@ void DriverDisplayC ::draw_speed_border(int color) {
 }
 
 // write color of the border of the speed display
-void DriverDisplayC ::draw_acceleration_border(int color) {
+void DriverDisplay ::draw_acceleration_border(int color) {
   // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
@@ -414,7 +414,7 @@ void DriverDisplayC ::draw_acceleration_border(int color) {
   // CRITICAL SECTION SPI: end
 }
 
-void DriverDisplayC ::lifeSign() {
+void DriverDisplay ::lifeSign() {
   int color;
   if (lifeSignState) {
     color = bgColor;
@@ -435,7 +435,7 @@ void DriverDisplayC ::lifeSign() {
   lifeSignState = !lifeSignState;
 }
 
-void DriverDisplayC ::draw_display_background() {
+void DriverDisplay ::draw_display_background() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setRotation(0);
@@ -486,7 +486,7 @@ void DriverDisplayC ::draw_display_background() {
   light2On = false;
 }
 
-void DriverDisplayC ::_arrow_increase(int color) {
+void DriverDisplay ::_arrow_increase(int color) {
   int x = speedFrameX;
   int y = speedFrameY - 3;
 
@@ -495,7 +495,7 @@ void DriverDisplayC ::_arrow_increase(int color) {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplayC ::_arrow_decrease(int color) {
+void DriverDisplay ::_arrow_decrease(int color) {
   int x = speedFrameX;
   int y = speedFrameY + speedFrameSizeY + 3;
 
@@ -505,7 +505,7 @@ void DriverDisplayC ::_arrow_decrease(int color) {
 }
 
 // show the slower arrow (red under the speed display)
-void DriverDisplayC ::arrow_decrease(bool on) {
+void DriverDisplay ::arrow_decrease(bool on) {
   int color = bgColor;
   if (on) {
     arrow_increase(false);
@@ -515,7 +515,7 @@ void DriverDisplayC ::arrow_decrease(bool on) {
 }
 
 // show the faster arrow (green above the speed display)
-void DriverDisplayC ::arrow_increase(bool on) {
+void DriverDisplay ::arrow_increase(bool on) {
   int color = bgColor;
   if (on) {
     arrow_decrease(false);
@@ -524,24 +524,24 @@ void DriverDisplayC ::arrow_increase(bool on) {
   _arrow_increase(color);
 }
 
-void DriverDisplayC ::constant_drive_mode_set(CONSTANT_MODE mode) {
+void DriverDisplay ::constant_drive_mode_set(CONSTANT_MODE mode) {
   constant_drive_mode = mode;
   if (constant_drive_set == true) {
     constant_drive_mode_show();
   }
 }
 
-void DriverDisplayC ::constant_drive_on() {
+void DriverDisplay ::constant_drive_on() {
   constant_drive_set = true;
   constant_drive_mode_show();
 }
 
-void DriverDisplayC ::constant_drive_off() {
+void DriverDisplay ::constant_drive_off() {
   constant_drive_set = false;
   constant_drive_mode_hide();
 }
 
-void DriverDisplayC ::constant_drive_mode_hide() {
+void DriverDisplay ::constant_drive_mode_hide() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
@@ -552,7 +552,7 @@ void DriverDisplayC ::constant_drive_mode_hide() {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplayC ::constant_drive_mode_show() {
+void DriverDisplay ::constant_drive_mode_show() {
   constant_drive_mode_hide();
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setTextColor(ILI9341_YELLOW);
@@ -565,7 +565,7 @@ void DriverDisplayC ::constant_drive_mode_show() {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
+void DriverDisplay ::write_drive_direction(DRIVE_DIRECTION direction) {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(driveDirectionTextSize);
@@ -586,7 +586,7 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplayC ::_turn_Left(int color) {
+void DriverDisplay ::_turn_Left(int color) {
   int x = indicatorLeftX;
   int y = indicatorY;
 
@@ -595,7 +595,7 @@ void DriverDisplayC ::_turn_Left(int color) {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplayC ::_turn_Right(int color) {
+void DriverDisplay ::_turn_Right(int color) {
   int x = indicatorRightX;
   int y = indicatorY;
 
@@ -604,9 +604,9 @@ void DriverDisplayC ::_turn_Right(int color) {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction) { indicator_set_and_blink(direction, true); }
+void DriverDisplay ::indicator_set_and_blink(INDICATOR direction) { indicator_set_and_blink(direction, true); }
 
-void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
+void DriverDisplay ::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
   _turn_Left(bgColor);
   _turn_Right(bgColor);
   if (blinkOn) {
@@ -631,17 +631,17 @@ void DriverDisplayC ::indicator_set_and_blink(INDICATOR direction, bool blinkOn)
   }
 }
 
-void DriverDisplayC ::_light1(bool lightOn) {
+void DriverDisplay ::_light1(bool lightOn) {
   light1On = !lightOn;
   light1OnOff();
 }
 
-void DriverDisplayC ::_light2(bool lightOn) {
+void DriverDisplay ::_light2(bool lightOn) {
   light2On = !lightOn;
   light2OnOff();
 }
 
-void DriverDisplayC ::light1OnOff() {
+void DriverDisplay ::light1OnOff() {
   int color = ILI9341_YELLOW;
   if (light1On) {
     color = bgColor;
@@ -662,7 +662,7 @@ void DriverDisplayC ::light1OnOff() {
   // CRITICAL SECTION SPI: end
 }
 
-void DriverDisplayC ::light2OnOff() {
+void DriverDisplay ::light2OnOff() {
   int color = ILI9341_BLUE;
   if (light2On) {
     color = bgColor;
@@ -684,12 +684,12 @@ void DriverDisplayC ::light2OnOff() {
 }
 
 // Write the speed in the centre frame
-void DriverDisplayC ::write_speed() {
+void DriverDisplay ::write_speed() {
   int value = carState.Speed.get();
   write_speed(value);
 }
 
-void DriverDisplayC ::write_speed(int value) {
+void DriverDisplay ::write_speed(int value) {
   speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 
   // tft.setFont(&FreeMonoBold24pt7b);
@@ -699,29 +699,29 @@ void DriverDisplayC ::write_speed(int value) {
 }
 
 // acceleration value: 0-255
-void DriverDisplayC ::write_acceleration(int value) {
+void DriverDisplay ::write_acceleration(int value) {
   if (value < -99 || value > 99) {
     value = 999;
   }
   accelerationLast = _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
 }
 
-void DriverDisplayC ::write_bat(float value) {
+void DriverDisplay ::write_bat(float value) {
   int labelOffset = labelLen * batTextSize * 6;
   batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value, batTextSize, ILI9341_BLUE);
 }
 
-void DriverDisplayC ::write_pv(float value) {
+void DriverDisplay ::write_pv(float value) {
   int labelOffset = labelLen * pvTextSize * 6;
   pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value, pvTextSize, ILI9341_YELLOW);
 }
 
-void DriverDisplayC ::write_motor(float value) {
+void DriverDisplay ::write_motor(float value) {
   int labelOffset = labelLen * motorTextSize * 6;
   motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, ILI9341_YELLOW);
 }
 
-void DriverDisplayC ::_drawCentreString(const string &buf, int x, int y) {
+void DriverDisplay ::_drawCentreString(const string &buf, int x, int y) {
   // // CRITICAL SECTION SPI: start
   // xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
@@ -737,7 +737,7 @@ void DriverDisplayC ::_drawCentreString(const string &buf, int x, int y) {
 
 // INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR
 // = ILI9341_RED
-int DriverDisplayC ::_getColorForInfoType(INFO_TYPE type) {
+int DriverDisplay ::_getColorForInfoType(INFO_TYPE type) {
   int color;
   switch (type) {
   case INFO_TYPE::ERROR:
@@ -760,7 +760,7 @@ int DriverDisplayC ::_getColorForInfoType(INFO_TYPE type) {
   return color;
 }
 
-void DriverDisplayC ::write_driver_info(string msg, INFO_TYPE type) {
+void DriverDisplay ::write_driver_info(string msg, INFO_TYPE type) {
   // comments are preparation for font usage
 
   // CRITICAL SECTION SPI: start
@@ -791,7 +791,7 @@ void DriverDisplayC ::write_driver_info(string msg, INFO_TYPE type) {
   // CRITICAL SECTION SPI: end
 }
 
-void DriverDisplayC ::driver_display_demo_screen() {
+void DriverDisplay ::driver_display_demo_screen() {
   printf("  Draw demo screen:\n");
 #ifdef POWERMEASUREMENT
   // ---- for power measurement: start
@@ -861,4 +861,4 @@ void DriverDisplayC ::driver_display_demo_screen() {
   printf("  End of demo screen.\n");
 }
 
-// } //namespace DriverDisplayC
+// } //namespace DriverDisplay

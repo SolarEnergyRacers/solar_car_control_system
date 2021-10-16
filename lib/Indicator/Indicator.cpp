@@ -10,7 +10,7 @@
 #include <Indicator.h>
 
 extern CarState carState;
-extern DriverDisplayC dd;
+extern DriverDisplay dd;
 
 INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
 

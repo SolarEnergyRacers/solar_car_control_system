@@ -16,7 +16,7 @@
 extern I2CBus i2cBus;
 extern ADC adc;
 extern DAC dac;
-extern DriverDisplayC dd;
+extern DriverDisplay dd;
 
 void ADC::re_init() { ADC::init(); }
 

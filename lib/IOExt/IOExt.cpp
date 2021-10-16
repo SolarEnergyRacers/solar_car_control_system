@@ -16,7 +16,7 @@ extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt ioExt;
 extern CarState carState;
-extern DriverDisplayC dd;
+extern DriverDisplay dd;
 
 #define DEBUGIOEXT
 

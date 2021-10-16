@@ -21,14 +21,14 @@ using namespace std;
 
 extern SemaphoreHandle_t spi_mutex;
 
-// namespace DriverDisplayC {
+// namespace DriverDisplay {
 // // public structures
 // enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
 // enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
 // enum class CONSTANT_MODE { NONE, SPEED, POWER };
 // enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 
-class DriverDisplayC : public abstract_task {
+class DriverDisplay : public abstract_task {
 
 private:
   //==== Driver Display definition ==== START
@@ -114,8 +114,8 @@ public:
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
   // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
 
-  virtual ~DriverDisplayC() {}
-  DriverDisplayC() {}
+  virtual ~DriverDisplay() {}
+  DriverDisplay() {}
 
 private:
   enum class DISPLAY_STATUS { SETUP, DISPLAY_CONSOLE, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
@@ -194,5 +194,5 @@ public:
   void setIndicatorState(bool state);
   void task(void);
 };
-//} // namespace DriverDisplayC
+//} // namespace DriverDisplay
 #endif // DRIVER_DISPLAY_C_H

@@ -31,13 +31,14 @@ extern ADC adc;
 extern IOExt ioExt;
 extern Indicator indicator;
 extern CarState carState;
+extern DriverDisplayC dd;
 
 void CmdHandler::re_init() { init(); }
 
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
   printf("[v] Command handler inited\n");
-  DriverDisplayC::instance()->print("[v] " + getName() + " initialized.\n");
+  dd.print("[v] " + getName() + " initialized.\n");
 }
 
 void CmdHandler::exit() {
@@ -46,7 +47,6 @@ void CmdHandler::exit() {
 
 void CmdHandler::task() {
 
-  DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
 
     while (Serial.available() > 0) {
@@ -72,9 +72,9 @@ void CmdHandler::task() {
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
-        dd->re_init();
-        DriverDisplayC::instance()->setScreen0Mode();
-        dd->draw_display_background();
+        dd.re_init();
+        dd.setScreen0Mode();
+        dd.draw_display_background();
         break;
       case 'S':
         printSystemValues();
@@ -92,27 +92,27 @@ void CmdHandler::task() {
       case 's':
         if (input[2] == 'f') {
           carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
-          dd->write_drive_direction(DRIVE_DIRECTION::FORWARD);
+          dd.write_drive_direction(DRIVE_DIRECTION::FORWARD);
         } else if (input[2] == 'b') {
           carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
-          dd->write_drive_direction(DRIVE_DIRECTION::BACKWARD);
+          dd.write_drive_direction(DRIVE_DIRECTION::BACKWARD);
         } else {
           carState.Speed.set(atoi(&input[1]));
-          dd->write_speed();
+          dd.write_speed();
         }
         break;
       case 'b':
-        dd->write_bat(atof(&input[1]));
+        dd.write_bat(atof(&input[1]));
         break;
       case 'p':
-        dd->write_pv(atof(&input[1]));
+        dd.write_pv(atof(&input[1]));
         break;
       case 'm':
-        dd->write_motor(atof(&input[1]));
+        dd.write_motor(atof(&input[1]));
         break;
       case 'a':
         accValue = atoi(&input[1]);
-        dd->write_acceleration(accValue);
+        dd.write_acceleration(accValue);
         // TODO: where to put in this important
         if (accValue > 0) {
           dac.set_pot(accValue, DAC::POT_CHAN0);
@@ -143,26 +143,26 @@ void CmdHandler::task() {
       case 'u':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          dd->arrow_increase(false);
+          dd.arrow_increase(false);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          dd->arrow_increase(true);
+          dd.arrow_increase(true);
         }
         break;
       case 'd':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          dd->arrow_decrease(false);
+          dd.arrow_decrease(false);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          dd->arrow_decrease(true);
+          dd.arrow_decrease(true);
         }
         break;
       case ':':
-        dd->write_driver_info(&input[1], INFO_TYPE::INFO);
+        dd.write_driver_info(&input[1], INFO_TYPE::INFO);
         break;
       case '!':
-        dd->write_driver_info(&input[1], INFO_TYPE::WARN);
+        dd.write_driver_info(&input[1], INFO_TYPE::WARN);
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -175,21 +175,21 @@ void CmdHandler::task() {
         indicator.setIndicator(INDICATOR::WARN);
         break;
       case 'l':
-        dd->light1OnOff();
+        dd.light1OnOff();
         break;
       case 'L':
-        dd->light2OnOff();
+        dd.light2OnOff();
         break;
       case 'c':
         if (input[2] == 's') {
-          dd->constant_drive_mode_set(CONSTANT_MODE::SPEED);
-          dd->constant_drive_mode_show();
+          dd.constant_drive_mode_set(CONSTANT_MODE::SPEED);
+          dd.constant_drive_mode_show();
         } else if (input[2] == 'p') {
-          dd->constant_drive_mode_set(CONSTANT_MODE::POWER);
-          dd->constant_drive_mode_show();
+          dd.constant_drive_mode_set(CONSTANT_MODE::POWER);
+          dd.constant_drive_mode_show();
         } else {
-          dd->constant_drive_mode_set(CONSTANT_MODE::NONE);
-          dd->constant_drive_mode_show();
+          dd.constant_drive_mode_set(CONSTANT_MODE::NONE);
+          dd.constant_drive_mode_show();
         }
         break;
       // usage

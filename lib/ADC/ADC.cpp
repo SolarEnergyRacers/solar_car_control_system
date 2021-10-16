@@ -16,6 +16,7 @@
 extern I2CBus i2cBus;
 extern ADC adc;
 extern DAC dac;
+extern DriverDisplayC dd;
 
 void ADC::re_init() { ADC::init(); }
 
@@ -66,7 +67,7 @@ void ADC::init() {
     printf("[v] ADC[%d] initialized.\n", idx);
     char msg[100];
     sprintf(msg, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
-    DriverDisplayC::instance()->print(msg);
+    dd.print(msg);
   }
 }
 

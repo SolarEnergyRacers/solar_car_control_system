@@ -62,23 +62,24 @@ using namespace std;
 
 ADC adc;
 CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
-OneWireBus oneWireBus;
-SPIBus spiBus;
-I2CBus i2cBus;
-Temp ds; // temperature
-SDCard sdCard;
+CarSpeed carSpeed;
+CarState carState;
 CmdHandler cmdHandler;
 DAC dac;
-Uart uart; // SERIAL
+Display disp;
+DriverDisplayC dd;
+GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
+I2CBus i2cBus;
 Indicator indicator; // DISPLAY_LARGE_INDICATOR_ON
 IOExt ioExt;
+OneWireBus oneWireBus;
 PWM pwm;
-Display disp;
 RTC rtc;
-GPInputOutput gpio; // I2C Interrupts
-CarState carState;
-CarSpeed carSpeed;
+SDCard sdCard;
+SPIBus spiBus;
+Temp ds; // temperature
+Uart uart; // SERIAL
 
 bool startOk = true;
 bool systemOk = false;
@@ -112,7 +113,7 @@ void app_main(void) {
 
   // ---- init modules ----
   if (DISPLAY_LARGE_ON) {
-    DriverDisplayC::instance()->init();
+    dd.init();
   }
   if (BLINK_ON) {
   }
@@ -167,22 +168,22 @@ void app_main(void) {
   printf("\n-----------------------------------------------------------------\n");
   printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
   printf("-----------------------------------------------------------------\n");
-  DriverDisplayC::instance()->print("\n---------------------------------\n");
-  DriverDisplayC::instance()->print("Startup sequence(s) successful.\nSystem creating FreeRTOS tasks...\n");
-  DriverDisplayC::instance()->print("---------------------------------\n");
+  dd.print("\n---------------------------------\n");
+  dd.print("Startup sequence(s) successful.\nSystem creating FreeRTOS tasks...\n");
+  dd.print("---------------------------------\n");
 
   // ---- create tasks ----
   if (DISPLAY_ON) {
     disp.create_task();
   }
   if (DISPLAY_LARGE_ON) {
-    DriverDisplayC::instance()->create_task();
-    DriverDisplayC::instance()->print("[v] " + DriverDisplayC::instance()->getName() + "task initialized.\n");
+    dd.create_task();
+    dd.print("[v] " + dd.getName() + "task initialized.\n");
   }
 
   if (DISPLAY_LARGE_INDICATOR_ON) {
     indicator.create_task();
-    DriverDisplayC::instance()->print("[v] " + indicator.getName() + "task initialized.\n");
+    dd.print("[v] " + indicator.getName() + "task initialized.\n");
   }
   // if (BLINK_ON) { // not activated
   //   printf(" - blink_demo_task\n");
@@ -197,22 +198,22 @@ void app_main(void) {
   }
   if (PWM_ON) {
     pwm.create_task();
-    DriverDisplayC::instance()->print("[v] " + pwm.getName() + "task initialized.\n");
+    dd.print("[v] " + pwm.getName() + "task initialized.\n");
   }
   if (RTC_ON) {
     rtc.create_task();
-    DriverDisplayC::instance()->print("[v] " + rtc.getName() + "task initialized.\n");
+    dd.print("[v] " + rtc.getName() + "task initialized.\n");
   }
   if (SD_ON) {
     xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
     gpio.create_task();
-    DriverDisplayC::instance()->print("[v] " + gpio.getName() + "task initialized.\n");
+    dd.print("[v] " + gpio.getName() + "task initialized.\n");
   }
   if (IOEXT_ON) {
     ioExt.create_task();
-    DriverDisplayC::instance()->print("[v] " + ioExt.getName() + "task initialized.\n");
+    dd.print("[v] " + ioExt.getName() + "task initialized.\n");
   }
   if (DAC_ON) {
     dac.init();
@@ -220,7 +221,7 @@ void app_main(void) {
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
-    DriverDisplayC::instance()->print("[v] " + cmdHandler.getName() + "task initialized.\n");
+    dd.print("[v] " + cmdHandler.getName() + "task initialized.\n");
   }
   if (SERIAL_ON) {
     printf(" - serial_demo_task\n");
@@ -233,7 +234,7 @@ void app_main(void) {
 
   if (CARSPEED_ON) {
     carSpeed.create_task();
-    DriverDisplayC::instance()->print("[v] " + carSpeed.getName() + "task initialized.\n");
+    dd.print("[v] " + carSpeed.getName() + "task initialized.\n");
   }
 
   systemOk = true;
@@ -241,11 +242,11 @@ void app_main(void) {
   printf("-----------------------------------------------------------------\n");
   printf("Creating FreeRTOS tasks successful. System running.\n");
   printf("-----------------------------------------------------------------\n\n");
-  DriverDisplayC::instance()->print("\n----------------------------------------------------\n");
-  DriverDisplayC::instance()->print("FreeRTOS tasks created successfully. System running.\n");
-  DriverDisplayC::instance()->print("----------------------------------------------------\n");
+  dd.print("\n----------------------------------------------------\n");
+  dd.print("FreeRTOS tasks created successfully. System running.\n");
+  dd.print("----------------------------------------------------\n");
 
   if (DISPLAY_LARGE_ON) {
-    DriverDisplayC::instance()->setScreen0Mode();
+    dd.setScreen0Mode();
   }
 }

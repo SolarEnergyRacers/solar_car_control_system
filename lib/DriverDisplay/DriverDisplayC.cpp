@@ -34,6 +34,7 @@ extern SPIBus spiBus;
 extern ADC adc;
 extern bool systemOk;
 extern CarState carState;
+extern DriverDisplayC dd;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // namespace DriverDisplayC {
@@ -54,7 +55,7 @@ CONSTANT_MODE constant_drive_mode = CONSTANT_MODE::SPEED;
 bool constant_drive_set = false;
 //=======================================
 
-DriverDisplayC *DriverDisplayC::_instance = 0;
+// DriverDisplayC *DriverDisplayC::_instance = 0;
 DriverDisplayC::DISPLAY_STATUS DriverDisplayC::status = DISPLAY_STATUS::SETUP;
 
 string DriverDisplayC ::getName() { return "Display0 (driver display)"; };
@@ -72,7 +73,7 @@ void DriverDisplayC ::_setup() {
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   tft.begin();
   // read for bugs: https://forums.adafruit.com/viewtopic.php?p=815969
-  //tft.initSPI(3000000, SPI_MODE3);
+  // tft.initSPI(3000000, SPI_MODE3);
   printf("done.\n");
   try {
     printf("      Display0 (driver display) initializing...\n");
@@ -86,7 +87,7 @@ void DriverDisplayC ::_setup() {
     printf("      Image Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDSELFDIAG);
     printf("      Self Diagnostic:    0x%x\n", x);
-    //tft.fillScreen(bgColor);
+    // tft.fillScreen(bgColor);
     tft.setRotation(1);
     tft.setTextSize(1);
     tft.setTextColor(ILI9341_WHITE);
@@ -184,16 +185,15 @@ void DriverDisplayC::scrollAddress(uint16_t VSP) {
 //________________________________________________________________________
 
 void DriverDisplayC::speedCheck(int speed) {
-  DriverDisplayC *dd = DriverDisplayC::instance();
-  if (speed < 50) {
-    dd->arrow_increase(true);
+   if (speed < 50) {
+    dd.arrow_increase(true);
   } else {
-    dd->arrow_increase(false);
+    dd.arrow_increase(false);
   }
   if (speed > 80) {
-    dd->arrow_decrease(true);
+    dd.arrow_decrease(true);
   } else {
-    dd->arrow_decrease(false);
+    dd.arrow_decrease(false);
   }
 }
 
@@ -543,42 +543,29 @@ void DriverDisplayC ::constant_drive_off() {
 
 void DriverDisplayC ::constant_drive_mode_hide() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
   tft.setCursor(constantModeX, constantModeY);
   tft.print("power");
   tft.setCursor(constantModeX, constantModeY);
   tft.print("speed");
-  // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
   xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::constant_drive_mode_show() {
-
+  constant_drive_mode_hide();
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
-  tft.setTextSize(constantModeTextSize);
-  tft.setTextColor(ILI9341_BLACK);
-  tft.setCursor(constantModeX, constantModeY);
-  tft.print("power");
-  tft.setCursor(constantModeX, constantModeY);
-  tft.print("speed");
-  // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
-
   tft.setTextColor(ILI9341_YELLOW);
   tft.setCursor(constantModeX, constantModeY);
-  if (constant_drive_mode == CONSTANT_MODE::POWER) {
+  if (carState.ConstantMode.get() == CONSTANT_MODE::POWER) {
     tft.print("power");
   } else {
     tft.print("speed");
   }
-
   xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(driveDirectionTextSize);
@@ -589,7 +576,7 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
   tft.print("backward");
 
   tft.setCursor(driveDirectionX, driveDirectionY);
-  if (direction == DRIVE_DIRECTION::FORWARD) {
+  if (carState.DriveDirection.get() == DRIVE_DIRECTION::FORWARD) {
     tft.setTextColor(ILI9341_YELLOW);
     tft.print("forward");
   } else {
@@ -597,7 +584,6 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
     tft.print("backward");
   }
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::_turn_Left(int color) {

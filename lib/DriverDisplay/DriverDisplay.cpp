@@ -199,7 +199,7 @@ void DriverDisplay::speedCheck(int speed) {
 
 void exit(void) {}
 
-// writes flDriverDisplayC ::oat value  in the range from -9999.9 to 9999.9
+// writes DriverDisplay ::float value  in the range from -9999.9 to 9999.9
 float DriverDisplay ::_write_float(int x, int y, float valueLast, float value, int textSize, int color) {
 
   if (value < -9999.9 || value > 9999.9) {

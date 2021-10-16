@@ -11,7 +11,7 @@
 
 #include <ADC.h>
 #include <DAC.h>
-#include <DriverDisplayC.h>
+#include <DriverDisplay.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;

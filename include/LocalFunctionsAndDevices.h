@@ -7,8 +7,8 @@
 #define COMMANDHANDLER_ON true          // command input and deploy
 #define DAC_ON false                    // digital analog converter, I2C (DS1803)
 #define DISPLAY_LARGE_INDICATOR_ON true // indicator blink
-#define DISPLAY_LARGE_ON true           // driver display, SPI (ILI9341)
-#define DISPLAY_ON false                // display elements
+#define DRIVER_DISPLAY_ON true           // driver display, SPI (ILI9341)
+#define ENGINEER_DISPLAY_ON false                // display elements
 #define DS_ON false                     // 1-Wire Digital Thermometer (DS18B20)
 #define GYRO_ACC_ON false               // 6-axis Motion Tracking (BMI088)
 #define INT_ON false                    // interrupt for I/O Expander

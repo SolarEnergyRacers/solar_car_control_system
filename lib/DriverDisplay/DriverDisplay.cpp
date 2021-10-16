@@ -13,7 +13,7 @@
 #include <definitions.h>
 
 #include <ADC.h>
-#include <DriverDisplayC.h>
+#include <DriverDisplay.h>
 
 #include <CarState.h>
 #include <SPIBus.h>

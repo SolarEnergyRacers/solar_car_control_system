@@ -17,7 +17,7 @@
 #include <Wire.h> // I2C
 
 #include <DAC.h>
-#include <DriverDisplayC.h>
+#include <DriverDisplay.h>
 
 #define BASE_ADDR_CMD 0xA8
 

@@ -9,14 +9,14 @@
 
 #include <I2CBus.h>
 
-#include <Display.h>
+#include <EngineerDisplay.h>
 
 extern I2CBus i2cBus;
 Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET); // TODO: remove & add to class
 
-void Display::re_init() { init(); }
+void EngineerDisplay::re_init() { init(); }
 
-void Display::init(void) {
+void EngineerDisplay::init(void) {
 
   // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
@@ -31,29 +31,24 @@ void Display::init(void) {
   display.display(); // show splashscreen
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 
   vTaskDelay(1000 / portTICK_PERIOD_MS);
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
   display.clearDisplay(); // clears the screen and buffer
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 }
 
-void Display::exit() {
+void EngineerDisplay::exit() {
   // TODO
 }
 
-void Display::task() {
+void EngineerDisplay::task() {
 
   // polling loop
   while (1) {
-
-    // CRITICAL SECTION I2C: start
     xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
     // clears the screen and buffer
@@ -78,8 +73,6 @@ void Display::task() {
     display.display();
 
     xSemaphoreGive(i2cBus.mutex);
-    // CRITICAL SECTION I2C: end
-
     // sleep for 1s
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }

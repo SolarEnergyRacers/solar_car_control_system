@@ -27,8 +27,8 @@
 #include <CarSpeed.h>
 #include <CmdHandler.h>
 #include <DAC.h>
-#include <Display.h>
-#include <DriverDisplayC.h>
+#include <EngineerDisplay.h>
+#include <DriverDisplay.h>
 #include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
@@ -66,7 +66,7 @@ CarSpeed carSpeed;
 CarState carState;
 CmdHandler cmdHandler;
 DAC dac;
-Display disp;
+EngineerDisplay engDisp;
 DriverDisplay dd;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
@@ -112,7 +112,7 @@ void app_main(void) {
   spiBus.init();
 
   // ---- init modules ----
-  if (DISPLAY_LARGE_ON) {
+  if (DRIVER_DISPLAY_ON) {
     dd.init();
   }
   if (BLINK_ON) {
@@ -145,8 +145,8 @@ void app_main(void) {
     gpio.init();
     gpio.register_gpio_interrupt();
   }
-  if (DISPLAY_ON) {
-    disp.init();
+  if (ENGINEER_DISPLAY_ON) {
+    engDisp.init();
   }
   if (IOEXT_ON) {
     ioExt.init();
@@ -173,10 +173,10 @@ void app_main(void) {
   dd.print("---------------------------------\n");
 
   // ---- create tasks ----
-  if (DISPLAY_ON) {
-    disp.create_task();
+  if (ENGINEER_DISPLAY_ON) {
+    engDisp.create_task();
   }
-  if (DISPLAY_LARGE_ON) {
+  if (DRIVER_DISPLAY_ON) {
     dd.create_task();
     dd.print("[v] " + dd.getName() + "task initialized.\n");
   }
@@ -246,7 +246,7 @@ void app_main(void) {
   dd.print("FreeRTOS tasks created successfully. System running.\n");
   dd.print("----------------------------------------------------\n");
 
-  if (DISPLAY_LARGE_ON) {
+  if (DRIVER_DISPLAY_ON) {
     dd.setScreen0Mode();
   }
 }

@@ -64,11 +64,12 @@ void app_main(void);
 using namespace std;
 
 ADC adc;
-CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
-CAN_device_t CAN_cfg;
-CarControl carControl;
-CarSpeed carSpeed;
-CarState carState;
+CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
+OneWireBus oneWireBus;
+SPIBus spiBus;
+I2CBus i2cBus;
+Temp ds; // temperature
+SDCard sdCard;
 CmdHandler cmdHandler;
 DAC dac;
 DriverDisplay driverDisplay;

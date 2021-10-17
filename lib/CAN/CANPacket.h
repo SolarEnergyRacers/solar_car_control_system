@@ -10,6 +10,15 @@ class CANPacket {
         CANPacket(uint16_t id, uint8_t data[]);
         CANPacket(uint16_t id, uint64_t data);
 
+        CANPacket& operator=(const CANPacket& that){
+            if (this != &that){
+                this->id = that.id;
+                this->data = that.data;
+            }
+
+            return *this;
+        };
+
         void setID(uint16_t id);
         uint16_t getID();
 

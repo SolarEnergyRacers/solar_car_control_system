@@ -10,9 +10,12 @@
 #include <CAN.h>
 
 #include "CANBus.h"
-#include "CANPacket.h"
 
 extern CANBus can;
+
+void onReceiveForwarder(int packetSize){
+  can.onReceive(packetSize);
+}
 
 void CANBus::re_init() { 
   CAN.end();
@@ -23,7 +26,7 @@ void CANBus::init() {
   mutex = xSemaphoreCreateBinary();
 
   CAN.setPins(CAN_RX, CAN_TX);
-  CAN.onReceive(can.onReceive); //ToDo Fix
+  CAN.onReceive(onReceiveForwarder); //not sure if works
 
   if(!CAN.begin(CAN_SPEED)){
     //opening CAN failed :,(
@@ -36,19 +39,26 @@ void CANBus::init() {
 void CANBus::onReceive(int packetSize){
 
   CANPacket packet;
-  uint8_t receivedData[packetSize];
+  uint64_t rxData = 0;
 
   packet.setID(CAN.packetId());
 
   for(int i = 0; i < packetSize; i++){
     if(CAN.available()){
-      receivedData[i] = (uint8_t) CAN.read();
+      rxData = rxData | (((uint8_t) CAN.read()) << (i * 8));
     }
   }
 
-  packet.setData(receivedData);
+  packet.setData(rxData);
 
-  //Check if packet is relevant for board computer
+  //Add packet to buffer so task can handle it later
+  rxBuffer.push(packet);
+}
+
+
+
+void read_can_demo_task(void *pvParameter) {
+  /*  //Check if packet is relevant for board computer
   switch(packet.getID()){
     case BMS_BASE_ADDR | 0xFB:
       //Battery Pack Status
@@ -57,10 +67,5 @@ void CANBus::onReceive(int packetSize){
       break;
     default:
       break;
-  }
-
-}
-
-
-void read_can_demo_task(void *pvParameter) {
+  }*/
 }

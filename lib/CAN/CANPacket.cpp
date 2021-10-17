@@ -3,8 +3,8 @@
 #include "CANPacket.h"
 
 CANPacket::CANPacket(){
-    id = 0;
-    data = 0;
+    this->id = 0;
+    this->data = 0;
 }
 
 CANPacket::CANPacket(uint16_t id, uint8_t data[]){
@@ -19,6 +19,7 @@ CANPacket::CANPacket(uint16_t id, uint64_t data){
     this->id = id;
     this->data = data;
 }
+
 
 void CANPacket::setID(uint16_t id){
     this->id = id;

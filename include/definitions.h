@@ -72,7 +72,11 @@
 #define MPPT0_BASE_ADDR 0x600
 #define MPPT1_BASE_ADDR 0x610
 #define MPPT2_BASE_ADDR 0x620
-#define CAN_RX_BUFFER_SIZE 10
+#define CAN_RX_BUFFER_SIZE 20
+
+#ifndef ARDUINO_ARCH_ESP32
+  #define ARDUINO_ARCH_ESP32 0
+#endif
 
 /*
  *  SPI

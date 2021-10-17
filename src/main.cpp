@@ -55,7 +55,7 @@ using namespace std;
 // using namespace DriverDisplayC;
 
 ADC adc;
-CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
+CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
 OneWireBus oneWireBus;
 SPIBus spiBus;
 I2CBus i2cBus;

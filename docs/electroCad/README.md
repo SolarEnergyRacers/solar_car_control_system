@@ -1,6 +1,6 @@
 # ELT-Schema and Board Design
 
-[TOC]
+[toc]
 
 ## Open Questions
 
@@ -16,16 +16,14 @@
 ## Main-board
 
 ### Layout Idea
- - Board 150x100
-![image-20210810101641377](.README/image-20210810101641377.png)
 
- --> The IO and ADC board are stripped of of all connectors and reassembled, see below)
+- Board 150x100![mount1](assets.README/mount1.png)
 
-![image-20210810103350670](.README/image-20210810103350670.png)
+- --> The IO and ADC board are stripped of of all connectors and reassembled, see below) ![mount2](assets.README/mount2.png)
 
 To change connectors:
 
-- PCF8574 boards 
+- PCF8574 boards
   - remove all plugs
   - reassembly 9 pin plug (8 IOs and Interrupt) and 4 pin I2C pin (I2C) on backside
   - can possibly be shortened a little
@@ -37,4 +35,3 @@ To change connectors:
   - IC names missing in doc/data-sheets
 
 ## Steering-wheel Board
-

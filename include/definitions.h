@@ -12,7 +12,7 @@
 /*
  * OneWire
  */
-#define ONEWIRE_PIN 2
+#define ONEWIRE_PIN 12
 
 /*
  * I2C

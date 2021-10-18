@@ -69,28 +69,28 @@ void DriverDisplay ::init() {
 void DriverDisplay ::re_init(void) { _setup(); }
 
 void DriverDisplay ::_setup() {
+  printf("    Init 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   tft.begin();
   // read for bugs: https://forums.adafruit.com/viewtopic.php?p=815969
   // tft.initSPI(3000000, SPI_MODE3);
-  printf("done.\n");
   try {
-    printf("      Display0 (driver display) initializing...\n");
+    printf("    Display0 (driver display) initializing...\n");
     uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-    printf("      Display Power Mode: 0x%x\n", x);
+    printf("    Display Power Mode: 0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDMADCTL);
-    printf("      MADCTL Mode:        0x%x\n", x);
+    printf("    MADCTL Mode:        0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDPIXFMT);
-    printf("      Pixel Format:       0x%x\n", x);
+    printf("    Pixel Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDIMGFMT);
-    printf("      Image Format:       0x%x\n", x);
+    printf("    Image Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDSELFDIAG);
-    printf("      Self Diagnostic:    0x%x\n", x);
-    // tft.fillScreen(bgColor);
+    printf("    Self Diagnostic:    0x%x\n", x);
+    tft.fillScreen(ILI9341_WHITE);
     tft.setRotation(1);
     tft.setTextSize(1);
-    tft.setTextColor(ILI9341_WHITE);
+    tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(10, tft.width() - 20);
     infoFrameSizeX = tft.width();
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
@@ -100,10 +100,10 @@ void DriverDisplay ::_setup() {
     throw ex;
   }
   xSemaphoreGive(spiBus.mutex);
-  printf("[v] Display0 (driver display) inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
+  printf("[v] Driver display inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
 }
 
-void DriverDisplay::clear_screen(int bgColor){
+void DriverDisplay::clear_screen(int bgColor) {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.fillScreen(bgColor);
   xSemaphoreGive(spiBus.mutex);
@@ -114,7 +114,7 @@ void DriverDisplay ::exit() {}
 // -------------
 // FreeRTOS TASK
 // -------------
-void DriverDisplay ::task(void) {
+void DriverDisplay::task(void) {
   // polling loop
   while (1) {
     switch (status) {
@@ -126,6 +126,7 @@ void DriverDisplay ::task(void) {
       status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
       break;
     case DISPLAY_STATUS::DISPLAY_BACKGROUND:
+      clear_screen(bgColor);
       draw_display_background();
       status = DISPLAY_STATUS::DRIVER;
       break;
@@ -134,19 +135,22 @@ void DriverDisplay ::task(void) {
       // do nothing special
       break;
     case DISPLAY_STATUS::ENGINEER:
+      if (lifeSignCounter > 10) {
+        lifeSign();
+        lifeSignCounter = 0;
+      }
       break;
     case DISPLAY_STATUS::DRIVER:
-    default: // driver / engineer screen
+    default: // driver screen
       if (lifeSignCounter > 10) {
         lifeSign();
         lifeSignCounter = 0;
         int accDisplayValue = adc.read_adc_acc_dec();
         write_acceleration(accDisplayValue);
-        // speedCheck(speedLast);
       }
-      lifeSignCounter++;
       break;
     }
+    lifeSignCounter++;
     // sleep for sleep_polling_ms
     this->sleep(20);
   }
@@ -416,14 +420,12 @@ void DriverDisplay ::draw_speed_border(int color) {
 
 // write color of the border of the speed display
 void DriverDisplay ::draw_acceleration_border(int color) {
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   accFrameSizeX = speedFrameX - 3;
   tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
 
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplay ::lifeSign() {
@@ -433,8 +435,8 @@ void DriverDisplay ::lifeSign() {
   } else {
     color = ILI9341_GREEN;
   }
+  lifeSignState = !lifeSignState;
 
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   lifeSignX = tft.width() - lifeSignRadius - 6;
@@ -442,16 +444,14 @@ void DriverDisplay ::lifeSign() {
   tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, color);
 
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 
-  lifeSignState = !lifeSignState;
 }
 
 void DriverDisplay ::draw_display_background() {
   clear_screen(bgColor);
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
-  //tft.fillScreen(bgColor);
+  // tft.fillScreen(bgColor);
   tft.setRotation(1);
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_DARKGREEN);

@@ -19,21 +19,14 @@
 
 using namespace std;
 
-extern SemaphoreHandle_t spi_mutex;
-
-// namespace DriverDisplay {
-// // public structures
-// enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-// enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-// enum class CONSTANT_MODE { NONE, SPEED, POWER };
-// enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
+// namespace DriverDisplayC {
 
 class DriverDisplay : public abstract_task {
 
 private:
   //==== Driver Display definition ==== START
   // display formats and sizes
-  int bgColor = 0x000000;
+  int bgColor = ILI9341_BLACK;
   int infoFrameX = 0;
   int infoFrameY = 0;
   int infoFrameSizeX = -1; // full tft width, calculated beow

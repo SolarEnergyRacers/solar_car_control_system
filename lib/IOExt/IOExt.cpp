@@ -98,13 +98,6 @@ CarStatePin CarState::pins[] = { // IOExtDev0
 void IOExt::handleIoInterrupt() {
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
 
-#ifdef USE_LEGACY_PIN_READ
-  // read all
-  PCF8574::DigitalInput dra[PCF8574_NUM_DEVICES];
-  for (int i = 0; i < PCF8574_NUM_DEVICES; i++) {
-    dra[i] = IOExt[i].digitalReadAll();
-  }
-#else
   list<void (*)()> pinHandlerList;
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
@@ -121,7 +114,6 @@ void IOExt::handleIoInterrupt() {
       }
     }
   }
-#endif
   xSemaphoreGive(i2cBus.mutex);
 
 #ifdef DEBUGIOEXT

@@ -48,9 +48,9 @@
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
 
+#include <CarState.h>
 #include <CarStatePin.h>
 #include <CarStateValue.h>
-#include <CarState.h>
 
 // add C linkage definition
 extern "C" {
@@ -78,7 +78,7 @@ PWM pwm;
 RTC rtc;
 SDCard sdCard;
 SPIBus spiBus;
-Temp ds; // temperature
+Temp ds;   // temperature
 Uart uart; // SERIAL
 
 bool startOk = true;
@@ -189,7 +189,7 @@ void app_main(void) {
   //   printf(" - blink_demo_task\n");
   //   xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   // }
- 
+
   if (DS_ON) {
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }

@@ -26,9 +26,7 @@ extern DriverDisplayC dd;
 
 void DAC::re_init() { init(); }
 
-void DAC::init() {
-  dd.print("[v] DAC initialized.\n");
-}
+void DAC::init() { dd.print("[v] DAC initialized.\n"); }
 uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {

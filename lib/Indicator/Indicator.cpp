@@ -5,9 +5,9 @@
 #include <ADS1X15.h>
 #include <Adafruit_ILI9341.h>
 
-#include <definitions.h>
 #include <DriverDisplayC.h>
 #include <Indicator.h>
+#include <definitions.h>
 
 extern CarState carState;
 extern DriverDisplayC dd;

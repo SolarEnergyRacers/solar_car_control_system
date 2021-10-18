@@ -6,10 +6,9 @@
 #define CARSTATE_H
 
 #include <cJSON.h>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
-
 
 #include <CarStatePin.h>
 #include <CarStateValue.h>
@@ -79,7 +78,7 @@ public:
 
   std::map<string, int> idxOfPin;
   // std::map<int, Pin> pins; // pins by index
-  
+
   // tools
   const string print(string msg);
   const string printIOs(string msg);

@@ -28,7 +28,7 @@ void ADC::init() {
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
 
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-    //TODO: remove this continue
+    // TODO: remove this continue
     if (ads_addrs[idx] == 0x49 || ads_addrs[idx] == 0x4a) {
       continue;
     }

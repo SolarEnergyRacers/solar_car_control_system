@@ -11,12 +11,12 @@
 
 #include <PCF8574.h>
 
-#include <definitions.h>
 #include <abstract_task.h>
+#include <definitions.h>
 
-#include <CarStateValue.h>
-#include <CarStatePin.h>
 #include <CarState.h>
+#include <CarStatePin.h>
+#include <CarStateValue.h>
 #include <Indicator.h>
 
 #define PinBatOnOff "BatOnOff"
@@ -82,10 +82,10 @@ public:
   void re_init(void);
   void exit(void);
   void task(void);
-  
+
   static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
   static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
-  
+
 private:
   void setMode(int port, uint8_t mode);
   void set(int port, bool value);

@@ -186,7 +186,7 @@ void DriverDisplayC::scrollAddress(uint16_t VSP) {
 //________________________________________________________________________
 
 void DriverDisplayC::speedCheck(int speed) {
-   if (speed < 50) {
+  if (speed < 50) {
     dd.arrow_increase(true);
   } else {
     dd.arrow_increase(false);

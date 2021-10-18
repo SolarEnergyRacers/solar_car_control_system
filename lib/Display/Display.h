@@ -21,4 +21,4 @@ public:
   void task(void);
 };
 
-#endif //SOLAR_CAR_CONTROL_SYSTEM_ DISPLAY_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_ DISPLAY_H

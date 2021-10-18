@@ -116,9 +116,10 @@ public:
 
   virtual ~DriverDisplay() {}
   DriverDisplay() {}
+  void clear_screen(int bgColor);
 
 private:
-  enum class DISPLAY_STATUS { SETUP, DISPLAY_CONSOLE, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
+  enum class DISPLAY_STATUS { SETUP, DISPLAY_CONSOLE, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, DRIVER, ENGINEER };
   template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
     return static_cast<typename std::underlying_type<Enumeration>::type>(value);
   }

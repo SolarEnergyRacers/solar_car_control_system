@@ -68,7 +68,8 @@ void DriverDisplay ::init() {
 
 void DriverDisplay ::re_init(void) { _setup(); }
 
-void DriverDisplay ::_setup() {
+void DriverDisplayC ::_setup() {
+  printf("    Init 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   tft.begin();

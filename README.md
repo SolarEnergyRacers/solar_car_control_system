@@ -8,9 +8,6 @@
 
 ## ESP32 Pinout & Wiring
 
-**_Wiring_**:
-![ESP32 Pinout](media/Adafruit-HUZZAH32-Feather-pinout.png "ESP32 Pinout")
-
 ## Wiring / Port Usage
 
 ![Device Diagram](media/device_diagram.svg "Device Diagram")
@@ -144,6 +141,9 @@
 | :-------- | :-------------------------------------: |
 | CAN Lo    |            see ESP32:CAN:Lo             |
 | CAN Hi    |            see ESP32:CAN:Hi             |
+
+**_Wiring_**:
+![ESP32 Pinout](media/Adafruit-HUZZAH32-Feather-pinout.png "ESP32 Pinout")
 
 ## PlatformIO - Command Guide
 

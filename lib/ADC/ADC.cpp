@@ -28,9 +28,11 @@ void ADC::init() {
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
 
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-    if (ads_addrs[idx] == 0) {
+    //TODO: remove this continue
+    if (ads_addrs[idx] == 0x49 || ads_addrs[idx] == 0x4a) {
       continue;
     }
+
     printf("    Init 'ADC[%d]' with address 0x%x ...", idx, ads_addrs[idx]);
 
     xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
@@ -48,6 +50,7 @@ void ADC::init() {
     // 1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
     adss[idx].setGain(0);
     adss[idx].setMode(1);
+    adss[idx].setDataRate(3);
 
     // conversion factor:
     // bit-value -> mV: 2/3x gain +/- 6.144V
@@ -59,12 +62,11 @@ void ADC::init() {
       int16_t value = adss[idx].readADC(i);
       printf("      [ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
     }
-    adss[idx].setDataRate(3);
     xSemaphoreGive(i2cBus.mutex);
 
     justInited = true;
     printf("[v] ADC[%d] initialized.\n", idx);
-    char msg[100]; 
+    char msg[100];
     sprintf(msg, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
     dd.print(msg);
   }

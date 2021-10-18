@@ -19,14 +19,7 @@
 
 using namespace std;
 
-extern SemaphoreHandle_t spi_mutex;
-
 // namespace DriverDisplayC {
-// // public structures
-// enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-// enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-// enum class CONSTANT_MODE { NONE, SPEED, POWER };
-// enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 
 class DriverDisplayC : public abstract_task {
 

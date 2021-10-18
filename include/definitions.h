@@ -7,8 +7,7 @@
 /*
  *  GPIO
  */
-//#define LED_BUILTIN (gpio_num_t)13
-#define GPIO_INTERRUPT_PIN 0 //33 // 25
+#define GPIO_INTERRUPT_PIN 33
 
 /*
  * OneWire
@@ -24,7 +23,7 @@
 
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
-#define I2C_ADDRESS_ADS1x15_1 0// 0x49
+#define I2C_ADDRESS_ADS1x15_1 0x49
 #define I2C_ADDRESS_ADS1x15_2 0x4B
 
 #define PWM_NUM_PORTS 16
@@ -92,8 +91,7 @@
 #define SPI_RST 21
 
 #define SPI_CS_TFT 36
-#define SPI_CS_POTI 0 //33
-#define SPI_CS_SDCARD 0 //14
+#define SPI_CS_SDCARD 14
 
 /*
  * ESP32 JTAG Debug Probe Wiring

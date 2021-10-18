@@ -26,7 +26,7 @@ class DriverDisplay : public abstract_task {
 private:
   //==== Driver Display definition ==== START
   // display formats and sizes
-  int bgColor = 0x000000;
+  int bgColor = ILI9341_BLACK;
   int infoFrameX = 0;
   int infoFrameY = 0;
   int infoFrameSizeX = -1; // full tft width, calculated beow

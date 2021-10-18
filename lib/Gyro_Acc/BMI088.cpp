@@ -30,7 +30,7 @@
 #include <I2CBus.h>
 #include <definitions.h>
 
-#include "BMI088.h"
+#include <BMI088.h>
 
 extern I2CBus i2cBus;
 

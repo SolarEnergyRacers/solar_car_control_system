@@ -2,10 +2,10 @@
  * Analog to Digital Converter
  */
 
-#ifndef ADC_H
-#define ADC_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_ADC_H
+#define SOLAR_CAR_CONTROL_SYSTEM_ADC_H
 
-#include <ADS1X15.h> // ADS1x15
+#include <ADS1X15.h>
 #include <definitions.h>
 
 class ADC {
@@ -49,4 +49,4 @@ public:
   int normalize(int value, int maxValue, int min, int max);
 };
 
-#endif // ADC_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_ADC_H

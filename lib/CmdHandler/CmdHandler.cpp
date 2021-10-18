@@ -12,25 +12,33 @@
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "ADC.h"
-#include "CmdHandler.h"
-#include "DAC.h"
-#include "DriverDisplayC.h"
-#include "Helper.h"
-#include "IOExt.h"
-#include "Indicator.h"
+#include <ADC.h>
+#include <CarState.h>
+#include <CarStatePin.h>
+#include <CarStateValue.h>
+#include <CmdHandler.h>
+#include <DAC.h>
+#include <DriverDisplayC.h>
+#include <Helper.h>
+#include <IOExt.h>
+#include <Indicator.h>
+#include <sstream>
+#include <string>
 
 extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
 extern IOExt ioExt;
 extern Indicator indicator;
+extern CarState carState;
+extern DriverDisplayC dd;
 
 void CmdHandler::re_init() { init(); }
 
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
   printf("[v] Command handler inited\n");
+  dd.print("[v] " + getName() + " initialized.\n");
 }
 
 void CmdHandler::exit() {
@@ -39,7 +47,6 @@ void CmdHandler::exit() {
 
 void CmdHandler::task() {
 
-  DriverDisplayC *dd = DriverDisplayC::instance();
   while (1) {
 
     while (Serial.available() > 0) {
@@ -57,7 +64,7 @@ void CmdHandler::task() {
 
       debug_printf("Received: %s\n", input.c_str());
 
-      if (input.length() < 1 || commands.lastIndexOf(input[0]) == -1) {
+      if (input.length() < 1 || commands.find(input[0], 0) == -1) {
         input = "h"; // help
       }
 
@@ -65,11 +72,16 @@ void CmdHandler::task() {
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
-        dd->re_init();
-        dd->draw_display_background();
+        dd.re_init();
+        dd.setScreen0Mode();
+        dd.draw_display_background();
         break;
       case 'S':
         printSystemValues();
+        debug_printf("%s\n", carState.print("Recent State").c_str());
+        if (input[1] == 'J') {
+          debug_printf("%s\n", carState.serialize("Recent State").c_str());
+        }
         break;
       case '-':
         adc.adjust_min_acc_dec();
@@ -79,25 +91,28 @@ void CmdHandler::task() {
         break;
       case 's':
         if (input[2] == 'f') {
-          dd->write_drive_direction(DRIVE_DIRECTION::FORWARD);
+          carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
+          dd.write_drive_direction(DRIVE_DIRECTION::FORWARD);
         } else if (input[2] == 'b') {
-          dd->write_drive_direction(DRIVE_DIRECTION::BACKWARD);
+          carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
+          dd.write_drive_direction(DRIVE_DIRECTION::BACKWARD);
         } else {
-          dd->write_speed(atoi(&input[1]));
+          carState.Speed.set(atoi(&input[1]));
+          dd.write_speed();
         }
         break;
       case 'b':
-        dd->write_bat(atof(&input[1]));
+        dd.write_bat(atof(&input[1]));
         break;
       case 'p':
-        dd->write_pv(atof(&input[1]));
+        dd.write_pv(atof(&input[1]));
         break;
       case 'm':
-        dd->write_motor(atof(&input[1]));
+        dd.write_motor(atof(&input[1]));
         break;
       case 'a':
         accValue = atoi(&input[1]);
-        dd->write_acceleration(accValue);
+        dd.write_acceleration(accValue);
         // TODO: where to put in this important
         if (accValue > 0) {
           dac.set_pot(accValue, DAC::POT_CHAN0);
@@ -126,28 +141,28 @@ void CmdHandler::task() {
 
       // -------------- chase car commands
       case 'u':
-        if (String("off") == String(&input[2])) {
+        if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          dd->arrow_increase(false);
+          dd.arrow_increase(false);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          dd->arrow_increase(true);
+          dd.arrow_increase(true);
         }
         break;
       case 'd':
-        if (String("off") == String(&input[2])) {
+        if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          dd->arrow_decrease(false);
+          dd.arrow_decrease(false);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          dd->arrow_decrease(true);
+          dd.arrow_decrease(true);
         }
         break;
       case ':':
-        dd->write_driver_info(&input[1], INFO_TYPE::INFO);
+        dd.write_driver_info(&input[1], INFO_TYPE::INFO);
         break;
       case '!':
-        dd->write_driver_info(&input[1], INFO_TYPE::WARN);
+        dd.write_driver_info(&input[1], INFO_TYPE::WARN);
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -160,21 +175,21 @@ void CmdHandler::task() {
         indicator.setIndicator(INDICATOR::WARN);
         break;
       case 'l':
-        dd->light1OnOff();
+        dd.light1OnOff();
         break;
       case 'L':
-        dd->light2OnOff();
+        dd.light2OnOff();
         break;
       case 'c':
         if (input[2] == 's') {
-          dd->constant_drive_mode_set(CONSTANT_MODE::SPEED);
-          dd->constant_drive_mode_show();
+          dd.constant_drive_mode_set(CONSTANT_MODE::SPEED);
+          dd.constant_drive_mode_show();
         } else if (input[2] == 'p') {
-          dd->constant_drive_mode_set(CONSTANT_MODE::POWER);
-          dd->constant_drive_mode_show();
+          dd.constant_drive_mode_set(CONSTANT_MODE::POWER);
+          dd.constant_drive_mode_show();
         } else {
-          dd->constant_drive_mode_set(CONSTANT_MODE::NONE);
-          dd->constant_drive_mode_show();
+          dd.constant_drive_mode_set(CONSTANT_MODE::NONE);
+          dd.constant_drive_mode_show();
         }
         break;
       // usage
@@ -196,14 +211,13 @@ void CmdHandler::printSystemValues() {
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
   printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
-
-  printf("IOExt2:");
-  for (int idx = 0; idx < 8; idx++) {
-    printf(" %d", ioExt.get((IOExt::Pin)(0x20 | idx))); // all pins of IOExt2
-    if (idx == 3) {
-      printf(" - ");
+  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
+    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
+      if (pin->value == 0) {
+        printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
+      }
     }
   }
-  printf("\n");
   printf("POT0 (accel)= %4d, POT1 (recup)= %4d\n", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
 }

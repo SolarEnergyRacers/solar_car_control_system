@@ -11,7 +11,7 @@
 #include <CAN_config.h>
 #include <ESP32CAN.h>
 
-#include "CANBus.h"
+#include <CANBus.h>
 
 void CanBus::re_init() { CanBus::init(); }
 

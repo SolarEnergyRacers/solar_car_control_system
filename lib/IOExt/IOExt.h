@@ -2,79 +2,104 @@
  * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
  */
 
-#ifndef IOEXT_H
-#define IOEXT_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
+#define SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
+
+#include <list>
+#include <map>
+#include <string>
 
 #include <PCF8574.h>
-#include <definitions.h>
+
 #include <abstract_task.h>
+#include <definitions.h>
+
+#include <CarState.h>
+#include <CarStatePin.h>
+#include <CarStateValue.h>
+#include <Indicator.h>
+
+#define PinBatOnOff "BatOnOff"
+#define PinPvOnOff "PvOnOff"
+#define PinMcOnOff "McOnOff"
+#define PinEcoPower "EcoPower"
+#define PinFwdBwd "FwdBwd"
+#define PinDUMMY06 "DUMMY06"
+#define PinDUMMY07 "DUMMY07"
+#define PinRelais11 "Relais11"
+// IOExt1
+#define PinRelais21 "Relais21"
+#define PinRelais22 "Relais22"
+#define PinRalais12 "Ralais12"
+#define PinRelais31 "Relais31"
+#define PinRelais32 "Relais32"
+#define PinBreakPedal "BreakPedal"
+#define PinDUMMY19 "DUMMY19"
+#define PinDUMMY17 "DUMMY17"
+// IOExt2
+#define PinIndicatorLeft "IndicatorLeft"
+#define PinIndicatorRight "IndicatorRight"
+#define PinLight "Light"
+#define PinDriveLight "DriveLight"
+#define PinConstantMode "ConstantMode"
+#define PinConstantSet "ConstantSet"
+#define PinHorn "Horn"
+#define PinNextScreen "NextScreen"
+// IOExt3
+#define PinDUMMY31 "DUMMY31"
+#define PinReserve1 "Reserve1"
+#define PinDUMMY33 "DUMMY33"
+#define PinDUMMY34 "DUMMY34"
+#define PinDUMMY35 "DUMMY35"
+#define PinDUMMY36 "DUMMY36"
+#define PinDUMMY37 "DUMMY37"
+#define PinDUMMY38 "DUMMY38"
+
+// known pin handler
+// the handler must its bit copy to oldValue
+void batteryOnOffHandler();
+void mcOnOffHandler();
+void pvOnOffHandler();
+void fwdBwdHandler();
+void ecoPowerHandler();
+void breakPedalHandler();
+void indicatorHandler();
+void hornHandler();
+void nextScreenHandler();
+void lightHandler();
+void driveLightHandler();
+void constantModeHandler();
+void constantSetHandler();
+// end pin handler
 
 class IOExt : public abstract_task {
-private:
-
-  PCF8574 IOExt[PCF8574_NUM_DEVICES] = {
-    PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
-    PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
-    PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
-    PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler)
-  };
-  bool isInInterruptHandler = false;
-  int taskSleep = 50;
-  void handleIoInterrupt(void);
-
 public:
+  static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
 
-  enum Pin { // high nibble: device number, low nibble: port
-    // IOExt0
-    DUMMY01 = 0x00, // TODO: add human readeable name
-    DUMMY02 = 0x01,
-    DUMMY03 = 0x02,
-    DUMMY04 = 0x03,
-    DUMMY05 = 0x04,
-    DUMMY06 = 0x05,
-    DUMMY07 = 0x06,
-    DUMMY08 = 0x07,
-    // IOExt1
-    DUMMY11 = 0x10,
-    DUMMY12 = 0x11,
-    DUMMY13 = 0x12,
-    DUMMY14 = 0x13,
-    DUMMY15 = 0x14,
-    DUMMY16 = 0x15,
-    DUMMY17 = 0x16,
-    DUMMY18 = 0x17,
-    // IOExt2
-    DUMMY21 = 0x20,
-    DUMMY22 = 0x21,
-    DUMMY23 = 0x22,
-    DUMMY24 = 0x23,
-    DUMMY25 = 0x24,
-    DUMMY26 = 0x25,
-    DUMMY27 = 0x26,
-    DUMMY28 = 0x27,
-    // IOExt3
-    DUMMY31 = 0x30,
-    DUMMY32 = 0x31,
-    DUMMY33 = 0x32,
-    DUMMY34 = 0x33,
-    DUMMY35 = 0x34,
-    DUMMY36 = 0x35,
-    DUMMY37 = 0x36,
-    DUMMY38 = 0x37
-  };
-  string getName(void) { return string("IOExt"); };
+  string getName(void) { return "IOExt"; };
+
   void init(void);
   void re_init(void);
   void exit(void);
   void task(void);
-  void setMode(Pin port, uint8_t mode);
-  void set(Pin port, bool value);
-  int get(Pin port);
 
-  static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
+  static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
+  static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
 
 private:
-  static volatile bool ioInterruptRequest;
-};
+  void setMode(int port, uint8_t mode);
+  void set(int port, bool value);
+  int get(int port);
+  void getAll(CarStatePin *pins, int maxCount);
+  PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler)};
+  bool isInInterruptHandler = false;
+  int taskSleep = 50;
 
-#endif // IOEXT_H
+  static volatile bool ioInterruptRequest;
+  void handleIoInterrupt();
+};
+#endif // SOLAR_CAR_CONTROL_SYSTEM_ IOEXT_H

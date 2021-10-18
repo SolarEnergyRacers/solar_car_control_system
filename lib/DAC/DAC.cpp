@@ -4,26 +4,29 @@
 
 #include <definitions.h>
 
-#include <Helper.h>
-#include <I2CBus.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include <Arduino.h>
-#include <SPI.h>
-#include <Wire.h> // I2C
 #include <inttypes.h>
 #include <stdio.h>
 
-#include "DAC.h"
-#include "DriverDisplayC.h"
+#include <Arduino.h>
+#include <Helper.h>
+#include <I2CBus.h>
+#include <SPI.h>
+#include <Wire.h> // I2C
+
+#include <DAC.h>
+#include <DriverDisplayC.h>
 
 #define BASE_ADDR_CMD 0xA8
 
 extern I2CBus i2cBus;
+extern DriverDisplayC dd;
 
 void DAC::re_init() { init(); }
 
+void DAC::init() { dd.print("[v] DAC initialized.\n"); }
 uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {
@@ -78,5 +81,3 @@ uint16_t DAC::get_pot(pot_chan channel) {
     return pot1;
   }
 }
-
-void DAC::init() {}

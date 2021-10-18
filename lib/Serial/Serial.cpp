@@ -6,7 +6,7 @@
 
 #include <SoftwareSerial.h>
 
-#include "Serial.h"
+#include <Serial.h>
 
 void Uart::re_init() { init(); }
 

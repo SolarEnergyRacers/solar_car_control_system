@@ -1,15 +1,17 @@
 //
 // Display
 //
-#include "LocalFunctionsAndDevices.h"
+#include <LocalFunctionsAndDevices.h>
 
 #ifndef DRIVER_DISPLAY_C_H
 #define DRIVER_DISPLAY_C_H
 
 #define ILI9341 // (320x240)
 
-#include <ADS1X15.h>          // ADS1x15
+#include <ADS1X15.h>
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
+
+#include <CarState.h>
 #include <abstract_task.h>
 
 #include <freertos/FreeRTOS.h>
@@ -17,14 +19,7 @@
 
 using namespace std;
 
-extern SemaphoreHandle_t spi_mutex;
-
 // namespace DriverDisplayC {
-// public structures
-enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
-enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
-enum class CONSTANT_MODE { NONE, SPEED, POWER };
-enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 
 class DriverDisplayC : public abstract_task {
 
@@ -104,27 +99,22 @@ private:
   int lifeSignRadius = 4;
   //==== Driver Display definition ==== END
 
+  void setupScrollArea(uint16_t TFA, uint16_t BFA);
+  int scroll(int lines);
+  void scrollAddress(uint16_t VSP);
+
 public:
   // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
   // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
 
-  static DriverDisplayC *instance() {
-    if (!_instance) {
-      _instance = new DriverDisplayC();
-    }
-    return _instance;
-  }
-  virtual ~DriverDisplayC() { _instance = 0; }
-
-protected:
+  virtual ~DriverDisplayC() {}
   DriverDisplayC() {}
 
 private:
-  enum class DISPLAY_STATUS { SETUP, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
+  enum class DISPLAY_STATUS { SETUP, DISPLAY_CONSOLE, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, WORK };
   template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
     return static_cast<typename std::underlying_type<Enumeration>::type>(value);
   }
-  static DriverDisplayC *_instance;
   static DISPLAY_STATUS status;
 
   // put private/internal variables/functions here
@@ -137,7 +127,7 @@ private:
   void _arrow_decrease(int color);
   void _light1(bool lightOn);
   void _light2(bool lightOn);
-  void _drawCentreString(const String &buf, int x, int y);
+  void _drawCentreString(const string &buf, int x, int y);
   int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int color);
   void _turn_Right(int color);
@@ -150,6 +140,13 @@ public:
   void init(void);
   void re_init(void);
   void exit(void);
+
+  void setConsoleMode() { status = DISPLAY_STATUS::DISPLAY_CONSOLE; };
+  void setScreen0Mode() {
+    status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
+    _setup();
+  };
+  void print(string msg);
 
   // public functions
   void draw_display_border(int color);
@@ -165,8 +162,9 @@ public:
   void constant_drive_mode_hide();
 
   void write_drive_direction(DRIVE_DIRECTION);
-  void write_driver_info(String msg, INFO_TYPE type);
-  void write_speed(int speed);
+  void write_driver_info(string msg, INFO_TYPE type);
+  void write_speed();
+  void write_speed(int value);
   void write_bat(float voltage);
   void write_motor(float ampers);
   void write_pv(float voltage);

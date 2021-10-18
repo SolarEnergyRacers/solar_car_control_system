@@ -8,7 +8,7 @@
 
 #include <Wire.h>
 
-#include "RTC.h"
+#include <RTC.h>
 
 #include <RtcDS1307.h>
 

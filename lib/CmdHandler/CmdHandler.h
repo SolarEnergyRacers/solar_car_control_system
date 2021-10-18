@@ -2,15 +2,15 @@
 // Command Receiver and Handler
 //
 
-#ifndef CMDHANDLER_H
-#define CMDHANDLER_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H
+#define SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H
 
 #include <abstract_task.h>
 
 class CmdHandler : public abstract_task {
 private:
-  String commands = "RS-=:!udsaAbpm<>wlLc";
-  String helpText = "Available commands (" + commands +
+  string commands = "RS-=:!udsaAbpm<>wlLc";
+  string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
                     "\tR        - reset and reinit display\n"
@@ -50,4 +50,4 @@ public:
   void task(void); // this is the actual task
 };
 
-#endif // CMDHANDLER_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H

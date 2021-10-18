@@ -2,8 +2,8 @@
 // General Purpose Input / Output
 //
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_GPIO_H
+#define SOLAR_CAR_CONTROL_SYSTEM_GPIO_H
 
 #include <abstract_task.h>
 #include <definitions.h>
@@ -31,4 +31,4 @@ public:
   };
 };
 
-#endif // GPIO_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_GPIO_H

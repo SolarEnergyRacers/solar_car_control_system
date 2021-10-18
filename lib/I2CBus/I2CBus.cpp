@@ -9,7 +9,7 @@
 
 #include <definitions.h>
 
-#include "I2CBus.h"
+#include <I2CBus.h>
 
 void I2CBus::re_init() { init(); }
 

@@ -2,10 +2,10 @@
 // System Utility and Helper Functions
 //
 
-#ifndef SYSTEM_H
-#define SYSTEM_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_SYSTEM_H
+#define SOLAR_CAR_CONTROL_SYSTEM_SYSTEM_H
 
 void chip_info(void);
 void restart(void);
 
-#endif // SYSTEM_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_SYSTEM_H

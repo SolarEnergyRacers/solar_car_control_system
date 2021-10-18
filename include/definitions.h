@@ -7,8 +7,7 @@
 /*
  *  GPIO
  */
-//#define LED_BUILTIN (gpio_num_t)13
-#define GPIO_INTERRUPT_PIN 33 // 25
+#define GPIO_INTERRUPT_PIN 33
 
 /*
  * OneWire
@@ -23,9 +22,9 @@
 #define I2C_FREQ 100000 // 100kHz
 
 #define NUM_ADC_DEVICES 3
-#define I2C_ADDRESS_ADS1x15_0 0x4A
-#define I2C_ADDRESS_ADS1x15_1 0x48
-#define I2C_ADDRESS_ADS1x15_2 0x49
+#define I2C_ADDRESS_ADS1x15_0 0x48
+#define I2C_ADDRESS_ADS1x15_1 0x49
+#define I2C_ADDRESS_ADS1x15_2 0x4B
 
 #define PWM_NUM_PORTS 16
 #define PWM_MAX_VALUE 4096
@@ -38,12 +37,13 @@
 
 #define PCF8574_NUM_DEVICES 4
 #define PCF8574_NUM_PORTS 8
-#define I2C_ADDRESS_PCF8574_IOExt0 0x20 // TODO: set jumpers accordingly
-#define I2C_ADDRESS_PCF8574_IOExt1 0x21 // TODO: set jumpers accordingly
-#define I2C_ADDRESS_PCF8574_IOExt2 0x22 // TODO: set jumpers accordingly
-#define I2C_ADDRESS_PCF8574_IOExt3 0x23 // TODO: set jumpers accordingly
+
+#define IOExtPINCOUNT PCF8574_NUM_DEVICES *PCF8574_NUM_PORTS
+#define I2C_ADDRESS_PCF8574_IOExt0 0x20
+#define I2C_ADDRESS_PCF8574_IOExt1 0x21
+#define I2C_ADDRESS_PCF8574_IOExt2 0x22
+#define I2C_ADDRESS_PCF8574_IOExt3 0x23
 #define I2C_INTERRUPT_PIN_PCF8574 33
-#define USE_LEGACY_PIN_READ
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
 #define DS1803_BASE_ADDR 0x28
@@ -90,7 +90,6 @@
 #define SPI_RST 21
 
 #define SPI_CS_TFT 36
-#define SPI_CS_POTI 33
 #define SPI_CS_SDCARD 14
 
 /*

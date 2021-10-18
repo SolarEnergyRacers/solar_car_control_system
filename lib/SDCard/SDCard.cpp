@@ -8,7 +8,7 @@
 
 #include <SPIBus.h>
 
-#include "SDCard.h"
+#include <SDCard.h>
 
 #define FILENAME "/test.txt"
 

@@ -9,26 +9,24 @@
 
 #include <definitions.h>
 
-#include "SPIBus.h"
+#include <SPIBus.h>
 
 void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
+  // printf("    Init 'SPI bus' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);
 
-  //   // init mutex (it is acquired)
+  // init mutex (it is acquired)
   mutex = xSemaphoreCreateBinary();
 
-  //   // CRITICAL SECTION SPI: start
-  //   xSemaphoreTake(spi_mutex, portMAX_DELAY);
-
-  //     // initialize SPI:
-  //   SPI.begin(SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_POTI);
-  //   SPI.begin(SPI_CLK, SPI_MOSI, SPI_MISO);
-  //   SPI.setDataMode(SPI_MODE0); // configuration of SPI communication in mode
-  //   0 SPI.setClockDivider(SPI_CLOCK_DIV16); // configuration of clock at 1MHz
+  // // initialize SPI:
+  // SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI);
+  // SPI.setDataMode(SPI_MODE0);           // configuration of SPI communication in mode
+  // SPI.setClockDivider(SPI_CLOCK_DIV16); // configuration of clock at 1MHz
+  // SPI.end();
 
   xSemaphoreGive(mutex);
-  // CRITICAL SECTION SPI: end
+  // // CRITICAL SECTION SPI: end
 
-  printf("[v] SPI inited: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);
+  // printf("[v] SPI inited.\n");
 }

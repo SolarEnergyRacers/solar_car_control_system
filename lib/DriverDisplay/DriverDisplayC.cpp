@@ -12,9 +12,10 @@
 #include <abstract_task.h>
 #include <definitions.h>
 
-#include "ADC.h"
-#include "DriverDisplayC.h"
+#include <ADC.h>
+#include <DriverDisplayC.h>
 
+#include <CarState.h>
 #include <SPIBus.h>
 
 #include <Adafruit_GFX.h>     // graphics library
@@ -32,6 +33,8 @@
 extern SPIBus spiBus;
 extern ADC adc;
 extern bool systemOk;
+extern CarState carState;
+extern DriverDisplayC dd;
 
 Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // namespace DriverDisplayC {
@@ -40,7 +43,7 @@ Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
 // ... to avoid flickering
 int lifeSignCounter = 0;
 bool lifeSignState = false;
-String infoLast = "";
+string infoLast = "";
 int speedLast = -1;
 int accelerationLast = -1;
 float batLast = -1;
@@ -52,26 +55,26 @@ CONSTANT_MODE constant_drive_mode = CONSTANT_MODE::SPEED;
 bool constant_drive_set = false;
 //=======================================
 
-DriverDisplayC *DriverDisplayC::_instance = 0;
+// DriverDisplayC *DriverDisplayC::_instance = 0;
 DriverDisplayC::DISPLAY_STATUS DriverDisplayC::status = DISPLAY_STATUS::SETUP;
 
 string DriverDisplayC ::getName() { return "Display0 (driver display)"; };
 
 void DriverDisplayC ::init() {
   abstract_task::init();
+  status = DISPLAY_STATUS::DISPLAY_CONSOLE;
   re_init();
-  status = DISPLAY_STATUS::DISPLAY_DEMOSCREEN;
 }
 
-void DriverDisplayC ::re_init(void) {
-  _setup();
-  status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
-}
+void DriverDisplayC ::re_init(void) { _setup(); }
 
 void DriverDisplayC ::_setup() {
+  printf("    Init 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
   tft.begin();
+  // read for bugs: https://forums.adafruit.com/viewtopic.php?p=815969
+  // tft.initSPI(3000000, SPI_MODE3);
   printf("done.\n");
   try {
     printf("      Display0 (driver display) initializing...\n");
@@ -85,13 +88,20 @@ void DriverDisplayC ::_setup() {
     printf("      Image Format:       0x%x\n", x);
     x = tft.readcommand8(ILI9341_RDSELFDIAG);
     printf("      Self Diagnostic:    0x%x\n", x);
+    // tft.fillScreen(bgColor);
+    tft.setRotation(1);
+    tft.setTextSize(1);
+    tft.setTextColor(ILI9341_WHITE);
+    tft.setScrollMargins(10, tft.width() - 20);
     infoFrameSizeX = tft.width();
     speedFrameX = (tft.width() - speedFrameSizeX) / 2;
-    printf("[v] Display0 (driver display) inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
+    tft.printf("Screen ILI9341 inited with %d x %d.\n", tft.height(), tft.width());
   } catch (__exception ex) {
     printf("[x] Display0 (driver display): Unable to initialize screen ILI9341.\n");
+    throw ex;
   }
   xSemaphoreGive(spiBus.mutex);
+  printf("[v] Display0 (driver display) inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
 }
 
 void DriverDisplayC ::exit() {}
@@ -103,14 +113,16 @@ void DriverDisplayC ::task(void) {
   // polling loop
   while (1) {
     switch (status) {
+    case DISPLAY_STATUS::DISPLAY_CONSOLE:
+      // do nothing special
+      break;
     case DISPLAY_STATUS::DISPLAY_DEMOSCREEN:
       draw_display_background();
       driver_display_demo_screen();
       status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
       break;
     case DISPLAY_STATUS::DISPLAY_BACKGROUND:
-      // draw_display_background();
-
+      draw_display_background();
       status = DISPLAY_STATUS::WORK;
       break;
     default:
@@ -129,17 +141,60 @@ void DriverDisplayC ::task(void) {
   }
 }
 
-void DriverDisplayC::speedCheck(int speed) {
-  DriverDisplayC *dd = DriverDisplayC::instance();
-  if (speed < 50) {
-    dd->arrow_increase(true);
+void DriverDisplayC::print(string msg) {
+  if (status == DISPLAY_STATUS::DISPLAY_CONSOLE) {
+    tft.print(msg.c_str());
   } else {
-    dd->arrow_increase(false);
+    write_driver_info(msg, INFO_TYPE::STATUS);
+  }
+}
+
+//------------------------------------------------------------------------
+void DriverDisplayC::setupScrollArea(uint16_t TFA, uint16_t BFA) {
+  tft.writeCommand(ILI9341_VSCRDEF); // Vertical scroll definition
+  tft.write(TFA >> 8);
+  tft.write(TFA);
+  tft.write((320 - TFA - BFA) >> 8);
+  tft.write(320 - TFA - BFA);
+  tft.write(BFA >> 8);
+  tft.write(BFA);
+}
+
+int DriverDisplayC::scroll(int lines) {
+  int TEXT_HEIGHT = 8;    // Height of text to be printed and scrolled
+  int BOT_FIXED_AREA = 0; // Number of lines in bottom fixed area (lines counted from bottom of screen)
+  int TOP_FIXED_AREA = 0;
+  uint16_t yStart = TOP_FIXED_AREA;
+  uint16_t yArea = 320 - TOP_FIXED_AREA - BOT_FIXED_AREA;
+  uint16_t yDraw = 320 - BOT_FIXED_AREA - TEXT_HEIGHT;
+  int yTemp = yStart;
+  for (int i = 0; i < lines; i++) {
+    yStart++;
+    if (yStart == 320 - BOT_FIXED_AREA)
+      yStart = TOP_FIXED_AREA;
+    scrollAddress(yStart);
+  }
+  return yTemp;
+}
+
+void DriverDisplayC::scrollAddress(uint16_t VSP) {
+  tft.writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
+  tft.write(VSP >> 8);
+  tft.write(VSP);
+}
+
+//________________________________________________________________________
+
+void DriverDisplayC::speedCheck(int speed) {
+  if (speed < 50) {
+    dd.arrow_increase(true);
+  } else {
+    dd.arrow_increase(false);
   }
   if (speed > 80) {
-    dd->arrow_decrease(true);
+    dd.arrow_decrease(true);
   } else {
-    dd->arrow_decrease(false);
+    dd.arrow_decrease(false);
   }
 }
 
@@ -410,7 +465,7 @@ void DriverDisplayC ::draw_display_background() {
   lifeSignCounter = 0;
   lifeSignState = false;
 
-  String infoLast = "";
+  string infoLast = "";
   write_driver_info(infoLast = "", INFO_TYPE::STATUS);
 
   speedLast = -1;
@@ -489,42 +544,29 @@ void DriverDisplayC ::constant_drive_off() {
 
 void DriverDisplayC ::constant_drive_mode_hide() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
   tft.setCursor(constantModeX, constantModeY);
   tft.print("power");
   tft.setCursor(constantModeX, constantModeY);
   tft.print("speed");
-  // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
   xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::constant_drive_mode_show() {
-
+  constant_drive_mode_hide();
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
-  tft.setTextSize(constantModeTextSize);
-  tft.setTextColor(ILI9341_BLACK);
-  tft.setCursor(constantModeX, constantModeY);
-  tft.print("power");
-  tft.setCursor(constantModeX, constantModeY);
-  tft.print("speed");
-  // tft.writeFillRect(constantModeX, constantModeY, constantModeTextSize * 5, constantModeTextSize * 1, ILI9341_BLACK);
-
   tft.setTextColor(ILI9341_YELLOW);
   tft.setCursor(constantModeX, constantModeY);
-  if (constant_drive_mode == CONSTANT_MODE::POWER) {
+  if (carState.ConstantMode.get() == CONSTANT_MODE::POWER) {
     tft.print("power");
   } else {
     tft.print("speed");
   }
-
   xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
-  // CRITICAL SECTION SPI: start
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   tft.setTextSize(driveDirectionTextSize);
@@ -535,7 +577,7 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
   tft.print("backward");
 
   tft.setCursor(driveDirectionX, driveDirectionY);
-  if (direction == DRIVE_DIRECTION::FORWARD) {
+  if (carState.DriveDirection.get() == DRIVE_DIRECTION::FORWARD) {
     tft.setTextColor(ILI9341_YELLOW);
     tft.print("forward");
   } else {
@@ -543,7 +585,6 @@ void DriverDisplayC ::write_drive_direction(DRIVE_DIRECTION direction) {
     tft.print("backward");
   }
   xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
 }
 
 void DriverDisplayC ::_turn_Left(int color) {
@@ -644,6 +685,11 @@ void DriverDisplayC ::light2OnOff() {
 }
 
 // Write the speed in the centre frame
+void DriverDisplayC ::write_speed() {
+  int value = carState.Speed.get();
+  write_speed(value);
+}
+
 void DriverDisplayC ::write_speed(int value) {
   speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 
@@ -676,18 +722,18 @@ void DriverDisplayC ::write_motor(float value) {
   motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, ILI9341_YELLOW);
 }
 
-void DriverDisplayC ::_drawCentreString(const String &buf, int x, int y) {
-  // CRITICAL SECTION SPI: start
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+void DriverDisplayC ::_drawCentreString(const string &buf, int x, int y) {
+  // // CRITICAL SECTION SPI: start
+  // xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
-  int16_t x1, y1;
-  uint16_t w, h;
-  tft.getTextBounds(buf, x, y, &x1, &y1, &w, &h); // calc width of new string
-  tft.setCursor(x - w / 2, y);
-  tft.print(buf);
+  // int16_t x1, y1;
+  // uint16_t w, h;
+  // tft.getTextBounds(buf, &x, &y, &x1, &y1, &w, &h); // calc width of new string
+  // tft.setCursor(x - w / 2, y);
+  // tft.print(buf.c_str());
 
-  xSemaphoreGive(spiBus.mutex);
-  // CRITICAL SECTION SPI: end
+  // xSemaphoreGive(spiBus.mutex);
+  // // CRITICAL SECTION SPI: end
 }
 
 // INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR
@@ -715,7 +761,7 @@ int DriverDisplayC ::_getColorForInfoType(INFO_TYPE type) {
   return color;
 }
 
-void DriverDisplayC ::write_driver_info(String msg, INFO_TYPE type) {
+void DriverDisplayC ::write_driver_info(string msg, INFO_TYPE type) {
   // comments are preparation for font usage
 
   // CRITICAL SECTION SPI: start
@@ -732,11 +778,11 @@ void DriverDisplayC ::write_driver_info(String msg, INFO_TYPE type) {
     tft.setTextColor(bgColor);
     // tft.setCursor(infoFrameX, infoFrameY + 9);
     tft.setCursor(infoFrameX, infoFrameY);
-    tft.print(infoLast);
+    tft.print(infoLast.c_str());
 
     tft.setTextColor(_getColorForInfoType(type));
     tft.setCursor(infoFrameX, infoFrameY);
-    tft.print(msg);
+    tft.print(msg.c_str());
     // TODO: _drawCentreString(msg.c_str(), 0, 0);
     infoLast = msg;
   }

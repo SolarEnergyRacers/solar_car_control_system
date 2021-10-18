@@ -2,8 +2,8 @@
 // 16-Channel Pulse Width Modulation
 //
 
-#ifndef PWM_H
-#define PWM_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_PWM_H
+#define SOLAR_CAR_CONTROL_SYSTEM_PWM_H
 
 #include <Adafruit_PWMServoDriver.h>
 #include <abstract_task.h>
@@ -21,4 +21,4 @@ public:
   void update_pwm(int channel, int value);
 };
 
-#endif // PWM_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_PWM_H

@@ -2,8 +2,8 @@
 // SPI Bus
 //
 
-#ifndef SPIBUS_H
-#define SPIBUS_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_SPIBUS_H
+#define SOLAR_CAR_CONTROL_SYSTEM_SPIBUS_H
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -16,4 +16,4 @@ public:
   void re_init();
 };
 
-#endif // SPIBUS_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_SPIBUS_H

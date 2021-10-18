@@ -18,7 +18,7 @@
 #define SERIAL_ON false                 // write/read to/from console
 #define SD_ON false                     // SD card
 #define CAN_ON false                    // CAN bus (MPPT, BMS, ..)
-
+#define CARSPEED_ON false               // car pid speed controller
 #define DEBUGLEVEL_VERBOSED true
 
 #endif // LocalFunctionsAndDevices_H

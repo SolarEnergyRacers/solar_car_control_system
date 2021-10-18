@@ -5,6 +5,7 @@
 #ifndef ABSTRACT_TASK_H
 #define ABSTRACT_TASK_H
 
+#include <definitions.h>
 #include <stdint.h>
 #include <string>
 

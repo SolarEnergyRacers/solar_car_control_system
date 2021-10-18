@@ -2,8 +2,8 @@
 // 3-axis Gyroscope & 3-axis Accelerometer
 //
 
-#ifndef GYRO_ACC_H
-#define GYRO_ACC_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_GYRO_ACC_H
+#define SOLAR_CAR_CONTROL_SYSTEM_GYRO_ACC_H
 
 typedef struct {
   float x, y, z;
@@ -20,4 +20,4 @@ public:
   Float3D read_acceleration(void);
 };
 
-#endif // GYRO_ACC_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_GYRO_ACC_H

@@ -103,6 +103,12 @@ void DriverDisplay ::_setup() {
   printf("[v] Display0 (driver display) inited: screen ILI9341 with %d x %d.\n", tft.height(), tft.width());
 }
 
+void DriverDisplay::clear_screen(int bgColor){
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  tft.fillScreen(bgColor);
+  xSemaphoreGive(spiBus.mutex);
+}
+
 void DriverDisplay ::exit() {}
 
 // -------------
@@ -112,19 +118,25 @@ void DriverDisplay ::task(void) {
   // polling loop
   while (1) {
     switch (status) {
-    case DISPLAY_STATUS::DISPLAY_CONSOLE:
-      // do nothing special
-      break;
+    // initializing states:
     case DISPLAY_STATUS::DISPLAY_DEMOSCREEN:
+      clear_screen(bgColor);
       draw_display_background();
       driver_display_demo_screen();
       status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
       break;
     case DISPLAY_STATUS::DISPLAY_BACKGROUND:
       draw_display_background();
-      status = DISPLAY_STATUS::WORK;
+      status = DISPLAY_STATUS::DRIVER;
       break;
-    default:
+    // working states:
+    case DISPLAY_STATUS::DISPLAY_CONSOLE:
+      // do nothing special
+      break;
+    case DISPLAY_STATUS::ENGINEER:
+      break;
+    case DISPLAY_STATUS::DRIVER:
+    default: // driver / engineer screen
       if (lifeSignCounter > 10) {
         lifeSign();
         lifeSignCounter = 0;
@@ -185,7 +197,7 @@ void DriverDisplay::scrollAddress(uint16_t VSP) {
 //________________________________________________________________________
 
 void DriverDisplay::speedCheck(int speed) {
-   if (speed < 50) {
+  if (speed < 50) {
     dd.arrow_increase(true);
   } else {
     dd.arrow_increase(false);
@@ -436,10 +448,10 @@ void DriverDisplay ::lifeSign() {
 }
 
 void DriverDisplay ::draw_display_background() {
+  clear_screen(bgColor);
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
-  tft.setRotation(0);
-  tft.fillScreen(bgColor);
+  //tft.fillScreen(bgColor);
   tft.setRotation(1);
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_DARKGREEN);

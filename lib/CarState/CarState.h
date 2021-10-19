@@ -23,6 +23,7 @@ enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
+enum class LIGHT { OFF, L1, L2 };
 
 class CarState {
 
@@ -41,12 +42,12 @@ public:
     Indicator.set(INDICATOR::OFF);
     DriveDirection.set(DRIVE_DIRECTION::FORWARD);
     ConstantMode.set(CONSTANT_MODE::SPEED);
+    ConstantModeOn.set(false);
 
     TargetSpeed.set(0);
     TargetPower.set(0);
     InfoLast.set("ok.");
-    Light1On.set(false);
-    Light2On.set(false);
+    Light.set(LIGHT::OFF);
   }
   ~CarState(){};
 
@@ -62,13 +63,13 @@ public:
   // logical car data (values set by driver or chase car)
   CarStateValue<DRIVE_DIRECTION> DriveDirection;
   CarStateValue<CONSTANT_MODE> ConstantMode;
+  CarStateValue<bool> ConstantModeOn;
   CarStateValue<INDICATOR> Indicator;
 
   CarStateValue<int> TargetSpeed;
   CarStateValue<int> TargetPower;
   CarStateValue<string> InfoLast;
-  CarStateValue<bool> Light1On;
-  CarStateValue<bool> Light2On;
+  CarStateValue<LIGHT> Light;
 
   // All IO pins
   static CarStatePin pins[IOExtPINCOUNT];

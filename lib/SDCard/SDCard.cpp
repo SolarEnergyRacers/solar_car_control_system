@@ -13,6 +13,7 @@
 #define FILENAME "/test.txt"
 
 extern SPIBus spiBus;
+extern SDCard sdCard;
 
 void SDCard::re_init() { init(); }
 
@@ -24,18 +25,16 @@ void SDCard::init() {
   if (!SD.begin(SPI_CS_SDCARD)) {
     printf("[SDCard] Initialization failed\n");
   } else {
-    printf("[SDCard] Initialization successful\n");
+    printf("[SDCard] Initialization successful, open file '%s' for append\n", FILENAME);
 
     // open file
-    dataFile = SD.open(FILENAME,
-                       FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
+    dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
   }
 
   xSemaphoreGive(spiBus.mutex);
   // CRITICAL SECTION SPI: end
 }
 
-extern SDCard sdCard;
 void write_sdcard_demo_task(void *pvParameter) {
 
   // demo counter (written to file)

@@ -2,78 +2,89 @@
 // Display
 //
 
+#include <LocalFunctionsAndDevices.h>
+#include <abstract_task.h>
 #include <definitions.h>
 
-#include <Adafruit_GFX.h>     // graphics library
-#include <Adafruit_SSD1305.h> // display
-
-#include <I2CBus.h>
-
+#include <ADC.h>
+#include <Display.h>
 #include <EngineerDisplay.h>
 
-extern I2CBus i2cBus;
-Adafruit_SSD1305 display(OLED_WIDTH, OLED_HEIGHT, &Wire, OLED_RESET); // TODO: remove & add to class
+#include <Adafruit_GFX.h>     // graphics library
+#include <Adafruit_ILI9341.h> // display
+#include <CarState.h>
+#include <SPIBus.h>
 
-void EngineerDisplay::re_init() { init(); }
+extern SPIBus spiBus;
+extern ADC adc;
+extern CarState carState;
+extern Adafruit_ILI9341 tft;
 
-void EngineerDisplay::init(void) {
+void EngineerDisplay::draw_display_background() {
 
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  tft.setRotation(1);
+  tft.setTextSize(2);
+  tft.setTextColor(ILI9341_DARKGREEN);
+  tft.setCursor(U1FrameX, U1FrameY);
+  tft.print("   U1(V):");
 
-  if (!display.begin(I2C_ADDRESS_SSD1305)) {
-    printf("[Display] Unable to initialize OLED screen.\n");
-  } else {
-    printf("[Display] Screen initialize successfully.\n");
+  tft.setCursor(I1FrameX, I1FrameY);
+  tft.print("   I1(A):");
+
+  tft.setCursor(I2FrameX, I2FrameY);
+  tft.print("   I2(A):");
+  tft.setTextSize(1);
+  xSemaphoreGive(spiBus.mutex);
+}
+
+DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
+  printf("    Init 'EngineerDisplay'\n");
+  int height = 0;
+  int width = 0;
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  try {
+    height = tft.height();
+    width = tft.width();
+    tft.fillScreen(ILI9341_LIGHTGREY);
+    tft.setRotation(1);
+    tft.setTextSize(1);
+    tft.setTextColor(ILI9341_DARKGREEN);
+    tft.setScrollMargins(10, width - 20);
+
+  } catch (__exception ex) {
+    printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
+    throw ex;
   }
-
-  // init done
-  display.display(); // show splashscreen
-
-  xSemaphoreGive(i2cBus.mutex);
-
-  vTaskDelay(1000 / portTICK_PERIOD_MS);
-
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
-  display.clearDisplay(); // clears the screen and buffer
-
-  xSemaphoreGive(i2cBus.mutex);
+  xSemaphoreGive(spiBus.mutex);
+  printf("[v] EngineerDisplay inited: screen ILI9341 with %d x %d.\n", height, width);
+  return DISPLAY_STATUS::BACKGROUNDENGINEER;
 }
 
-void EngineerDisplay::exit() {
-  // TODO
-}
-
-void EngineerDisplay::task() {
-
-  // polling loop
-  while (1) {
-    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
-    // clears the screen and buffer
-    display.clearDisplay();
-
-    // setup params
-    display.setTextSize(1);
-    display.setTextWrap(false);
-    display.setTextColor(WHITE);
-    display.setCursor(0, 0);
-
-    // print demo characters
-    for (int i = 0; i < 168; i++) {
-      if (i == '\n')
-        continue;
-      // write char
-      display.write(i);
-      // newline
-      if ((i > 0) && (i % 21 == 0))
-        display.println();
+DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
+  switch (status) {
+    // initializing states:
+  case DISPLAY_STATUS::SETUPENGINEER:
+    display_setup(status);
+    clear_screen(bgColor);
+    status = DISPLAY_STATUS::BACKGROUNDENGINEER;
+    debug_printf("DISPLAY_STATUS-E::%s\n", DISPLAY_STATUS_str[(int)status]);
+    break;
+  case DISPLAY_STATUS::BACKGROUNDENGINEER:
+    draw_display_background();
+    status = DISPLAY_STATUS::ENGINEER;
+    debug_printf("DISPLAY_STATUS-E::%s\n", DISPLAY_STATUS_str[(int)status]);
+    break;
+  // working state:
+  case DISPLAY_STATUS::ENGINEER:
+    if (lifeSignCounter > 10) {
+      // TODO
     }
-    display.display();
-
-    xSemaphoreGive(i2cBus.mutex);
-    // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+  default:
+    // ignore others
+    break;
   }
+  return status;
 }
+
+void EngineerDisplay::print(string msg) { Display::print(msg); }

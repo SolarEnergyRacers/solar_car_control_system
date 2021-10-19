@@ -27,8 +27,9 @@
 #include <CarSpeed.h>
 #include <CmdHandler.h>
 #include <DAC.h>
-#include <EngineerDisplay.h>
+#include <Display.h>
 #include <DriverDisplay.h>
+#include <EngineerDisplay.h>
 #include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
@@ -66,8 +67,8 @@ CarSpeed carSpeed;
 CarState carState;
 CmdHandler cmdHandler;
 DAC dac;
-EngineerDisplay engDisp;
-DriverDisplay dd;
+EngineerDisplay engineerDisplay;
+DriverDisplay driverDisplay;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
 I2CBus i2cBus;
@@ -112,8 +113,11 @@ void app_main(void) {
   spiBus.init();
 
   // ---- init modules ----
+  if (ENGINEER_DISPLAY_ON) {
+    engineerDisplay.init();
+  }
   if (DRIVER_DISPLAY_ON) {
-    dd.init();
+    driverDisplay.init();
   }
   if (BLINK_ON) {
   }
@@ -145,9 +149,6 @@ void app_main(void) {
     gpio.init();
     gpio.register_gpio_interrupt();
   }
-  if (ENGINEER_DISPLAY_ON) {
-    engDisp.init();
-  }
   if (IOEXT_ON) {
     ioExt.init();
   }
@@ -168,28 +169,15 @@ void app_main(void) {
   printf("\n-----------------------------------------------------------------\n");
   printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
   printf("-----------------------------------------------------------------\n");
-  dd.print("\n---------------------------------\n");
-  dd.print("Startup sequence(s) successful.\nSystem creating FreeRTOS tasks...\n");
-  dd.print("---------------------------------\n");
+  driverDisplay.print("\n---------------------------------\n");
+  driverDisplay.print("Startup sequence(s) successful.\nSystem creating FreeRTOS tasks...\n");
+  driverDisplay.print("---------------------------------\n");
 
   // ---- create tasks ----
-  if (ENGINEER_DISPLAY_ON) {
-    engDisp.create_task();
-  }
-  if (DRIVER_DISPLAY_ON) {
-    dd.create_task();
-    dd.print("[v] " + dd.getName() + "task initialized.\n");
-  }
-
   if (INDICATOR_ON) {
     indicator.create_task();
-    dd.print("[v] " + indicator.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + indicator.getName() + "task initialized.\n");
   }
-  // if (BLINK_ON) { // not activated
-  //   printf(" - blink_demo_task\n");
-  //   xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  // }
- 
   if (DS_ON) {
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
@@ -198,22 +186,22 @@ void app_main(void) {
   }
   if (PWM_ON) {
     pwm.create_task();
-    dd.print("[v] " + pwm.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + pwm.getName() + "task initialized.\n");
   }
   if (RTC_ON) {
     rtc.create_task();
-    dd.print("[v] " + rtc.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + rtc.getName() + "task initialized.\n");
   }
   if (SD_ON) {
     xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
     gpio.create_task();
-    dd.print("[v] " + gpio.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + gpio.getName() + "task initialized.\n");
   }
   if (IOEXT_ON) {
     ioExt.create_task();
-    dd.print("[v] " + ioExt.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + ioExt.getName() + "task initialized.\n");
   }
   if (DAC_ON) {
     dac.init();
@@ -221,7 +209,7 @@ void app_main(void) {
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
-    dd.print("[v] " + cmdHandler.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + cmdHandler.getName() + "task initialized.\n");
   }
   if (SERIAL_ON) {
     printf(" - serial_demo_task\n");
@@ -231,10 +219,17 @@ void app_main(void) {
     printf(" - read_can_demo_task\n");
     xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
-
   if (CARSPEED_ON) {
     carSpeed.create_task();
-    dd.print("[v] " + carSpeed.getName() + "task initialized.\n");
+    driverDisplay.print("[v] " + carSpeed.getName() + "task initialized.\n");
+  }
+  if (ENGINEER_DISPLAY_ON) {
+    engineerDisplay.create_task();
+    engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized.\n");
+  }
+  if (DRIVER_DISPLAY_ON) {
+    driverDisplay.create_task();
+    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");
   }
 
   systemOk = true;
@@ -242,11 +237,11 @@ void app_main(void) {
   printf("-----------------------------------------------------------------\n");
   printf("Creating FreeRTOS tasks successful. System running.\n");
   printf("-----------------------------------------------------------------\n\n");
-  dd.print("\n----------------------------------------------------\n");
-  dd.print("FreeRTOS tasks created successfully. System running.\n");
-  dd.print("----------------------------------------------------\n");
+  driverDisplay.print("\n----------------------------------------------------\n");
+  driverDisplay.print("FreeRTOS tasks created successfully. System running.\n");
+  driverDisplay.print("----------------------------------------------------\n");
 
   if (DRIVER_DISPLAY_ON) {
-    dd.setScreen0Mode();
+    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
   }
 }

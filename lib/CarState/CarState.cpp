@@ -20,6 +20,7 @@ static const char *INDICATOR_str[] = {"off", "left", "right", "HAZARD FLASHR"};
 static const char *CONSTANT_MODE_str[] = {"none", "speed", "power"};
 static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
 static const char *BOOL_str[] = {"false", "true"};
+static const char *LIGHT_str[] = {"off", "L1", "L2"};
 
 const string CarState::print(string msg) {
   stringstream ss(msg);
@@ -35,12 +36,12 @@ const string CarState::print(string msg) {
   ss << "Drive Direction . " << DRIVE_DIRECTION_str[(int)(DriveDirection.get())] << endl;
   ss << "------------------------" << endl;
   ss << "Indicator ....... " << INDICATOR_str[(int)(Indicator.get())] << endl;
+  ss << "Constant Mode On  " << BOOL_str[(int)(ConstantModeOn.get())] << endl;
   ss << "Constant Mode ... " << CONSTANT_MODE_str[(int)(ConstantMode.get())] << endl;
   ss << "Target Speed .... " << TargetSpeed.get() << endl;
   ss << "Target Power .... " << TargetPower.get() << endl;
   ss << "Info Last ....... " << InfoLast.get() << endl;
-  ss << "Light 1 On ...... " << BOOL_str[Light1On.get()] << endl;
-  ss << "Light 2 On ...... " << BOOL_str[Light2On.get()] << endl;
+  ss << "Light .... ...... " << LIGHT_str[(int)(Light.get())] << endl;
   ss << "=======================" << endl;
   ss << printIOs("");
   return ss.str();
@@ -58,8 +59,7 @@ const string CarState::serialize(string msg) {
   cJSON_AddItemToObject(carData, "controlData", ctrData);
   cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed.get());
   cJSON_AddStringToObject(ctrData, "infoLast", InfoLast.get().c_str());
-  cJSON_AddBoolToObject(ctrData, "light1", Light1On.get());
-  cJSON_AddBoolToObject(ctrData, "light2", Light2On.get());
+  cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light.get())]);
   cJSON_AddStringToObject(ctrData, "ios:", printIOs("").c_str());
   return cJSON_Print(carData);
 }

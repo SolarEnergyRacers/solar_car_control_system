@@ -22,12 +22,12 @@
 #define BASE_ADDR_CMD 0xA8
 
 extern I2CBus i2cBus;
-extern DriverDisplay dd;
+extern DriverDisplay driverDisplay;
 
 void DAC::re_init() { init(); }
 
 void DAC::init() {
-  dd.print("[v] DAC initialized.\n");
+  driverDisplay.print("[v] DAC initialized.\n");
 }
 uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;

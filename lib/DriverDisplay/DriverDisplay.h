@@ -1,10 +1,9 @@
 //
 // Display
 //
-#include <LocalFunctionsAndDevices.h>
 
-#ifndef DRIVER_DISPLAY_C_H
-#define DRIVER_DISPLAY_C_H
+#ifndef SER_DRIVER_DISPLAY_C_H
+#define SER_DRIVER_DISPLAY_C_H
 
 #define ILI9341 // (320x240)
 
@@ -12,19 +11,17 @@
 #include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
 
 #include <CarState.h>
-#include <abstract_task.h>
-
-#include <freertos/FreeRTOS.h>
-#include <freertos/semphr.h>
+#include <Display.h>
+#include <LocalFunctionsAndDevices.h>
 
 using namespace std;
 
 // namespace DriverDisplayC {
 
-class DriverDisplay : public abstract_task {
+class DriverDisplay : public Display {
 
 private:
-  //==== Driver Display definition ==== START
+  //==== Driver Display definitions ==== START
   // display formats and sizes
   int bgColor = ILI9341_BLACK;
   int infoFrameX = 0;
@@ -87,47 +84,29 @@ private:
   int indicatorWidth = 30;
   int indicatorHeight = 20;
 
-  // light on indicator
-  int light1OnX = 250;
-  int light1OnY = 118;
-  int light2OnX = 250;
-  int light2OnY = 138;
+  int lightX = 250;
+  int lightY = 138;
 
-  // life sign for connection to microprocessor via rtx
-  int lifeSignX = -1;
-  int lifeSignY = -1;
-  int lifeSignRadius = 4;
+  // INFO:ILI9341_WHITE
+  // STATUS:ILI9341_GREEN
+  // WARN.ILI9341_PURPLE
+  // ERROR.ILI9341_RED
   //==== Driver Display definition ==== END
 
-  void setupScrollArea(uint16_t TFA, uint16_t BFA);
-  int scroll(int lines);
-  void scrollAddress(uint16_t VSP);
-
 public:
-  // INFO:ILI9341_WHITE, STATUS:ILI9341_GREEN,
-  // WARN.ILI9341_PURPLE, ERROR.ILI9341_RED
-
   virtual ~DriverDisplay() {}
   DriverDisplay() {}
-  void clear_screen(int bgColor);
 
 private:
-  enum class DISPLAY_STATUS { SETUP, DISPLAY_CONSOLE, DISPLAY_DEMOSCREEN, DISPLAY_BACKGROUND, DRIVER, ENGINEER };
-  template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
-    return static_cast<typename std::underlying_type<Enumeration>::type>(value);
-  }
-  static DISPLAY_STATUS status;
-
-  // put private/internal variables/functions here
-  void _setup(void);
   uint32_t sleep_polling_ms = 1000;
   float _write_float(int x, int y, float valueLast, float value, int textSize, int color);
   int _write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color);
   int _write_nat_999(int x, int y, int valueLast, int value, int textSize, int color);
   void _arrow_increase(int color);
   void _arrow_decrease(int color);
-  void _light1(bool lightOn);
-  void _light2(bool lightOn);
+  // void _light1(bool lightOn);
+  // void _light2(bool lightOn);
+  void _hide_light();
   void _drawCentreString(const string &buf, int x, int y);
   int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int color);
@@ -135,32 +114,22 @@ private:
   bool init_driver_display(void);
 
 public:
-  string getName(void);
+  string getName() { return "DriverDisplay"; };
 
-  // RTOS task
-  void init(void);
-  void re_init(void);
-  void exit(void);
+  //==== overwrites from base class ==== START
+  DISPLAY_STATUS display_setup(DISPLAY_STATUS status) override;
+  DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
+  //==== overwrites from base class ==== END
 
-  void setConsoleMode() { status = DISPLAY_STATUS::DISPLAY_CONSOLE; };
-  void setScreen0Mode() {
-    status = DISPLAY_STATUS::DISPLAY_BACKGROUND;
-    _setup();
-  };
   void print(string msg);
 
   // public functions
   void draw_display_border(int color);
   void draw_speed_border(int);
   void draw_acceleration_border(int);
-  void lifeSign();
   void draw_display_background();
 
-  void constant_drive_mode_set(CONSTANT_MODE mode);
-  void constant_drive_on();
-  void constant_drive_off();
   void constant_drive_mode_show();
-  void constant_drive_mode_hide();
 
   void write_drive_direction(DRIVE_DIRECTION);
   void write_driver_info(string msg, INFO_TYPE type);
@@ -172,8 +141,9 @@ public:
   void write_acceleration(int value);
 
   void indicator_set_and_blink(INDICATOR direction);
-  void light1OnOff();
-  void light2OnOff();
+  // void light1OnOff();
+  // void light2OnOff();
+  void show_light();
 
   void speedCheck(int speed);
   void arrow_increase(bool on);
@@ -186,7 +156,6 @@ public:
   void indicator_set_and_blink(INDICATOR direction, bool blinkOn);
   bool getIndicatorState();
   void setIndicatorState(bool state);
-  void task(void);
 };
 //} // namespace DriverDisplay
-#endif // DRIVER_DISPLAY_C_H
+#endif // #ifndef SER_DRIVER_DISPLAY_C_H

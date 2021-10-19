@@ -5,12 +5,13 @@
 #include <ADS1X15.h>
 #include <Adafruit_ILI9341.h>
 
-#include <definitions.h>
+#include <Display.h>
 #include <DriverDisplay.h>
 #include <Indicator.h>
+#include <definitions.h>
 
 extern CarState carState;
-extern DriverDisplay dd;
+extern DriverDisplay driverDisplay;
 
 INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
 
@@ -46,7 +47,7 @@ void Indicator::exit(void){
 // ------------------
 void Indicator::init(void) {
   printf("[v] Indicator handler inited\n");
-  dd.print("[v] " + getName() + " initialized.\n");
+  driverDisplay.print("[v] " + getName() + " initialized.\n");
   vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: why sleep here?
 }
 // -------------
@@ -56,7 +57,9 @@ void Indicator::task() {
   // do not add code here -- only controlling the blink frequency
   // polling loop
   while (1) {
-    dd.indicator_set_and_blink(carState.Indicator.get(), blinkState);
+    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER) {
+      driverDisplay.indicator_set_and_blink(carState.Indicator.get(), blinkState);
+    }
     blinkState = !blinkState;
 
     // sleep

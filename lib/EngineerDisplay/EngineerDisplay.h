@@ -30,7 +30,7 @@ private:
   // Battery status [OK/Error]
   DisplayValue<string> BatteryStatus = DisplayValue<string>(4, 90, "Battery", "");
   // BMS error [string]
-  DisplayValue<string> BmsStatus = DisplayValue<string>(4, 110, "BMS", "");
+  DisplayValue<string> BmsStatus = DisplayValue<string>(4, 110, "BMS Msg", "");
 
   // Battery temperature 1...4 [°C]
   DisplayValue<float> Temperature1 = DisplayValue<float>(168, 130, "T-1", "C");

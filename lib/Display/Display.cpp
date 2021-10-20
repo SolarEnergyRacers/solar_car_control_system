@@ -138,25 +138,25 @@ void Display::task(void) {
       break;
     // working states:
     case DISPLAY_STATUS::CONSOLE:
-      if (lifeSignCounter > 20) {
+      if (lifeSignCounter > 40) {
         lifeSign();
         lifeSignCounter = 0;
         // status = task(status, lifeSignCounter);
       }
       break;
     case DISPLAY_STATUS::ENGINEER:
-      if (lifeSignCounter > 20) {
+      if (lifeSignCounter > 40) {
+        status = task(status, lifeSignCounter);
         lifeSign();
         lifeSignCounter = 0;
-        status = task(status, lifeSignCounter);
       }
       break;
     case DISPLAY_STATUS::DRIVER:
     default:
-      if (lifeSignCounter > 10) {
+      if (lifeSignCounter > 20) {
+        status = task(status, lifeSignCounter);
         lifeSign();
         lifeSignCounter = 0;
-        status = task(status, lifeSignCounter);
       }
       break;
     }

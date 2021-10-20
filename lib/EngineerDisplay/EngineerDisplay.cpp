@@ -24,28 +24,28 @@ void EngineerDisplay::draw_display_background() {
 
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setRotation(1);
-  tft.setTextSize(2);
-  tft.setTextColor(ILI9341_DARKGREEN);
+  // tft.setTextSize(2);
+  // tft.setTextColor(ILI9341_DARKGREEN);
   xSemaphoreGive(spiBus.mutex);
 
-  PvStatus.write(tft);
-  McStatus.write(tft);
-  Mppt1.write(tft);
-  Mppt2.write(tft);
-  Mppt3.write(tft);
-  Mppt4.write(tft);
-  BatteryStatus.write(tft);
-  BmsStatus.write(tft);
-  Temperature1.write(tft);
-  Temperature2.write(tft);
-  Temperature3.write(tft);
-  Temperature4.write(tft);
-  TemperatureMax.write(tft);
-  BatteryCurrent.write(tft);
-  BatteryVoltage.write(tft);
-  VoltageAvg.write(tft);
-  VoltageMin.write(tft);
-  VoltageMax.write(tft);
+  PvStatus.showLabel(tft);
+  McStatus.showLabel(tft);
+  Mppt1.showLabel(tft);
+  Mppt2.showLabel(tft);
+  Mppt3.showLabel(tft);
+  Mppt4.showLabel(tft);
+  BatteryStatus.showLabel(tft);
+  BmsStatus.showLabel(tft);
+  Temperature1.showLabel(tft);
+  Temperature2.showLabel(tft);
+  Temperature3.showLabel(tft);
+  Temperature4.showLabel(tft);
+  TemperatureMax.showLabel(tft);
+  BatteryCurrent.showLabel(tft);
+  BatteryVoltage.showLabel(tft);
+  VoltageAvg.showLabel(tft);
+  VoltageMin.showLabel(tft);
+  VoltageMax.showLabel(tft);
 
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setTextSize(1);
@@ -92,7 +92,10 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
   // working state:
   case DISPLAY_STATUS::ENGINEER:
     if (lifeSignCounter > 10) {
-      // TODO
+      PvStatus.Value = carState.PhotoVoltaic.get();
+      PvStatus.showValue(tft);
+      McStatus.Value = carState.ConstantModeOn.get();
+      McStatus.showValue(tft);
     }
   default:
     // ignore others

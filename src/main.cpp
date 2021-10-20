@@ -223,13 +223,13 @@ void app_main(void) {
     carSpeed.create_task();
     driverDisplay.print("[v] " + carSpeed.getName() + "task initialized.\n");
   }
-  if (ENGINEER_DISPLAY_ON) {
-    engineerDisplay.create_task();
-    engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized.\n");
-  }
   if (DRIVER_DISPLAY_ON) {
     driverDisplay.create_task();
     driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");
+  }
+  if (ENGINEER_DISPLAY_ON) {
+    engineerDisplay.create_task();
+    engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized.\n");
   }
 
   systemOk = true;

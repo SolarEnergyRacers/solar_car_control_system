@@ -175,14 +175,14 @@ void lightHandler() {
   int value = carState.getPin(PinLight)->value;
   if (value == 0) {
     printf("Light toggle\n");
-    int devNr = 1;
-    int pinNr = 3;
+    //TODO: int devNr = 1;
+    //TODO: int pinNr = 3;
     if (carState.Light.get() == LIGHT::L1) {
       carState.Light.set(LIGHT::OFF);
-      ioExt.setPort((devNr << 4) + pinNr, false);
+      //TODO: ioExt.setPort((devNr << 4) + pinNr, false);
     } else {
       carState.Light.set(LIGHT::L1);
-      ioExt.setPort((devNr << 4) + pinNr, true);
+      //TODO: ioExt.setPort((devNr << 4) + pinNr, true);
     }
     driverDisplay.show_light();
   }

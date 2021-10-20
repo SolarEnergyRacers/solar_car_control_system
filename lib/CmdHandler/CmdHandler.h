@@ -9,7 +9,7 @@
 
 class CmdHandler : public abstract_task {
 private:
-  string commands = "RECDS-=:!udsaAbpm<>wlLci";
+  string commands = "RECDS-=:!udsaAbpm<>wlLciI";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
@@ -42,6 +42,7 @@ private:
                     "\tL [off]  - beam light on/off           [|off]\n"
                     "\tc [c|s|p]- constant speed|power mode   [|c|s|p]\n"
                     "\ti        - update all IOs (INPUT) \n"
+                    "\tI        - scan I2C devices \n"
                     "\t\n";
 
   void printSystemValues(void);

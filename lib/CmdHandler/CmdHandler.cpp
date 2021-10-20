@@ -31,6 +31,7 @@ extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
 extern IOExt ioExt;
+extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
 extern DriverDisplay driverDisplay;
@@ -222,7 +223,9 @@ void CmdHandler::task() {
       case 'i':
         ioExt.readAll();
         break;
-      // usage
+      case 'I':
+        i2cBus.scan_i2c_devices();
+        break;      // usage
       default:
         printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
         break;

@@ -26,14 +26,28 @@ void EngineerDisplay::draw_display_background() {
   tft.setRotation(1);
   tft.setTextSize(2);
   tft.setTextColor(ILI9341_DARKGREEN);
-  tft.setCursor(U1FrameX, U1FrameY);
-  tft.print("   U1(V):");
+  xSemaphoreGive(spiBus.mutex);
 
-  tft.setCursor(I1FrameX, I1FrameY);
-  tft.print("   I1(A):");
+  PvStatus.write(tft);
+  McStatus.write(tft);
+  Mppt1.write(tft);
+  Mppt2.write(tft);
+  Mppt3.write(tft);
+  Mppt4.write(tft);
+  BatteryStatus.write(tft);
+  BmsStatus.write(tft);
+  Temperature1.write(tft);
+  Temperature2.write(tft);
+  Temperature3.write(tft);
+  Temperature4.write(tft);
+  TemperatureMax.write(tft);
+  BatteryCurrent.write(tft);
+  BatteryVoltage.write(tft);
+  VoltageAvg.write(tft);
+  VoltageMin.write(tft);
+  VoltageMax.write(tft);
 
-  tft.setCursor(I2FrameX, I2FrameY);
-  tft.print("   I2(A):");
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }

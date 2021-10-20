@@ -2,8 +2,8 @@
 // Car State Values
 //
 
-#ifndef CARSTATEVALUE_H
-#define CARSTATEVALUE_H
+#ifndef SER_CARSTATEVALUE_H
+#define SER_CARSTATEVALUE_H
 
 #include <stdio.h>  /* printf */
 #include <stdlib.h> /* abs */
@@ -36,4 +36,4 @@ public:
   bool is_changed() { return abs(_Value - _ValueLast) > _epsilon; }
 };
 
-#endif // CARSTATEVALUE_H
+#endif // SER_CARSTATEVALUE_H

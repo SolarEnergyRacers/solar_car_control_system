@@ -58,27 +58,28 @@ void I2CBus::scan_i2c_devices() {
       * Connect a 2.4k resistor between SCL and Vcc
   */
   printf("    Scanning I2C addresses:\n    ");
-
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(mutex, portMAX_DELAY);
-
   uint8_t cnt = 0;
-  for (uint8_t i = 0; i < 0x80; i++) {
-    Wire.beginTransmission(i);
-    uint8_t ec = Wire.endTransmission(true);
+
+  xSemaphoreTake(mutex, portMAX_DELAY);
+  for (uint8_t addr = 0; addr < 0x80; addr++) {
+    uint8_t ec = -1;
+    try {
+      Wire.beginTransmission(addr);
+      ec = Wire.endTransmission(true);
+    } catch (__exception ex) {
+      // do nothing
+    }
     if (ec == 0) {
-      printf("%02x ", i);
+      printf("%02x ", addr);
       cnt++;
     } else {
       printf("-- ");
     }
-    if ((i & 0x0f) == 0x0f) {
+    if ((addr & 0x0f) == 0x0f) {
       printf("\n    ");
     }
   }
-
   xSemaphoreGive(mutex);
-  // CRITICAL SECTION I2C: end
 
   printf("Scan completed: %d I2C devices found.\n", cnt);
 }

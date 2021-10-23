@@ -49,9 +49,9 @@
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
 
+#include <CarState.h>
 #include <CarStatePin.h>
 #include <CarStateValue.h>
-#include <CarState.h>
 
 // add C linkage definition
 extern "C" {
@@ -79,7 +79,7 @@ PWM pwm;
 RTC rtc;
 SDCard sdCard;
 SPIBus spiBus;
-Temp ds; // temperature
+Temp ds;   // temperature
 Uart uart; // SERIAL
 
 bool startOk = true;
@@ -223,23 +223,25 @@ void app_main(void) {
     carSpeed.create_task();
     driverDisplay.print("[v] " + carSpeed.getName() + "task initialized.\n");
   }
-  if (DRIVER_DISPLAY_ON) {
-    driverDisplay.create_task();
-    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");
-  }
+
   if (ENGINEER_DISPLAY_ON) {
     engineerDisplay.create_task();
+    engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
     engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized.\n");
   }
-
+  if (DRIVER_DISPLAY_ON) {
+    driverDisplay.create_task();
+    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");
+  }
   systemOk = true;
 
   printf("-----------------------------------------------------------------\n");
   printf("Creating FreeRTOS tasks successful. System running.\n");
   printf("-----------------------------------------------------------------\n\n");
-  driverDisplay.print("\n----------------------------------------------------\n");
+  // driverDisplay.print("\n----------------------------------------------------\n");
   driverDisplay.print("FreeRTOS tasks created successfully. System running.\n");
-  driverDisplay.print("----------------------------------------------------\n");
+  // driverDisplay.print("----------------------------------------------------\n");
 
   if (DRIVER_DISPLAY_ON) {
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);

@@ -9,6 +9,7 @@
 #include <stdlib.h> /* abs */
 
 #include <definitions.h>
+//#include <../lib/CarControl/CarControl.h>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ public:
   // set the new value and returns the last set value
   T set(T theValue) {
     _Value = theValue;
+    // CarControl::valueChangedHandler();
     return _ValueLast;
   }
   // get the recent value

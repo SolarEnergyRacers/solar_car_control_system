@@ -80,15 +80,16 @@ void CmdHandler::task() {
         driverDisplay.re_init();
         driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
         break;
-      case 'D':
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
-        break;
       case 'C':
+        driverDisplay.clear_screen(ILI9341_WHITE);
         driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
         engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
         driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
-        driverDisplay.clear_screen(ILI9341_WHITE);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+        break;
+      case 'D':
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
         break;
       case 'E':
         driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
@@ -110,27 +111,27 @@ void CmdHandler::task() {
       case 's':
         if (input[2] == 'f') {
           carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
-          driverDisplay.write_drive_direction(DRIVE_DIRECTION::FORWARD);
         } else if (input[2] == 'b') {
           carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
-          driverDisplay.write_drive_direction(DRIVE_DIRECTION::BACKWARD);
         } else {
           carState.Speed.set(atoi(&input[1]));
-          driverDisplay.write_speed();
         }
         break;
       case 'b':
-        driverDisplay.write_bat(atof(&input[1]));
+        carState.BatteryVoltage.set(atof(&input[1]));
+        break;
+      case 'B':
+        carState.BatteryCurrent.set(atof(&input[1]));
         break;
       case 'p':
-        driverDisplay.write_pv(atof(&input[1]));
+        carState.PhotoVoltaicCurrent.set(atof(&input[1]));
         break;
       case 'm':
-        driverDisplay.write_motor(atof(&input[1]));
+        carState.MotorCurrent.set(atof(&input[1]));
         break;
       case 'a':
         accValue = atoi(&input[1]);
-        driverDisplay.write_acceleration(accValue);
+        carState.Acceleration.set(accValue);
         // TODO: where to put in this important
         if (accValue > 0) {
           dac.set_pot(accValue, DAC::POT_CHAN0);
@@ -177,10 +178,12 @@ void CmdHandler::task() {
         }
         break;
       case ':':
-        driverDisplay.write_driver_info(&input[1], INFO_TYPE::INFO);
+        carState.DriverInfoType.set(INFO_TYPE::INFO);
+        carState.DriverInfo.set(&input[1]);
         break;
       case '!':
-        driverDisplay.write_driver_info(&input[1], INFO_TYPE::WARN);
+        carState.DriverInfoType.set(INFO_TYPE::WARN);
+        carState.DriverInfo.set(&input[1]);
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -225,7 +228,7 @@ void CmdHandler::task() {
         break;
       case 'I':
         i2cBus.scan_i2c_devices();
-        break;      // usage
+        break; // usage
       default:
         printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
         break;

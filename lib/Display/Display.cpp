@@ -51,8 +51,6 @@ int lifeSignCounter = 0;
 bool lifeSignState = false;
 //==== Display cache ========== END
 
-DISPLAY_STATUS Display::status = DISPLAY_STATUS::CONSOLE;
-
 string Display::getName() { return "Display"; };
 
 void Display::init() {
@@ -69,6 +67,7 @@ void Display::re_init(void) {
 
 void Display::_setup() {
   printf("    Setup 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
+  DISPLAY_STATUS status = DISPLAY_STATUS::CONSOLE;
   int height = 0;
   int width = 0;
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
@@ -152,12 +151,14 @@ void Display::task(void) {
       }
       break;
     case DISPLAY_STATUS::DRIVER:
-    default:
       if (lifeSignCounter > 20) {
         status = task(status, lifeSignCounter);
         lifeSign();
         lifeSignCounter = 0;
       }
+      break;
+    default:
+      status = task(status, lifeSignCounter);
       break;
     }
     lifeSignCounter++;
@@ -398,7 +399,7 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
 }
 void Display::lifeSign() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState?ILI9341_DARKGREEN:ILI9341_GREEN);
+  tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : ILI9341_GREEN);
   xSemaphoreGive(spiBus.mutex);
 
   lifeSignState = !lifeSignState;

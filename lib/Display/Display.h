@@ -44,7 +44,7 @@ private:
 
 protected:
   Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
-  static DISPLAY_STATUS status;
+  volatile DISPLAY_STATUS status;
   void print(string msg);
 
 public:

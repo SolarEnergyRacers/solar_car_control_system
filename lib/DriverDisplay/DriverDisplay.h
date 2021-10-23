@@ -125,20 +125,19 @@ public:
 
   // public functions
   void draw_display_border(int color);
-  void draw_speed_border(int);
-  void draw_acceleration_border(int);
+  void draw_speed_border(int color);
+  void draw_acceleration_border(int color);
   void draw_display_background();
 
   void constant_drive_mode_show();
 
-  void write_drive_direction(DRIVE_DIRECTION);
-  void write_driver_info(string msg, INFO_TYPE type);
+  void write_drive_direction();
+  void write_driver_info();
   void write_speed();
-  void write_speed(int value);
-  void write_bat(float voltage);
-  void write_motor(float ampers);
-  void write_pv(float voltage);
-  void write_acceleration(int value);
+  void write_bat();
+  void write_motor();
+  void write_pv();
+  void write_acceleration();
 
   void indicator_set_and_blink(INDICATOR direction);
   // void light1OnOff();

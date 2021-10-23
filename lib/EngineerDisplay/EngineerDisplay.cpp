@@ -20,16 +20,37 @@ extern ADC adc;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
-void EngineerDisplay::draw_display_background() {
+DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
+  printf("    Init 'EngineerDisplay'\n");
+  int height = 0;
+  int width = 0;
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  try {
+    height = tft.height();
+    width = tft.width();
+    tft.setRotation(1);
+    tft.setTextSize(1);
+    tft.setTextColor(ILI9341_DARKGREEN);
+    tft.setScrollMargins(10, width - 20);
 
+  } catch (__exception ex) {
+    xSemaphoreGive(spiBus.mutex);
+    printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
+    throw ex;
+  }
+  xSemaphoreGive(spiBus.mutex);
+  printf("[v] EngineerDisplay inited: screen ILI9341 with %d x %d.\n", height, width);
+  return DISPLAY_STATUS::BACKGROUNDENGINEER;
+}
+
+void EngineerDisplay::draw_display_background() {
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setRotation(1);
-  // tft.setTextSize(2);
-  // tft.setTextColor(ILI9341_DARKGREEN);
   xSemaphoreGive(spiBus.mutex);
 
-  PvStatus.showLabel(tft);
-  McStatus.showLabel(tft);
+  PhotoVoltaicOn.showLabel(tft);
+  MotorOn.showLabel(tft);
+  BatteryOn.showLabel(tft);
   Mppt1.showLabel(tft);
   Mppt2.showLabel(tft);
   Mppt3.showLabel(tft);
@@ -52,39 +73,18 @@ void EngineerDisplay::draw_display_background() {
   xSemaphoreGive(spiBus.mutex);
 }
 
-DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
-  printf("    Init 'EngineerDisplay'\n");
-  int height = 0;
-  int width = 0;
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  try {
-    height = tft.height();
-    width = tft.width();
-    tft.fillScreen(ILI9341_LIGHTGREY);
-    tft.setRotation(1);
-    tft.setTextSize(1);
-    tft.setTextColor(ILI9341_DARKGREEN);
-    tft.setScrollMargins(10, width - 20);
-
-  } catch (__exception ex) {
-    printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
-    throw ex;
-  }
-  xSemaphoreGive(spiBus.mutex);
-  printf("[v] EngineerDisplay inited: screen ILI9341 with %d x %d.\n", height, width);
-  return DISPLAY_STATUS::BACKGROUNDENGINEER;
-}
+void EngineerDisplay::print(string msg) { Display::print(msg); }
 
 DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
   switch (status) {
     // initializing states:
   case DISPLAY_STATUS::SETUPENGINEER:
     display_setup(status);
-    clear_screen(bgColor);
     status = DISPLAY_STATUS::BACKGROUNDENGINEER;
     debug_printf("DISPLAY_STATUS-E::%s\n", DISPLAY_STATUS_str[(int)status]);
     break;
   case DISPLAY_STATUS::BACKGROUNDENGINEER:
+    clear_screen(bgColor);
     draw_display_background();
     status = DISPLAY_STATUS::ENGINEER;
     debug_printf("DISPLAY_STATUS-E::%s\n", DISPLAY_STATUS_str[(int)status]);
@@ -92,10 +92,31 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
   // working state:
   case DISPLAY_STATUS::ENGINEER:
     if (lifeSignCounter > 10) {
-      PvStatus.Value = carState.PhotoVoltaic.get();
-      PvStatus.showValue(tft);
-      McStatus.Value = carState.ConstantModeOn.get();
-      McStatus.showValue(tft);
+      PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
+      MotorOn.Value = carState.MotorOn.get();
+      BatteryOn.Value = carState.BatteryOn.get();
+      BatteryVoltage.Value = carState.BatteryVoltage.get();
+      BatteryCurrent.Value = carState.BatteryCurrent.get();
+
+      PhotoVoltaicOn.showValue(tft);
+      MotorOn.showValue(tft);
+      BatteryOn.showValue(tft);
+      Mppt1.showValue(tft);
+      Mppt2.showValue(tft);
+      Mppt3.showValue(tft);
+      Mppt4.showValue(tft);
+      BatteryStatus.showValue(tft);
+      BmsStatus.showValue(tft);
+      Temperature1.showValue(tft);
+      Temperature2.showValue(tft);
+      Temperature3.showValue(tft);
+      Temperature4.showValue(tft);
+      TemperatureMax.showValue(tft);
+      BatteryCurrent.showValue(tft);
+      BatteryVoltage.showValue(tft);
+      VoltageAvg.showValue(tft);
+      VoltageMin.showValue(tft);
+      VoltageMax.showValue(tft);
     }
   default:
     // ignore others
@@ -103,5 +124,3 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
   }
   return status;
 }
-
-void EngineerDisplay::print(string msg) { Display::print(msg); }

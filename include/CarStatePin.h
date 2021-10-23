@@ -19,6 +19,7 @@ public:
   int mode;
   int value;
   int oldValue;
+  bool inited;
   long timestamp;
   string name;
   void (*handlerFunction)();

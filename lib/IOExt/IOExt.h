@@ -2,8 +2,8 @@
  * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
  */
 
-#ifndef SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
-#define SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
+#ifndef SER_IOEXT_H
+#define SER_IOEXT_H
 
 #include <list>
 #include <map>
@@ -11,12 +11,12 @@
 
 #include <PCF8574.h>
 
-#include <definitions.h>
 #include <abstract_task.h>
+#include <definitions.h>
 
-#include <CarStateValue.h>
-#include <CarStatePin.h>
 #include <CarState.h>
+#include <CarStatePin.h>
+#include <CarStateValue.h>
 #include <Indicator.h>
 
 #define PinBatOnOff "BatOnOff"
@@ -82,14 +82,14 @@ public:
   void re_init(void);
   void exit(void);
   void task(void);
-  
+
   void setPort(int port, bool value);
   int getPort(int port);
 
   static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
   static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
   void readAll();
-  
+
 private:
   void setPortMode(int port, uint8_t mode);
   void getAll(CarStatePin *pins, int maxCount);
@@ -104,4 +104,4 @@ private:
   static volatile bool ioInterruptRequest;
   void handleIoInterrupt();
 };
-#endif // SOLAR_CAR_CONTROL_SYSTEM_ IOEXT_H
+#endif // SER_IOEXT_H

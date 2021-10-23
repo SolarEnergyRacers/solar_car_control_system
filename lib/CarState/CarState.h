@@ -29,15 +29,17 @@ class CarState {
 
 public:
   CarState() {
-    Speed.set(321);
-    Acceleration.set(-12);
+    Speed.set(0);
+    Acceleration.set(0);
     Deceleration.set(0);
-    Battery.set(-13.5);
-    Battery.set_epsilon(0.1);
-    PhotoVoltaic.set(-1);
-    PhotoVoltaic.set_epsilon(0.1);
-    Motor.set(-1);
-    Motor.set_epsilon(0.1);
+    BatteryVoltage.set(0);
+    BatteryVoltage.set_epsilon(0.1);
+    BatteryCurrent.set(0);
+    BatteryCurrent.set_epsilon(0.1);
+    PhotoVoltaicCurrent.set(0);
+    PhotoVoltaicCurrent.set_epsilon(0.1);
+    MotorCurrent.set(0);
+    MotorCurrent.set_epsilon(0.1);
 
     Indicator.set(INDICATOR::OFF);
     DriveDirection.set(DRIVE_DIRECTION::FORWARD);
@@ -46,7 +48,8 @@ public:
 
     TargetSpeed.set(0);
     TargetPower.set(0);
-    InfoLast.set("ok.");
+    DriverInfo.set("ok.");
+    DriverInfoType.set(INFO_TYPE::STATUS);
     Light.set(LIGHT::OFF);
   }
   ~CarState(){};
@@ -56,9 +59,13 @@ public:
   CarStateValue<int> Acceleration;
   CarStateValue<int> Deceleration;
 
-  CarStateValue<float> Battery;
-  CarStateValue<float> PhotoVoltaic;
-  CarStateValue<float> Motor;
+  CarStateValue<bool> BatteryOn;
+  CarStateValue<float> BatteryVoltage;
+  CarStateValue<float> BatteryCurrent;
+  CarStateValue<bool> PhotoVoltaicOn;
+  CarStateValue<float> PhotoVoltaicCurrent;
+  CarStateValue<bool> MotorOn;
+  CarStateValue<float> MotorCurrent;
 
   // logical car data (values set by driver or chase car)
   CarStateValue<DRIVE_DIRECTION> DriveDirection;
@@ -68,7 +75,8 @@ public:
 
   CarStateValue<int> TargetSpeed;
   CarStateValue<int> TargetPower;
-  CarStateValue<string> InfoLast;
+  CarStateValue<string> DriverInfo;
+  CarStateValue<INFO_TYPE> DriverInfoType;
   CarStateValue<LIGHT> Light;
 
   // All IO pins

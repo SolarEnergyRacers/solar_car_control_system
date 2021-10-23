@@ -15,40 +15,42 @@ class EngineerDisplay : public Display {
 private:
   //==== Driver Display definitions ==== START
   // display formats and sizes
-  int bgColor = ILI9341_LIGHTGREY;
+  int bgColor = ILI9341_ORANGE;
 
   // PV status [On/Off]
-  DisplayValue<bool> PvStatus = DisplayValue<bool>(4, 10, "PV", "", ILI9341_BLUE);
+  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(4, 10, "PV   :", "%3s", "", ILI9341_BLUE);
   // MC status [On/Off]
-  DisplayValue<bool> McStatus = DisplayValue<bool>(4, 30, "MC", "", ILI9341_BLUE);
+  DisplayValue<bool> MotorOn = DisplayValue<bool>(4, 30, "MC   :", "%3s", "", ILI9341_BLUE);
+  // MC status [On/Off]
+  DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 50, "Bat  :", "%3s", "", ILI9341_BLUE);
   // MPPT 1...3 [A]
-  DisplayValue<float> Mppt1 = DisplayValue<float>(168, 10, "MPPT-1", "A");
-  DisplayValue<float> Mppt2 = DisplayValue<float>(168, 30, "MPPT-2", "A");
-  DisplayValue<float> Mppt3 = DisplayValue<float>(168, 50, "MPPT-3", "A");
-  DisplayValue<float> Mppt4 = DisplayValue<float>(168, 70, "MPPT-4", "A");
+  DisplayValue<float> Mppt1 = DisplayValue<float>(168, 10, "MPPT-1:", "%3.1f", "A");
+  DisplayValue<float> Mppt2 = DisplayValue<float>(168, 30, "MPPT-2:", "%3.1f", "A");
+  DisplayValue<float> Mppt3 = DisplayValue<float>(168, 50, "MPPT-3:", "%3.1f", "A");
+  DisplayValue<float> Mppt4 = DisplayValue<float>(168, 70, "MPPT-4:", "%3.1f", "A");
 
   // Battery status [OK/Error]
-  DisplayValue<string> BatteryStatus = DisplayValue<string>(4, 90, "Battery", "");
+  DisplayValue<string> BatteryStatus = DisplayValue<string>(4, 90, "Battery:", "", "");
   // BMS error [string]
-  DisplayValue<string> BmsStatus = DisplayValue<string>(4, 110, "BMS Msg", "");
+  DisplayValue<string> BmsStatus = DisplayValue<string>(4, 110, "BMS Msg:", "", "");
 
   // Battery temperature 1...4 [°C]
-  DisplayValue<float> Temperature1 = DisplayValue<float>(168, 130, "T-1", "C");
-  DisplayValue<float> Temperature2 = DisplayValue<float>(168, 150, "T-2", "C");
-  DisplayValue<float> Temperature3 = DisplayValue<float>(168, 170, "T-3", "C");
-  DisplayValue<float> Temperature4 = DisplayValue<float>(168, 190, "T-4", "C");
+  DisplayValue<float> Temperature1 = DisplayValue<float>(168, 130, "T-1   :", "%3d", "C");
+  DisplayValue<float> Temperature2 = DisplayValue<float>(168, 150, "T-2   :", "%3d", "C");
+  DisplayValue<float> Temperature3 = DisplayValue<float>(168, 170, "T-3   :", "%3d", "C");
+  DisplayValue<float> Temperature4 = DisplayValue<float>(168, 190, "T-4   :", "%3d", "C");
   // Max temperature [°C]
-  DisplayValue<float> TemperatureMax = DisplayValue<float>(168, 210, "T-max", "C", ILI9341_DARKCYAN);
+  DisplayValue<float> TemperatureMax = DisplayValue<float>(168, 210, "T-max :", "%3d", "C", ILI9341_DARKCYAN);
 
   // BMS current [A]
-  DisplayValue<float> BatteryCurrent = DisplayValue<float>(4, 130, "BMS I", "A");
+  DisplayValue<float> BatteryCurrent = DisplayValue<float>(4, 130, "BMS I:", "%-4.1f", " A");
   // Voltage battery [V]
-  DisplayValue<float> BatteryVoltage = DisplayValue<float>(4, 150, "BMS U", "V");
+  DisplayValue<float> BatteryVoltage = DisplayValue<float>(4, 150, "BMS U:", "%-4.1f", " V");
   // Voltage min, max, average [V]
-  DisplayValue<float> VoltageMin = DisplayValue<float>(4, 170, "V-min", "V");
-  DisplayValue<float> VoltageAvg = DisplayValue<float>(4, 190, "V-avg", "V");
-  DisplayValue<float> VoltageMax = DisplayValue<float>(4, 210, "V-max", "V");
-  //==== Driver Display definition ==== END
+  DisplayValue<float> VoltageMin = DisplayValue<float>(4, 170, "U-min:", "%-4.1f", " V");
+  DisplayValue<float> VoltageAvg = DisplayValue<float>(4, 190, "U-avg:", "%-4.1f", " V");
+  DisplayValue<float> VoltageMax = DisplayValue<float>(4, 210, "U-max:", "%-4.1f", " V");
+  //==== Driver Display definition ==buf[== END
 
 public:
   string getName(void) { return "EngineerDisplay"; };

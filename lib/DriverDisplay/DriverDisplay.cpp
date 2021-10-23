@@ -40,7 +40,6 @@ extern Adafruit_ILI9341 tft;
 
 //==== display cache =====================
 // ... to avoid flickering
-string infoLast = "";
 int speedLast = -1;
 int accelerationLast = -1;
 float batLast = -1;
@@ -63,6 +62,7 @@ DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
     infoFrameSizeX = width;
     speedFrameX = (width - speedFrameSizeX) / 2;
   } catch (__exception ex) {
+    xSemaphoreGive(spiBus.mutex);
     printf("[x] DriverDisplay: Unable to initialize screen ILI9341.\n");
     throw ex;
   }
@@ -71,49 +71,16 @@ DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
   return DISPLAY_STATUS::CONSOLE;
 }
 
-DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
-  switch (status) {
-  // initializing states:
-  case DISPLAY_STATUS::SETUPDRIVER:
-    display_setup(status);
-    clear_screen(bgColor);
-    status = DISPLAY_STATUS::BACKGROUNDDRIVER;
-    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
-    break;
-  case DISPLAY_STATUS::DEMOSCREEN:
-    draw_display_background();
-    driver_display_demo_screen();
-    status = DISPLAY_STATUS::SETUPDRIVER;
-    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
-    break;
-  case DISPLAY_STATUS::BACKGROUNDDRIVER:
-    draw_display_background();
-    status = DISPLAY_STATUS::DRIVER;
-    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
-    break;
-  // working state:
-  case DISPLAY_STATUS::DRIVER:
-    if (lifeSignCounter > 10) {
-      int accDisplayValue = adc.read_adc_acc_dec();
-      write_acceleration(accDisplayValue);
-    }
-    break;
-  default:
-    // ignore others
-    break;
-  }
-  return status;
-}
-
 void DriverDisplay::print(string msg) {
-
   if (get_DisplayStatus() == DISPLAY_STATUS::CONSOLE) {
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     tft.setTextSize(1);
     tft.print(msg.c_str());
     xSemaphoreGive(spiBus.mutex);
   } else {
-    write_driver_info(msg, INFO_TYPE::STATUS);
+    carState.DriverInfo.set(msg);
+    carState.DriverInfoType.set(INFO_TYPE::INFO);
+    write_driver_info();
   }
 }
 
@@ -225,12 +192,12 @@ int DriverDisplay::_write_ganz_99(int x, int y, int valueLast, int value, int te
   int d1o = (int)valLast % 10;
   int d2o = ((int)valLast / 10) % 10;
 
+  int digitWidth = textSize * 6;
+  int digitHeight = textSize * 8;
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
-  int digitWidth = textSize * 6;
-  int digitHeight = textSize * 8;
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
   if (d1 != d1o) { //|| d1o == 0) {
@@ -277,7 +244,6 @@ int DriverDisplay::_write_nat_999(int x, int y, int valueLast, int value, int te
   int d3o = ((int)valueLast / 100) % 10;
 
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
@@ -353,24 +319,6 @@ void DriverDisplay::draw_display_background() {
   draw_display_border(ILI9341_GREEN);
   draw_speed_border(ILI9341_YELLOW);
   draw_acceleration_border(ILI9341_YELLOW);
-
-  string infoLast = "";
-  write_driver_info(infoLast = "", INFO_TYPE::STATUS);
-
-  speedLast = -1;
-  write_speed(0);
-
-  accelerationLast = -1;
-  write_acceleration(0);
-
-  batLast = -1;
-  write_bat(0);
-
-  pvLast = -1;
-  write_pv(0);
-
-  motorLast = -1;
-  write_motor(0);
 }
 
 void DriverDisplay::_arrow_increase(int color) {
@@ -440,7 +388,8 @@ void DriverDisplay::constant_drive_mode_show() {
 #define FORWARD_STRING ""
 #define BACKWARD_STRING "Backward"
 
-void DriverDisplay::write_drive_direction(DRIVE_DIRECTION direction) {
+void DriverDisplay::write_drive_direction() {
+  DRIVE_DIRECTION direction = carState.DriveDirection.get();
   int width = getPixelWidthOfTexts(driveDirectionTextSize, FORWARD_STRING, BACKWARD_STRING) + 4;
 
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
@@ -537,10 +486,6 @@ void DriverDisplay::show_light() {
 // Write the speed in the centre frame
 void DriverDisplay::write_speed() {
   int value = carState.Speed.get();
-  write_speed(value);
-}
-
-void DriverDisplay::write_speed(int value) {
   speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 
   // tft.setFont(&FreeMonoBold24pt7b);
@@ -550,24 +495,28 @@ void DriverDisplay::write_speed(int value) {
 }
 
 // acceleration value: 0-255
-void DriverDisplay::write_acceleration(int value) {
+void DriverDisplay::write_acceleration() {
+  int value = carState.Acceleration.get();
   if (value < -99 || value > 99) {
     value = 999;
   }
   accelerationLast = _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
 }
 
-void DriverDisplay::write_bat(float value) {
+void DriverDisplay::write_bat() {
+  float value = carState.BatteryCurrent.get();
   int labelOffset = labelLen * batTextSize * 6;
   batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value, batTextSize, ILI9341_BLUE);
 }
 
-void DriverDisplay::write_pv(float value) {
+void DriverDisplay::write_pv() {
+  float value = carState.PhotoVoltaicCurrent.get();
   int labelOffset = labelLen * pvTextSize * 6;
   pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value, pvTextSize, ILI9341_YELLOW);
 }
 
-void DriverDisplay::write_motor(float value) {
+void DriverDisplay::write_motor() {
+  float value = carState.MotorCurrent.get();
   int labelOffset = labelLen * motorTextSize * 6;
   motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, ILI9341_YELLOW);
 }
@@ -586,8 +535,6 @@ void DriverDisplay::_drawCentreString(const string &buf, int x, int y) {
   // // CRITICAL SECTION SPI: end
 }
 
-// INFO = ILI9341_WHITE, STATUS = ILI9341_GREEN, WARN = ILI9341_PURPLE, ERROR
-// = ILI9341_RED
 int DriverDisplay::_getColorForInfoType(INFO_TYPE type) {
   int color;
   switch (type) {
@@ -612,71 +559,116 @@ int DriverDisplay::_getColorForInfoType(INFO_TYPE type) {
 }
 
 // commented out code is preparation for font usage
-void DriverDisplay::write_driver_info(string msg, INFO_TYPE type) {
-
-  if (msg != infoLast) {
+void DriverDisplay::write_driver_info() {
+  string msg = carState.DriverInfo.get();
+  INFO_TYPE type = carState.DriverInfoType.get();
+  if (msg != carState.DriverInfo.get_last()) {
+    int len = msg.length();
+    int textSize = infoTextSize;
+    if (len > 2 * 17)
+      textSize = 2;
+    if (len > 4 * 26)
+      textSize = 1;
+    if (len > 7 * 53)
+      msg = msg.substr(0, 7 * 53 - 3) + "...";
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+    tft.fillRect(infoFrameX, infoFrameY, infoFrameSizeX, infoFrameSizeY, bgColor);
     // tft.setFont(&FreeSans18pt7b);
-    tft.setTextSize(infoTextSize);
+    tft.setTextSize(textSize);
     tft.setTextWrap(true);
-
-    tft.setTextColor(bgColor);
-    // tft.setCursor(infoFrameX, infoFrameY + 9);
-    tft.setCursor(infoFrameX, infoFrameY);
-    tft.print(infoLast.c_str());
-
     tft.setTextColor(_getColorForInfoType(type));
     tft.setCursor(infoFrameX, infoFrameY);
     tft.print(msg.c_str());
-    // TODO: _drawCentreString(msg.c_str(), 0, 0);
-    infoLast = msg;
-    tft.setTextSize(1);
-    // tft.setFont();
     xSemaphoreGive(spiBus.mutex);
+    carState.DriverInfo.overtake_recent_to_last();
   }
 }
 
 void DriverDisplay::driver_display_demo_screen() {
-  printf("  Draw demo screen:\n");
-  printf("   - driver info\n");
-  write_driver_info("123456789_123456789_123456", INFO_TYPE::INFO);
-  printf("   - hazzard warn\n");
-  indicator_set_and_blink(INDICATOR::WARN, true);
-  printf("   - speed\n");
-  write_speed(888);
-  printf("   - acceleration\n");
-  write_acceleration(888);
-  printf("   - increase arrow\n");
-  arrow_increase(true);
-  printf("   - decrease arrow\n");
-  arrow_decrease(true);
-  // printf("   - light1 on\n");
-  // LIGHT oldLight = carState.Light.get();
-  // carState.Light.set(LIGHT::L1);
-  // show_light();
-  // sleep(250);
-  // carState.Light.set(LIGHT::L2);
-  // show_light();
-  // sleep(250);
-  // carState.Light.set(oldLight);
-  // show_light();
-  // printf("   - constant mode speed\n");
-  // constant_drive_mode_set(CONSTANT_MODE::SPEED);
+  // printf("  Draw demo screen:\n");
+  // printf("   - driver info\n");
+  // write_driver_info("123456789_123456789_123456");
+  // printf("   - hazzard warn\n");
+  // indicator_set_and_blink(INDICATOR::WARN, true);
+  // printf("   - speed\n");
+  // write_speed(888);
+  // printf("   - acceleration\n");
+  // write_acceleration(888);
+  // printf("   - increase arrow\n");
+  // arrow_increase(true);
+  // printf("   - decrease arrow\n");
+  // arrow_decrease(true);
+  // // printf("   - light1 on\n");
+  // // LIGHT oldLight = carState.Light.get();
+  // // carState.Light.set(LIGHT::L1);
+  // // show_light();
+  // // sleep(250);
+  // // carState.Light.set(LIGHT::L2);
+  // // show_light();
+  // // sleep(250);
+  // // carState.Light.set(oldLight);
+  // // show_light();
+  // // printf("   - constant mode speed\n");
+  // // constant_drive_mode_set(CONSTANT_MODE::SPEED);
+  // // constant_drive_mode_show();
+  // printf("   - drive direction forwards\n");
+  // write_drive_direction(DRIVE_DIRECTION::FORWARD);
+  // printf("   - battery\n");
+  // write_bat(-8888.8);
+  // printf("   - photovoltaic\n");
+  // write_pv(-8888.8);
+  // printf("   - motor\n");
+  // write_motor(-8888.8);
+  // printf("   - constant mode power\n");
+  // // constant_drive_mode_set(CONSTANT_MODE::POWER);
   // constant_drive_mode_show();
-  printf("   - drive direction forwards\n");
-  write_drive_direction(DRIVE_DIRECTION::FORWARD);
-  printf("   - battery\n");
-  write_bat(-8888.8);
-  printf("   - photovoltaic\n");
-  write_pv(-8888.8);
-  printf("   - motor\n");
-  write_motor(-8888.8);
-  printf("   - constant mode power\n");
-  // constant_drive_mode_set(CONSTANT_MODE::POWER);
-  constant_drive_mode_show();
-  printf("   - drive direction backwards\n");
-  write_drive_direction(DRIVE_DIRECTION::BACKWARD);
-  printf("  End of demo screen.\n");
+  // printf("   - drive direction backwards\n");
+  // write_drive_direction(DRIVE_DIRECTION::BACKWARD);
+  // printf("  End of demo screen.\n");
+}
+
+DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
+  switch (status) {
+  // initializing states:
+  case DISPLAY_STATUS::SETUPDRIVER:
+    display_setup(status);
+    status = DISPLAY_STATUS::BACKGROUNDDRIVER;
+    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
+    break;
+  case DISPLAY_STATUS::DEMOSCREEN:
+    draw_display_background();
+    driver_display_demo_screen();
+    status = DISPLAY_STATUS::SETUPDRIVER;
+    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
+    break;
+  case DISPLAY_STATUS::BACKGROUNDDRIVER:
+    clear_screen(bgColor);
+    draw_display_background();
+    status = DISPLAY_STATUS::DRIVER;
+    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
+    break;
+  // working state:
+  case DISPLAY_STATUS::DRIVER:
+    if (lifeSignCounter > 10) {
+      // int accDisplayValue = adc.read_adc_acc_dec();
+      // write_acceleration(accDisplayValue);
+      carState.Acceleration.set(adc.read_adc_acc_dec());
+      write_driver_info();
+      write_speed();
+      write_acceleration();
+      write_bat();
+      write_pv();
+      write_motor();
+      write_drive_direction();
+      show_light();
+      constant_drive_mode_show();
+    }
+    break;
+  default:
+    // ignore others
+    break;
+  }
+  return status;
 }
 
 // } //namespace Display

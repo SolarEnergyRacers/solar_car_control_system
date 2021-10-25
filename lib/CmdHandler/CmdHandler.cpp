@@ -10,9 +10,12 @@
 #include <I2CBus.h>
 #include <Wire.h> // I2C
 #include <inttypes.h>
+#include <sstream>
 #include <stdio.h>
+#include <string>
 
 #include <ADC.h>
+#include <CarControl.h>
 #include <CarState.h>
 #include <CarStatePin.h>
 #include <CarStateValue.h>
@@ -24,8 +27,6 @@
 #include <Helper.h>
 #include <IOExt.h>
 #include <Indicator.h>
-#include <sstream>
-#include <string>
 
 extern I2CBus i2cBus;
 extern DAC dac;
@@ -34,6 +35,7 @@ extern IOExt ioExt;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
+extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 
@@ -78,14 +80,11 @@ void CmdHandler::task() {
       case 'R':
         engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
         driverDisplay.re_init();
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
         break;
       case 'C':
-        driverDisplay.clear_screen(ILI9341_WHITE);
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
         driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
         engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+        driverDisplay.clear_screen(ILI9341_WHITE);
         break;
       case 'D':
         engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
@@ -97,16 +96,16 @@ void CmdHandler::task() {
         break;
       case 'S':
         printSystemValues();
-        debug_printf("%s\n", carState.print("Recent State").c_str());
+        printf("%s\n", carState.print("Recent State").c_str());
         if (input[1] == 'J') {
-          debug_printf("%s\n", carState.serialize("Recent State").c_str());
+          printf("%s\n", carState.serialize("Recent State").c_str());
         }
         break;
       case '-':
-        adc.adjust_min_acc_dec();
+        carControl.adjust_paddles_min();
         break;
       case '=':
-        adc.adjust_max_acc_dec();
+        carControl.adjust_paddles_max();
         break;
       case 's':
         if (input[2] == 'f') {

@@ -12,6 +12,7 @@
 
 #include <CarState.h>
 #include <Display.h>
+#include <DisplayValue.h>
 #include <LocalFunctionsAndDevices.h>
 
 using namespace std;
@@ -21,6 +22,13 @@ using namespace std;
 class DriverDisplay : public Display {
 
 private:
+  DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 180, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<float> PhotoVoltaicCurrent = DisplayValue<float>(10, 200, "PV   :", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 220, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> BatteryOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(160, 200, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 220, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+
   //==== Driver Display definitions ==== START
   // display formats and sizes
   int bgColor = ILI9341_BLACK;
@@ -134,9 +142,6 @@ public:
   void write_drive_direction();
   void write_driver_info();
   void write_speed();
-  void write_bat();
-  void write_motor();
-  void write_pv();
   void write_acceleration();
 
   void indicator_set_and_blink(INDICATOR direction);

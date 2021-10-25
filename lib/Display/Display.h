@@ -21,8 +21,19 @@ using namespace std;
 
 // namespace Display {
 
-enum class DISPLAY_STATUS { SETUPDRIVER, SETUPENGINEER, CONSOLE, DEMOSCREEN, BACKGROUNDDRIVER, BACKGROUNDENGINEER, DRIVER, ENGINEER, HALTED };
-static const char *DISPLAY_STATUS_str[] = {"SETUPDRIVER", "SETUPENGINEER", "CONSOLE", "DEMOSCREEN", "BACKGROUNDDRIVER", "BACKGROUNDENGINEER", "DRIVER", "ENGINEER", "HALTED"};
+enum class DISPLAY_STATUS {
+  SETUPDRIVER,
+  SETUPENGINEER,
+  CONSOLE,
+  DEMOSCREEN,
+  BACKGROUNDDRIVER,
+  BACKGROUNDENGINEER,
+  DRIVER,
+  ENGINEER,
+  HALTED
+};
+static const char *DISPLAY_STATUS_str[] = {"SETUPDRIVER",        "SETUPENGINEER", "CONSOLE",  "DEMOSCREEN", "BACKGROUNDDRIVER",
+                                           "BACKGROUNDENGINEER", "DRIVER",        "ENGINEER", "HALTED"};
 
 template <typename Enumeration> auto as_integer(Enumeration const value) -> typename std::underlying_type<Enumeration>::type {
   return static_cast<typename std::underlying_type<Enumeration>::type>(value);
@@ -66,8 +77,8 @@ public:
 
   // handler called for inherited classes
   virtual string getName(void);
-  virtual DISPLAY_STATUS display_setup(DISPLAY_STATUS status);
-  virtual DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter);
+  virtual DISPLAY_STATUS display_setup(DISPLAY_STATUS status) { return DISPLAY_STATUS::HALTED; };
+  virtual DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) { return DISPLAY_STATUS::HALTED; };
 
   // workers
   float write_float(int x, int y, float valueLast, float value, int textSize, int color);

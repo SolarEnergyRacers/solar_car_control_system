@@ -21,7 +21,7 @@ extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
-  printf("    Init 'EngineerDisplay'\n");
+  printf("[?] Setup 'EngineerDisplay'...\n");
   int height = 0;
   int width = 0;
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
@@ -76,47 +76,51 @@ void EngineerDisplay::draw_display_background() {
 void EngineerDisplay::print(string msg) { Display::print(msg); }
 
 DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
+  // printf("EngineerDisplay, status: %s\n", DISPLAY_STATUS_str[(int)status]);
   switch (status) {
     // initializing states:
   case DISPLAY_STATUS::SETUPENGINEER:
+    re_init();
     display_setup(status);
     status = DISPLAY_STATUS::BACKGROUNDENGINEER;
-    debug_printf("DISPLAY_STATUS-E::%s\n", DISPLAY_STATUS_str[(int)status]);
     break;
   case DISPLAY_STATUS::BACKGROUNDENGINEER:
     clear_screen(bgColor);
     draw_display_background();
     status = DISPLAY_STATUS::ENGINEER;
-    debug_printf("DISPLAY_STATUS-E::%s\n", DISPLAY_STATUS_str[(int)status]);
     break;
   // working state:
   case DISPLAY_STATUS::ENGINEER:
     if (lifeSignCounter > 10) {
+      BatteryOn.Value = carState.BatteryOn.get();
       PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
       MotorOn.Value = carState.MotorOn.get();
-      BatteryOn.Value = carState.BatteryOn.get();
       BatteryVoltage.Value = carState.BatteryVoltage.get();
       BatteryCurrent.Value = carState.BatteryCurrent.get();
 
+      BatteryOn.showValue(tft);
       PhotoVoltaicOn.showValue(tft);
       MotorOn.showValue(tft);
-      BatteryOn.showValue(tft);
+
       Mppt1.showValue(tft);
       Mppt2.showValue(tft);
       Mppt3.showValue(tft);
       Mppt4.showValue(tft);
+
       BatteryStatus.showValue(tft);
       BmsStatus.showValue(tft);
-      Temperature1.showValue(tft);
-      Temperature2.showValue(tft);
-      Temperature3.showValue(tft);
-      Temperature4.showValue(tft);
-      TemperatureMax.showValue(tft);
+
       BatteryCurrent.showValue(tft);
       BatteryVoltage.showValue(tft);
       VoltageAvg.showValue(tft);
       VoltageMin.showValue(tft);
       VoltageMax.showValue(tft);
+
+      Temperature1.showValue(tft);
+      Temperature2.showValue(tft);
+      Temperature3.showValue(tft);
+      Temperature4.showValue(tft);
+      TemperatureMax.showValue(tft);
     }
   default:
     // ignore others

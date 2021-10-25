@@ -48,7 +48,7 @@ float motorLast = -1;
 //=======================================
 
 DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
-  printf("    Init 'DriverDisplay'\n");
+  printf("[?] Setup 'DriverDisplay'...\n");
   int height = 0;
   int width = 0;
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
@@ -298,20 +298,20 @@ void DriverDisplay::draw_acceleration_border(int color) {
 
 void DriverDisplay::draw_display_background() {
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  tft.setRotation(1);
-  tft.setTextSize(2);
-  tft.setTextColor(ILI9341_DARKGREEN);
-  tft.setCursor(batFrameX, batFrameY);
-  tft.print("  Bat(V):");
+  // xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  // tft.setRotation(1);
+  // tft.setTextSize(2);
+  // tft.setTextColor(ILI9341_DARKGREEN);
+  // tft.setCursor(batFrameX, batFrameY);
+  // tft.print("  Bat(V):");
 
-  tft.setCursor(pvFrameX, pvFrameY);
-  tft.print("   PV(A):");
+  // tft.setCursor(pvFrameX, pvFrameY);
+  // tft.print("   PV(A):");
 
-  tft.setCursor(motorFrameX, motorFrameY);
-  tft.print("Motor(A):");
-  tft.setTextSize(1);
-  xSemaphoreGive(spiBus.mutex);
+  // tft.setCursor(motorFrameX, motorFrameY);
+  // tft.print("Motor(A):");
+  // tft.setTextSize(1);
+  // xSemaphoreGive(spiBus.mutex);
 
   infoFrameSizeX = tft.width();
   speedFrameX = (tft.width() - speedFrameSizeX) / 2;
@@ -483,42 +483,21 @@ void DriverDisplay::show_light() {
   xSemaphoreGive(spiBus.mutex);
 }
 
-// Write the speed in the centre frame
+// Write the speed in the centre frame: 0...999
 void DriverDisplay::write_speed() {
   int value = carState.Speed.get();
-  speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
-
-  // tft.setFont(&FreeMonoBold24pt7b);
-  // speedLast = _write_nat_999(speedFrameX + 20, speedFrameY + 25, speedLast,
-  // value, 2, ILI9341_WHITE);
-  // tft.setFont();
-}
-
-// acceleration value: 0-255
-void DriverDisplay::write_acceleration() {
-  int value = carState.Acceleration.get();
-  if (value < -99 || value > 99) {
+  if (value < 0 || value > 999) {
     value = 999;
   }
-  accelerationLast = _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
+  speedLast = _write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 }
 
-void DriverDisplay::write_bat() {
-  float value = carState.BatteryCurrent.get();
-  int labelOffset = labelLen * batTextSize * 6;
-  batLast = _write_float(batFrameX + labelOffset, batFrameY, batLast, value, batTextSize, ILI9341_BLUE);
-}
-
-void DriverDisplay::write_pv() {
-  float value = carState.PhotoVoltaicCurrent.get();
-  int labelOffset = labelLen * pvTextSize * 6;
-  pvLast = _write_float(pvFrameX + labelOffset, pvFrameY, pvLast, value, pvTextSize, ILI9341_YELLOW);
-}
-
-void DriverDisplay::write_motor() {
-  float value = carState.MotorCurrent.get();
-  int labelOffset = labelLen * motorTextSize * 6;
-  motorLast = _write_float(motorFrameX + labelOffset, motorFrameY, motorLast, value, motorTextSize, ILI9341_YELLOW);
+// acceleration value: -99...+99
+void DriverDisplay::write_acceleration() {
+  int value = carState.AccelerationDisplay.get();
+  if (value > -99 && value < 99) {
+    accelerationLast = _write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
+  }
 }
 
 void DriverDisplay::_drawCentreString(const string &buf, int x, int y) {
@@ -628,40 +607,56 @@ void DriverDisplay::driver_display_demo_screen() {
 }
 
 DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
+  // printf("DriverDisplay, status: %s\n", DISPLAY_STATUS_str[(int)status]);
   switch (status) {
   // initializing states:
   case DISPLAY_STATUS::SETUPDRIVER:
+    re_init();
     display_setup(status);
     status = DISPLAY_STATUS::BACKGROUNDDRIVER;
-    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
     break;
   case DISPLAY_STATUS::DEMOSCREEN:
     draw_display_background();
     driver_display_demo_screen();
     status = DISPLAY_STATUS::SETUPDRIVER;
-    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
     break;
   case DISPLAY_STATUS::BACKGROUNDDRIVER:
     clear_screen(bgColor);
     draw_display_background();
+
+    BatteryVoltage.showLabel(tft);
+    BatteryOn.showLabel(tft);
+    PhotoVoltaicCurrent.showLabel(tft);
+    PhotoVoltaicOn.showLabel(tft);
+    MotorCurrent.showLabel(tft);
+    MotorOn.showLabel(tft);
+
     status = DISPLAY_STATUS::DRIVER;
-    debug_printf("DISPLAY_STATUS-D::%s\n", DISPLAY_STATUS_str[(int)status]);
     break;
   // working state:
   case DISPLAY_STATUS::DRIVER:
     if (lifeSignCounter > 10) {
-      // int accDisplayValue = adc.read_adc_acc_dec();
-      // write_acceleration(accDisplayValue);
-      carState.Acceleration.set(adc.read_adc_acc_dec());
       write_driver_info();
       write_speed();
       write_acceleration();
-      write_bat();
-      write_pv();
-      write_motor();
+
       write_drive_direction();
       show_light();
       constant_drive_mode_show();
+
+      BatteryOn.Value = carState.BatteryOn.get();
+      BatteryVoltage.Value = carState.BatteryVoltage.get();
+      PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
+      PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent.get();
+      MotorOn.Value = carState.MotorOn.get();
+      MotorCurrent.Value = carState.MotorCurrent.get();
+
+      BatteryVoltage.showValue(tft);
+      BatteryOn.showValue(tft);
+      PhotoVoltaicCurrent.showValue(tft);
+      PhotoVoltaicOn.showValue(tft);
+      MotorCurrent.showValue(tft);
+      MotorOn.showValue(tft);
     }
     break;
   default:

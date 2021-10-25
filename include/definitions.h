@@ -4,6 +4,9 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#define VERSION "v0.1"
+#define VERSION_PUBLISHED "2021.10"
+
 /*
  *  GPIO
  */
@@ -36,13 +39,12 @@
 
 #define PCF8574_NUM_DEVICES 4
 #define PCF8574_NUM_PORTS 8
-#define IOExtPINCOUNT PCF8574_NUM_DEVICES*PCF8574_NUM_PORTS
+#define IOExtPINCOUNT PCF8574_NUM_DEVICES *PCF8574_NUM_PORTS
 #define I2C_ADDRESS_PCF8574_IOExt0 0x20
 #define I2C_ADDRESS_PCF8574_IOExt1 0x21
 #define I2C_ADDRESS_PCF8574_IOExt2 0x22
 #define I2C_ADDRESS_PCF8574_IOExt3 0x23
 #define I2C_INTERRUPT_PIN_PCF8574 33
-
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
 #define DS1803_BASE_ADDR 0x28
@@ -117,6 +119,13 @@
 
 #define DEBUG2 false
 #define debug_printf_l2(fmt, ...)                                                                                                          \
+  do {                                                                                                                                     \
+    if (DEBUG2)                                                                                                                            \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
+  } while (0)
+
+#define DEBUG3 true
+#define debug_printf_l3(fmt, ...)                                                                                                          \
   do {                                                                                                                                     \
     if (DEBUG2)                                                                                                                            \
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \

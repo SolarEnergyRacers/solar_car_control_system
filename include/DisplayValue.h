@@ -36,6 +36,7 @@ private:
   int TextSize;
   int TextColor;
   int BgColor;
+  bool IsInited;
 
 public:
   DisplayValue(int x, int y, string label, string format = "%4.1f", string unit = "", int textColor = ILI9341_BLACK,
@@ -48,6 +49,7 @@ public:
     TextColor = textColor;
     TextSize = textSize;
     BgColor = bgColor;
+    IsInited = false;
   }
   virtual ~DisplayValue() {}
 
@@ -79,63 +81,63 @@ public:
     snprintf(label, 15, "%s", Label.c_str());
     int16_t x1, y1;
     uint16_t w, h;
+    vWidth = atoi(Format.substr(1, 1).c_str()) * TextSize * 6 + 2;
+    debug_printf("%s -- vFormat %s (%s): %dc --> %dpx\n", Label.c_str(), Format.c_str(), Format.substr(1, 1).c_str(),
+                 atoi(Format.substr(1, 1).c_str()), vWidth);
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     tft.setTextSize(TextSize);
     tft.setTextColor(TextColor);
     tft.setCursor(X, Y);
     tft.print(label);
     tft.getTextBounds(label, X, Y, &x1, &y1, &w, &h);
-    tft.printf("    %s", Unit.c_str());
+    tft.setCursor(X + w + vWidth, Y);
+    tft.printf("%s", Unit.c_str());
     xSemaphoreGive(spiBus.mutex);
     vX = x1 + w;
     vY = y1;
     vHeight = h;
-    //printf(Format.substr(1,1).c_str());
-    vWidth = TextSize * 6 * 4; //atoi(Format.substr(1,1).c_str());
   }
   char buffer[20];
 
   void showValue(Adafruit_ILI9341 tft) { showValue(Value, tft); }
 
   void showValue(string s, Adafruit_ILI9341 tft) {
-    if (s.compare(ValueLast) == 0) {
+    if (s.compare(ValueLast) == 0 || !IsInited) {
       _showValue(tft, Value.c_str());
-      ValueLast = Value;
     }
   }
 
   void showValue(bool b, Adafruit_ILI9341 tft) {
-    if (b != ValueLast) {
+    if (b != ValueLast || !IsInited) {
       _showValue(tft, Value ? "ON" : "OFF");
-      ValueLast = Value;
     }
   }
 
   void showValue(int s, Adafruit_ILI9341 tft) {
-    if (is_changed()) {
+    if (is_changed() || !IsInited) {
       snprintf(buffer, 20, Format.c_str(), Value);
       _showValue(tft, buffer);
-      ValueLast = Value;
     }
   }
 
   void showValue(float s, Adafruit_ILI9341 tft) {
-    if (is_changed()) {
+    if (is_changed() || !IsInited) {
       snprintf(buffer, 20, Format.c_str(), Value);
       _showValue(tft, buffer);
-      ValueLast = Value;
     }
   }
 
   void _showValue(Adafruit_ILI9341 tft, const char *value) {
-    int valX = X + Label.length() * TextSize * 6;
+    // int valX = X + Label.length() * TextSize * 6 * 5;
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     tft.setTextSize(TextSize);
     tft.setTextColor(TextColor);
     tft.fillRect(vX, vY, vWidth, vHeight, BgColor);
-    tft.setCursor(valX, Y);
+    tft.setCursor(vX, vY);
     tft.print(value);
     xSemaphoreGive(spiBus.mutex);
+    ValueLast = Value;
+    IsInited = true;
   }
 };
 

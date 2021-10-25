@@ -6,10 +6,9 @@
 #define CARSTATE_H
 
 #include <cJSON.h>
+#include <map>
 #include <sstream>
 #include <string>
-#include <map>
-
 
 #include <CarStatePin.h>
 #include <CarStateValue.h>
@@ -57,6 +56,7 @@ public:
   // pyhsical car data (measurment values)
   CarStateValue<int> Speed;
   CarStateValue<int> Acceleration;
+  CarStateValue<int> AccelerationDisplay;
   CarStateValue<int> Deceleration;
 
   CarStateValue<bool> BatteryOn;
@@ -66,6 +66,7 @@ public:
   CarStateValue<float> PhotoVoltaicCurrent;
   CarStateValue<bool> MotorOn;
   CarStateValue<float> MotorCurrent;
+  CarStateValue<float> MotorVoltage;
 
   // logical car data (values set by driver or chase car)
   CarStateValue<DRIVE_DIRECTION> DriveDirection;
@@ -88,10 +89,10 @@ public:
 
   std::map<string, int> idxOfPin;
   // std::map<int, Pin> pins; // pins by index
-  
+
   // tools
-  const string print(string msg);
-  const string printIOs(string msg);
+  const string print(string msg, bool withColors = true);
+  const string printIOs(string msg, bool withColors = true);
   const string serialize(string msg);
 };
 

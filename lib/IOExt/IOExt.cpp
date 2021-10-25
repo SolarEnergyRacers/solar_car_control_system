@@ -147,13 +147,15 @@ void IOExt::readAll() {
 
 // IO pin handler -----------------------------------------
 
-void batteryOnOffHandler() { 
+void batteryOnOffHandler() {
   carState.BatteryOn.set(carState.getPin(PinBatOnOff)->value == 1);
-  printf("Battery %s\n", (carState.BatteryOn.get() ? "On" : "Off")); }
+  printf("Battery %s\n", (carState.BatteryOn.get() ? "On" : "Off"));
+}
 
-void pvOnOffHandler() { 
+void pvOnOffHandler() {
   carState.PhotoVoltaicOn.set(carState.getPin(PinPvOnOff)->value == 1);
-  printf("PV %s\n", (carState.PhotoVoltaicOn.get() ? "On" : "Off")); }
+  printf("PV %s\n", (carState.PhotoVoltaicOn.get() ? "On" : "Off"));
+}
 
 void mcOnOffHandler() {
   carState.MotorOn.set(carState.getPin(PinMcOnOff)->value == 1);
@@ -214,12 +216,12 @@ void nextScreenHandler() {
   int value = carState.getPin(PinNextScreen)->value;
   if (value == 0) {
     printf("Switch Next Screen toggle\n");
-    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER) {
-      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-      engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
-    } else {
+    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::HALTED) {
       engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+      driverDisplay.re_init();
+    } else {
+      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+      engineerDisplay.re_init();
     }
   }
 }

@@ -61,19 +61,22 @@ void Display::init() {
 }
 
 void Display::re_init(void) {
+#if WithTaskSuspend == true
+  vTaskResume(getHandle());
+#endif
   _setup();
   status = DISPLAY_STATUS::CONSOLE;
 }
 
 void Display::_setup() {
   printf("    Setup 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
-  DISPLAY_STATUS status = DISPLAY_STATUS::CONSOLE;
+  status = DISPLAY_STATUS::CONSOLE;
   int height = 0;
   int width = 0;
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
-  tft.begin();
   try {
+    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+    tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
+    tft.begin();
     height = tft.height();
     width = tft.width();
     tft.setRotation(1);
@@ -81,27 +84,26 @@ void Display::_setup() {
     tft.fillScreen(ILI9341_WHITE);
     tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(0, height);
-    uint8_t x = tft.readcommand8(ILI9341_RDMODE);
-    printf("    Display Power Mode: 0x%x\n", x);
-    x = tft.readcommand8(ILI9341_RDMADCTL);
-    printf("    MADCTL Mode:        0x%x\n", x);
-    x = tft.readcommand8(ILI9341_RDPIXFMT);
-    printf("    Pixel Format:       0x%x\n", x);
-    x = tft.readcommand8(ILI9341_RDIMGFMT);
-    printf("    Image Format:       0x%x\n", x);
-    x = tft.readcommand8(ILI9341_RDSELFDIAG);
-    printf("    Self Diagnostic:    0x%x\n", x);
-    lifeSignX = tft.width() - lifeSignRadius - 6;
-    lifeSignY = tft.height() - lifeSignRadius - 6;
-    tft.printf("Screen ILI9341 inited with %d x %d.\n", height, width);
+    uint8_t rdmode = tft.readcommand8(ILI9341_RDMODE);
+    uint8_t rdmadctl = tft.readcommand8(ILI9341_RDMADCTL);
+    uint8_t rdpixfmt = tft.readcommand8(ILI9341_RDPIXFMT);
+    uint8_t rdimgfmt = tft.readcommand8(ILI9341_RDIMGFMT);
+    uint8_t rdselfdiag = tft.readcommand8(ILI9341_RDSELFDIAG);
+    tft.printf("Screen ILI9341 inited (%dx%d)-->%s\n", height, width, DISPLAY_STATUS_str[(int)status]);
+    xSemaphoreGive(spiBus.mutex);
+    printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
+    printf("    ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
+    printf("    ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
+    printf("    ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
+    printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
   } catch (__exception ex) {
     printf("[x] Display: Unable to initialize screen 'ILI9341'.\n");
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
-  xSemaphoreGive(spiBus.mutex);
-  status = DISPLAY_STATUS::CONSOLE;
-  printf("[v] Display inited: screen 'ILI9341' with %d x %d.\n", height, width);
+  lifeSignX = width - lifeSignRadius - 6;
+  lifeSignY = height - lifeSignRadius - 6;
+  printf("[v] Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", height, width, DISPLAY_STATUS_str[(int)status]);
 }
 
 void Display::clear_screen(int bgColor) {
@@ -111,61 +113,6 @@ void Display::clear_screen(int bgColor) {
 }
 
 void Display::exit() {}
-
-DISPLAY_STATUS Display::display_setup(DISPLAY_STATUS status) { return status; }
-
-DISPLAY_STATUS Display::task(DISPLAY_STATUS status, int lifeSignCounter) { return status; }
-
-// -------------
-// FreeRTOS TASK
-// -------------
-void Display::task(void) {
-  // polling loop
-  while (1) {
-    switch (status) {
-    // initializing states:
-    case DISPLAY_STATUS::SETUPDRIVER:
-    case DISPLAY_STATUS::SETUPENGINEER:
-      status = task(status, lifeSignCounter);
-      break;
-    case DISPLAY_STATUS::DEMOSCREEN:
-      status = task(status, lifeSignCounter);
-      break;
-    case DISPLAY_STATUS::BACKGROUNDDRIVER:
-    case DISPLAY_STATUS::BACKGROUNDENGINEER:
-      status = task(status, lifeSignCounter);
-      break;
-    // working states:
-    case DISPLAY_STATUS::CONSOLE:
-      if (lifeSignCounter > 40) {
-        lifeSign();
-        lifeSignCounter = 0;
-        // status = task(status, lifeSignCounter);
-      }
-      break;
-    case DISPLAY_STATUS::ENGINEER:
-      if (lifeSignCounter > 40) {
-        status = task(status, lifeSignCounter);
-        lifeSign();
-        lifeSignCounter = 0;
-      }
-      break;
-    case DISPLAY_STATUS::DRIVER:
-      if (lifeSignCounter > 20) {
-        status = task(status, lifeSignCounter);
-        lifeSign();
-        lifeSignCounter = 0;
-      }
-      break;
-    default:
-      status = task(status, lifeSignCounter);
-      break;
-    }
-    lifeSignCounter++;
-    // sleep for sleep_polling_ms
-    this->sleep(20);
-  }
-}
 
 int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
   int l1 = t1.length() * textSize * 6;
@@ -438,6 +385,66 @@ int Display::getColorForInfoType(INFO_TYPE type) {
     break;
   }
   return color;
+}
+
+// -------------
+// FreeRTOS TASK
+// -------------
+void Display::task(void) {
+  // polling loop
+  while (1) {
+    switch (status) {
+    // initializing states:
+    case DISPLAY_STATUS::SETUPDRIVER:
+    case DISPLAY_STATUS::SETUPENGINEER:
+    case DISPLAY_STATUS::BACKGROUNDDRIVER:
+    case DISPLAY_STATUS::BACKGROUNDENGINEER:
+      debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+      status = task(status, lifeSignCounter);
+      debug_printf_l3("%s.2-DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+      break;
+    case DISPLAY_STATUS::DEMOSCREEN:
+      status = task(status, lifeSignCounter);
+      break;
+    // working states:
+    case DISPLAY_STATUS::CONSOLE:
+      if (lifeSignCounter > 40) {
+        lifeSign();
+        lifeSignCounter = 0;
+      }
+      break;
+    case DISPLAY_STATUS::ENGINEER:
+      if (lifeSignCounter > 40) {
+        debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+        status = task(status, lifeSignCounter);
+        debug_printf_l3("%s.2-DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+        lifeSign();
+        lifeSignCounter = 0;
+      }
+      break;
+    case DISPLAY_STATUS::DRIVER:
+      if (lifeSignCounter > 20) {
+        debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+        status = task(status, lifeSignCounter);
+        debug_printf_l3("%s.2-DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+        lifeSign();
+        lifeSignCounter = 0;
+      }
+      break;
+    case DISPLAY_STATUS::HALTED:
+      debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+#if WithTaskSuspend == true
+      vTaskSuspend(getHandle());
+#endif
+      break;
+    default:
+      // ignore others
+      break;
+    }
+    lifeSignCounter++;
+    // sleep for sleep_polling_ms
+    this->sleep(20);
+  }
 }
 
 // } //namespace Display

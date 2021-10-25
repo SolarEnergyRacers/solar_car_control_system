@@ -132,6 +132,7 @@ void app_main(void) {
   }
   if (INDICATOR_ON) {
     indicator.init();
+    indicator.setIndicator(INDICATOR::OFF);
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.init();
@@ -196,9 +197,6 @@ void app_main(void) {
     driverDisplay.print("[v] " + pwm.getName() + "task initialized.\n");
   }
   if (RTC_ON) {
-    // rtc.create_task();
-    // driverDisplay.print("[v] " + rtc.getName() + "task initialized.\n");
-    // get date & time
     RtcDateTime now = rtc.read_rtc_datetime();
     debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
                  now.Second());
@@ -215,6 +213,10 @@ void app_main(void) {
   if (IOEXT_ON) {
     ioExt.create_task();
     ioExt.readAll();
+    indicator.setIndicator(INDICATOR::OFF);
+    carState.Indicator.set(INDICATOR::OFF);
+    carState.ConstantModeOn.set(false);
+    carState.Light.set(LIGHT::OFF);
     driverDisplay.print("[v] " + ioExt.getName() + "task initialized.\n");
   }
   if (DAC_ON) {

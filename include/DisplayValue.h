@@ -96,6 +96,7 @@ public:
     vX = x1 + w;
     vY = y1;
     vHeight = h;
+    IsInited = false; // showValue must be done for every Value
   }
   char buffer[20];
 

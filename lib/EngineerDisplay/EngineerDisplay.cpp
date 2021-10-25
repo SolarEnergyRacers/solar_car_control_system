@@ -92,6 +92,7 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
   // working state:
   case DISPLAY_STATUS::ENGINEER:
     if (lifeSignCounter > 10) {
+      printf("#########################################################################33");
       BatteryOn.Value = carState.BatteryOn.get();
       PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
       MotorOn.Value = carState.MotorOn.get();

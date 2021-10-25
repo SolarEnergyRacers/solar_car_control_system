@@ -19,6 +19,7 @@ extern IOExt ioExt;
 extern CarState carState;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
+extern bool systemOk;
 
 #define DEBUGIOEXT
 
@@ -127,19 +128,20 @@ void IOExt::handleIoInterrupt() {
 
 void IOExt::readAll() {
 
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-      CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->mode != OUTPUT) {
-        xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-        pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
-        xSemaphoreGive(i2cBus.mutex);
-        if (pin->value != pin->oldValue || !pin->inited) {
-          pin->oldValue = pin->value;
-        }
-      }
-    }
-  }
+  // for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
+  //   for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
+  //     CarStatePin *pin = carState.getPin(devNr, pinNr);
+  //     if (pin->mode != OUTPUT) {
+  //       xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  //       pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
+  //       xSemaphoreGive(i2cBus.mutex);
+  //       if (pin->value != pin->oldValue || !pin->inited) {
+  //         pin->oldValue = pin->value;
+  //       }
+  //     }
+  //   }
+  // }
+  handleIoInterrupt();
 #ifdef DEBUGIOEXT
   printf("%s", carState.printIOs("").c_str());
 #endif
@@ -216,12 +218,16 @@ void nextScreenHandler() {
   int value = carState.getPin(PinNextScreen)->value;
   if (value == 0) {
     printf("Switch Next Screen toggle\n");
-    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::HALTED) {
-      engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-      driverDisplay.re_init();
-    } else {
-      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-      engineerDisplay.re_init();
+    if (systemOk) {
+      if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::HALTED) {
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+        // driverDisplay.re_init();
+      } else {
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
+        // engineerDisplay.re_init();
+      }
     }
   }
 }

@@ -228,6 +228,9 @@ void CmdHandler::task() {
       case 'I':
         i2cBus.scan_i2c_devices();
         break; // usage
+      case 'r':
+        ioExt.readAll();
+        break;
       default:
         printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
         break;

@@ -114,13 +114,6 @@ void app_main(void) {
   printf("------------------------------\n");
 
   // ---- init modules ----
-  if (DRIVER_DISPLAY_ON) {
-    driverDisplay.init();
-    driverDisplay.create_task();
-    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
-    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized, CONSOLE.\n");
-    sleep(1);
-  }
   if (ENGINEER_DISPLAY_ON) {
     engineerDisplay.init();
     engineerDisplay.create_task();
@@ -128,7 +121,13 @@ void app_main(void) {
     engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized, HALTED.\n");
     sleep(1);
   }
-
+  if (DRIVER_DISPLAY_ON) {
+    driverDisplay.init();
+    driverDisplay.create_task();
+    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized, CONSOLE.\n");
+    sleep(1);
+  }
   if (BLINK_ON) {
   }
   if (INDICATOR_ON) {
@@ -215,6 +214,7 @@ void app_main(void) {
   }
   if (IOEXT_ON) {
     ioExt.create_task();
+    ioExt.readAll();
     driverDisplay.print("[v] " + ioExt.getName() + "task initialized.\n");
   }
   if (DAC_ON) {
@@ -242,19 +242,6 @@ void app_main(void) {
     carControl.create_task();
     driverDisplay.print("[v] " + carControl.getName() + "task initialized.\n");
   }
-  // if (ENGINEER_DISPLAY_ON) {
-  //   engineerDisplay.init();
-  //   engineerDisplay.create_task();
-  //   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-  //   engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized.");
-  // }
-  // if (DRIVER_DISPLAY_ON) {
-  //   driverDisplay.init();
-  //   driverDisplay.create_task();
-  //   driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
-  //   driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");
-  //   driverDisplay.print("Startup sequence(s) successful.\nSystem creating FreeRTOS tasks...\n");
-  // }
   if (DRIVER_DISPLAY_ON) {
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
     driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");

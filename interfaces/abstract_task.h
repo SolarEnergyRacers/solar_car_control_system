@@ -9,12 +9,20 @@
 #include <stdint.h>
 #include <string>
 
+#if WithTaskSuspend == true
+#include <task.h>
+// typedef void *TaskHandle_t;
+#endif
+
 using namespace std;
 
 class abstract_task {
 private:
   // put private/internal variables/functions here
   uint32_t sleep_polling_ms = 1000;
+#if WithTaskSuspend == true
+  TaskHandle_t xHandle;
+#endif
 
 public:
   virtual string getName(void);
@@ -24,6 +32,9 @@ public:
   virtual void task(void); // this is the actual task
 
   string getInfo(void);
+#if WithTaskSuspend == true
+  TaskHandle_t getHandle() { return xHandle; };
+#endif
 
   void sleep(void);
   void sleep(int polling_ms);

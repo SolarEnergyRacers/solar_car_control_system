@@ -4,14 +4,13 @@
 
 #include <definitions.h>
 
+#include <ESP32Time.h>
 #include <I2CBus.h>
-
+#include <RTC.h>
+#include <RtcDS1307.h>
 #include <Wire.h>
 
-#include <RTC.h>
-
-#include <RtcDS1307.h>
-
+extern ESP32Time esp32time;
 extern I2CBus i2cBus;
 
 void RTC::re_init() { init(); }
@@ -104,9 +103,10 @@ void RTC::task() {
 
     // get date & time
     RtcDateTime now = read_rtc_datetime();
-    printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
-           now.Second());
-
+    debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
+                 now.Second());
+    // setTime(30, 24, 15, 17, 1, 2021); // 17th Jan 2021 15:24:30
+    esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year()); // 17th Jan 2021 15:24:30
     // sleep for 1s
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }

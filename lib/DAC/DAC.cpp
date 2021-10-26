@@ -17,16 +17,16 @@
 #include <Wire.h> // I2C
 
 #include <DAC.h>
-#include <DriverDisplayC.h>
+#include <DriverDisplay.h>
 
 #define BASE_ADDR_CMD 0xA8
 
 extern I2CBus i2cBus;
-extern DriverDisplayC dd;
+extern DriverDisplay driverDisplay;
 
 void DAC::re_init() { init(); }
 
-void DAC::init() { dd.print("[v] DAC initialized.\n"); }
+void DAC::init() { driverDisplay.print("[v] DAC initialized.\n"); }
 uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {

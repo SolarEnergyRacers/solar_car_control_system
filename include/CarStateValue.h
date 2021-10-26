@@ -2,13 +2,14 @@
 // Car State Values
 //
 
-#ifndef CARSTATEVALUE_H
-#define CARSTATEVALUE_H
+#ifndef SER_CARSTATEVALUE_H
+#define SER_CARSTATEVALUE_H
 
 #include <stdio.h>  /* printf */
 #include <stdlib.h> /* abs */
 
 #include <definitions.h>
+//#include <../lib/CarControl/CarControl.h>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ public:
   // set the new value and returns the last set value
   T set(T theValue) {
     _Value = theValue;
+    // CarControl::valueChangedHandler();
     return _ValueLast;
   }
   // get the recent value
@@ -36,4 +38,4 @@ public:
   bool is_changed() { return abs(_Value - _ValueLast) > _epsilon; }
 };
 
-#endif // CARSTATEVALUE_H
+#endif // SER_CARSTATEVALUE_H

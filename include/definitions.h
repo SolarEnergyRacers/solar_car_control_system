@@ -4,6 +4,9 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
+#define VERSION "v0.1"
+#define VERSION_PUBLISHED "2021.10"
+
 /*
  *  GPIO
  */
@@ -23,7 +26,7 @@
 
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
-#define I2C_ADDRESS_ADS1x15_1 0x49
+#define I2C_ADDRESS_ADS1x15_1 0x4A
 #define I2C_ADDRESS_ADS1x15_2 0x4B
 
 #define PWM_NUM_PORTS 16
@@ -33,12 +36,10 @@
 #define OLED_RESET 9
 #define OLED_WIDTH 128
 #define OLED_HEIGHT 64
-#define I2C_ADDRESS_SSD1305 0x3C
 
 #define PCF8574_NUM_DEVICES 4
 #define PCF8574_NUM_PORTS 8
-
-#define IOExtPINCOUNT PCF8574_NUM_DEVICES *PCF8574_NUM_PORTS
+#define IOExtPINCOUNT (PCF8574_NUM_DEVICES * PCF8574_NUM_PORTS)
 #define I2C_ADDRESS_PCF8574_IOExt0 0x20
 #define I2C_ADDRESS_PCF8574_IOExt1 0x21
 #define I2C_ADDRESS_PCF8574_IOExt2 0x22
@@ -118,6 +119,13 @@
 
 #define DEBUG2 false
 #define debug_printf_l2(fmt, ...)                                                                                                          \
+  do {                                                                                                                                     \
+    if (DEBUG2)                                                                                                                            \
+      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
+  } while (0)
+
+#define DEBUG3 true
+#define debug_printf_l3(fmt, ...)                                                                                                          \
   do {                                                                                                                                     \
     if (DEBUG2)                                                                                                                            \
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \

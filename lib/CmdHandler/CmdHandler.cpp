@@ -10,35 +10,41 @@
 #include <I2CBus.h>
 #include <Wire.h> // I2C
 #include <inttypes.h>
+#include <sstream>
 #include <stdio.h>
+#include <string>
 
 #include <ADC.h>
+#include <CarControl.h>
 #include <CarState.h>
 #include <CarStatePin.h>
 #include <CarStateValue.h>
 #include <CmdHandler.h>
 #include <DAC.h>
-#include <DriverDisplayC.h>
+#include <Display.h>
+#include <DriverDisplay.h>
+#include <EngineerDisplay.h>
 #include <Helper.h>
 #include <IOExt.h>
 #include <Indicator.h>
-#include <sstream>
-#include <string>
 
 extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
 extern IOExt ioExt;
+extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
-extern DriverDisplayC dd;
+extern CarControl carControl;
+extern DriverDisplay driverDisplay;
+extern EngineerDisplay engineerDisplay;
 
 void CmdHandler::re_init() { init(); }
 
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
   printf("[v] Command handler inited\n");
-  dd.print("[v] " + getName() + " initialized.\n");
+  driverDisplay.print("[v] " + getName() + " initialized.\n");
 }
 
 void CmdHandler::exit() {
@@ -72,47 +78,59 @@ void CmdHandler::task() {
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
-        dd.re_init();
-        dd.setScreen0Mode();
-        dd.draw_display_background();
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        driverDisplay.re_init();
+        break;
+      case 'C':
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+        driverDisplay.clear_screen(ILI9341_WHITE);
+        break;
+      case 'D':
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+        break;
+      case 'E':
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
         break;
       case 'S':
         printSystemValues();
-        debug_printf("%s\n", carState.print("Recent State").c_str());
+        printf("%s\n", carState.print("Recent State").c_str());
         if (input[1] == 'J') {
-          debug_printf("%s\n", carState.serialize("Recent State").c_str());
+          printf("%s\n", carState.serialize("Recent State").c_str());
         }
         break;
       case '-':
-        adc.adjust_min_acc_dec();
+        carControl.adjust_paddles_min();
         break;
       case '=':
-        adc.adjust_max_acc_dec();
+        carControl.adjust_paddles_max();
         break;
       case 's':
         if (input[2] == 'f') {
           carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
-          dd.write_drive_direction(DRIVE_DIRECTION::FORWARD);
         } else if (input[2] == 'b') {
           carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
-          dd.write_drive_direction(DRIVE_DIRECTION::BACKWARD);
         } else {
           carState.Speed.set(atoi(&input[1]));
-          dd.write_speed();
         }
         break;
       case 'b':
-        dd.write_bat(atof(&input[1]));
+        carState.BatteryVoltage.set(atof(&input[1]));
+        break;
+      case 'B':
+        carState.BatteryCurrent.set(atof(&input[1]));
         break;
       case 'p':
-        dd.write_pv(atof(&input[1]));
+        carState.PhotoVoltaicCurrent.set(atof(&input[1]));
         break;
       case 'm':
-        dd.write_motor(atof(&input[1]));
+        carState.MotorCurrent.set(atof(&input[1]));
         break;
       case 'a':
         accValue = atoi(&input[1]);
-        dd.write_acceleration(accValue);
+        carState.Acceleration.set(accValue);
         // TODO: where to put in this important
         if (accValue > 0) {
           dac.set_pot(accValue, DAC::POT_CHAN0);
@@ -143,26 +161,28 @@ void CmdHandler::task() {
       case 'u':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          dd.arrow_increase(false);
+          driverDisplay.arrow_increase(false);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          dd.arrow_increase(true);
+          driverDisplay.arrow_increase(true);
         }
         break;
       case 'd':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          dd.arrow_decrease(false);
+          driverDisplay.arrow_decrease(false);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          dd.arrow_decrease(true);
+          driverDisplay.arrow_decrease(true);
         }
         break;
       case ':':
-        dd.write_driver_info(&input[1], INFO_TYPE::INFO);
+        carState.DriverInfoType.set(INFO_TYPE::INFO);
+        carState.DriverInfo.set(&input[1]);
         break;
       case '!':
-        dd.write_driver_info(&input[1], INFO_TYPE::WARN);
+        carState.DriverInfoType.set(INFO_TYPE::WARN);
+        carState.DriverInfo.set(&input[1]);
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -175,24 +195,42 @@ void CmdHandler::task() {
         indicator.setIndicator(INDICATOR::WARN);
         break;
       case 'l':
-        dd.light1OnOff();
+        if (input[1] == '-') {
+          carState.Light.set(LIGHT::OFF);
+        } else {
+          carState.Light.set(LIGHT::L1);
+        }
+        driverDisplay.show_light();
         break;
       case 'L':
-        dd.light2OnOff();
+        if (input[1] == '-') {
+          carState.Light.set(LIGHT::OFF);
+        } else {
+          carState.Light.set(LIGHT::L2);
+        }
+        driverDisplay.show_light();
         break;
       case 'c':
         if (input[2] == 's') {
-          dd.constant_drive_mode_set(CONSTANT_MODE::SPEED);
-          dd.constant_drive_mode_show();
+          carState.ConstantMode.set(CONSTANT_MODE::SPEED);
         } else if (input[2] == 'p') {
-          dd.constant_drive_mode_set(CONSTANT_MODE::POWER);
-          dd.constant_drive_mode_show();
+          carState.ConstantMode.set(CONSTANT_MODE::POWER);
+        } else if (input[2] == 'c') {
+          carState.ConstantMode.set(CONSTANT_MODE::NONE);
         } else {
-          dd.constant_drive_mode_set(CONSTANT_MODE::NONE);
-          dd.constant_drive_mode_show();
+          carState.ConstantModeOn.set(false);
         }
+        driverDisplay.constant_drive_mode_show();
         break;
-      // usage
+      case 'i':
+        ioExt.readAll();
+        break;
+      case 'I':
+        i2cBus.scan_i2c_devices();
+        break; // usage
+      case 'r':
+        ioExt.readAll();
+        break;
       default:
         printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
         break;

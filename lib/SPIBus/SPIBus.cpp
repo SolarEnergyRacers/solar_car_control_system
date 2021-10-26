@@ -14,7 +14,7 @@
 void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
-  // printf("    Init 'SPI bus' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);
+  printf("[?] Init 'SPI bus' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);
 
   // init mutex (it is acquired)
   mutex = xSemaphoreCreateBinary();
@@ -28,5 +28,5 @@ void SPIBus::init(void) {
   xSemaphoreGive(mutex);
   // // CRITICAL SECTION SPI: end
 
-  // printf("[v] SPI inited.\n");
+  printf("[v] SPI inited.\n");
 }

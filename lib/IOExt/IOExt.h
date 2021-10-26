@@ -2,8 +2,8 @@
  * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
  */
 
-#ifndef SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
-#define SOLAR_CAR_CONTROL_SYSTEM_IOEXT_H
+#ifndef SER_IOEXT_H
+#define SER_IOEXT_H
 
 #include <list>
 #include <map>
@@ -40,7 +40,7 @@
 #define PinIndicatorLeft "IndicatorLeft"
 #define PinIndicatorRight "IndicatorRight"
 #define PinLight "Light"
-#define PinDriveLight "DriveLight"
+#define PinHeadLight "HeadLight"
 #define PinConstantMode "ConstantMode"
 #define PinConstantSet "ConstantSet"
 #define PinHorn "Horn"
@@ -67,7 +67,7 @@ void indicatorHandler();
 void hornHandler();
 void nextScreenHandler();
 void lightHandler();
-void driveLightHandler();
+void headLightHandler();
 void constantModeHandler();
 void constantSetHandler();
 // end pin handler
@@ -83,13 +83,15 @@ public:
   void exit(void);
   void task(void);
 
+  void setPort(int port, bool value);
+  int getPort(int port);
+
   static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
   static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
+  void readAll();
 
 private:
-  void setMode(int port, uint8_t mode);
-  void set(int port, bool value);
-  int get(int port);
+  void setPortMode(int port, uint8_t mode);
   void getAll(CarStatePin *pins, int maxCount);
   PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
       PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
@@ -102,4 +104,4 @@ private:
   static volatile bool ioInterruptRequest;
   void handleIoInterrupt();
 };
-#endif // SOLAR_CAR_CONTROL_SYSTEM_ IOEXT_H
+#endif // SER_IOEXT_H

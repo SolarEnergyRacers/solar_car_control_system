@@ -83,7 +83,7 @@ public:
     uint16_t w, h;
     vWidth = atoi(Format.substr(1, 1).c_str()) * TextSize * 6 + 2;
     debug_printf_l2("%s -- vFormat %s (%s): %dc --> %dpx\n", Label.c_str(), Format.c_str(), Format.substr(1, 1).c_str(),
-                 atoi(Format.substr(1, 1).c_str()), vWidth);
+                    atoi(Format.substr(1, 1).c_str()), vWidth);
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     tft.setTextSize(TextSize);
     tft.setTextColor(TextColor);

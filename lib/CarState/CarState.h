@@ -12,7 +12,6 @@
 
 #include <CarStatePin.h>
 #include <CarStateValue.h>
-
 #include <definitions.h>
 
 using namespace std;

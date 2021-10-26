@@ -1,5 +1,5 @@
 //
-// Display
+// EngineeringDisplay
 //
 
 #include <LocalFunctionsAndDevices.h>

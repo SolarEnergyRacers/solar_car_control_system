@@ -240,7 +240,7 @@ void CmdHandler::task() {
       }
     }
     // sleep for sleep_polling_ms
-    this->sleep(200);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
 

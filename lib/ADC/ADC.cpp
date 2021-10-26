@@ -68,12 +68,17 @@ int16_t ADC::read(ADC::Pin port) {
 
   int idx = port >> 4;
   int pin = port & 0xf;
-  debug_printf_l2("index: 0x%x, pin: 0x%x \n", idx, pin);
+  debug_printf_l3("index: 0x%x, pin: 0x%x \n", idx, pin);
 
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
   int16_t value = ADC::adss[idx].readADC(pin);
   xSemaphoreGive(i2cBus.mutex);
 
-  debug_printf_l2("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
+  debug_printf_l3("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
   return value;
 }
+  float ADC::get_multiplier(Pin port){
+    int devNr = port >> 4;
+    return adss[devNr].toVoltage(1);
+  }
+

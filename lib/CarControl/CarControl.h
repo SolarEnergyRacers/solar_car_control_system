@@ -36,8 +36,8 @@ public:
   void adjust_paddles_max();
 
 private:
-  int taskSleep = 150;
-
+  int sleep_polling_ms = 150;
+  
   const int MIN_ADJUST_GAP = 10; // 0...Gap units show 0 (real reachable null point)
   const int MAX_ADJUST_GAP = 10; // max ... max+Gap to avoid max higher then adjusted max
   const int SMOOTHING = 1;

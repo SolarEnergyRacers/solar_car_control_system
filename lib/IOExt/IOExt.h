@@ -91,6 +91,7 @@ public:
   void readAll();
 
 private:
+  uint32_t sleep_polling_ms = 50;
   void setPortMode(int port, uint8_t mode);
   void getAll(CarStatePin *pins, int maxCount);
   PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
@@ -99,7 +100,6 @@ private:
       PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
       PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler)};
   bool isInInterruptHandler = false;
-  int taskSleep = 50;
 
   static volatile bool ioInterruptRequest;
   void handleIoInterrupt();

@@ -25,8 +25,8 @@
 #define I2C_FREQ 100000 // 100kHz
 
 #define NUM_ADC_DEVICES 3
-#define I2C_ADDRESS_ADS1x15_0 0x48
-#define I2C_ADDRESS_ADS1x15_1 0x4A
+#define I2C_ADDRESS_ADS1x15_0 0x4A
+#define I2C_ADDRESS_ADS1x15_1 0x48
 #define I2C_ADDRESS_ADS1x15_2 0x4B
 
 #define PWM_NUM_PORTS 16
@@ -124,10 +124,10 @@
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 
-#define DEBUG3 true
+#define DEBUG3 false
 #define debug_printf_l3(fmt, ...)                                                                                                          \
   do {                                                                                                                                     \
-    if (DEBUG2)                                                                                                                            \
+    if (DEBUG3)                                                                                                                            \
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 

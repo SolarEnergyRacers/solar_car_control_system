@@ -9,6 +9,7 @@
 
 class CmdHandler : public abstract_task {
 private:
+  uint32_t sleep_polling_ms = 200;
   string commands = "RECDS-=:!udsaAbBpm<>wlLciIr";
   string helpText = "Available commands (" + commands +
                     "):\n"

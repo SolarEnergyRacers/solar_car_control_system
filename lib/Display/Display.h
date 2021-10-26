@@ -43,7 +43,7 @@ class Display : public abstract_task {
 
 private:
   //==== Display definitions ==== START
-  uint32_t sleep_polling_ms = 1000;
+  uint32_t sleep_polling_ms = 50;
 
   //==== Display definitions ==== END
 

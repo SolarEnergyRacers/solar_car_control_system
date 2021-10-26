@@ -61,13 +61,19 @@ bool CarControl::read_pv_data() {
 }
 
 bool CarControl::read_speed() {
-
+  // native input
   xSemaphoreTake(carControl.mutex, portMAX_DELAY);
-
-  debug_printf_l2("???%s", "\n");
-
-  carState.Speed.set(adc.read(ADC::Pin::MOTOR_SPEED));
-  xSemaphoreGive(mutex);
+  int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
+  xSemaphoreGive(carControl.mutex);
+  // voltage
+  float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED);
+  // round per minute
+  float rpm = 370 * voltage;
+  // speed
+  float radius = 0.50; // m
+  float speed = 3.1415 * radius * rpm / 60 * 3.6;
+  carState.Speed.set((int)speed);
+  debug_printf_l3("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
   return carState.Speed.is_changed();
 }
 
@@ -216,16 +222,11 @@ void CarControl::task() {
   // polling loop
   while (1) {
     bool someThingChanged = false;
-    // someThingChanged |= read_paddles();
-    // someThingChanged |= read_motor_data();
-    // someThingChanged |= read_battery_data();
-    // someThingChanged |= read_pv_data();
-    // someThingChanged |= read_speed();
-
-    // int value = adc.read(ADC::Pin::MOTOR_CURRENT);
-    // if (abs(value - lastValue) > 10)
-    //   printf("ADC 0x%02x: %d\n", ADC::Pin::MOTOR_CURRENT & 0xff, value);
-    // printf("ADC 0x%02x: %d\n", ADC::Pin::BAT_CURRENT&0xff, adc.read(ADC::Pin::BAT_CURRENT));
+    someThingChanged |= read_paddles();
+    someThingChanged |= read_motor_data();
+    someThingChanged |= read_battery_data();
+    someThingChanged |= read_pv_data();
+    someThingChanged |= read_speed();
 
     // handle input interrupts
     // if ((someThingChanged || valueChangeRequest > 0) && !isInValueChangedHandler) {
@@ -235,6 +236,6 @@ void CarControl::task() {
     //   isInValueChangedHandler = false;
     // }
     // sleep
-    vTaskDelay(taskSleep / portTICK_PERIOD_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

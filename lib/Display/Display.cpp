@@ -443,7 +443,7 @@ void Display::task(void) {
     }
     lifeSignCounter++;
     // sleep for sleep_polling_ms
-    this->sleep(20);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
 

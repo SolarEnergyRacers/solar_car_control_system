@@ -39,7 +39,7 @@ public:
   void sleep(void);
   void sleep(int polling_ms);
 
-  void create_task(void);
+  void create_task(int priority = 1);
   static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };
 };
 

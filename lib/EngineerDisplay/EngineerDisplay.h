@@ -1,5 +1,5 @@
 //
-// Display
+// EngineeringDisplay
 //
 
 #ifndef SER_ENGINEER_DISPLAY_H

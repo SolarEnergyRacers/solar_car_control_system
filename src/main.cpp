@@ -65,7 +65,7 @@ using namespace std;
 
 ADC adc;
 CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
-CarSpeed carSpeed;
+CarSpeed carSpeed;[SDCard] Initialization faile
 CarState carState;
 CarControl carControl;
 CmdHandler cmdHandler;
@@ -116,14 +116,14 @@ void app_main(void) {
   // ---- init modules ----
   if (ENGINEER_DISPLAY_ON) {
     engineerDisplay.init();
-    engineerDisplay.create_task();
+    engineerDisplay.create_task(5);
     engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
     engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized, HALTED.\n");
     sleep(1);
   }
   if (DRIVER_DISPLAY_ON) {
     driverDisplay.init();
-    driverDisplay.create_task();
+    driverDisplay.create_task(5);
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
     driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized, CONSOLE.\n");
     sleep(1);

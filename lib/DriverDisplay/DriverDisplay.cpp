@@ -98,79 +98,79 @@ void DriverDisplay::speedCheck(int speed) {
 }
 
 // writes DriverDisplay::float value  in the range from -9999.9 to 9999.9
-float DriverDisplay::_write_float(int x, int y, float valueLast, float value, int textSize, int color) {
+// float DriverDisplay::_write_float(int x, int y, float valueLast, float value, int textSize, int color) {
 
-  if (value < -9999.9 || value > 9999.9) {
-    printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
-    return value;
-  }
-  int digitWidth = textSize * 6;
-  int digitHeight = textSize * 8;
-  // determine the sign of new and old value
-  char sign = value < 0 ? '-' : '+';
-  char signOld = valueLast < 0 ? '-' : '+';
-  // determine the four digits and one decimal of the new value
-  float val = abs(value);
-  int d1 = (int)val % 10;
-  int d2 = ((int)val / 10) % 10;
-  int d3 = ((int)val / 100) % 10;
-  int d4 = ((int)val / 1000) % 10;
-  int d0 = (val - (int)val) * 10;
-  // determine the four digits and one decimal of the stored, old value
-  float valOld = abs(valueLast);
-  int d1o = (int)valOld % 10;
-  int d2o = ((int)valOld / 10) % 10;
-  int d3o = ((int)valOld / 100) % 10;
-  int d4o = ((int)valOld / 1000) % 10;
-  int d0o = (valOld - (int)valOld) * 10;
+//   if (value < -9999.9 || value > 9999.9) {
+//     printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
+//     return value;
+//   }
+//   int digitWidth = textSize * 6;
+//   int digitHeight = textSize * 8;
+//   // determine the sign of new and old value
+//   char sign = value < 0 ? '-' : '+';
+//   char signOld = valueLast < 0 ? '-' : '+';
+//   // determine the four digits and one decimal of the new value
+//   float val = abs(value);
+//   int d1 = (int)val % 10;
+//   int d2 = ((int)val / 10) % 10;
+//   int d3 = ((int)val / 100) % 10;
+//   int d4 = ((int)val / 1000) % 10;
+//   int d0 = (val - (int)val) * 10;
+//   // determine the four digits and one decimal of the stored, old value
+//   float valOld = abs(valueLast);
+//   int d1o = (int)valOld % 10;
+//   int d2o = ((int)valOld / 10) % 10;
+//   int d3o = ((int)valOld / 100) % 10;
+//   int d4o = ((int)valOld / 1000) % 10;
+//   int d0o = (valOld - (int)valOld) * 10;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  tft.setTextSize(textSize);
-  tft.setTextColor(color);
-  tft.setCursor(x, y);
-  // if a change in the digit then replace the old with new value by
-  // first deleting the digit area and second write the new value
-  if (d0 != d0o) { // || d0o == 0) {
-    tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
-    tft.setCursor(x + (digitWidth + 1) * 5, y);
-    tft.printf(".%d", d0);
-  }
-  if (d1 != d1o || d1o == 0) {
-    tft.fillRect(x + (digitWidth + 1) * 4, y, digitWidth, digitHeight, bgColor);
-    tft.setCursor(x + (digitWidth + 1) * 4, y);
-    tft.print(d1);
-  }
-  if (d2 != d2o || d2o == 0) {
-    tft.fillRect(x + (digitWidth + 1) * 3, y, digitWidth, digitHeight, bgColor);
-    tft.setCursor(x + (digitWidth + 1) * 3, y);
-    if (abs(value) > 9) {
-      tft.print(d2);
-    }
-  }
-  if (d3 != d3o || d3o == 0) {
-    tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
-    tft.setCursor(x + (digitWidth + 1) * 2, y);
-    if (abs(value) > 99) {
-      tft.print(d3);
-    }
-  }
-  if (d4 != d4o || d4o == 0) {
-    tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
-    tft.setCursor(x + (digitWidth + 1) * 1, y);
-    if (abs(value) > 999) {
-      tft.print(d4);
-    }
-  }
-  if (sign != signOld) {
-    tft.fillRect(x, y, (digitWidth + 1), digitHeight, bgColor);
-    tft.setCursor(x, y);
-    tft.print(sign);
-  }
-  tft.setTextSize(1);
-  xSemaphoreGive(spiBus.mutex);
+//   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+//   tft.setTextSize(textSize);
+//   tft.setTextColor(color);
+//   tft.setCursor(x, y);
+//   // if a change in the digit then replace the old with new value by
+//   // first deleting the digit area and second write the new value
+//   if (d0 != d0o) { // || d0o == 0) {
+//     tft.fillRect(x + (digitWidth + 1) * 5, y, digitWidth * 2, digitHeight, bgColor);
+//     tft.setCursor(x + (digitWidth + 1) * 5, y);
+//     tft.printf(".%d", d0);
+//   }
+//   if (d1 != d1o || d1o == 0) {
+//     tft.fillRect(x + (digitWidth + 1) * 4, y, digitWidth, digitHeight, bgColor);
+//     tft.setCursor(x + (digitWidth + 1) * 4, y);
+//     tft.print(d1);
+//   }
+//   if (d2 != d2o || d2o == 0) {
+//     tft.fillRect(x + (digitWidth + 1) * 3, y, digitWidth, digitHeight, bgColor);
+//     tft.setCursor(x + (digitWidth + 1) * 3, y);
+//     if (abs(value) > 9) {
+//       tft.print(d2);
+//     }
+//   }
+//   if (d3 != d3o || d3o == 0) {
+//     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
+//     tft.setCursor(x + (digitWidth + 1) * 2, y);
+//     if (abs(value) > 99) {
+//       tft.print(d3);
+//     }
+//   }
+//   if (d4 != d4o || d4o == 0) {
+//     tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
+//     tft.setCursor(x + (digitWidth + 1) * 1, y);
+//     if (abs(value) > 999) {
+//       tft.print(d4);
+//     }
+//   }
+//   if (sign != signOld) {
+//     tft.fillRect(x, y, (digitWidth + 1), digitHeight, bgColor);
+//     tft.setCursor(x, y);
+//     tft.print(sign);
+//   }
+//   tft.setTextSize(1);
+//   xSemaphoreGive(spiBus.mutex);
 
-  return value;
-}
+//   return value;
+// }
 
 // writes integer value in the range from -99 to +99
 int DriverDisplay::_write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
@@ -297,22 +297,6 @@ void DriverDisplay::draw_acceleration_border(int color) {
 }
 
 void DriverDisplay::draw_display_background() {
-
-  // xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  // tft.setRotation(1);
-  // tft.setTextSize(2);
-  // tft.setTextColor(ILI9341_DARKGREEN);
-  // tft.setCursor(batFrameX, batFrameY);
-  // tft.print("  Bat(V):");
-
-  // tft.setCursor(pvFrameX, pvFrameY);
-  // tft.print("   PV(A):");
-
-  // tft.setCursor(motorFrameX, motorFrameY);
-  // tft.print("Motor(A):");
-  // tft.setTextSize(1);
-  // xSemaphoreGive(spiBus.mutex);
-
   infoFrameSizeX = tft.width();
   speedFrameX = (tft.width() - speedFrameSizeX) / 2;
 

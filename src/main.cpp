@@ -35,7 +35,6 @@
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
 #include <IOExt.h>
-#include <IOExt2.h>
 #include <Indicator.h>
 #include <OneWireBus.h>
 #include <PWM.h>

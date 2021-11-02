@@ -4,6 +4,7 @@
 
 #include <definitions.h>
 
+#include <DriverDisplay.h>
 #include <ESP32Time.h>
 #include <I2CBus.h>
 #include <RTC.h>
@@ -12,6 +13,7 @@
 
 extern ESP32Time esp32time;
 extern I2CBus i2cBus;
+extern DriverDisplay driverDisplay;
 
 void RTC::re_init() { init(); }
 
@@ -20,54 +22,54 @@ void RTC::exit() {
 }
 
 void RTC::init(void) {
-
+  char msg[100];
+  printf("[?] Init 'RTC'...\n");
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  printf("[RTC] Compile date/time: %02u/%02u/%04u %02u:%02u:%02u\n", compiled.Month(), compiled.Day(), compiled.Year(), compiled.Hour(),
-         compiled.Minute(), compiled.Second());
+  printf("    [INFO] rtc compile date/time: %02u/%02u/%04u %02u:%02u:%02u\n", compiled.Month(), compiled.Day(), compiled.Year(),
+         compiled.Hour(), compiled.Minute(), compiled.Second());
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
   Rtc.Begin();
 
   // check validity and possibly update time
   if (!Rtc.IsDateTimeValid()) {
     // check & report error
     if (Rtc.LastError() != 0) {
-      printf("[RTC] communication error %d\n", Rtc.LastError());
+      printf("    [INFO] rtc Communication error %d\n", Rtc.LastError());
     } else {
       // Common Causes:
       //    1) first time you ran and the device wasn't running yet
       //    2) the battery on the device is low or even missing
-      printf("[RTC] lost confidence. Set datetime to compile time of this "
-             "binary.\n");
+      printf("    [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n");
       Rtc.SetDateTime(compiled);
     }
   }
 
   // start device
   if (!Rtc.GetIsRunning()) {
-    printf("[RTC] was not actively running, starting now\n");
+    printf("    [INFO] rtc was not actively running, starting now\n");
     Rtc.SetIsRunning(true);
   }
 
   // check time
   RtcDateTime now = Rtc.GetDateTime();
   if (now < compiled) {
-    printf("[RTC] rtc time older than compile time! Updating DateTime.\n");
+    printf("   [INFO] rtc time older than compile time! Updating DateTime.\n");
     Rtc.SetDateTime(compiled);
   } else if (now > compiled) {
-    printf("[RTC] rtc time newer than compile time.\n");
+    printf("   [INFO] rtc time newer than compile time.\n");
   } else if (now == compiled) {
-    printf("[RTC] rtc time equal to compile time.\n");
+    printf("   [INFO] rtc time equal to compile time.\n");
   }
 
   // set pin
   Rtc.SetSquareWavePin(DS1307SquareWaveOut_Low);
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
+  snprintf(msg, 100, "[v] Init 'RTC' inited\n");
+  printf(msg);
+  driverDisplay.print(msg);
 }
 
 RtcDateTime RTC::read_rtc_datetime(void) {

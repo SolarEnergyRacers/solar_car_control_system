@@ -35,6 +35,7 @@
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
 #include <IOExt.h>
+#include <IOExt2.h>
 #include <Indicator.h>
 #include <OneWireBus.h>
 #include <PWM.h>
@@ -65,13 +66,13 @@ using namespace std;
 
 ADC adc;
 CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
-CarSpeed carSpeed;[SDCard] Initialization faile
-CarState carState;
 CarControl carControl;
+CarSpeed carSpeed;
+CarState carState;
 CmdHandler cmdHandler;
 DAC dac;
-EngineerDisplay engineerDisplay;
 DriverDisplay driverDisplay;
+EngineerDisplay engineerDisplay;
 ESP32Time esp32time;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;

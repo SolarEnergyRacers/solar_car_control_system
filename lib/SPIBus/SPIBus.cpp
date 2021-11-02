@@ -11,6 +11,8 @@
 
 #include <SPIBus.h>
 
+extern SPIClass SPI;
+
 void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
@@ -20,10 +22,10 @@ void SPIBus::init(void) {
   mutex = xSemaphoreCreateBinary();
 
   // // initialize SPI:
-  // SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI);
-  // SPI.setDataMode(SPI_MODE0);           // configuration of SPI communication in mode
-  // SPI.setClockDivider(SPI_CLOCK_DIV16); // configuration of clock at 1MHz
-  // SPI.end();
+  SPI.begin(SPI_CLK, SPI_MISO, SPI_MOSI);
+  SPI.setDataMode(SPI_MODE0);           // configuration of SPI communication in mode
+  SPI.setClockDivider(SPI_CLOCK_DIV16); // configuration of clock at 1MHz
+  SPI.end();
 
   xSemaphoreGive(mutex);
   // // CRITICAL SECTION SPI: end

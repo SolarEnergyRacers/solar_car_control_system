@@ -1,5 +1,5 @@
 /*
- * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
+ * Car controll loops
  */
 
 #ifndef SER_CAR_CONTROL_H
@@ -9,6 +9,7 @@
 #include <map>
 #include <string>
 
+#include <MCP23017.h>
 #include <PCF8574.h>
 
 #include <abstract_task.h>
@@ -19,7 +20,7 @@ public:
   SemaphoreHandle_t mutex;
   static void valueChangedHandler() { valueChangeRequest++; };
 
-  string getName(void) { return "IOExt"; };
+  string getName(void) { return "CarControl"; };
 
   void init(void);
   void re_init(void);
@@ -37,7 +38,7 @@ public:
 
 private:
   int sleep_polling_ms = 150;
-  
+
   const int MIN_ADJUST_GAP = 10; // 0...Gap units show 0 (real reachable null point)
   const int MAX_ADJUST_GAP = 10; // max ... max+Gap to avoid max higher then adjusted max
   const int SMOOTHING = 1;
@@ -58,4 +59,4 @@ private:
 
   int _normalize(int value, int maxValue, int min, int max);
 };
-#endif // SER_CAR_CONTROL_H IOEXT_H
+#endif // SER_CAR_CONTROL_H

@@ -57,9 +57,9 @@ void ADC::init() {
     }
     xSemaphoreGive(i2cBus.mutex);
 
-    printf("[v] ADC[%d] initialized.\n", idx);
     char msg[100];
     snprintf(msg, 100, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
+    printf(msg);
     driverDisplay.print(msg);
   }
 }
@@ -77,8 +77,7 @@ int16_t ADC::read(ADC::Pin port) {
   debug_printf_l3("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
   return value;
 }
-  float ADC::get_multiplier(Pin port){
-    int devNr = port >> 4;
-    return adss[devNr].toVoltage(1);
-  }
-
+float ADC::get_multiplier(Pin port) {
+  int devNr = port >> 4;
+  return adss[devNr].toVoltage(1);
+}

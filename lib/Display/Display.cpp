@@ -39,7 +39,6 @@ extern CarState carState;
 // namespace Display {
 
 //==== Display definitions ==== START
-int bgColor = ILI9341_WHITE;
 // life sign for connection to microprocessor via rtx
 int lifeSignX = -1;
 int lifeSignY = -1;

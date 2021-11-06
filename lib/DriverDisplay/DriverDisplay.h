@@ -31,7 +31,6 @@ private:
 
   //==== Driver Display definitions ==== START
   // display formats and sizes
-  int bgColor = ILI9341_BLACK;
   int infoFrameX = 0;
   int infoFrameY = 0;
   int infoFrameSizeX = -1; // full tft width, calculated beow

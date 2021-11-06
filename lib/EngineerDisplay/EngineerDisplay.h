@@ -14,9 +14,7 @@
 class EngineerDisplay : public Display {
 private:
   //==== Driver Display definitions ==== START
-  // display formats and sizes
-  int bgColor = ILI9341_ORANGE;
-
+  
   // Stati [On/Off]
   DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 10, "Bat  :", "%3s", "", ILI9341_BLUE);
   DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(4, 30, "PV   :", "%3s", "", ILI9341_BLUE);

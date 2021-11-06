@@ -49,6 +49,7 @@ float motorLast = -1;
 
 DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
   printf("[?] Setup 'DriverDisplay'...\n");
+  bgColor = ILI9341_BLACK;
   int height = 0;
   int width = 0;
   try {
@@ -115,7 +116,7 @@ void DriverDisplay::draw_speed_border(int color) {
   xSemaphoreGive(spiBus.mutex);
 }
 
-// write color of the border of the speed display
+// write color of the border of the acceleration display
 void DriverDisplay::draw_acceleration_border(int color) {
   accFrameSizeX = speedFrameX - 3;
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);

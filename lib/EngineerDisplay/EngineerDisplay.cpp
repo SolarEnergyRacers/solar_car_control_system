@@ -22,6 +22,7 @@ extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
   printf("[?] Setup 'EngineerDisplay'...\n");
+  bgColor = ILI9341_ORANGE;
   int height = 0;
   int width = 0;
   try {

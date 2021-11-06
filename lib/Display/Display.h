@@ -54,6 +54,7 @@ private:
   void _setup(void);
 
 protected:
+  int bgColor = ILI9341_WHITE;
   Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
   volatile DISPLAY_STATUS status;
   bool _is_ready() {

@@ -3,7 +3,6 @@
 #define LocalFunctionsAndDevices_H
 
 #define ADC_ON true              // analog digital converte, I2C (ADS1015, ADS1115)
-#define BLINK_ON true            // blink microcontroller LED
 #define CAN_ON false             // CAN bus (MPPT, BMS, ..)
 #define CARCONTROL_ON true       // central car control task
 #define CARSPEED_ON false        // car pid speed controller
@@ -18,7 +17,7 @@
 #define IOEXT_ON true            // 8-Bit I/O Expander for I2C Bus (PCF8574)
 #define PWM_ON false             // 16-channel, 12-bit PWM Fm, I2C (PCA9685)
 #define RTC_ON true              // real time clock, I2C
-#define SD_ON true               // SD card
+#define SD_ON false               // SD card
 #define SERIAL_ON false          // write/read to/from console
 
 #define DEBUGLEVEL_VERBOSED true

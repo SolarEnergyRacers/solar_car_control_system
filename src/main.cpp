@@ -97,39 +97,28 @@ void app_main(void) {
   // init serial output for  console
 
   Serial.begin(115200);
-  delay(2000);
-  printf("\n--------------------\n");
-  printf("esp32dev + free RTOS\n");
-  printf("Solar Energy Car Races SER4, %s, %s\n", VERSION, VERSION_PUBLISHED);
-  printf("--------------------\n");
+  delay(1000);
+  cout << endl;
+  cout << "--------------------" << endl;
+  cout << "esp32dev + free RTOS" << endl;
+  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << endl;
+  cout << "--------------------" << endl;
 
   // report chip info
-  printf("-chip info -------------------\n");
+  cout << "-chip info -------------------" << endl;
   chip_info();
-  printf("-init bus systems ------------\n");
+  cout << "-init bus systems ------------" << endl;
   // init buses
   spiBus.init();
   oneWireBus.init();
   i2cBus.init();
-  printf("------------------------------\n");
+  cout << "------------------------------" << endl;
+
+  engineerDisplay.init();
+  engineerDisplay.clear_screen(ILI9341_WHITE);
+  engineerDisplay.print("[v] " + engineerDisplay.getName() + " task initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
 
   // ---- init modules ----
-  if (ENGINEER_DISPLAY_ON) {
-    engineerDisplay.init();
-    engineerDisplay.create_task(5);
-    engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-    engineerDisplay.print("[v] " + engineerDisplay.getName() + "task initialized, HALTED.\n");
-    sleep(1);
-  }
-  if (DRIVER_DISPLAY_ON) {
-    driverDisplay.init();
-    driverDisplay.create_task(5);
-    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
-    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized, CONSOLE.\n");
-    sleep(1);
-  }
-  if (BLINK_ON) {
-  }
   if (INDICATOR_ON) {
     indicator.init();
     indicator.setIndicator(INDICATOR::OFF);
@@ -173,18 +162,21 @@ void app_main(void) {
   }
 
   if (!startOk) {
-    printf("ERROR in init sequence(s). System halted!\n");
+    cout << "ERROR in init sequence(s). System halted!" << endl;
     exit(0);
   }
 
-  printf("\n-----------------------------------------------------------------\n");
-  printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
-  printf("-----------------------------------------------------------------\n");
+  engineerDisplay.print("Startup sequence(s) successful.\n");
+  engineerDisplay.print("System creating FreeRTOS tasks...\n");
+  cout << endl;
+  cout << "-----------------------------------------------------------------" << endl;
+  cout << "Startup sequence(s) successful. System creating FreeRTOS tasks..." << endl;
+  cout << "-----------------------------------------------------------------" << endl;
 
   // ---- create tasks ----
   if (INDICATOR_ON) {
     indicator.create_task();
-    driverDisplay.print("[v] " + indicator.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + indicator.getName() + " task initialized.\n");
   }
   if (DS_ON) {
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
@@ -194,21 +186,21 @@ void app_main(void) {
   }
   if (PWM_ON) {
     pwm.create_task();
-    driverDisplay.print("[v] " + pwm.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + pwm.getName() + " task initialized.\n");
   }
   if (RTC_ON) {
     RtcDateTime now = rtc.read_rtc_datetime();
     debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
                  now.Second());
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
-    driverDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
+    engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
   }
   if (SD_ON) {
     xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
     gpio.create_task();
-    driverDisplay.print("[v] " + gpio.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + gpio.getName() + " task initialized.\n");
   }
   if (IOEXT_ON) {
     ioExt.create_task();
@@ -217,7 +209,7 @@ void app_main(void) {
     carState.Indicator.set(INDICATOR::OFF);
     carState.ConstantModeOn.set(false);
     carState.Light.set(LIGHT::OFF);
-    driverDisplay.print("[v] " + ioExt.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
   }
   if (DAC_ON) {
     dac.init();
@@ -225,7 +217,7 @@ void app_main(void) {
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
-    driverDisplay.print("[v] " + cmdHandler.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
   if (SERIAL_ON) {
     printf(" - serial_demo_task\n");
@@ -237,18 +229,33 @@ void app_main(void) {
   }
   if (CARSPEED_ON) {
     carSpeed.create_task();
-    driverDisplay.print("[v] " + carSpeed.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
   }
   if (CARCONTROL_ON) {
     carControl.init();
     carControl.create_task();
-    driverDisplay.print("[v] " + carControl.getName() + "task initialized.\n");
+    engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");
+  }
+  //--let the bootscreen visible for a moment ------------------
+  int waitAtConsoleView = 5;
+  engineerDisplay.print("ready.\nWaiting for start of life display: ");
+  while (waitAtConsoleView-- > 0) {
+    engineerDisplay.print("-" + to_string(waitAtConsoleView));
+    sleep(1);
+  }
+  engineerDisplay.print(" start");
+  engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+  //------------------------------------------------------------
+  if (ENGINEER_DISPLAY_ON) {
+    engineerDisplay.create_task(4);
   }
   if (DRIVER_DISPLAY_ON) {
+    driverDisplay.init();
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
-    driverDisplay.print("[v] " + driverDisplay.getName() + "task initialized.\n");
-    driverDisplay.print("Startup sequence(s) successful.\nSystem creating FreeRTOS tasks...\n");
+    driverDisplay.create_task(5);
+    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << endl;
   }
+
   systemOk = true;
 
   cout << "-----------------------------------------------------------------" << endl;
@@ -256,5 +263,6 @@ void app_main(void) {
   cout << "-----------------------------------------------------------------" << endl;
   driverDisplay.print("FreeRTOS tasks created successfully. System running.");
   driverDisplay.print("ok.");
-  cout << endl << carState.print("Initial car state:") << endl;
+  cout << endl;
+  cout << carState.print("Initial car state:") << endl;
 }

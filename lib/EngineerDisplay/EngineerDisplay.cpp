@@ -24,21 +24,20 @@ DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
   printf("[?] Setup 'EngineerDisplay'...\n");
   int height = 0;
   int width = 0;
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   try {
+    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     height = tft.height();
     width = tft.width();
     tft.setRotation(1);
     tft.setTextSize(1);
     tft.setTextColor(ILI9341_DARKGREEN);
     tft.setScrollMargins(10, width - 20);
-
+    xSemaphoreGive(spiBus.mutex);
   } catch (__exception ex) {
     xSemaphoreGive(spiBus.mutex);
     printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
     throw ex;
   }
-  xSemaphoreGive(spiBus.mutex);
   printf("[v] EngineerDisplay inited: screen ILI9341 with %d x %d.\n", height, width);
   return DISPLAY_STATUS::BACKGROUNDENGINEER;
 }
@@ -73,7 +72,7 @@ void EngineerDisplay::draw_display_background() {
   xSemaphoreGive(spiBus.mutex);
 }
 
-void EngineerDisplay::print(string msg) { Display::print(msg); }
+// void EngineerDisplay::print(string msg) { Display::print(msg); }
 
 DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
   // printf("EngineerDisplay, status: %s\n", DISPLAY_STATUS_str[(int)status]);
@@ -91,37 +90,36 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
     break;
   // working state:
   case DISPLAY_STATUS::ENGINEER:
-    if (lifeSignCounter > 10) {
-      BatteryOn.Value = carState.BatteryOn.get();
-      PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
-      MotorOn.Value = carState.MotorOn.get();
-      BatteryVoltage.Value = carState.BatteryVoltage.get();
-      BatteryCurrent.Value = carState.BatteryCurrent.get();
+    BatteryOn.Value = carState.BatteryOn.get();
+    PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
+    MotorOn.Value = carState.MotorOn.get();
+    BatteryVoltage.Value = carState.BatteryVoltage.get();
+    BatteryCurrent.Value = carState.BatteryCurrent.get();
 
-      BatteryOn.showValue(tft);
-      PhotoVoltaicOn.showValue(tft);
-      MotorOn.showValue(tft);
+    BatteryOn.showValue(tft);
+    PhotoVoltaicOn.showValue(tft);
+    MotorOn.showValue(tft);
 
-      Mppt1.showValue(tft);
-      Mppt2.showValue(tft);
-      Mppt3.showValue(tft);
-      Mppt4.showValue(tft);
+    Mppt1.showValue(tft);
+    Mppt2.showValue(tft);
+    Mppt3.showValue(tft);
+    Mppt4.showValue(tft);
 
-      BatteryStatus.showValue(tft);
-      BmsStatus.showValue(tft);
+    BatteryStatus.showValue(tft);
+    BmsStatus.showValue(tft);
 
-      BatteryCurrent.showValue(tft);
-      BatteryVoltage.showValue(tft);
-      VoltageAvg.showValue(tft);
-      VoltageMin.showValue(tft);
-      VoltageMax.showValue(tft);
+    BatteryCurrent.showValue(tft);
+    BatteryVoltage.showValue(tft);
+    VoltageAvg.showValue(tft);
+    VoltageMin.showValue(tft);
+    VoltageMax.showValue(tft);
 
-      Temperature1.showValue(tft);
-      Temperature2.showValue(tft);
-      Temperature3.showValue(tft);
-      Temperature4.showValue(tft);
-      TemperatureMax.showValue(tft);
-    }
+    Temperature1.showValue(tft);
+    Temperature2.showValue(tft);
+    Temperature3.showValue(tft);
+    Temperature4.showValue(tft);
+    TemperatureMax.showValue(tft);
+    break;
   default:
     // ignore others
     break;

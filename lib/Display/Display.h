@@ -56,11 +56,14 @@ private:
 protected:
   Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
   volatile DISPLAY_STATUS status;
-  void print(string msg);
+  bool _is_ready() {
+    bool isReady = (status == DISPLAY_STATUS::CONSOLE || status == DISPLAY_STATUS::DRIVER || status == DISPLAY_STATUS::ENGINEER);
+    return isReady;
+  }
 
 public:
-  virtual ~Display() {}
-  Display() {}
+  virtual ~Display() {tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);}
+  Display() { status = DISPLAY_STATUS::HALTED; }
 
   // RTOS task
   void init(void);
@@ -68,7 +71,9 @@ public:
   void exit(void);
   void set_DisplayStatus(DISPLAY_STATUS theNewStatus) { status = theNewStatus; };
   DISPLAY_STATUS get_DisplayStatus() { return status; };
+  char * get_DisplayStatus_text() { return (char *)DISPLAY_STATUS_str[(int)status]; };
 
+  void print(string msg);
   void clear_screen(int bgColor);
   int getPixelWidthOfTexts(int textSize, string t1, string t2);
 

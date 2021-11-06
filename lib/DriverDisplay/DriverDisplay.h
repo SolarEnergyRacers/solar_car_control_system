@@ -106,17 +106,11 @@ public:
   DriverDisplay() {}
 
 private:
-  //uint32_t sleep_polling_ms = 1000;
-  //float _write_float(int x, int y, float valueLast, float value, int textSize, int color);
-  int _write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color);
-  int _write_nat_999(int x, int y, int valueLast, int value, int textSize, int color);
   void _arrow_increase(int color);
   void _arrow_decrease(int color);
   // void _light1(bool lightOn);
   // void _light2(bool lightOn);
   void _hide_light();
-  void _drawCentreString(const string &buf, int x, int y);
-  int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int color);
   void _turn_Right(int color);
   bool init_driver_display(void);
@@ -128,8 +122,6 @@ public:
   DISPLAY_STATUS display_setup(DISPLAY_STATUS status) override;
   DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
   //==== overwrites from base class ==== END
-
-  void print(string msg);
 
   // public functions
   void draw_display_border(int color);

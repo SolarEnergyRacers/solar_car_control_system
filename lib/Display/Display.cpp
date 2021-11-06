@@ -57,7 +57,6 @@ void Display::init() {
   abstract_task::init();
   printf("\n");
   re_init();
-  status = DISPLAY_STATUS::CONSOLE;
 }
 
 void Display::re_init(void) {
@@ -65,12 +64,15 @@ void Display::re_init(void) {
   vTaskResume(getHandle());
 #endif
   _setup();
-  status = DISPLAY_STATUS::CONSOLE;
+}
+
+void debugMsg(char *msg) {
+  printf("%s\n", msg);
+  sleep(1);
 }
 
 void Display::_setup() {
   printf("    Setup 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
-  status = DISPLAY_STATUS::CONSOLE;
   int height = 0;
   int width = 0;
   try {
@@ -81,7 +83,6 @@ void Display::_setup() {
     width = tft.width();
     tft.setRotation(1);
     tft.setTextSize(1);
-    tft.fillScreen(ILI9341_WHITE);
     tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(0, height);
     uint8_t rdmode = tft.readcommand8(ILI9341_RDMODE);
@@ -103,6 +104,7 @@ void Display::_setup() {
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
+  status = DISPLAY_STATUS::CONSOLE;
   printf("[v] Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", height, width, DISPLAY_STATUS_str[(int)status]);
 }
 
@@ -121,6 +123,8 @@ int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
 }
 
 void Display::print(string msg) {
+  if (!_is_ready())
+    return;
   if (status == DISPLAY_STATUS::CONSOLE) {
     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     tft.setTextSize(1);
@@ -131,6 +135,7 @@ void Display::print(string msg) {
 
 //------------------------------------------------------------------------
 void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.writeCommand(ILI9341_VSCRDEF); // Vertical scroll definition
   tft.write(TFA >> 8);
   tft.write(TFA);
@@ -138,9 +143,12 @@ void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
   tft.write(320 - TFA - BFA);
   tft.write(BFA >> 8);
   tft.write(BFA);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 int Display::scroll(int lines) {
+  if (!_is_ready())
+    return 0;
   int TEXT_HEIGHT = 8;    // Height of text to be printed and scrolled
   int BOT_FIXED_AREA = 0; // Number of lines in bottom fixed area (lines counted from bottom of screen)
   int TOP_FIXED_AREA = 0;
@@ -158,9 +166,13 @@ int Display::scroll(int lines) {
 }
 
 void Display::scrollAddress(uint16_t VSP) {
+  if (!_is_ready())
+    return;
+  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
   tft.write(VSP >> 8);
   tft.write(VSP);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 //________________________________________________________________________
@@ -169,7 +181,8 @@ void exit(void) {}
 
 // writes Display::float value  in the range from -9999.9 to 9999.9
 float Display::write_float(int x, int y, float valueLast, float value, int textSize, int color) {
-
+  if (!_is_ready())
+    return value;
   if (value < -9999.9 || value > 9999.9) {
     printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
     return value;
@@ -195,7 +208,6 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
   int d0o = (valOld - (int)valOld) * 10;
 
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
@@ -245,8 +257,10 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
 
 // writes integer value in the range from -99 to +99
 int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
+  if (!_is_ready())
+    return value;
   if (value < -99 || value > 999) {
-    printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'", value);
+    printf("ERROR: call write_ganz_99 with a value outside the range: '%d'", value);
     return value;
   }
   // determine the sign of new and old value
@@ -298,6 +312,8 @@ int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize,
 
 // writes integer value in the range from 0 to 999
 int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
+  if (!_is_ready())
+    return value;
   if (value < 0 || value > 999) {
     printf("ERROR: call _write_nat_999 with a value outside the range: '%d'", value);
     return value;
@@ -345,6 +361,8 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
   return value;
 }
 void Display::lifeSign() {
+  if (!_is_ready())
+    return;
   xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
   tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : ILI9341_GREEN);
   xSemaphoreGive(spiBus.mutex);
@@ -353,6 +371,8 @@ void Display::lifeSign() {
 }
 
 void Display::drawCentreString(const string &buf, int x, int y) {
+  if (!_is_ready())
+    return;
   // xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
 
   // int16_t x1, y1;

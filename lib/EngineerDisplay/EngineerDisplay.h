@@ -59,7 +59,6 @@ public:
   DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
   //==== overwrites from base class ==== END
 
-  void print(string msg);
   void draw_display_background();
 };
 

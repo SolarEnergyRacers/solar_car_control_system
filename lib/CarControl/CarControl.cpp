@@ -44,19 +44,19 @@ void CarControl::_handleValueChanged() {
 }
 
 bool CarControl::read_battery_data() {
-  carState.BatteryVoltage.set(adc.read(ADC::Pin::BAT_VOLTAGE));
-  carState.BatteryCurrent.set(adc.read(ADC::Pin::BAT_CURRENT));
+  carState.BatteryVoltage.set(adc.read(ADC::Pin::BAT_VOLTAGE)/100.); //TODO
+  carState.BatteryCurrent.set(adc.read(ADC::Pin::BAT_CURRENT)/1000.); //TODO
   return carState.BatteryVoltage.is_changed() | carState.BatteryCurrent.is_changed();
 }
 
 bool CarControl::read_motor_data() {
-  carState.MotorVoltage.set(adc.read(ADC::Pin::MOTOR_VOLTAGE));
-  carState.MotorCurrent.set(adc.read(ADC::Pin::MOTOR_CURRENT));
+  carState.MotorVoltage.set(adc.read(ADC::Pin::MOTOR_VOLTAGE)/100.); //TODO
+  carState.MotorCurrent.set(adc.read(ADC::Pin::MOTOR_CURRENT)/1000.); //TODO
   return carState.MotorVoltage.is_changed() || carState.MotorCurrent.is_changed();
 }
 
 bool CarControl::read_pv_data() {
-  carState.PhotoVoltaicCurrent.set(adc.read(ADC::Pin::PV_CURRENT));
+  carState.PhotoVoltaicCurrent.set(adc.read(ADC::Pin::PV_CURRENT)/100.); //TODO
   return carState.PhotoVoltaicCurrent.is_changed();
 }
 

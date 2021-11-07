@@ -32,7 +32,8 @@ CANPacket CANRxBuffer::pop(){
             this->tail = 0;
         }
     }else{
-        packet = *new CANPacket();
+        packet.setID(0);
+        packet.setData((uint64_t)0);
     }
 
     return packet;

@@ -17,6 +17,15 @@ void onReceiveForwarder(int packetSize){
   can.onReceive(packetSize);
 }
 
+/*void can_task(void *pvParameter){
+  can.task();
+}*/
+
+string CANBus::getName(){
+  return "CAN_Task";
+}
+
+
 void CANBus::re_init() { 
   CAN.end();
   CANBus::init(); 
@@ -35,37 +44,52 @@ void CANBus::init() {
   xSemaphoreGive(mutex);
 }
 
+void CANBus::exit(){
+  // Exit needs to be implemented for Task, here or in abstract_task
+  CAN.end();
+}
+
+void CANBus::task(){
+  CANPacket packet;
+
+  while(1){
+
+    while(this->rxBuffer.isAvailable()){
+      packet = this->rxBuffer.pop();
+
+      
+      //Do something with packet
+
+      /*if(packet.getID() == 0x700){
+        printf("Received Packet:\n");
+        printf("id: %02x \n", packet.getID());
+        printf("data: %llu \n", packet.getData_ui64());
+        printf("data 0: %02x \n", packet.getData_ui32(0));
+        printf("data 1: %02x \n\n", packet.getData_ui32(1));
+      }*/
+    }
+    this->sleep(50);
+  }
+}
 
 void CANBus::onReceive(int packetSize){
 
   CANPacket packet;
   uint64_t rxData = 0;
 
+  //ToDo implement Semaphore
+
   packet.setID(CAN.packetId());
 
   for(int i = 0; i < packetSize; i++){
     if(CAN.available()){
-      rxData = rxData | (((uint8_t) CAN.read()) << (i * 8));
+      rxData = rxData | (((uint64_t) CAN.read()) << (i * 8));
     }
   }
+
 
   packet.setData(rxData);
 
   //Add packet to buffer so task can handle it later
   rxBuffer.push(packet);
-}
-
-
-
-void read_can_demo_task(void *pvParameter) {
-  /*  //Check if packet is relevant for board computer
-  switch(packet.getID()){
-    case BMS_BASE_ADDR | 0xFB:
-      //Battery Pack Status
-      break;
-    case BMS_BASE_ADDR | 0xF1:
-      break;
-    default:
-      break;
-  }*/
 }

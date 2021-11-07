@@ -217,7 +217,7 @@ void app_main(void) {
   }
   if (CAN_ON) {
     cout << " - read_can_demo_task" << endl;
-    xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    can.create_task();
   }
   if (CARSPEED_ON) {
     carSpeed.create_task();

@@ -213,8 +213,8 @@ void app_main(void) {
     // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
-    printf(" - read_can_demo_task\n");
-    xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    printf(" - can_task\n");
+    can.create_task();
   }
 
   systemOk = true;

@@ -40,3 +40,5 @@ void abstract_task::exit() {
 };
 
 string abstract_task::getInfo() { return getName(); }
+
+void abstract_task::set_SleepTime(int milliseconds) { sleep_polling_ms = milliseconds; }

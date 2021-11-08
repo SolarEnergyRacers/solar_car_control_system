@@ -21,40 +21,36 @@ extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
-  printf("[?] Setup 'EngineerDisplay'...\n");
-  bgColor = ILI9341_ORANGE;
-  int height = 0;
-  int width = 0;
-  try {
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-    height = tft.height();
-    width = tft.width();
-    tft.setRotation(1);
-    tft.setTextSize(1);
-    tft.setTextColor(ILI9341_DARKGREEN);
-    tft.setScrollMargins(10, width - 20);
-    xSemaphoreGive(spiBus.mutex);
-  } catch (__exception ex) {
-    xSemaphoreGive(spiBus.mutex);
-    printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
-    throw ex;
-  }
-  printf("[v] EngineerDisplay inited: screen ILI9341 with %d x %d.\n", height, width);
+  // printf("[?] Setup 'EngineerDisplay'...\n");
+  // bgColor = ILI9341_ORANGE;
+  // int height = 0;
+  // int width = 0;
+  // try {
+  //   // xSemaphoreTakeT(spiBus.mutex);
+  //   // height = tft.height();
+  //   // width = tft.width();
+  //   // tft.setRotation(1);
+  //   // tft.setTextSize(1);
+  //   // tft.setTextColor(ILI9341_DARKGREEN);
+  //   // tft.setScrollMargins(10, width - 20);
+  //   // xSemaphoreGive(spiBus.mutex);
+  // } catch (__exception ex) {
+  //   xSemaphoreGive(spiBus.mutex);
+  //   printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
+  //   throw ex;
+  // }
+  printf("[v] %s inited: screen ILI9341 with %d x %d.\n", getName().c_str(), height, width);
   return DISPLAY_STATUS::BACKGROUNDENGINEER;
 }
 
 void EngineerDisplay::draw_display_background() {
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  tft.setRotation(1);
-  xSemaphoreGive(spiBus.mutex);
-
   PhotoVoltaicOn.showLabel(tft);
   MotorOn.showLabel(tft);
   BatteryOn.showLabel(tft);
   Mppt1.showLabel(tft);
   Mppt2.showLabel(tft);
   Mppt3.showLabel(tft);
-  Mppt4.showLabel(tft);
+  // Mppt4.showLabel(tft);
   BatteryStatus.showLabel(tft);
   BmsStatus.showLabel(tft);
   Temperature1.showLabel(tft);
@@ -67,16 +63,11 @@ void EngineerDisplay::draw_display_background() {
   VoltageAvg.showLabel(tft);
   VoltageMin.showLabel(tft);
   VoltageMax.showLabel(tft);
-
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-  tft.setTextSize(1);
-  xSemaphoreGive(spiBus.mutex);
 }
 
 // void EngineerDisplay::print(string msg) { Display::print(msg); }
 
 DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
-  // printf("EngineerDisplay, status: %s\n", DISPLAY_STATUS_str[(int)status]);
   switch (status) {
     // initializing states:
   case DISPLAY_STATUS::SETUPENGINEER:
@@ -87,6 +78,7 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
   case DISPLAY_STATUS::BACKGROUNDENGINEER:
     clear_screen(bgColor);
     draw_display_background();
+    set_SleepTime(500);
     status = DISPLAY_STATUS::ENGINEER;
     break;
   // working state:
@@ -104,7 +96,7 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
     Mppt1.showValue(tft);
     Mppt2.showValue(tft);
     Mppt3.showValue(tft);
-    Mppt4.showValue(tft);
+    // Mppt4.showValue(tft);
 
     BatteryStatus.showValue(tft);
     BmsStatus.showValue(tft);

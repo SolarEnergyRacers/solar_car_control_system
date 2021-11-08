@@ -13,7 +13,7 @@ void read_can_demo_task(void *pvParameter);
 class CanBus {
 private:
 public:
-  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t mutex = NULL;
   CAN_device_t cfg;
   void init();
   void re_init();

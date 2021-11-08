@@ -6,6 +6,7 @@
 
 #include <DriverDisplay.h>
 #include <ESP32Time.h>
+#include <Helper.h>
 #include <I2CBus.h>
 #include <RTC.h>
 #include <RtcDS1307.h>
@@ -14,6 +15,9 @@
 extern ESP32Time esp32time;
 extern I2CBus i2cBus;
 extern DriverDisplay driverDisplay;
+
+// ------------------
+// FreeRTOS functions
 
 void RTC::re_init() { init(); }
 
@@ -29,7 +33,7 @@ void RTC::init(void) {
   printf("    [INFO] rtc compile date/time: %02u/%02u/%04u %02u:%02u:%02u\n", compiled.Month(), compiled.Day(), compiled.Year(),
          compiled.Hour(), compiled.Minute(), compiled.Second());
 
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(i2cBus.mutex);
   Rtc.Begin();
 
   // check validity and possibly update time
@@ -45,6 +49,7 @@ void RTC::init(void) {
       Rtc.SetDateTime(compiled);
     }
   }
+  // ------------------
 
   // start device
   if (!Rtc.GetIsRunning()) {
@@ -67,16 +72,16 @@ void RTC::init(void) {
   Rtc.SetSquareWavePin(DS1307SquareWaveOut_Low);
 
   xSemaphoreGive(i2cBus.mutex);
+
+  set_SleepTime(1000);
   snprintf(msg, 100, "[v] Init 'RTC' inited\n");
   printf(msg);
   driverDisplay.print(msg);
 }
 
 RtcDateTime RTC::read_rtc_datetime(void) {
-
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
+  RtcDateTime now;
+  xSemaphoreTakeT(i2cBus.mutex);
   // check connection & confidence
   if (!Rtc.IsDateTimeValid()) {
     if (Rtc.LastError() != 0) {
@@ -89,12 +94,10 @@ RtcDateTime RTC::read_rtc_datetime(void) {
       printf("[RTC] lost confidence in the datetime\n");
     }
   }
-
   // get datetime
-  RtcDateTime now = Rtc.GetDateTime();
+  now = Rtc.GetDateTime();
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
 
   return now;
 }
@@ -110,6 +113,6 @@ void RTC::task() {
     // setTime(30, 24, 15, 17, 1, 2021); // 17th Jan 2021 15:24:30
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year()); // 17th Jan 2021 15:24:30
     // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

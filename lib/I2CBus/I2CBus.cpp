@@ -14,16 +14,12 @@
 void I2CBus::re_init() { init(); }
 
 void I2CBus::init(void) {
+  printf("[?] Init 'i2c bus'\n");
 
-  // CRITICAL SECTION I2C: start
-  // init mutex (it is acquired)
-  mutex = xSemaphoreCreateBinary();
-
+  mutex = xSemaphoreCreateMutex();
   // init i2c wire library
   Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
-
   xSemaphoreGive(mutex);
-  // CRITICAL SECTION I2C: end
 
   printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA, I2C_SCL, I2C_FREQ);
   scan_i2c_devices();
@@ -34,16 +30,12 @@ bool I2CBus::i2c_available(uint8_t adr) {
   uint32_t timeout = millis();
   bool ready = false;
 
-  // CRITICAL SECTION I2C: start
   xSemaphoreTake(mutex, portMAX_DELAY);
-
   while ((millis() - timeout < 100) && (!ready)) {
     Wire.beginTransmission(adr);
     ready = (Wire.endTransmission() == 0);
   }
-
   xSemaphoreGive(mutex);
-  // CRITICAL SECTION I2C: end
 
   return ready;
 }

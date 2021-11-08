@@ -22,6 +22,7 @@ static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
 static const char *BOOL_str[] = {"false", "true"};
 static const char *LIGHT_str[] = {"off", "L1", "L2"};
 static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
+static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
 
 const string CarState::print(string msg, bool withColors) {
   time_t theTime = time(NULL);
@@ -54,6 +55,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Target Power .......... " << TargetPower.get() << endl;
   ss << "Info Last ............. "
      << "[" << INFO_TYPE_str[(int)DriverInfoType.get()] << "] " << DriverInfo.get() << endl;
+  ss << "Spped Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow.get()] << "]" << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light.get())] << endl;
   ss << "IO ....................." << printIOs("", false);
   ss << "===========================================================================================" << endl;

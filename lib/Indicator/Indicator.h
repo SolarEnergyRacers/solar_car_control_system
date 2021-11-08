@@ -10,7 +10,8 @@
 
 class Indicator : public abstract_task {
 private:
-  volatile bool blinkState = false;
+  unsigned long intervall_on = 600;
+  unsigned long intervall_off = 300;
 
 public:
   string getName(void);
@@ -18,9 +19,10 @@ public:
   void re_init(void);
   void exit(void);
   void task(void); // this is the actual task
-  INDICATOR getIndicator();
   void setIndicator(INDICATOR state);
   void setIndicator(int left, int right);
+  bool getIndicatorLeft();
+  bool getIndicatorRight();
 };
 
 #endif // INDICATOR_H

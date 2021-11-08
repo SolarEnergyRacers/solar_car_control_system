@@ -15,9 +15,10 @@
 #define INDICATOR_ON false        // indicator blink
 #define INT_ON false             // interrupt for I/O Expander
 #define IOEXT_ON true            // 8-Bit I/O Expander for I2C Bus (PCF8574)
+#define LIFESIGN_ON false        // LifeSign on Screens
 #define PWM_ON false             // 16-channel, 12-bit PWM Fm, I2C (PCA9685)
 #define RTC_ON true              // real time clock, I2C
-#define SD_ON false               // SD card
+#define SD_ON false              // SD card
 #define SERIAL_ON false          // write/read to/from console
 
 #define DEBUGLEVEL_VERBOSED true

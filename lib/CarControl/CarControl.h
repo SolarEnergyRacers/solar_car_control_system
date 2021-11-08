@@ -17,7 +17,7 @@
 
 class CarControl : public abstract_task {
 public:
-  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t mutex = NULL;
   static void valueChangedHandler() { valueChangeRequest++; };
 
   string getName(void) { return "CarControl"; };
@@ -37,8 +37,6 @@ public:
   void adjust_paddles_max();
 
 private:
-  int sleep_polling_ms = 150;
-
   const int MIN_ADJUST_GAP = 10; // 0...Gap units show 0 (real reachable null point)
   const int MAX_ADJUST_GAP = 10; // max ... max+Gap to avoid max higher then adjusted max
   const int SMOOTHING = 1;
@@ -52,6 +50,8 @@ private:
   int16_t recupLast = 0;
   int16_t valueDisplayLast = 0;
   bool justInited = true;
+
+  void _handle_indicator();
 
   static volatile int valueChangeRequest;
   bool isInValueChangedHandler = false;

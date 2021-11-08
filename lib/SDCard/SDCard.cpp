@@ -8,9 +8,9 @@
 #include <SPI.h>
 
 #include <DriverDisplay.h>
+#include <Helper.h>
 #include <SDCard.h>
 #include <SPIBus.h>
-
 
 #define FILENAME "/test.txt"
 
@@ -32,7 +32,7 @@ void SDCard::init() {
   while (!inited && count < 10) {
     count++;
 
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+    xSemaphoreTakeT(spiBus.mutex);
     // inited = SD.begin(SPI_CS_SDCARD, SPI, 4000000U, "/x");
     inited = SD.begin(SPI_CS_SDCARD, SPI);
     xSemaphoreGive(spiBus.mutex);
@@ -49,10 +49,12 @@ void SDCard::init() {
     snprintf(msg, 100, "   Open file '%s' for append...", FILENAME);
     printf(msg);
     driverDisplay.print(msg);
+
+    xSemaphoreTakeT(spiBus.mutex);
     // open file
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
     dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
     xSemaphoreGive(spiBus.mutex);
+
     if (dataFile == 0) {
       printf("failed.\n");
     } else {
@@ -67,8 +69,7 @@ void write_sdcard_demo_task(void *pvParameter) {
   int counter = 0;
 
   while (1) {
-
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+    xSemaphoreTakeT(spiBus.mutex);
     // check file open
     if (sdCard.isInited() && sdCard.dataFile) {
       // write counter value
@@ -79,7 +80,6 @@ void write_sdcard_demo_task(void *pvParameter) {
       // debug_printf("[SDCard] Error opening file.%s", " \n");
     }
     sdCard.dataFile.flush(); // ensure write-back
-
     xSemaphoreGive(spiBus.mutex);
 
     // sleep for 1s

@@ -11,7 +11,6 @@
 
 class CarSpeed : public abstract_task {
 private:
-  uint32_t sleep_polling_ms = 200;
   double input_value;
   double output_setpoint;
   double target_speed;

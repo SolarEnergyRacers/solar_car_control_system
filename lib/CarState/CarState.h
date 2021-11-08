@@ -19,6 +19,7 @@ using namespace std;
 // public structures
 enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 enum class LIGHT { OFF, L1, L2 };
@@ -53,29 +54,41 @@ public:
   ~CarState(){};
 
   // pyhsical car data (measurment values)
-  CarStateValue<int> Speed;
-  CarStateValue<int> Acceleration;
-  CarStateValue<int> AccelerationDisplay;
-  CarStateValue<int> Deceleration;
+  CarStateValue<int> Speed;               // ADC
+  CarStateValue<int> Acceleration;        // ADC Steering Wheel
+  CarStateValue<int> Deceleration;        // ADC Steering Wheel
+  CarStateValue<int> AccelerationDisplay; // Display Value (-99...+99)
 
-  CarStateValue<bool> BatteryOn;
-  CarStateValue<float> BatteryVoltage;
-  CarStateValue<float> BatteryCurrent;
-  CarStateValue<bool> PhotoVoltaicOn;
-  CarStateValue<float> PhotoVoltaicCurrent;
-  CarStateValue<bool> MotorOn;
-  CarStateValue<float> MotorCurrent;
-  CarStateValue<float> MotorVoltage;
+  CarStateValue<bool> BatteryOn;            // IO-In
+  CarStateValue<float> BatteryVoltage;      // CAN
+  CarStateValue<float> BatteryCurrent;      // CAN
+  CarStateValue<bool> PhotoVoltaicOn;       // IO-in
+  CarStateValue<float> PhotoVoltaicCurrent; // CAN
+  CarStateValue<bool> MotorOn;              // IO-In
+  CarStateValue<float> MotorVoltage;        // ADC
+  CarStateValue<float> MotorCurrent;        // ADC
+
+  CarStateValue<float> Mppt1Current; // CAN
+  CarStateValue<float> Mppt2Current; // CAN
+  CarStateValue<float> Mppt3Current; // CAN
+
+  CarStateValue<float> Umin; // CAN
+  CarStateValue<float> Uavg; // CAN
+  CarStateValue<float> Umax; // CAN
+
+  CarStateValue<bool> BreakPedal;
 
   // logical car data (values set by driver or chase car)
   CarStateValue<DRIVE_DIRECTION> DriveDirection;
   CarStateValue<CONSTANT_MODE> ConstantMode;
   CarStateValue<bool> ConstantModeOn;
   CarStateValue<INDICATOR> Indicator;
+  CarStateValue<bool> IndicatorBlink;
 
   CarStateValue<int> TargetSpeed;
   CarStateValue<int> TargetPower;
   CarStateValue<string> DriverInfo;
+  CarStateValue<SPEED_ARROW> SpeedArrow;
   CarStateValue<INFO_TYPE> DriverInfoType;
   CarStateValue<LIGHT> Light;
 

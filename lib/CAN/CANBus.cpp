@@ -17,7 +17,7 @@ void CanBus::re_init() { CanBus::init(); }
 
 void CanBus::init() {
 
-  mutex = xSemaphoreCreateBinary();
+  mutex = xSemaphoreCreateMutex();
 
   cfg.speed = CAN_SPEED; // MPPT & BMS are both running on 125KBPS by default
   cfg.tx_pin_id = CAN_TX;

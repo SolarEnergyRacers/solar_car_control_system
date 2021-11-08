@@ -43,7 +43,6 @@ class Display : public abstract_task {
 
 private:
   //==== Display definitions ==== START
-  uint32_t sleep_polling_ms = 50;
 
   //==== Display definitions ==== END
 
@@ -54,8 +53,9 @@ private:
   void _setup(void);
 
 protected:
-  int bgColor = ILI9341_WHITE;
-  Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
+  int bgColor;
+  static Adafruit_ILI9341 tft;
+
   volatile DISPLAY_STATUS status;
   bool _is_ready() {
     bool isReady = (status == DISPLAY_STATUS::CONSOLE || status == DISPLAY_STATUS::DRIVER || status == DISPLAY_STATUS::ENGINEER);
@@ -63,16 +63,17 @@ protected:
   }
 
 public:
-  virtual ~Display() {tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);}
-  Display() { status = DISPLAY_STATUS::HALTED; }
+  virtual ~Display(){};
+  Display() { status = DISPLAY_STATUS::HALTED; };
 
   // RTOS task
   void init(void);
   void re_init(void);
   void exit(void);
   void set_DisplayStatus(DISPLAY_STATUS theNewStatus) { status = theNewStatus; };
+
   DISPLAY_STATUS get_DisplayStatus() { return status; };
-  char * get_DisplayStatus_text() { return (char *)DISPLAY_STATUS_str[(int)status]; };
+  char *get_DisplayStatus_text() { return (char *)DISPLAY_STATUS_str[(int)status]; };
 
   void print(string msg);
   void clear_screen(int bgColor);
@@ -81,8 +82,12 @@ public:
   // internal functions for inner task communication
   void task(void);
 
-  // handler called for inherited classes
   virtual string getName(void);
+
+protected:
+  int height;
+  int width;
+  // handler called for inherited classes
   virtual DISPLAY_STATUS display_setup(DISPLAY_STATUS status) { return DISPLAY_STATUS::HALTED; };
   virtual DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) { return DISPLAY_STATUS::HALTED; };
 
@@ -92,8 +97,8 @@ public:
   int write_nat_999(int x, int y, int valueLast, int value, int textSize, int color);
 
   void drawCentreString(const string &buf, int x, int y);
-  int getColorForInfoType(INFO_TYPE type);
-  bool init_display(void);
+
+private:
 };
 //} // namespace Display
 #endif // SER_DISPLAY_C_H

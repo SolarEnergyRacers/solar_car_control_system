@@ -12,6 +12,7 @@
 #include <ADC.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
+#include <Helper.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;
@@ -28,7 +29,7 @@ void ADC::init() {
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
     printf("[?] Init 'ADC[%d]' with address 0x%x ...", idx, ads_addrs[idx]);
 
-    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+    xSemaphoreTakeT(i2cBus.mutex);
     adss[idx] = ADS1115(ads_addrs[idx]);
 
     bool result = adss[idx].begin();
@@ -70,8 +71,9 @@ int16_t ADC::read(ADC::Pin port) {
   int pin = port & 0xf;
   debug_printf_l3("index: 0x%x, pin: 0x%x \n", idx, pin);
 
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  int16_t value = ADC::adss[idx].readADC(pin);
+  int16_t value = 0;
+  xSemaphoreTakeT(i2cBus.mutex);
+  value = ADC::adss[idx].readADC(pin);
   xSemaphoreGive(i2cBus.mutex);
 
   debug_printf_l3("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);

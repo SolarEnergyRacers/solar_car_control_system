@@ -39,6 +39,9 @@ extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 
+// ------------------
+// FreeRTOS functions
+
 void CmdHandler::re_init() { init(); }
 
 void CmdHandler::init() {
@@ -50,6 +53,7 @@ void CmdHandler::init() {
 void CmdHandler::exit() {
   // TODO
 }
+// ------------------
 
 void CmdHandler::task() {
 
@@ -83,7 +87,7 @@ void CmdHandler::task() {
         break;
       case 'C':
         driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
         driverDisplay.clear_screen(ILI9341_WHITE);
         break;
       case 'D':
@@ -161,19 +165,19 @@ void CmdHandler::task() {
       case 'u':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_increase(false);
+          carState.SpeedArrow.set(SPEED_ARROW::OFF);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_increase(true);
+          carState.SpeedArrow.set(SPEED_ARROW::INCREASE);
         }
         break;
       case 'd':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_decrease(false);
+          carState.SpeedArrow.set(SPEED_ARROW::OFF);
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_decrease(true);
+          carState.SpeedArrow.set(SPEED_ARROW::DECREASE);
         }
         break;
       case ':':
@@ -200,7 +204,6 @@ void CmdHandler::task() {
         } else {
           carState.Light.set(LIGHT::L1);
         }
-        driverDisplay.show_light();
         break;
       case 'L':
         if (input[1] == '-') {
@@ -208,7 +211,6 @@ void CmdHandler::task() {
         } else {
           carState.Light.set(LIGHT::L2);
         }
-        driverDisplay.show_light();
         break;
       case 'c':
         if (input[2] == 's') {
@@ -220,7 +222,6 @@ void CmdHandler::task() {
         } else {
           carState.ConstantModeOn.set(false);
         }
-        driverDisplay.constant_drive_mode_show();
         break;
       case 'i':
         ioExt.readAll();
@@ -239,7 +240,6 @@ void CmdHandler::task() {
         break;
       }
     }
-    // sleep for sleep_polling_ms
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

@@ -28,8 +28,8 @@
 #define PinDUMMY07 "DUMMY07"
 #define PinRelais11 "Relais11"
 // IOExt1
-#define PinRelais21 "Relais21"
-#define PinRelais22 "Relais22"
+#define PinIndicatorOutLeft "IndicatorOutLeft"
+#define PinIndicatorOutRight "IndicatorOutRight"
 #define PinRalais12 "Ralais12"
 #define PinRelais31 "Relais31"
 #define PinRelais32 "Relais32"
@@ -37,8 +37,8 @@
 #define PinDUMMY19 "DUMMY19"
 #define PinDUMMY17 "DUMMY17"
 // IOExt2
-#define PinIndicatorLeft "IndicatorLeft"
-#define PinIndicatorRight "IndicatorRight"
+#define PinIndicatorBtnLeft "IndicatorBtnLeft"
+#define PinIndicatorBtnRight "IndicatorBtnRight"
 #define PinLight "Light"
 #define PinHeadLight "HeadLight"
 #define PinConstantMode "ConstantMode"
@@ -91,7 +91,6 @@ public:
   void readAll();
 
 private:
-  uint32_t sleep_polling_ms = 50;
   void setPortMode(int port, uint8_t mode);
   void getAll(CarStatePin *pins, int maxCount);
   PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {

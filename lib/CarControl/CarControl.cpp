@@ -1,6 +1,7 @@
 //
 // PCF8574 I/O Extension over I2C
 //
+#include <definitions.h>
 
 #include <stdio.h>
 
@@ -12,9 +13,9 @@
 #include <DAC.h>
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
+#include <Helper.h>
 #include <I2CBus.h>
 #include <IOExt.h>
-#include <definitions.h>
 
 extern I2CBus i2cBus;
 extern Indicator indicator;
@@ -26,13 +27,19 @@ extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 
+// ------------------
+// FreeRTOS functions
+
 void CarControl::re_init() { init(); }
 
 void CarControl::init() {
-  char msg[100];
+  printf("[?] Setup '%s'...\n", getName().c_str());
   justInited = true;
-  mutex = xSemaphoreCreateBinary();
+  mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
+  sleep_polling_ms = 250;
+  printf("[v] %s inited.\n", getName().c_str());
+  driverDisplay.print("[v] " + getName() + " initialized.\n");
 }
 
 void CarControl::exit(void) {
@@ -42,29 +49,30 @@ void CarControl::exit(void) {
 void CarControl::_handleValueChanged() {
   // TODO
 }
+// ------------------
 
 bool CarControl::read_battery_data() {
-  carState.BatteryVoltage.set(adc.read(ADC::Pin::BAT_VOLTAGE)/100.); //TODO
-  carState.BatteryCurrent.set(adc.read(ADC::Pin::BAT_CURRENT)/1000.); //TODO
+  carState.BatteryVoltage.set(adc.read(ADC::Pin::BAT_VOLTAGE) / 100.);  // TODO
+  carState.BatteryCurrent.set(adc.read(ADC::Pin::BAT_CURRENT) / 1000.); // TODO
   return carState.BatteryVoltage.is_changed() | carState.BatteryCurrent.is_changed();
 }
 
 bool CarControl::read_motor_data() {
-  carState.MotorVoltage.set(adc.read(ADC::Pin::MOTOR_VOLTAGE)/100.); //TODO
-  carState.MotorCurrent.set(adc.read(ADC::Pin::MOTOR_CURRENT)/1000.); //TODO
+  carState.MotorVoltage.set(adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.);  // TODO
+  carState.MotorCurrent.set(adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.); // TODO
   return carState.MotorVoltage.is_changed() || carState.MotorCurrent.is_changed();
 }
 
 bool CarControl::read_pv_data() {
-  carState.PhotoVoltaicCurrent.set(adc.read(ADC::Pin::PV_CURRENT)/100.); //TODO
+  carState.PhotoVoltaicCurrent.set(adc.read(ADC::Pin::PV_CURRENT) / 100.); // TODO
   return carState.PhotoVoltaicCurrent.is_changed();
 }
 
 bool CarControl::read_speed() {
   // native input
-  xSemaphoreTake(carControl.mutex, portMAX_DELAY);
+  // xSemaphoreTakeT(carControl.mutex);
   int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
-  xSemaphoreGive(carControl.mutex);
+  // xSemaphoreGive(carControl.mutex);
   // voltage
   float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED);
   // round per minute
@@ -138,13 +146,13 @@ bool CarControl::read_paddles() {
   valueDisplay = (int)((valueDisplayLast * (SMOOTHING - 1) + valueDisplay) / SMOOTHING);
 
   // prepare and write motor acceleration and recuperation values to DigiPot
-  int valueDecPot = 0;
-  int valueAccPot = 0;
-  if (valueDisplay < 0) {
-    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
-  } else {
-    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
-  }
+  // int valueDecPot = 0;
+  // int valueAccPot = 0;
+  // if (valueDisplay < 0) {
+  //   valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+  // } else {
+  //   valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+  // }
 
   // if (valueDisplayLast != valueDisplay) {
   //   debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | "
@@ -208,12 +216,17 @@ int CarControl::_normalize(int value, int maxValue, int min, int max) {
 // }
 // void breakPedalHandler() { printf("Break pedal pressed %s\n", (carState.getPin(PinBreakPedal)->value == 1 ? "yes" : "no")); }
 // void indicatorHandler() {
-//   int indiLeft = carState.getPin(PinIndicatorLeft)->value;
-//   int indiRight = carState.getPin(PinIndicatorRight)->value;
+//   int indiLeft = carState.getPin(PinIndicatorBtnLeft)->value;
+//   int indiRight = carState.getPin(PinIndicatorBtnRight)->value;
 //   if (indiLeft == 0 || indiRight == 0) {
 //     indicator.setIndicator(indiLeft, indiRight);
 //   }
 // }
+
+void CarControl::_handle_indicator() {
+  // ioExt.setPort(carState.getPin(PinIndicatorOutLeft)->port, indicator.getIndicatorLeft());
+  // ioExt.setPort(carState.getPin(PinIndicatorOutRight)->port, indicator.getIndicatorRight());
+}
 
 volatile int CarControl::valueChangeRequest = 0;
 
@@ -228,13 +241,8 @@ void CarControl::task() {
     someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
 
-    // handle input interrupts
-    // if ((someThingChanged || valueChangeRequest > 0) && !isInValueChangedHandler) {
-    //   isInValueChangedHandler = true;
-    //   _handleValueChanged();
-    //   valueChangeRequest = 0;
-    //   isInValueChangedHandler = false;
-    // }
+    _handle_indicator();
+
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

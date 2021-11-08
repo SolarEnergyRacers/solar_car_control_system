@@ -13,10 +13,10 @@
 #include <definitions.h>
 
 #include <ADC.h>
+#include <CarState.h>
 #include <Display.h>
 #include <DriverDisplay.h>
-
-#include <CarState.h>
+#include <Helper.h>
 #include <SPIBus.h>
 
 #include <Adafruit_GFX.h>     // graphics library
@@ -45,30 +45,31 @@ int accelerationLast = -1;
 float batLast = -1;
 float pvLast = -1;
 float motorLast = -1;
+bool blinkOn = true;
 //=======================================
 
 DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
-  printf("[?] Setup 'DriverDisplay'...\n");
-  bgColor = ILI9341_BLACK;
-  int height = 0;
-  int width = 0;
-  try {
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-    height = tft.height();
-    width = tft.width();
-    tft.setRotation(1);
-    tft.setTextSize(1);
-    tft.setTextColor(ILI9341_BLUE);
-    tft.setScrollMargins(10, width - 20);
-    infoFrameSizeX = width;
-    speedFrameX = (width - speedFrameSizeX) / 2;
-    xSemaphoreGive(spiBus.mutex);
-  } catch (__exception ex) {
-    xSemaphoreGive(spiBus.mutex);
-    printf("[x] DriverDisplay: Unable to initialize screen ILI9341.\n");
-    throw ex;
-  }
-  printf("[v] DriverDisplay inited: screen ILI9341 with %d x %d.\n", height, width);
+  // printf("[?] Setup 'DriverDisplay'...\n");
+  // bgColor = ILI9341_BLACK;
+  // int height = 0;
+  // int width = 0;
+  // try {
+  //   xSemaphoreTakeT(spiBus.mutex);
+  //   height = tft.height();
+  //   width = tft.width();
+  //   tft.setRotation(1);
+  //   tft.setTextSize(1);
+  //   tft.setTextColor(ILI9341_BLUE);
+  //   tft.setScrollMargins(10, width - 20);
+  //   infoFrameSizeX = width;
+  //   speedFrameX = (width - speedFrameSizeX) / 2;
+  //   xSemaphoreGive(spiBus.mutex);
+  // } catch (__exception ex) {
+  //   xSemaphoreGive(spiBus.mutex);
+  //   printf("[x] DriverDisplay: Unable to initialize screen ILI9341.\n");
+  //   throw ex;
+  // }
+  printf("[v] %s inited: screen ILI9341 with %d x %d.\n", getName().c_str(), height, width);
   return DISPLAY_STATUS::CONSOLE;
 }
 
@@ -76,7 +77,7 @@ DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
 //   if (!_is_ready())
 //     return;
 //   if (get_DisplayStatus() == DISPLAY_STATUS::CONSOLE) {
-//     xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+//     xSemaphoreTakeT(spiBus.mutex);
 //     tft.setTextSize(1);
 //     tft.print(msg.c_str());
 //     xSemaphoreGive(spiBus.mutex);
@@ -86,6 +87,29 @@ DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
 //     write_driver_info();
 //   }
 // }
+
+int DriverDisplay::getColorForInfoType(INFO_TYPE type) {
+  int color;
+  switch (type) {
+  case INFO_TYPE::ERROR:
+    color = ILI9341_RED;
+    break;
+
+  case INFO_TYPE::WARN:
+    color = ILI9341_GREENYELLOW;
+    break;
+
+  case INFO_TYPE::STATUS:
+    color = ILI9341_GREEN;
+    break;
+
+  case INFO_TYPE::INFO:
+  default:
+    color = ILI9341_WHITE;
+    break;
+  }
+  return color;
+}
 
 void DriverDisplay::speedCheck(int speed) {
   if (!_is_ready())
@@ -104,14 +128,14 @@ void DriverDisplay::speedCheck(int speed) {
 
 // write color of the border of the main display
 void DriverDisplay::draw_display_border(int color) {
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.drawRoundRect(0, mainFrameX, tft.width(), tft.height() - mainFrameX, 8, color);
   xSemaphoreGive(spiBus.mutex);
 }
 
 // write color of the border of the speed display
 void DriverDisplay::draw_speed_border(int color) {
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.drawRoundRect(speedFrameX, speedFrameY, speedFrameSizeX, speedFrameSizeY, 4, color);
   xSemaphoreGive(spiBus.mutex);
 }
@@ -119,13 +143,13 @@ void DriverDisplay::draw_speed_border(int color) {
 // write color of the border of the acceleration display
 void DriverDisplay::draw_acceleration_border(int color) {
   accFrameSizeX = speedFrameX - 3;
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
   xSemaphoreGive(spiBus.mutex);
 }
 
 void DriverDisplay::draw_display_background() {
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   infoFrameSizeX = tft.width();
   speedFrameX = (tft.width() - speedFrameSizeX) / 2;
   xSemaphoreGive(spiBus.mutex);
@@ -141,7 +165,7 @@ void DriverDisplay::_arrow_increase(int color) {
   int x = speedFrameX;
   int y = speedFrameY - 3;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y - 10, color);
   xSemaphoreGive(spiBus.mutex);
 }
@@ -152,7 +176,7 @@ void DriverDisplay::_arrow_decrease(int color) {
   int x = speedFrameX;
   int y = speedFrameY + speedFrameSizeY + 3;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillTriangle(x, y, x + speedFrameSizeX, y, x + speedFrameSizeX / 2, y + 10, color);
   xSemaphoreGive(spiBus.mutex);
 }
@@ -189,13 +213,14 @@ void DriverDisplay::constant_drive_mode_show() {
     return;
   int width = getPixelWidthOfTexts(constantModeTextSize, SPEED_STRING, POWER_STRING) + 4;
   if (carState.ConstantMode.get() == CONSTANT_MODE::NONE || !carState.ConstantModeOn.get()) {
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+    xSemaphoreTakeT(spiBus.mutex);
     tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 18, 3, ILI9341_BLACK);
     xSemaphoreGive(spiBus.mutex);
+
     return;
   }
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.setCursor(constantModeX, constantModeY);
   tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 18, 3, ILI9341_YELLOW);
   tft.setTextSize(constantModeTextSize);
@@ -205,7 +230,7 @@ void DriverDisplay::constant_drive_mode_show() {
   } else {
     tft.print(SPEED_STRING);
   }
-  tft.setTextSize(1);
+  // tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }
 
@@ -215,10 +240,10 @@ void DriverDisplay::constant_drive_mode_show() {
 void DriverDisplay::write_drive_direction() {
   if (!_is_ready())
     return;
-  DRIVE_DIRECTION direction = carState.DriveDirection.get();
+  // DRIVE_DIRECTION direction = carState.DriveDirection.get();
   int width = getPixelWidthOfTexts(driveDirectionTextSize, FORWARD_STRING, BACKWARD_STRING) + 4;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillRoundRect(driveDirectionX - 2, driveDirectionY - 2, width, 18, 3, ILI9341_BLACK);
   tft.setTextSize(driveDirectionTextSize);
   tft.setCursor(driveDirectionX, driveDirectionY);
@@ -229,7 +254,6 @@ void DriverDisplay::write_drive_direction() {
     tft.setTextColor(ILI9341_RED);
     tft.print(BACKWARD_STRING);
   }
-  tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }
 
@@ -239,7 +263,7 @@ void DriverDisplay::_turn_Left(int color) {
   int x = indicatorLeftX;
   int y = indicatorY;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillTriangle(x, y, x + indicatorWidth, y - indicatorHeight, x + indicatorWidth, y + indicatorHeight, color);
   xSemaphoreGive(spiBus.mutex);
 }
@@ -250,20 +274,21 @@ void DriverDisplay::_turn_Right(int color) {
   int x = indicatorRightX;
   int y = indicatorY;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillTriangle(x, y, x - indicatorWidth, y - indicatorHeight, x - indicatorWidth, y + indicatorHeight, color);
   xSemaphoreGive(spiBus.mutex);
 }
 
-void DriverDisplay::indicator_set_and_blink(INDICATOR direction) { indicator_set_and_blink(direction, true); }
-
-void DriverDisplay::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
+void DriverDisplay::show_indicator() {
   if (!_is_ready())
     return;
-  _turn_Left(bgColor);
-  _turn_Right(bgColor);
+  INDICATOR indicator = carState.Indicator.get();
+  if (indicator != INDICATOR::OFF || blinkOn) {
+    _turn_Left(bgColor);
+    _turn_Right(bgColor);
+  }
   if (blinkOn) {
-    switch (direction) {
+    switch (indicator) {
     case INDICATOR::LEFT:
       _turn_Left(ILI9341_YELLOW);
       break;
@@ -282,6 +307,7 @@ void DriverDisplay::indicator_set_and_blink(INDICATOR direction, bool blinkOn) {
       break;
     }
   }
+  blinkOn = !blinkOn;
 }
 
 #define LIGHT1_STRING "Light"
@@ -291,7 +317,7 @@ void DriverDisplay::_hide_light() {
   if (!_is_ready())
     return;
   int width = getPixelWidthOfTexts(lightTextSize, LIGHT1_STRING, LIGHT2_STRING) + 4;
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillRoundRect(lightX - 2, lightY - 2, width, 18, 3, ILI9341_BLACK);
   xSemaphoreGive(spiBus.mutex);
 }
@@ -304,7 +330,7 @@ void DriverDisplay::show_light() {
     return;
   }
   int width = getPixelWidthOfTexts(lightTextSize, LIGHT1_STRING, LIGHT2_STRING) + 4;
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.setCursor(lightX, lightY);
   tft.setTextSize(lightTextSize);
   tft.fillRoundRect(lightX - 2, lightY - 2, width, 18, 3, ILI9341_BLACK);
@@ -315,7 +341,7 @@ void DriverDisplay::show_light() {
     tft.setTextColor(ILI9341_BLUE);
     tft.print(LIGHT2_STRING);
   }
-  tft.setTextSize(1);
+  // tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }
 
@@ -328,7 +354,7 @@ void DriverDisplay::write_speed() {
     return;
   if (value < 0 || value > 999)
     value = 999;
-  debug_printf("Speed: %d\n", value);
+  // debug_printf("Speed: %d\n", value);
   speedLast = write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
 }
 
@@ -357,7 +383,7 @@ void DriverDisplay::write_driver_info() {
       textSize = 1;
     if (len > 7 * 53)
       msg = msg.substr(0, 7 * 53 - 3) + "...";
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+    xSemaphoreTakeT(spiBus.mutex);
     tft.fillRect(infoFrameX, infoFrameY, infoFrameSizeX, infoFrameSizeY, bgColor);
     // tft.setFont(&FreeSans18pt7b);
     tft.setTextSize(textSize);
@@ -366,8 +392,8 @@ void DriverDisplay::write_driver_info() {
     tft.setCursor(infoFrameX, infoFrameY);
     tft.print(msg.c_str());
     xSemaphoreGive(spiBus.mutex);
-    carState.DriverInfo.overtake_recent_to_last();
   }
+  carState.DriverInfo.overtake_recent_to_last();
 }
 
 void DriverDisplay::driver_display_demo_screen() {
@@ -416,7 +442,6 @@ void DriverDisplay::driver_display_demo_screen() {
 }
 
 DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
-  // printf("DriverDisplay, status: %s\n", DISPLAY_STATUS_str[(int)status]);
   switch (status) {
   // initializing states:
   case DISPLAY_STATUS::SETUPDRIVER:
@@ -439,7 +464,7 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
     PhotoVoltaicOn.showLabel(tft);
     MotorCurrent.showLabel(tft);
     MotorOn.showLabel(tft);
-
+    set_SleepTime(300);
     status = DISPLAY_STATUS::DRIVER;
     break;
   // working state:
@@ -451,6 +476,7 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
     write_drive_direction();
     show_light();
     constant_drive_mode_show();
+    show_indicator();
 
     BatteryOn.Value = carState.BatteryOn.get();
     BatteryVoltage.Value = carState.BatteryVoltage.get();

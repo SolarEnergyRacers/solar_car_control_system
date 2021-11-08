@@ -7,7 +7,9 @@
  */
 
 // standard libraries
+#include <iostream>
 #include <stdio.h>
+#include <string>
 
 // FreeRTOS / Arduino
 #include <Arduino.h>
@@ -43,8 +45,6 @@
 #include <SPIBus.h>
 #include <Serial.h>
 #include <Temp.h>
-#include <iostream>
-#include <string>
 #include <system.h>
 
 #include <LocalFunctionsAndDevices.h>
@@ -97,7 +97,7 @@ void app_main(void) {
   // init serial output for  console
 
   Serial.begin(115200);
-  delay(1000);
+  delay(300);
   cout << endl;
   cout << "--------------------" << endl;
   cout << "esp32dev + free RTOS" << endl;
@@ -115,9 +115,7 @@ void app_main(void) {
   cout << "------------------------------" << endl;
 
   engineerDisplay.init();
-  engineerDisplay.clear_screen(ILI9341_WHITE);
   engineerDisplay.print("[v] " + engineerDisplay.getName() + " task initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
-
   // ---- init modules ----
   if (INDICATOR_ON) {
     indicator.init();
@@ -238,12 +236,15 @@ void app_main(void) {
   }
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;
-  engineerDisplay.print("ready.\nWaiting for start of life display: ");
+  engineerDisplay.print("\nready at ");
+  engineerDisplay.print(esp32time.getDateTime().c_str());
+  engineerDisplay.print(".\nWaiting for start of life display: ");
   while (waitAtConsoleView-- > 0) {
-    engineerDisplay.print("-" + to_string(waitAtConsoleView));
+    engineerDisplay.print(to_string(waitAtConsoleView));
     sleep(1);
+    engineerDisplay.print("-");
   }
-  engineerDisplay.print(" start");
+  engineerDisplay.print("start");
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
   //------------------------------------------------------------
   if (ENGINEER_DISPLAY_ON) {

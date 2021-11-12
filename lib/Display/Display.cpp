@@ -13,12 +13,12 @@
 #include <definitions.h>
 
 #include <ADC.h>
-#include <Display.h>
-
 #include <CarState.h>
+#include <Display.h>
 #include <Helper.h>
 #include <SPIBus.h>
 
+#include <ADS1X15.h>
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 #include <Fonts/FreeMono12pt7b.h>
@@ -79,7 +79,7 @@ void Display::_setup() {
     uint8_t rdselfdiag = 0;
 
     xSemaphoreTakeT(spiBus.mutex);
-    //tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
+    // tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
     tft.begin();
     tft.setRotation(1);
     height = tft.height();
@@ -89,7 +89,7 @@ void Display::_setup() {
     rdpixfmt = tft.readcommand8(ILI9341_RDPIXFMT);
     rdimgfmt = tft.readcommand8(ILI9341_RDIMGFMT);
     rdselfdiag = tft.readcommand8(ILI9341_RDSELFDIAG);
-    tft.setCursor(0,0);
+    tft.setCursor(0, 0);
     tft.setTextSize(1);
     tft.fillScreen(bgColor);
     tft.setTextColor(ILI9341_BLUE);
@@ -128,8 +128,6 @@ int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
 }
 
 void Display::print(string msg) {
-  if (!_is_ready())
-    return;
   if (status == DISPLAY_STATUS::CONSOLE) {
     xSemaphoreTakeT(spiBus.mutex);
     tft.setTextSize(1);
@@ -153,8 +151,6 @@ void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
 }
 
 int Display::scroll(int lines) {
-  if (!_is_ready())
-    return 0;
   // int TEXT_HEIGHT = 8;    // Height of text to be printed and scrolled
   int BOT_FIXED_AREA = 0; // Number of lines in bottom fixed area (lines counted from bottom of screen)
   int TOP_FIXED_AREA = 0;
@@ -172,12 +168,11 @@ int Display::scroll(int lines) {
 }
 
 void Display::scrollAddress(uint16_t VSP) {
-  if (_is_ready() && xSemaphoreTake(spiBus.mutex, portMAX_DELAY) == pdTRUE) {
-    tft.writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
-    tft.write(VSP >> 8);
-    tft.write(VSP);
-    xSemaphoreGive(spiBus.mutex);
-  }
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
+  tft.write(VSP >> 8);
+  tft.write(VSP);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 //________________________________________________________________________
@@ -186,8 +181,6 @@ void exit(void) {}
 
 // writes Display::float value  in the range from -9999.9 to 9999.9
 float Display::write_float(int x, int y, float valueLast, float value, int textSize, int color) {
-  if (!_is_ready())
-    return value;
   if (value < -9999.9 || value > 9999.9) {
     printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
     return value;
@@ -262,8 +255,6 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
 
 // writes integer value in the range from -99 to +99
 int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
-  if (!_is_ready())
-    return value;
   if (value < -99 || value > 999) {
     printf("ERROR: call write_ganz_99 with a value outside the range: '%d'", value);
     return value;
@@ -317,8 +308,6 @@ int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize,
 
 // writes integer value in the range from 0 to 999
 int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
-  if (!_is_ready())
-    return value;
   if (value < 0 || value > 999) {
     printf("ERROR: call _write_nat_999 with a value outside the range: '%d'", value);
     return value;
@@ -366,8 +355,6 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
   return value;
 }
 void Display::lifeSign() {
-  if (!_is_ready())
-    return;
   xSemaphoreTakeT(spiBus.mutex);
   tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : ILI9341_GREEN);
   xSemaphoreGive(spiBus.mutex);
@@ -376,8 +363,6 @@ void Display::lifeSign() {
 }
 
 void Display::drawCentreString(const string &buf, int x, int y) {
-  if (!_is_ready())
-    return;
   // xSemaphoreTakeT(spiBus.mutex);
 
   // int16_t x1, y1;
@@ -402,6 +387,8 @@ void Display::task(void) {
       break;
     case DISPLAY_STATUS::SETUPENGINEER:
       bgColor = ILI9341_ORANGE;
+      //extern EngineerDisplay engineerDisplay;
+      //engineerDisplay.create_task(4);
       status = task(status, lifeSignCounter);
       break;
     case DISPLAY_STATUS::BACKGROUNDDRIVER:

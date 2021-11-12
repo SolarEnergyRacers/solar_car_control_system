@@ -73,6 +73,7 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
   case DISPLAY_STATUS::SETUPENGINEER:
     re_init();
     display_setup(status);
+    justInited = true;
     status = DISPLAY_STATUS::BACKGROUNDENGINEER;
     break;
   case DISPLAY_STATUS::BACKGROUNDENGINEER:
@@ -112,6 +113,7 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
     Temperature3.showValue(tft);
     Temperature4.showValue(tft);
     TemperatureMax.showValue(tft);
+    justInited = false;
     break;
   default:
     // ignore others

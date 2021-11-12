@@ -14,6 +14,7 @@
 // FreeRTOS / Arduino
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
+#include <freertos/FreeRTOSConfig.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
 
@@ -253,7 +254,7 @@ void app_main(void) {
   if (DRIVER_DISPLAY_ON) {
     driverDisplay.init();
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
-    driverDisplay.create_task(5);
+    driverDisplay.create_task(16);
     cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << endl;
   }
 

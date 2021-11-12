@@ -32,13 +32,13 @@ public:
     Acceleration.set(0);
     Deceleration.set(0);
     BatteryVoltage.set(0);
-    BatteryVoltage.set_epsilon(0.1);
+    BatteryVoltage.epsilon(0.1);
     BatteryCurrent.set(0);
-    BatteryCurrent.set_epsilon(0.1);
+    BatteryCurrent.epsilon(0.1);
     PhotoVoltaicCurrent.set(0);
-    PhotoVoltaicCurrent.set_epsilon(0.1);
+    PhotoVoltaicCurrent.epsilon(0.1);
     MotorCurrent.set(0);
-    MotorCurrent.set_epsilon(0.1);
+    MotorCurrent.epsilon(0.1);
 
     Indicator.set(INDICATOR::OFF);
     DriveDirection.set(DRIVE_DIRECTION::FORWARD);

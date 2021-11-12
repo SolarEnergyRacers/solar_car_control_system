@@ -73,7 +73,7 @@ public:
   T get_last() { return ValueLast; }
 
   // makes the recent value to the last value
-  void overtake_recent_to_last() { ValueLast = Value; }
+  T get_recent_overtake_last() { ValueLast = Value; return Value; }
 
   void set_epsilon(T theEpsilon) { _epsilon = theEpsilon; }
 

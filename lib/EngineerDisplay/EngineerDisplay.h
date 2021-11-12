@@ -25,8 +25,12 @@ protected:
   //==== overwrites from base class ==== END
 
 private:
+  //==== display cache =====================
+  // ... to avoid flickering
+  bool justInited;
+  //=======================================
+  
   //==== Driver Display definitions ==== START
-
   // Stati [On/Off]
   DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 10, "Bat  :", "%3s", "", ILI9341_BLUE);
   DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(4, 30, "PV   :", "%3s", "", ILI9341_BLUE);

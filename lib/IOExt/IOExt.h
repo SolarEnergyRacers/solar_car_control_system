@@ -42,7 +42,7 @@
 #define PinLight "Light"
 #define PinHeadLight "HeadLight"
 #define PinConstantMode "ConstantMode"
-#define PinConstantSet "ConstantSet"
+#define PinConstantModeOn "ConstantModeOn"
 #define PinHorn "Horn"
 #define PinNextScreen "NextScreen"
 // IOExt3
@@ -69,7 +69,7 @@ void nextScreenHandler();
 void lightHandler();
 void headLightHandler();
 void constantModeHandler();
-void constantSetHandler();
+void constantModeOnOffHandler();
 // end pin handler
 
 class IOExt : public abstract_task {

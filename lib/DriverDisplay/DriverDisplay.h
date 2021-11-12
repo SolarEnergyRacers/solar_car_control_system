@@ -25,12 +25,20 @@ public:
   string getName() { return "DriverDisplay"; };
 
 private:
-  DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 180, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);
-  DisplayValue<float> PhotoVoltaicCurrent = DisplayValue<float>(10, 200, "PV   :", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
-  DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 220, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
-  DisplayValue<bool> BatteryOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
-  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(160, 200, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
-  DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 220, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 180, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 200, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> BatteryOn = DisplayValue<bool>(160, 200, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<float> PhotoVoltaicCurrent = DisplayValue<float>(10, 220, "PV   :", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(160, 220, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+
+  //==== display cache =====================
+  // ... to avoid flickering
+  int speedLast = -1;
+  int accelerationLast = -1;
+  bool blinkOn = true;
+  bool justInited = true;
+  //=======================================
 
   //==== Driver Display definitions ==== START
   // display formats and sizes

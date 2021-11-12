@@ -57,10 +57,6 @@ protected:
   static Adafruit_ILI9341 tft;
 
   volatile DISPLAY_STATUS status;
-  bool _is_ready() {
-    bool isReady = (status == DISPLAY_STATUS::CONSOLE || status == DISPLAY_STATUS::DRIVER || status == DISPLAY_STATUS::ENGINEER);
-    return isReady;
-  }
 
 public:
   virtual ~Display(){};

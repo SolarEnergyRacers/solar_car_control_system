@@ -88,7 +88,7 @@ CarStatePin CarState::pins[] = { // IOExtDev0
     {0x24, INPUT_PULLUP, 1, 1, false, 0l, PinHorn, hornHandler},
     {0x25, INPUT_PULLUP, 1, 1, false, 0l, PinNextScreen, nextScreenHandler},
     {0x26, INPUT_PULLUP, 1, 1, false, 0l, PinConstantMode, constantModeHandler},
-    {0x27, INPUT_PULLUP, 1, 1, false, 0l, PinConstantSet, constantSetHandler},
+    {0x27, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler},
     // IOExtDev3
     {0x30, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY31, NULL},
     {0x31, INPUT_PULLUP, 1, 1, false, 0l, PinReserve1, NULL},
@@ -114,6 +114,7 @@ void IOExt::handleIoInterrupt() {
         // printf("0x%02x [%2d], %16s, %d ? %d ", pin->port, getIdx(pin->name), pin->name.c_str(), pin->value, pin->oldValue);
         if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited)) {
           // printf("!!");
+          pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
           pin->oldValue = pin->value;
         }
@@ -178,9 +179,10 @@ void fwdBwdHandler() {
   printf("Direction %s\n", (carState.DriveDirection.get() == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward"));
 }
 
-void breakPedalHandler() { 
+void breakPedalHandler() {
   carState.BreakPedal.set(carState.getPin(PinBreakPedal)->value == 1);
-  printf("Break pedal pressed %s\n", (carState.BreakPedal.get() ? "pressed" : "released")); }
+  printf("Break pedal pressed %s\n", (carState.BreakPedal.get() ? "pressed" : "released"));
+}
 
 void indicatorHandler() {
   int indiLeft = carState.getPin(PinIndicatorBtnLeft)->value;
@@ -220,36 +222,32 @@ void headLightHandler() {
 }
 
 void nextScreenHandler() {
-  int value = carState.getPin(PinNextScreen)->value;
-  if (value == 0) {
+  if (carState.getPin(PinNextScreen)->value == 0) {
     printf("Switch Next Screen toggle\n");
-    if (systemOk) {
-      if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::HALTED) {
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
-      } else {
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
-      }
+    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::HALTED) {
+      engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+    } else {
+      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+      engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
     }
   }
 }
 
-void constantSetHandler() {
-  int value = carState.getPin(PinConstantSet)->value;
-  if (value == 0) {
-    printf("Constant set toggle\n");
+void constantModeOnOffHandler() {
+  if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn.get()) {
+      printf("ConstantMode OFF\n");
       carState.ConstantModeOn.set(false);
     } else {
+      printf("ConstantMode ON\n");
       carState.ConstantModeOn.set(true);
     }
   }
 }
 
 void constantModeHandler() {
-  int value = carState.getPin(PinConstantMode)->value;
-  if (value == 0) {
+  if (carState.getPin(PinConstantMode)->value == 0) {
     printf("Constant mode toggle\n");
     if (carState.ConstantMode.get() == CONSTANT_MODE::POWER) {
       carState.ConstantMode.set(CONSTANT_MODE::SPEED);

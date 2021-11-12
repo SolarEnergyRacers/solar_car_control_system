@@ -16,6 +16,7 @@
 #include <CarState.h>
 #include <Display.h>
 #include <DriverDisplay.h>
+#include <EngineerDisplay.h>
 #include <Helper.h>
 #include <SPIBus.h>
 
@@ -35,18 +36,7 @@ extern SPIBus spiBus;
 extern ADC adc;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
-
-// namespace Display {
-
-//==== display cache =====================
-// ... to avoid flickering
-int speedLast = -1;
-int accelerationLast = -1;
-float batLast = -1;
-float pvLast = -1;
-float motorLast = -1;
-bool blinkOn = true;
-//=======================================
+extern EngineerDisplay engineerDisplay;
 
 DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
   // printf("[?] Setup 'DriverDisplay'...\n");
@@ -74,8 +64,6 @@ DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
 }
 
 // void DriverDisplay::print(string msg) {
-//   if (!_is_ready())
-//     return;
 //   if (get_DisplayStatus() == DISPLAY_STATUS::CONSOLE) {
 //     xSemaphoreTakeT(spiBus.mutex);
 //     tft.setTextSize(1);
@@ -112,8 +100,6 @@ int DriverDisplay::getColorForInfoType(INFO_TYPE type) {
 }
 
 void DriverDisplay::speedCheck(int speed) {
-  if (!_is_ready())
-    return;
   if (speed < 50) {
     arrow_increase(true);
   } else {
@@ -160,8 +146,6 @@ void DriverDisplay::draw_display_background() {
 }
 
 void DriverDisplay::_arrow_increase(int color) {
-  if (!_is_ready())
-    return;
   int x = speedFrameX;
   int y = speedFrameY - 3;
 
@@ -171,8 +155,6 @@ void DriverDisplay::_arrow_increase(int color) {
 }
 
 void DriverDisplay::_arrow_decrease(int color) {
-  if (!_is_ready())
-    return;
   int x = speedFrameX;
   int y = speedFrameY + speedFrameSizeY + 3;
 
@@ -183,8 +165,6 @@ void DriverDisplay::_arrow_decrease(int color) {
 
 // show the slower arrow (red under the speed display)
 void DriverDisplay::arrow_decrease(bool on) {
-  if (!_is_ready())
-    return;
   int color = bgColor;
   if (on) {
     arrow_increase(false);
@@ -195,8 +175,6 @@ void DriverDisplay::arrow_decrease(bool on) {
 
 // show the faster arrow (green above the speed display)
 void DriverDisplay::arrow_increase(bool on) {
-  if (!_is_ready())
-    return;
   int color = bgColor;
   if (on) {
     arrow_decrease(false);
@@ -207,25 +185,23 @@ void DriverDisplay::arrow_increase(bool on) {
 
 #define SPEED_STRING "Speed"
 #define POWER_STRING "Power"
-
 void DriverDisplay::constant_drive_mode_show() {
-  if (!_is_ready())
-    return;
+  CONSTANT_MODE mode = carState.ConstantMode.get_recent_overtake_last();
+  bool isOn = carState.ConstantModeOn.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(constantModeTextSize, SPEED_STRING, POWER_STRING) + 4;
-  if (carState.ConstantMode.get() == CONSTANT_MODE::NONE || !carState.ConstantModeOn.get()) {
+  if (mode == CONSTANT_MODE::NONE || !isOn) {
     xSemaphoreTakeT(spiBus.mutex);
     tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 18, 3, ILI9341_BLACK);
     xSemaphoreGive(spiBus.mutex);
-
     return;
   }
 
   xSemaphoreTakeT(spiBus.mutex);
-  tft.setCursor(constantModeX, constantModeY);
   tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 18, 3, ILI9341_YELLOW);
+  tft.setCursor(constantModeX, constantModeY);
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
-  if (carState.ConstantMode.get() == CONSTANT_MODE::POWER) {
+  if (mode == CONSTANT_MODE::POWER) {
     tft.print(POWER_STRING);
   } else {
     tft.print(SPEED_STRING);
@@ -234,20 +210,48 @@ void DriverDisplay::constant_drive_mode_show() {
   xSemaphoreGive(spiBus.mutex);
 }
 
+#define LIGHT1_STRING "Light"
+#define LIGHT2_STRING "LIGHT"
+void DriverDisplay::_hide_light() {
+  int width = getPixelWidthOfTexts(lightTextSize, LIGHT1_STRING, LIGHT2_STRING) + 4;
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.fillRoundRect(lightX - 2, lightY - 2, width, 18, 3, ILI9341_BLACK);
+  xSemaphoreGive(spiBus.mutex);
+}
+
+void DriverDisplay::show_light() {
+  LIGHT light = carState.Light.get_recent_overtake_last();
+  if (light == LIGHT::OFF) {
+    _hide_light();
+    return;
+  }
+  int width = getPixelWidthOfTexts(lightTextSize, LIGHT1_STRING, LIGHT2_STRING) + 4;
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.setCursor(lightX, lightY);
+  tft.setTextSize(lightTextSize);
+  tft.fillRoundRect(lightX - 2, lightY - 2, width, 18, 3, ILI9341_BLACK);
+  if (light == LIGHT::L1) {
+    tft.setTextColor(ILI9341_YELLOW);
+    tft.print(LIGHT1_STRING);
+  } else {
+    tft.setTextColor(ILI9341_BLUE);
+    tft.print(LIGHT2_STRING);
+  }
+  // tft.setTextSize(1);
+  xSemaphoreGive(spiBus.mutex);
+}
+
 #define FORWARD_STRING ""
 #define BACKWARD_STRING "Backward"
-
 void DriverDisplay::write_drive_direction() {
-  if (!_is_ready())
-    return;
-  // DRIVE_DIRECTION direction = carState.DriveDirection.get();
+  DRIVE_DIRECTION direction = carState.DriveDirection.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(driveDirectionTextSize, FORWARD_STRING, BACKWARD_STRING) + 4;
 
   xSemaphoreTakeT(spiBus.mutex);
   tft.fillRoundRect(driveDirectionX - 2, driveDirectionY - 2, width, 18, 3, ILI9341_BLACK);
   tft.setTextSize(driveDirectionTextSize);
   tft.setCursor(driveDirectionX, driveDirectionY);
-  if (carState.DriveDirection.get() == DRIVE_DIRECTION::FORWARD) {
+  if (direction == DRIVE_DIRECTION::FORWARD) {
     tft.setTextColor(ILI9341_YELLOW);
     tft.print(FORWARD_STRING);
   } else {
@@ -258,8 +262,6 @@ void DriverDisplay::write_drive_direction() {
 }
 
 void DriverDisplay::_turn_Left(int color) {
-  if (!_is_ready())
-    return;
   int x = indicatorLeftX;
   int y = indicatorY;
 
@@ -269,8 +271,6 @@ void DriverDisplay::_turn_Left(int color) {
 }
 
 void DriverDisplay::_turn_Right(int color) {
-  if (!_is_ready())
-    return;
   int x = indicatorRightX;
   int y = indicatorY;
 
@@ -280,9 +280,7 @@ void DriverDisplay::_turn_Right(int color) {
 }
 
 void DriverDisplay::show_indicator() {
-  if (!_is_ready())
-    return;
-  INDICATOR indicator = carState.Indicator.get();
+  INDICATOR indicator = carState.Indicator.get_recent_overtake_last();
   if (indicator != INDICATOR::OFF || blinkOn) {
     _turn_Left(bgColor);
     _turn_Right(bgColor);
@@ -310,71 +308,31 @@ void DriverDisplay::show_indicator() {
   blinkOn = !blinkOn;
 }
 
-#define LIGHT1_STRING "Light"
-#define LIGHT2_STRING "LIGHT"
-
-void DriverDisplay::_hide_light() {
-  if (!_is_ready())
-    return;
-  int width = getPixelWidthOfTexts(lightTextSize, LIGHT1_STRING, LIGHT2_STRING) + 4;
-  xSemaphoreTakeT(spiBus.mutex);
-  tft.fillRoundRect(lightX - 2, lightY - 2, width, 18, 3, ILI9341_BLACK);
-  xSemaphoreGive(spiBus.mutex);
-}
-
-void DriverDisplay::show_light() {
-  if (!_is_ready())
-    return;
-  if (carState.Light.get() == LIGHT::OFF) {
-    _hide_light();
-    return;
-  }
-  int width = getPixelWidthOfTexts(lightTextSize, LIGHT1_STRING, LIGHT2_STRING) + 4;
-  xSemaphoreTakeT(spiBus.mutex);
-  tft.setCursor(lightX, lightY);
-  tft.setTextSize(lightTextSize);
-  tft.fillRoundRect(lightX - 2, lightY - 2, width, 18, 3, ILI9341_BLACK);
-  if (carState.Light.get() == LIGHT::L1) {
-    tft.setTextColor(ILI9341_YELLOW);
-    tft.print(LIGHT1_STRING);
-  } else {
-    tft.setTextColor(ILI9341_BLUE);
-    tft.print(LIGHT2_STRING);
-  }
-  // tft.setTextSize(1);
-  xSemaphoreGive(spiBus.mutex);
-}
-
 // Write the speed in the centre frame: 0...999
 void DriverDisplay::write_speed() {
-  if (!_is_ready())
-    return;
-  int value = carState.Speed.get();
-  if (abs(speedLast - value) < 1)
-    return;
-  if (value < 0 || value > 999)
-    value = 999;
-  // debug_printf("Speed: %d\n", value);
-  speedLast = write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
+  int value = carState.Speed.get_recent_overtake_last();
+  if (value >= 0 || value <= 999) {
+    if (justInited)
+      speedLast = -1;
+    speedLast = write_nat_999(speedFrameX + 9, speedFrameY + 10, speedLast, value, speedTextSize, ILI9341_WHITE);
+  }
 }
 
 // acceleration value: -99...+99
 void DriverDisplay::write_acceleration() {
-  if (!_is_ready())
-    return;
-  int value = carState.AccelerationDisplay.get();
-  if (value > -99 && value < 99) {
+  int value = carState.AccelerationDisplay.get_recent_overtake_last();
+  if (value >= -99 && value <= 99) {
+    if (justInited)
+      accelerationLast = -1;
     accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
   }
 }
 
 // commented out code is preparation for font usage
 void DriverDisplay::write_driver_info() {
-  if (!_is_ready())
-    return;
-  string msg = carState.DriverInfo.get();
+  string msg = carState.DriverInfo.get_recent_overtake_last();
   INFO_TYPE type = carState.DriverInfoType.get();
-  if (msg != carState.DriverInfo.get_last()) {
+  if (msg != carState.DriverInfo.get_last() || justInited) {
     int len = msg.length();
     int textSize = infoTextSize;
     if (len > 2 * 17)
@@ -393,12 +351,9 @@ void DriverDisplay::write_driver_info() {
     tft.print(msg.c_str());
     xSemaphoreGive(spiBus.mutex);
   }
-  carState.DriverInfo.overtake_recent_to_last();
 }
 
 void DriverDisplay::driver_display_demo_screen() {
-  if (!_is_ready())
-    return;
   // printf("  Draw demo screen:\n");
   // printf("   - driver info\n");
   // write_driver_info("123456789_123456789_123456");
@@ -447,13 +402,16 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
   case DISPLAY_STATUS::SETUPDRIVER:
     re_init();
     display_setup(status);
+    justInited = true;
     status = DISPLAY_STATUS::BACKGROUNDDRIVER;
     break;
-  // case DISPLAY_STATUS::DEMOSCREEN:
-  //   draw_display_background();
-  //   driver_display_demo_screen();
-  //   status = DISPLAY_STATUS::SETUPDRIVER;
-  //   break;
+
+    // case DISPLAY_STATUS::DEMOSCREEN:
+    //   draw_display_background();
+    //   driver_display_demo_screen();
+    //   status = DISPLAY_STATUS::SETUPDRIVER;
+    //   break;
+
   case DISPLAY_STATUS::BACKGROUNDDRIVER:
     clear_screen(bgColor);
     draw_display_background();
@@ -467,36 +425,71 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
     set_SleepTime(300);
     status = DISPLAY_STATUS::DRIVER;
     break;
+
   // working state:
   case DISPLAY_STATUS::DRIVER:
-    write_driver_info();
-    write_speed();
-    write_acceleration();
+    if (carState.DriverInfo.is_changed() || justInited) {
+      write_driver_info();
+    }
+    // if (carState.Speed.is_changed()) {
+    if (carState.Speed.is_changed() || justInited) {
+      write_speed();
+    }
+    if (carState.AccelerationDisplay.is_changed() || justInited) {
+      write_acceleration();
+    }
 
-    write_drive_direction();
-    show_light();
-    constant_drive_mode_show();
-    show_indicator();
+    if (carState.DriveDirection.is_changed() || justInited) {
+      write_drive_direction();
+    }
+    if (carState.Light.is_changed() || justInited) {
+      show_light();
+    }
+    if (carState.ConstantMode.is_changed() || carState.ConstantModeOn.is_changed() || justInited) {
+      constant_drive_mode_show();
+    }
+    // if (carState.Indicator.is_changed() || justInited) {
+    //   printf("Indicator changed");
+    //   show_indicator();
+    // }
+    //show_indicator();
 
-    BatteryOn.Value = carState.BatteryOn.get();
-    BatteryVoltage.Value = carState.BatteryVoltage.get();
-    PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
-    PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent.get();
-    MotorOn.Value = carState.MotorOn.get();
-    MotorCurrent.Value = carState.MotorCurrent.get();
-
-    BatteryVoltage.showValue(tft);
-    BatteryOn.showValue(tft);
-    PhotoVoltaicCurrent.showValue(tft);
-    PhotoVoltaicOn.showValue(tft);
-    MotorCurrent.showValue(tft);
-    MotorOn.showValue(tft);
+    if (abs(carState.BatteryVoltage.get() - carState.BatteryVoltage.get_last()) > carState.BatteryVoltage.epsilon() || justInited) {
+      BatteryVoltage.Value = carState.BatteryVoltage.get_recent_overtake_last();
+      BatteryVoltage.showValue(tft);
+    }
+    if (carState.BatteryOn.is_changed() || justInited) {
+      BatteryOn.Value = carState.BatteryOn.get_recent_overtake_last();
+      BatteryOn.showValue(tft);
+    }
+    if (abs(carState.PhotoVoltaicCurrent.get() - carState.PhotoVoltaicCurrent.get_last()) > carState.PhotoVoltaicCurrent.epsilon() ||
+        justInited) {
+      PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent.get_recent_overtake_last();
+      PhotoVoltaicCurrent.showValue(tft);
+    }
+    if (carState.PhotoVoltaicOn.is_changed() || justInited) {
+      PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get_recent_overtake_last();
+      PhotoVoltaicOn.showValue(tft);
+    }
+    if (abs(carState.MotorCurrent.get() - carState.MotorCurrent.get_last()) > carState.MotorCurrent.epsilon() || justInited) {
+      MotorCurrent.Value = carState.MotorCurrent.get_recent_overtake_last();
+      MotorCurrent.showValue(tft);
+    }
+    if (carState.MotorOn.is_changed() || justInited) {
+      MotorOn.Value = carState.MotorOn.get_recent_overtake_last();
+      MotorOn.showValue(tft);
+    }
+    justInited = false;
     break;
+
+    // case DISPLAY_STATUS::SETUPENGINEER:
+    //   engineerDisplay.create_task(4);
+    //   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
+    //   break;
+
   default:
     // ignore others
     break;
   }
   return status;
 }
-
-// } //namespace Display

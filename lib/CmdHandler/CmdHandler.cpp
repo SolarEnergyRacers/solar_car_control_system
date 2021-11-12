@@ -215,12 +215,16 @@ void CmdHandler::task() {
       case 'c':
         if (input[2] == 's') {
           carState.ConstantMode.set(CONSTANT_MODE::SPEED);
+          carState.ConstantModeOn.set(true);
         } else if (input[2] == 'p') {
           carState.ConstantMode.set(CONSTANT_MODE::POWER);
-        } else if (input[2] == 'c') {
-          carState.ConstantMode.set(CONSTANT_MODE::NONE);
+          carState.ConstantModeOn.set(true);
         } else {
-          carState.ConstantModeOn.set(false);
+          if (carState.ConstantModeOn.get()) {
+            carState.ConstantModeOn.set(false);
+          } else {
+            carState.ConstantModeOn.set(false);
+          }
         }
         break;
       case 'i':

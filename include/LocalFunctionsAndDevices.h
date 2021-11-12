@@ -12,7 +12,7 @@
 #define DS_ON false              // 1-Wire Digital Thermometer (DS18B20)
 #define ENGINEER_DISPLAY_ON true // display elements
 #define GYRO_ACC_ON false        // 6-axis Motion Tracking (BMI088)
-#define INDICATOR_ON false        // indicator blink
+#define INDICATOR_ON true        // indicator blink
 #define INT_ON false             // interrupt for I/O Expander
 #define IOEXT_ON true            // 8-Bit I/O Expander for I2C Bus (PCF8574)
 #define LIFESIGN_ON false        // LifeSign on Screens

@@ -158,30 +158,30 @@ void IOExt::readAll() {
 // IO pin handler -----------------------------------------
 
 void batteryOnOffHandler() {
-  carState.BatteryOn.set(carState.getPin(PinBatOnOff)->value == 1);
-  printf("Battery %s\n", (carState.BatteryOn.get() ? "On" : "Off"));
+  carState.BatteryOn = carState.getPin(PinBatOnOff)->value == 1;
+  printf("Battery %s\n", (carState.BatteryOn ? "On" : "Off"));
 }
 
 void pvOnOffHandler() {
-  carState.PhotoVoltaicOn.set(carState.getPin(PinPvOnOff)->value == 1);
-  printf("PV %s\n", (carState.PhotoVoltaicOn.get() ? "On" : "Off"));
+  carState.PhotoVoltaicOn = carState.getPin(PinPvOnOff)->value == 1;
+  printf("PV %s\n", (carState.PhotoVoltaicOn ? "On" : "Off"));
 }
 
 void mcOnOffHandler() {
-  carState.MotorOn.set(carState.getPin(PinMcOnOff)->value == 1);
-  printf("MC %s\n", (carState.MotorOn.get() ? "On" : "Off"));
+  carState.MotorOn = carState.getPin(PinMcOnOff)->value == 1;
+  printf("MC %s\n", (carState.MotorOn ? "On" : "Off"));
 }
 
 void ecoPowerHandler() { printf("EcoMowerMode %s\n", (carState.getPin(PinEcoPower)->value == 1 ? "Eco" : "Power")); }
 
 void fwdBwdHandler() {
-  carState.DriveDirection.set(carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD);
-  printf("Direction %s\n", (carState.DriveDirection.get() == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward"));
+  carState.DriveDirection = carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD;
+  printf("Direction %s\n", (carState.DriveDirection == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward"));
 }
 
 void breakPedalHandler() {
-  carState.BreakPedal.set(carState.getPin(PinBreakPedal)->value == 1);
-  printf("Break pedal pressed %s\n", (carState.BreakPedal.get() ? "pressed" : "released"));
+  carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
+  printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
 }
 
 void indicatorHandler() {
@@ -201,10 +201,10 @@ void lightHandler() {
   int value = carState.getPin(PinLight)->value;
   if (value == 0) {
     printf("Light toggle\n");
-    if (carState.Light.get() == LIGHT::L1) {
-      carState.Light.set(LIGHT::OFF);
+    if (carState.Light == LIGHT::L1) {
+      carState.Light = LIGHT::OFF;
     } else {
-      carState.Light.set(LIGHT::L1);
+      carState.Light = LIGHT::L1;
     }
   }
 }
@@ -213,10 +213,10 @@ void headLightHandler() {
   int value = carState.getPin(PinHeadLight)->value;
   if (value == 0) {
     printf("Drive Light toggle\n");
-    if (carState.Light.get() == LIGHT::L2) {
-      carState.Light.set(LIGHT::L1);
+    if (carState.Light == LIGHT::L2) {
+      carState.Light=LIGHT::L1;
     } else {
-      carState.Light.set(LIGHT::L2);
+      carState.Light=LIGHT::L2;
     }
   }
 }
@@ -236,12 +236,12 @@ void nextScreenHandler() {
 
 void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
-    if (carState.ConstantModeOn.get()) {
+    if (carState.ConstantModeOn) {
       printf("ConstantMode OFF\n");
-      carState.ConstantModeOn.set(false);
+      carState.ConstantModeOn=false;
     } else {
       printf("ConstantMode ON\n");
-      carState.ConstantModeOn.set(true);
+      carState.ConstantModeOn=true;
     }
   }
 }
@@ -249,10 +249,10 @@ void constantModeOnOffHandler() {
 void constantModeHandler() {
   if (carState.getPin(PinConstantMode)->value == 0) {
     printf("Constant mode toggle\n");
-    if (carState.ConstantMode.get() == CONSTANT_MODE::POWER) {
-      carState.ConstantMode.set(CONSTANT_MODE::SPEED);
+    if (carState.ConstantMode == CONSTANT_MODE::POWER) {
+      carState.ConstantMode=CONSTANT_MODE::SPEED;
     } else {
-      carState.ConstantMode.set(CONSTANT_MODE::POWER);
+      carState.ConstantMode=CONSTANT_MODE::POWER;
     }
   }
 }

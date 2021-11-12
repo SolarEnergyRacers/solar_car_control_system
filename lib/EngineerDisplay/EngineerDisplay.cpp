@@ -84,11 +84,11 @@ DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter)
     break;
   // working state:
   case DISPLAY_STATUS::ENGINEER:
-    BatteryOn.Value = carState.BatteryOn.get();
-    PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get();
-    MotorOn.Value = carState.MotorOn.get();
-    BatteryVoltage.Value = carState.BatteryVoltage.get();
-    BatteryCurrent.Value = carState.BatteryCurrent.get();
+    BatteryOn.Value = carState.BatteryOn;
+    PhotoVoltaicOn.Value = carState.PhotoVoltaicOn;
+    MotorOn.Value = carState.MotorOn;
+    BatteryVoltage.Value = carState.BatteryVoltage;
+    BatteryCurrent.Value = carState.BatteryCurrent;
 
     BatteryOn.showValue(tft);
     PhotoVoltaicOn.showValue(tft);

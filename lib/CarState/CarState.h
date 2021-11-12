@@ -11,7 +11,6 @@
 #include <string>
 
 #include <CarStatePin.h>
-#include <CarStateValue.h>
 #include <definitions.h>
 
 using namespace std;
@@ -28,69 +27,65 @@ class CarState {
 
 public:
   CarState() {
-    Speed.set(0);
-    Acceleration.set(0);
-    Deceleration.set(0);
-    BatteryVoltage.set(0);
-    BatteryVoltage.epsilon(0.1);
-    BatteryCurrent.set(0);
-    BatteryCurrent.epsilon(0.1);
-    PhotoVoltaicCurrent.set(0);
-    PhotoVoltaicCurrent.epsilon(0.1);
-    MotorCurrent.set(0);
-    MotorCurrent.epsilon(0.1);
+    Speed = 0;
+    Acceleration = 0;
+    Deceleration = 0;
+    BatteryVoltage = 0;
+    BatteryCurrent = 0;
+    PhotoVoltaicCurrent = 0;
+    MotorCurrent = 0;
 
-    Indicator.set(INDICATOR::OFF);
-    DriveDirection.set(DRIVE_DIRECTION::FORWARD);
-    ConstantMode.set(CONSTANT_MODE::SPEED);
-    ConstantModeOn.set(false);
+    Indicator = INDICATOR::OFF;
+    DriveDirection = DRIVE_DIRECTION::FORWARD;
+    ConstantMode = CONSTANT_MODE::SPEED;
+    ConstantModeOn = false;
 
-    TargetSpeed.set(0);
-    TargetPower.set(0);
-    DriverInfo.set("ok.");
-    DriverInfoType.set(INFO_TYPE::STATUS);
-    Light.set(LIGHT::OFF);
+    TargetSpeed = 0;
+    TargetPower = 0;
+    DriverInfo = "ok.";
+    DriverInfoType = INFO_TYPE::STATUS;
+    Light = LIGHT::OFF;
   }
   ~CarState(){};
 
   // pyhsical car data (measurment values)
-  CarStateValue<int> Speed;               // ADC
-  CarStateValue<int> Acceleration;        // ADC Steering Wheel
-  CarStateValue<int> Deceleration;        // ADC Steering Wheel
-  CarStateValue<int> AccelerationDisplay; // Display Value (-99...+99)
+  int Speed;               // ADC
+  int Acceleration;        // ADC Steering Wheel
+  int Deceleration;        // ADC Steering Wheel
+  int AccelerationDisplay; // Display Value (-99...+99)
 
-  CarStateValue<bool> BatteryOn;            // IO-In
-  CarStateValue<float> BatteryVoltage;      // CAN
-  CarStateValue<float> BatteryCurrent;      // CAN
-  CarStateValue<bool> PhotoVoltaicOn;       // IO-in
-  CarStateValue<float> PhotoVoltaicCurrent; // CAN
-  CarStateValue<bool> MotorOn;              // IO-In
-  CarStateValue<float> MotorVoltage;        // ADC
-  CarStateValue<float> MotorCurrent;        // ADC
+  bool BatteryOn;            // IO-In
+  float BatteryVoltage;      // CAN
+  float BatteryCurrent;      // CAN
+  bool PhotoVoltaicOn;       // IO-in
+  float PhotoVoltaicCurrent; // CAN
+  bool MotorOn;              // IO-In
+  float MotorVoltage;        // ADC
+  float MotorCurrent;        // ADC
 
-  CarStateValue<float> Mppt1Current; // CAN
-  CarStateValue<float> Mppt2Current; // CAN
-  CarStateValue<float> Mppt3Current; // CAN
+  float Mppt1Current; // CAN
+  float Mppt2Current; // CAN
+  float Mppt3Current; // CAN
 
-  CarStateValue<float> Umin; // CAN
-  CarStateValue<float> Uavg; // CAN
-  CarStateValue<float> Umax; // CAN
+  float Umin; // CAN
+  float Uavg; // CAN
+  float Umax; // CAN
 
-  CarStateValue<bool> BreakPedal;
+  bool BreakPedal;
 
   // logical car data (values set by driver or chase car)
-  CarStateValue<DRIVE_DIRECTION> DriveDirection;
-  CarStateValue<CONSTANT_MODE> ConstantMode;
-  CarStateValue<bool> ConstantModeOn;
-  CarStateValue<INDICATOR> Indicator;
-  CarStateValue<bool> IndicatorBlink;
+  DRIVE_DIRECTION DriveDirection;
+  CONSTANT_MODE ConstantMode;
+  bool ConstantModeOn;
+  INDICATOR Indicator;
+  bool IndicatorBlink;
 
-  CarStateValue<int> TargetSpeed;
-  CarStateValue<int> TargetPower;
-  CarStateValue<string> DriverInfo;
-  CarStateValue<SPEED_ARROW> SpeedArrow;
-  CarStateValue<INFO_TYPE> DriverInfoType;
-  CarStateValue<LIGHT> Light;
+  int TargetSpeed;
+  int TargetPower;
+  string DriverInfo;
+  SPEED_ARROW SpeedArrow;
+  INFO_TYPE DriverInfoType;
+  LIGHT Light;
 
   // All IO pins
   static CarStatePin pins[IOExtPINCOUNT];

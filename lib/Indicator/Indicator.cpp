@@ -33,12 +33,12 @@ void Indicator::exit(void){
 // ------------------
 
 void Indicator::setIndicator(INDICATOR state) {
-  if (carState.Indicator.get() == state) {
+  if (carState.Indicator == state) {
     debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
-    carState.Indicator.set(INDICATOR::OFF);
+    carState.Indicator = INDICATOR::OFF;
   } else {
     debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
-    carState.Indicator.set(state);
+    carState.Indicator = state;
   }
 }
 
@@ -53,11 +53,11 @@ void Indicator::setIndicator(int left, int right) {
 }
 
 bool Indicator::getIndicatorLeft() {
-  return (carState.Indicator.get() == INDICATOR::LEFT || carState.Indicator.get() == INDICATOR::WARN) && carState.IndicatorBlink.get();
+  return (carState.Indicator == INDICATOR::LEFT || carState.Indicator == INDICATOR::WARN) && carState.IndicatorBlink;
 }
 
 bool Indicator::getIndicatorRight() {
-  return (carState.Indicator.get() == INDICATOR::RIGHT || carState.Indicator.get() == INDICATOR::WARN) && carState.IndicatorBlink.get();
+  return (carState.Indicator == INDICATOR::RIGHT || carState.Indicator == INDICATOR::WARN) && carState.IndicatorBlink;
 }
 
 unsigned long lastFlip = 0;
@@ -65,13 +65,13 @@ void Indicator::task() {
   // do not add code here -- only controlling the blink frequency
   // polling loop
   while (1) {
-    if (carState.Indicator.get() != INDICATOR::OFF) {
-      if (carState.IndicatorBlink.get() && (millis() - lastFlip) > intervall_on) {
+    if (carState.Indicator != INDICATOR::OFF) {
+      if (carState.IndicatorBlink && (millis() - lastFlip) > intervall_on) {
         lastFlip = millis();
-        carState.IndicatorBlink.set(false);
-      } else if (!carState.IndicatorBlink.get() && (millis() - lastFlip) > intervall_off) {
+        carState.IndicatorBlink = false;
+      } else if (!carState.IndicatorBlink && (millis() - lastFlip) > intervall_off) {
         lastFlip = millis();
-        carState.IndicatorBlink.set(true);
+        carState.IndicatorBlink = true;
       }
     }
     ioExt.setPort(carState.getPin(PinIndicatorOutLeft)->port, indicator.getIndicatorLeft());

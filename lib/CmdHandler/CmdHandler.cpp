@@ -18,7 +18,6 @@
 #include <CarControl.h>
 #include <CarState.h>
 #include <CarStatePin.h>
-#include <CarStateValue.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
@@ -113,28 +112,28 @@ void CmdHandler::task() {
         break;
       case 's':
         if (input[2] == 'f') {
-          carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
+          carState.DriveDirection=DRIVE_DIRECTION::FORWARD;
         } else if (input[2] == 'b') {
-          carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
+          carState.DriveDirection=DRIVE_DIRECTION::BACKWARD;
         } else {
-          carState.Speed.set(atoi(&input[1]));
+          carState.Speed=atoi(&input[1]);
         }
         break;
       case 'b':
-        carState.BatteryVoltage.set(atof(&input[1]));
+        carState.BatteryVoltage=atof(&input[1]);
         break;
       case 'B':
-        carState.BatteryCurrent.set(atof(&input[1]));
+        carState.BatteryCurrent=atof(&input[1]);
         break;
       case 'p':
-        carState.PhotoVoltaicCurrent.set(atof(&input[1]));
+        carState.PhotoVoltaicCurrent=atof(&input[1]);
         break;
       case 'm':
-        carState.MotorCurrent.set(atof(&input[1]));
+        carState.MotorCurrent=atof(&input[1]);
         break;
       case 'a':
         accValue = atoi(&input[1]);
-        carState.Acceleration.set(accValue);
+        carState.Acceleration=accValue;
         // TODO: where to put in this important
         if (accValue > 0) {
           dac.set_pot(accValue, DAC::POT_CHAN0);
@@ -165,28 +164,28 @@ void CmdHandler::task() {
       case 'u':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          carState.SpeedArrow.set(SPEED_ARROW::OFF);
+          carState.SpeedArrow=SPEED_ARROW::OFF;
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          carState.SpeedArrow.set(SPEED_ARROW::INCREASE);
+          carState.SpeedArrow=SPEED_ARROW::INCREASE;
         }
         break;
       case 'd':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          carState.SpeedArrow.set(SPEED_ARROW::OFF);
+          carState.SpeedArrow=SPEED_ARROW::OFF;
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          carState.SpeedArrow.set(SPEED_ARROW::DECREASE);
+          carState.SpeedArrow=SPEED_ARROW::DECREASE;
         }
         break;
       case ':':
-        carState.DriverInfoType.set(INFO_TYPE::INFO);
-        carState.DriverInfo.set(&input[1]);
+        carState.DriverInfoType=INFO_TYPE::INFO;
+        carState.DriverInfo=&input[1];
         break;
       case '!':
-        carState.DriverInfoType.set(INFO_TYPE::WARN);
-        carState.DriverInfo.set(&input[1]);
+        carState.DriverInfoType=INFO_TYPE::WARN;
+        carState.DriverInfo=&input[1];
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -200,30 +199,30 @@ void CmdHandler::task() {
         break;
       case 'l':
         if (input[1] == '-') {
-          carState.Light.set(LIGHT::OFF);
+          carState.Light=LIGHT::OFF;
         } else {
-          carState.Light.set(LIGHT::L1);
+          carState.Light=LIGHT::L1;
         }
         break;
       case 'L':
         if (input[1] == '-') {
-          carState.Light.set(LIGHT::OFF);
+          carState.Light=LIGHT::OFF;
         } else {
-          carState.Light.set(LIGHT::L2);
+          carState.Light=LIGHT::L2;
         }
         break;
       case 'c':
         if (input[2] == 's') {
-          carState.ConstantMode.set(CONSTANT_MODE::SPEED);
-          carState.ConstantModeOn.set(true);
+          carState.ConstantMode=CONSTANT_MODE::SPEED;
+          carState.ConstantModeOn=true;
         } else if (input[2] == 'p') {
-          carState.ConstantMode.set(CONSTANT_MODE::POWER);
-          carState.ConstantModeOn.set(true);
+          carState.ConstantMode=CONSTANT_MODE::POWER;
+          carState.ConstantModeOn=true;
         } else {
-          if (carState.ConstantModeOn.get()) {
-            carState.ConstantModeOn.set(false);
+          if (carState.ConstantModeOn) {
+            carState.ConstantModeOn=false;
           } else {
-            carState.ConstantModeOn.set(false);
+            carState.ConstantModeOn=false;
           }
         }
         break;

@@ -52,20 +52,20 @@ void CarControl::_handleValueChanged() {
 // ------------------
 
 bool CarControl::read_battery_data() {
-  carState.BatteryVoltage.set(adc.read(ADC::Pin::BAT_VOLTAGE) / 100.);  // TODO
-  carState.BatteryCurrent.set(adc.read(ADC::Pin::BAT_CURRENT) / 1000.); // TODO
-  return carState.BatteryVoltage.is_changed() | carState.BatteryCurrent.is_changed();
+  carState.BatteryVoltage=adc.read(ADC::Pin::BAT_VOLTAGE) / 100.;  // TODO
+  carState.BatteryCurrent=adc.read(ADC::Pin::BAT_CURRENT) / 1000.; // TODO
+  return true;
 }
 
 bool CarControl::read_motor_data() {
-  carState.MotorVoltage.set(adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.);  // TODO
-  carState.MotorCurrent.set(adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.); // TODO
-  return carState.MotorVoltage.is_changed() || carState.MotorCurrent.is_changed();
+  carState.MotorVoltage=adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.;  // TODO
+  carState.MotorCurrent=adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.; // TODO
+  return true;
 }
 
 bool CarControl::read_pv_data() {
-  carState.PhotoVoltaicCurrent.set(adc.read(ADC::Pin::PV_CURRENT) / 100.); // TODO
-  return carState.PhotoVoltaicCurrent.is_changed();
+  carState.PhotoVoltaicCurrent=adc.read(ADC::Pin::PV_CURRENT) / 100.; // TODO
+  return true;
 }
 
 bool CarControl::read_speed() {
@@ -80,9 +80,9 @@ bool CarControl::read_speed() {
   // speed
   float radius = 0.50; // m
   float speed = 3.1415 * radius * rpm / 60 * 3.6;
-  carState.Speed.set((int)speed);
+  carState.Speed=(int)speed;
   debug_printf_l3("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
-  return carState.Speed.is_changed();
+  return true;
 }
 
 bool CarControl::read_paddles() {
@@ -166,9 +166,9 @@ bool CarControl::read_paddles() {
   //   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   // }
 
-  carState.Acceleration.set(valueAcc);
-  carState.Deceleration.set(valueDec);
-  carState.AccelerationDisplay.set(valueDisplay);
+  carState.Acceleration=valueAcc;
+  carState.Deceleration=valueDec;
+  carState.AccelerationDisplay=valueDisplay;
 
   //  return valueDisplayLast;
   return true;
@@ -211,7 +211,7 @@ int CarControl::_normalize(int value, int maxValue, int min, int max) {
 // void ecoPowerHandler() { printf("EcoMowerMode %s\n", (carState.getPin(PinEcoPower)->value == 1 ? "Eco" : "Power")); }
 // void fwdBwdHandler() {
 //   printf("Direction %s\n", (carState.getPin(PinFwdBwd)->value == 1 ? "Forward" : "Backward"));
-//   carState.DriveDirection.set(carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD);
+//   carState.DriveDirection=carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD;
 //   driverDisplay.write_drive_direction();
 // }
 // void breakPedalHandler() { printf("Break pedal pressed %s\n", (carState.getPin(PinBreakPedal)->value == 1 ? "yes" : "no")); }

@@ -54,7 +54,6 @@
 #include <CarControl.h>
 #include <CarState.h>
 #include <CarStatePin.h>
-#include <CarStateValue.h>
 
 // add C linkage definition
 extern "C" {
@@ -205,9 +204,9 @@ void app_main(void) {
     ioExt.create_task();
     ioExt.readAll();
     indicator.setIndicator(INDICATOR::OFF);
-    carState.Indicator.set(INDICATOR::OFF);
-    carState.ConstantModeOn.set(false);
-    carState.Light.set(LIGHT::OFF);
+    carState.Indicator = INDICATOR::OFF;
+    carState.ConstantModeOn = false;
+    carState.Light = LIGHT::OFF;
     engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
   }
   if (DAC_ON) {

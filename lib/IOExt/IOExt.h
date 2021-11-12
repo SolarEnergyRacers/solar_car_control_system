@@ -16,7 +16,6 @@
 
 #include <CarState.h>
 #include <CarStatePin.h>
-#include <CarStateValue.h>
 #include <Indicator.h>
 
 #define PinBatOnOff "BatOnOff"

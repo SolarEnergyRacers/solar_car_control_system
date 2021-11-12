@@ -186,8 +186,8 @@ void DriverDisplay::arrow_increase(bool on) {
 #define SPEED_STRING "Speed"
 #define POWER_STRING "Power"
 void DriverDisplay::constant_drive_mode_show() {
-  CONSTANT_MODE mode = carState.ConstantMode.get_recent_overtake_last();
-  bool isOn = carState.ConstantModeOn.get_recent_overtake_last();
+  CONSTANT_MODE mode = ConstantMode.get_recent_overtake_last();
+  bool isOn = ConstantModeOn.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(constantModeTextSize, SPEED_STRING, POWER_STRING) + 4;
   if (mode == CONSTANT_MODE::NONE || !isOn) {
     xSemaphoreTakeT(spiBus.mutex);
@@ -220,7 +220,7 @@ void DriverDisplay::_hide_light() {
 }
 
 void DriverDisplay::show_light() {
-  LIGHT light = carState.Light.get_recent_overtake_last();
+  LIGHT light = Light.get_recent_overtake_last();
   if (light == LIGHT::OFF) {
     _hide_light();
     return;
@@ -237,14 +237,13 @@ void DriverDisplay::show_light() {
     tft.setTextColor(ILI9341_BLUE);
     tft.print(LIGHT2_STRING);
   }
-  // tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }
 
 #define FORWARD_STRING ""
 #define BACKWARD_STRING "Backward"
 void DriverDisplay::write_drive_direction() {
-  DRIVE_DIRECTION direction = carState.DriveDirection.get_recent_overtake_last();
+  DRIVE_DIRECTION direction = DriveDirection.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(driveDirectionTextSize, FORWARD_STRING, BACKWARD_STRING) + 4;
 
   xSemaphoreTakeT(spiBus.mutex);
@@ -280,7 +279,7 @@ void DriverDisplay::_turn_Right(int color) {
 }
 
 void DriverDisplay::show_indicator() {
-  INDICATOR indicator = carState.Indicator.get_recent_overtake_last();
+  INDICATOR indicator = Indicator.get_recent_overtake_last();
   if (indicator != INDICATOR::OFF || blinkOn) {
     _turn_Left(bgColor);
     _turn_Right(bgColor);
@@ -310,7 +309,7 @@ void DriverDisplay::show_indicator() {
 
 // Write the speed in the centre frame: 0...999
 void DriverDisplay::write_speed() {
-  int value = carState.Speed.get_recent_overtake_last();
+  int value = Speed.get_recent_overtake_last();
   if (value >= 0 || value <= 999) {
     if (justInited)
       speedLast = -1;
@@ -320,7 +319,7 @@ void DriverDisplay::write_speed() {
 
 // acceleration value: -99...+99
 void DriverDisplay::write_acceleration() {
-  int value = carState.AccelerationDisplay.get_recent_overtake_last();
+  int value = Acceleration.get_recent_overtake_last();
   if (value >= -99 && value <= 99) {
     if (justInited)
       accelerationLast = -1;
@@ -330,9 +329,9 @@ void DriverDisplay::write_acceleration() {
 
 // commented out code is preparation for font usage
 void DriverDisplay::write_driver_info() {
-  string msg = carState.DriverInfo.get_recent_overtake_last();
-  INFO_TYPE type = carState.DriverInfoType.get();
-  if (msg != carState.DriverInfo.get_last() || justInited) {
+  string msg = DriverInfo.get_recent_overtake_last();
+  INFO_TYPE type = DriverInfoType.Value;
+  if (msg != DriverInfo.ValueLast || justInited) {
     int len = msg.length();
     int textSize = infoTextSize;
     if (len > 2 * 17)
@@ -428,55 +427,58 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
 
   // working state:
   case DISPLAY_STATUS::DRIVER:
-    if (carState.DriverInfo.is_changed() || justInited) {
+    DriverInfo.Value = carState.DriverInfo;
+    if (DriverInfo.Value != DriverInfo.ValueLast || justInited) {
       write_driver_info();
     }
-    // if (carState.Speed.is_changed()) {
-    if (carState.Speed.is_changed() || justInited) {
+    Speed.Value = carState.Speed;
+    if (Speed.is_changed() || justInited) {
       write_speed();
     }
-    if (carState.AccelerationDisplay.is_changed() || justInited) {
+    Acceleration.Value = carState.Acceleration;
+    if (Acceleration.is_changed() || justInited) {
       write_acceleration();
     }
-
-    if (carState.DriveDirection.is_changed() || justInited) {
+    DriveDirection.Value = carState.DriveDirection;
+    if (DriveDirection.Value != DriveDirection.ValueLast || justInited) {
       write_drive_direction();
     }
-    if (carState.Light.is_changed() || justInited) {
+    Light.Value = carState.Light;
+    if (Light.Value != Light.ValueLast || justInited) {
       show_light();
     }
-    if (carState.ConstantMode.is_changed() || carState.ConstantModeOn.is_changed() || justInited) {
+    ConstantMode.Value = carState.ConstantMode;
+    ConstantModeOn.Value = carState.ConstantModeOn;
+    if (ConstantMode.Value != ConstantMode.ValueLast || ConstantModeOn.Value != ConstantModeOn.ValueLast || justInited) {
       constant_drive_mode_show();
     }
     // if (carState.Indicator.is_changed() || justInited) {
     //   printf("Indicator changed");
     //   show_indicator();
     // }
-    //show_indicator();
-
-    if (abs(carState.BatteryVoltage.get() - carState.BatteryVoltage.get_last()) > carState.BatteryVoltage.epsilon() || justInited) {
-      BatteryVoltage.Value = carState.BatteryVoltage.get_recent_overtake_last();
+    // show_indicator();
+    BatteryVoltage.Value = carState.BatteryVoltage;
+    if (BatteryVoltage.is_changed() || justInited) {
       BatteryVoltage.showValue(tft);
     }
-    if (carState.BatteryOn.is_changed() || justInited) {
-      BatteryOn.Value = carState.BatteryOn.get_recent_overtake_last();
+    BatteryOn.Value = carState.BatteryOn;
+    if (BatteryOn.is_changed() || justInited) {
       BatteryOn.showValue(tft);
     }
-    if (abs(carState.PhotoVoltaicCurrent.get() - carState.PhotoVoltaicCurrent.get_last()) > carState.PhotoVoltaicCurrent.epsilon() ||
-        justInited) {
-      PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent.get_recent_overtake_last();
+    PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent;
+    if (PhotoVoltaicCurrent.is_changed() || justInited) {
       PhotoVoltaicCurrent.showValue(tft);
     }
-    if (carState.PhotoVoltaicOn.is_changed() || justInited) {
-      PhotoVoltaicOn.Value = carState.PhotoVoltaicOn.get_recent_overtake_last();
+    PhotoVoltaicOn.Value = carState.PhotoVoltaicOn;
+    if (PhotoVoltaicOn.is_changed() || justInited) {
       PhotoVoltaicOn.showValue(tft);
     }
-    if (abs(carState.MotorCurrent.get() - carState.MotorCurrent.get_last()) > carState.MotorCurrent.epsilon() || justInited) {
-      MotorCurrent.Value = carState.MotorCurrent.get_recent_overtake_last();
+    MotorCurrent.Value = carState.MotorCurrent;
+    if (MotorCurrent.is_changed() || justInited) {
       MotorCurrent.showValue(tft);
     }
-    if (carState.MotorOn.is_changed() || justInited) {
-      MotorOn.Value = carState.MotorOn.get_recent_overtake_last();
+    MotorOn.Value = carState.MotorOn;
+    if (MotorOn.is_changed() || justInited) {
       MotorOn.showValue(tft);
     }
     justInited = false;

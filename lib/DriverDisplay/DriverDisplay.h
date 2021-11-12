@@ -25,6 +25,16 @@ public:
   string getName() { return "DriverDisplay"; };
 
 private:
+  DisplayValue<string> DriverInfo = DisplayValue<string>(0, 0, "", "%s", "");
+  DisplayValue<INFO_TYPE> DriverInfoType = DisplayValue<INFO_TYPE>(0, 0, "", "%s", "");
+  DisplayValue<DRIVE_DIRECTION> DriveDirection = DisplayValue<DRIVE_DIRECTION>(0, 0, "", "%s", "");
+  DisplayValue<LIGHT> Light = DisplayValue<LIGHT>(0, 0, "", "%s", "");
+  DisplayValue<CONSTANT_MODE> ConstantMode = DisplayValue<CONSTANT_MODE>(0, 0, "", "%s", "");
+  DisplayValue<bool> ConstantModeOn = DisplayValue<bool>(0, 0, "", "%s", "");
+  DisplayValue<INDICATOR> Indicator = DisplayValue<INDICATOR>(0, 0, ",", "", "");
+
+  DisplayValue<int> Speed = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
+  DisplayValue<int> Acceleration = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
   DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 180, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
   DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
   DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 200, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);

@@ -35,28 +35,28 @@ const string CarState::print(string msg, bool withColors) {
   if (msg.length() > 0)
     ss << msg << endl;
   // ss << ss.fixed << ss.precision(3) << ss.width(7);
-  ss << "Speed ................. " << Speed.get() << endl;
-  ss << "Acceleration .......... " << Acceleration.get() << endl;
-  ss << "Deceleration .......... " << Deceleration.get() << endl;
-  ss << "Acceleration Display... " << AccelerationDisplay.get() << endl;
-  ss << "Battery On............. " << BatteryOn.get() << endl;
-  ss << "Battery Voltage........ " << BatteryVoltage.get() << endl;
-  ss << "Battery Current........ " << BatteryCurrent.get() << endl;
-  ss << "Photo Voltaic On ...... " << PhotoVoltaicOn.get() << endl;
-  ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent.get() << endl;
-  ss << "Motor On .............. " << MotorOn.get() << endl;
-  ss << "Motor Current ......... " << MotorCurrent.get() << endl;
-  ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection.get())] << endl;
+  ss << "Speed ................. " << Speed << endl;
+  ss << "Acceleration .......... " << Acceleration << endl;
+  ss << "Deceleration .......... " << Deceleration << endl;
+  ss << "Acceleration Display... " << AccelerationDisplay << endl;
+  ss << "Battery On............. " << BatteryOn << endl;
+  ss << "Battery Voltage........ " << BatteryVoltage << endl;
+  ss << "Battery Current........ " << BatteryCurrent << endl;
+  ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
+  ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent << endl;
+  ss << "Motor On .............. " << MotorOn << endl;
+  ss << "Motor Current ......... " << MotorCurrent << endl;
+  ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection)] << endl;
   ss << "------------------------" << endl;
-  ss << "Indicator ............. " << INDICATOR_str[(int)(Indicator.get())] << endl;
-  ss << "Constant Mode On ...... " << BOOL_str[(int)(ConstantModeOn.get())] << endl;
-  ss << "Constant Mode ......... " << CONSTANT_MODE_str[(int)(ConstantMode.get())] << endl;
-  ss << "Target Speed .......... " << TargetSpeed.get() << endl;
-  ss << "Target Power .......... " << TargetPower.get() << endl;
+  ss << "Indicator ............. " << INDICATOR_str[(int)(Indicator)] << endl;
+  ss << "Constant Mode On ...... " << BOOL_str[(int)(ConstantModeOn)] << endl;
+  ss << "Constant Mode ......... " << CONSTANT_MODE_str[(int)(ConstantMode)] << endl;
+  ss << "Target Speed .......... " << TargetSpeed << endl;
+  ss << "Target Power .......... " << TargetPower << endl;
   ss << "Info Last ............. "
-     << "[" << INFO_TYPE_str[(int)DriverInfoType.get()] << "] " << DriverInfo.get() << endl;
-  ss << "Spped Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow.get()] << "]" << endl;
-  ss << "Light ................. " << LIGHT_str[(int)(Light.get())] << endl;
+     << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
+  ss << "Spped Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << "]" << endl;
+  ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
   ss << "IO ....................." << printIOs("", false);
   ss << "===========================================================================================" << endl;
   return ss.str();
@@ -67,25 +67,25 @@ const string CarState::serialize(string msg) {
   cJSON *dynData = cJSON_CreateObject();
   cJSON *ctrData = cJSON_CreateObject();
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
-  cJSON_AddNumberToObject(dynData, "speed", Speed.get());
-  cJSON_AddBoolToObject(dynData, "batteryOn", BatteryOn.get());
-  cJSON_AddNumberToObject(dynData, "batteryVoltage", BatteryVoltage.get());
-  cJSON_AddNumberToObject(dynData, "batteryCurrent", BatteryCurrent.get());
-  cJSON_AddBoolToObject(dynData, "pvOn", PhotoVoltaicOn.get());
-  cJSON_AddNumberToObject(dynData, "pvCurrent", PhotoVoltaicCurrent.get());
-  cJSON_AddBoolToObject(dynData, "motorOn", MotorOn.get());
-  cJSON_AddNumberToObject(dynData, "motorCurrent", MotorCurrent.get());
+  cJSON_AddNumberToObject(dynData, "speed", Speed);
+  cJSON_AddBoolToObject(dynData, "batteryOn", BatteryOn);
+  cJSON_AddNumberToObject(dynData, "batteryVoltage", BatteryVoltage);
+  cJSON_AddNumberToObject(dynData, "batteryCurrent", BatteryCurrent);
+  cJSON_AddBoolToObject(dynData, "pvOn", PhotoVoltaicOn);
+  cJSON_AddNumberToObject(dynData, "pvCurrent", PhotoVoltaicCurrent);
+  cJSON_AddBoolToObject(dynData, "motorOn", MotorOn);
+  cJSON_AddNumberToObject(dynData, "motorCurrent", MotorCurrent);
 
-  cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator.get())]);
+  cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator)]);
 
   cJSON_AddItemToObject(carData, "controlData", ctrData);
-  cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed.get());
+  cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed);
 
   char buf[100];
-  snprintf(buf, 100, "[%s] %s", INFO_TYPE_str[(int)DriverInfoType.get()], DriverInfo.get().c_str());
+  snprintf(buf, 100, "[%s] %s", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str());
   cJSON_AddStringToObject(ctrData, "driverInfo", buf);
 
-  cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light.get())]);
+  cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
   return cJSON_Print(carData);
 }

@@ -13,7 +13,7 @@ class GPInputOutput : public abstract_task { // Note: This class is called weird
 private:
   // add local variables required for the handler
 public:
-  string getName(void);
+  string getName(void) { return "GPInputOutput"; };
   void init(void);
   void re_init(void);
   void exit(void);

@@ -10,8 +10,9 @@
 #include <sstream>
 #include <string>
 
-#include <CarStatePin.h>
 #include <definitions.h>
+
+#include <CarStatePin.h>
 
 using namespace std;
 
@@ -22,11 +23,35 @@ enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 enum class LIGHT { OFF, L1, L2 };
-
+enum class DISPLAY_STATUS {
+  ENGINEER_CONSOLE,
+  DRIVER_HALTED,
+  DRIVER_SETUP,
+  DRIVER_BACKGROUND,
+  DRIVER_RUNNING,
+  DRIVER_DEMOSCREEN,
+  ENGINEER_HALTED,
+  ENGINEER_SETUP,
+  ENGINEER_BACKGROUND,
+  ENGINEER_RUNNING
+};
+static const char *DISPLAY_STATUS_str[] = {
+    "DRIVER_HALTED",       // no action on this display
+    "DRIVER_SETUP",        // driver screen setup
+    "DRIVER_BACKGROUND",   // create background for driver screen
+    "DRIVER_RUNNING",      // driver mode active
+    "DRIVER_DEMOSCREEN",   // demo
+    "ENGINEER_CONSOLE",    // console mode (engineer screen)
+    "ENGINEER_HALTED"      // no action on this display
+    "ENGINEER_SETUP",      // engineerscreen setup
+    "ENGINEER_BACKGROUND", // create background for engineer screen
+    "ENGINEER_RUNNING"     // enineer mode active
+};
 class CarState {
 
 public:
   CarState() {
+    displayStatus = DISPLAY_STATUS::ENGINEER_HALTED;
     Speed = 0;
     Acceleration = 0;
     Deceleration = 0;
@@ -74,6 +99,7 @@ public:
   bool BreakPedal;
 
   // logical car data (values set by driver or chase car)
+  DISPLAY_STATUS displayStatus;
   DRIVE_DIRECTION DriveDirection;
   CONSTANT_MODE ConstantMode;
   bool ConstantModeOn;

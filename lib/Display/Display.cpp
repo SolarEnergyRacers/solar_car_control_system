@@ -94,8 +94,9 @@ void Display::_setup() {
     tft.fillScreen(bgColor);
     tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(0, height);
-    tft.printf("%s inited (%dx%d)-->%s\n", getName().c_str(), height, width, DISPLAY_STATUS_str[(int)status]);
+    tft.printf("%s inited (%dx%d)-->%s\n", getName().c_str(), height, width, DISPLAY_STATUS_str[(int)carState.displayStatus]);
     xSemaphoreGive(spiBus.mutex);
+
     printf("    ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
     printf("    ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
     printf("    ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
@@ -108,9 +109,9 @@ void Display::_setup() {
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  status = DISPLAY_STATUS::CONSOLE;
+  carState.displayStatus = DISPLAY_STATUS::ENGINEER_CONSOLE;
   printf("[v] '%s' Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", getName().c_str(), height, width,
-         DISPLAY_STATUS_str[(int)status]);
+         DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }
 
 void Display::clear_screen(int bgColor) {
@@ -128,7 +129,7 @@ int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
 }
 
 void Display::print(string msg) {
-  if (status == DISPLAY_STATUS::CONSOLE) {
+  if (carState.displayStatus == DISPLAY_STATUS::ENGINEER_CONSOLE) {
     xSemaphoreTakeT(spiBus.mutex);
     tft.setTextSize(1);
     tft.print(msg.c_str());
@@ -354,6 +355,8 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
 
   return value;
 }
+
+#if LIFESIGN_ON == true
 void Display::lifeSign() {
   xSemaphoreTakeT(spiBus.mutex);
   tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : ILI9341_GREEN);
@@ -361,6 +364,7 @@ void Display::lifeSign() {
 
   lifeSignState = !lifeSignState;
 }
+#endif
 
 void Display::drawCentreString(const string &buf, int x, int y) {
   // xSemaphoreTakeT(spiBus.mutex);
@@ -380,48 +384,53 @@ void Display::drawCentreString(const string &buf, int x, int y) {
 void Display::task(void) {
   // polling loop
   while (1) {
-    switch (status) {
+    switch (carState.displayStatus) {
     // initializing states:
-    case DISPLAY_STATUS::SETUPDRIVER:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::DRIVER_SETUP:
+      carState.displayStatus = task(lifeSignCounter);
       break;
-    case DISPLAY_STATUS::SETUPENGINEER:
+    case DISPLAY_STATUS::ENGINEER_SETUP:
       bgColor = ILI9341_ORANGE;
-      //extern EngineerDisplay engineerDisplay;
-      //engineerDisplay.create_task(4);
-      status = task(status, lifeSignCounter);
+      carState.displayStatus = task(lifeSignCounter);
       break;
-    case DISPLAY_STATUS::BACKGROUNDDRIVER:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::DRIVER_BACKGROUND:
+      carState.displayStatus = task(lifeSignCounter);
       break;
-    case DISPLAY_STATUS::BACKGROUNDENGINEER:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::ENGINEER_BACKGROUND:
+      carState.displayStatus = task(lifeSignCounter);
       break;
-    case DISPLAY_STATUS::DEMOSCREEN:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::DRIVER_DEMOSCREEN:
+      carState.displayStatus = task(lifeSignCounter);
       break;
     // working states:
-    case DISPLAY_STATUS::CONSOLE:
+    case DISPLAY_STATUS::ENGINEER_CONSOLE:
+      bgColor = ILI9341_WHITE;
+#if LIFESIGN_ON == true
       if (lifeSignCounter > 2) {
         lifeSign();
         lifeSignCounter = 0;
       }
+#endif
       break;
-    case DISPLAY_STATUS::ENGINEER:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::ENGINEER_RUNNING:
+      carState.displayStatus = task(lifeSignCounter);
+#if LIFESIGN_ON == true
       if (lifeSignCounter > 2) {
         lifeSign();
         lifeSignCounter = 0;
       }
+#endif
       break;
-    case DISPLAY_STATUS::DRIVER:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::DRIVER_RUNNING:
+      carState.displayStatus = task(lifeSignCounter);
+#if LIFESIGN_ON == true
       if (lifeSignCounter > 1) {
         lifeSign();
         lifeSignCounter = 0;
       }
+#endif
       break;
-    case DISPLAY_STATUS::HALTED:
+    case DISPLAY_STATUS::ENGINEER_HALTED:
       set_SleepTime(1500);
       break;
 #if WithTaskSuspend == true
@@ -432,7 +441,9 @@ void Display::task(void) {
       // ignore others
       break;
     }
+#if LIFESIGN_ON == true
     lifeSignCounter++;
+#endif
     // debug_printf("%16s -- sleep_polling_ms: %d\n", getName().c_str(), sleep_polling_ms);
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

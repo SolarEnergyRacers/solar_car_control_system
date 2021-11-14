@@ -7,6 +7,11 @@
  *
  ***/
 
+// standard libraries
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <LocalFunctionsAndDevices.h>
 
 #include <abstract_task.h>
@@ -38,7 +43,7 @@ extern CarState carState;
 extern Adafruit_ILI9341 tft;
 extern EngineerDisplay engineerDisplay;
 
-DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
+DISPLAY_STATUS DriverDisplay::display_setup() {
   // printf("[?] Setup 'DriverDisplay'...\n");
   // bgColor = ILI9341_BLACK;
   // int height = 0;
@@ -60,11 +65,11 @@ DISPLAY_STATUS DriverDisplay::display_setup(DISPLAY_STATUS status) {
   //   throw ex;
   // }
   printf("[v] %s inited: screen ILI9341 with %d x %d.\n", getName().c_str(), height, width);
-  return DISPLAY_STATUS::CONSOLE;
+  return DISPLAY_STATUS::ENGINEER_CONSOLE;
 }
 
 // void DriverDisplay::print(string msg) {
-//   if (get_DisplayStatus() == DISPLAY_STATUS::CONSOLE) {
+//   if (get_DisplayStatus() == DISPLAY_STATUS::ENGINEER_CONSOLE) {
 //     xSemaphoreTakeT(spiBus.mutex);
 //     tft.setTextSize(1);
 //     tft.print(msg.c_str());
@@ -280,31 +285,28 @@ void DriverDisplay::_turn_Right(int color) {
 
 void DriverDisplay::show_indicator() {
   INDICATOR indicator = Indicator.get_recent_overtake_last();
-  if (indicator != INDICATOR::OFF || blinkOn) {
+  switch (indicator) {
+  case INDICATOR::OFF:
     _turn_Left(bgColor);
     _turn_Right(bgColor);
+    break;
+
+  case INDICATOR::LEFT:
+    _turn_Left(ILI9341_YELLOW);
+    break;
+
+  case INDICATOR::RIGHT:
+    _turn_Right(ILI9341_YELLOW);
+    break;
+
+  case INDICATOR::WARN:
+    _turn_Left(ILI9341_RED);
+    _turn_Right(ILI9341_RED);
+    break;
+
+  default:
+    break;
   }
-  if (blinkOn) {
-    switch (indicator) {
-    case INDICATOR::LEFT:
-      _turn_Left(ILI9341_YELLOW);
-      break;
-
-    case INDICATOR::RIGHT:
-      _turn_Right(ILI9341_YELLOW);
-      break;
-
-    case INDICATOR::WARN:
-      _turn_Left(ILI9341_RED);
-      _turn_Right(ILI9341_RED);
-      break;
-
-    case INDICATOR::OFF:
-    default:
-      break;
-    }
-  }
-  blinkOn = !blinkOn;
 }
 
 // Write the speed in the centre frame: 0...999
@@ -395,38 +397,42 @@ void DriverDisplay::driver_display_demo_screen() {
   // printf("  End of demo screen.\n");
 }
 
-DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
-  switch (status) {
+DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
+  DISPLAY_STATUS status = carState.displayStatus;
+  switch (carState.displayStatus) {
   // initializing states:
-  case DISPLAY_STATUS::SETUPDRIVER:
+  case DISPLAY_STATUS::DRIVER_SETUP:
     re_init();
-    display_setup(status);
+    display_setup();
     justInited = true;
-    status = DISPLAY_STATUS::BACKGROUNDDRIVER;
+    status = DISPLAY_STATUS::DRIVER_BACKGROUND;
     break;
 
-    // case DISPLAY_STATUS::DEMOSCREEN:
+    // case DISPLAY_STATUS::DRIVER_DEMOSCREEN:
     //   draw_display_background();
     //   driver_display_demo_screen();
-    //   status = DISPLAY_STATUS::SETUPDRIVER;
+    //   status = DISPLAY_STATUS::DRIVER_SETUP;
     //   break;
 
-  case DISPLAY_STATUS::BACKGROUNDDRIVER:
+  case DISPLAY_STATUS::DRIVER_BACKGROUND:
     clear_screen(bgColor);
     draw_display_background();
 
     BatteryVoltage.showLabel(tft);
+    BatteryVoltage.set_epsilon(0.1);
     BatteryOn.showLabel(tft);
     PhotoVoltaicCurrent.showLabel(tft);
+    PhotoVoltaicCurrent.set_epsilon(0.1);
     PhotoVoltaicOn.showLabel(tft);
     MotorCurrent.showLabel(tft);
+    MotorCurrent.set_epsilon(0.1);
     MotorOn.showLabel(tft);
     set_SleepTime(300);
-    status = DISPLAY_STATUS::DRIVER;
+    status = DISPLAY_STATUS::DRIVER_RUNNING;
     break;
 
   // working state:
-  case DISPLAY_STATUS::DRIVER:
+  case DISPLAY_STATUS::DRIVER_RUNNING:
     DriverInfo.Value = carState.DriverInfo;
     if (DriverInfo.Value != DriverInfo.ValueLast || justInited) {
       write_driver_info();
@@ -452,11 +458,12 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
     if (ConstantMode.Value != ConstantMode.ValueLast || ConstantModeOn.Value != ConstantModeOn.ValueLast || justInited) {
       constant_drive_mode_show();
     }
-    // if (carState.Indicator.is_changed() || justInited) {
-    //   printf("Indicator changed");
-    //   show_indicator();
-    // }
-    // show_indicator();
+
+    Indicator.Value = carState.Indicator;
+    if (Indicator.Value != Indicator.ValueLast || justInited) {
+      show_indicator();
+    }
+
     BatteryVoltage.Value = carState.BatteryVoltage;
     if (BatteryVoltage.is_changed() || justInited) {
       BatteryVoltage.showValue(tft);
@@ -484,9 +491,9 @@ DISPLAY_STATUS DriverDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
     justInited = false;
     break;
 
-    // case DISPLAY_STATUS::SETUPENGINEER:
+    // case DISPLAY_STATUS::ENGINEER_SETUP:
     //   engineerDisplay.create_task(4);
-    //   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
+    //   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
     //   break;
 
   default:

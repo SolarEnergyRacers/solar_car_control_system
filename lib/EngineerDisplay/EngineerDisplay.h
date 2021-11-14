@@ -20,8 +20,8 @@ public:
 
 protected:
   //==== overwrites from base class ==== START
-  DISPLAY_STATUS display_setup(DISPLAY_STATUS status) override;
-  DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
+  DISPLAY_STATUS display_setup() override;
+  DISPLAY_STATUS task(int lifeSignCounter) override;
   //==== overwrites from base class ==== END
 
 private:
@@ -29,7 +29,7 @@ private:
   // ... to avoid flickering
   bool justInited;
   //=======================================
-  
+
   //==== Driver Display definitions ==== START
   // Stati [On/Off]
   DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 10, "Bat  :", "%3s", "", ILI9341_BLUE);

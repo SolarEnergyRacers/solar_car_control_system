@@ -52,19 +52,19 @@ void CarControl::_handleValueChanged() {
 // ------------------
 
 bool CarControl::read_battery_data() {
-  carState.BatteryVoltage=adc.read(ADC::Pin::BAT_VOLTAGE) / 100.;  // TODO
-  carState.BatteryCurrent=adc.read(ADC::Pin::BAT_CURRENT) / 1000.; // TODO
+  carState.BatteryVoltage = adc.read(ADC::Pin::BAT_VOLTAGE) / 100.;  // TODO
+  carState.BatteryCurrent = adc.read(ADC::Pin::BAT_CURRENT) / 1000.; // TODO
   return true;
 }
 
 bool CarControl::read_motor_data() {
-  carState.MotorVoltage=adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.;  // TODO
-  carState.MotorCurrent=adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.; // TODO
+  carState.MotorVoltage = adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.;  // TODO
+  carState.MotorCurrent = adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.; // TODO
   return true;
 }
 
 bool CarControl::read_pv_data() {
-  carState.PhotoVoltaicCurrent=adc.read(ADC::Pin::PV_CURRENT) / 100.; // TODO
+  carState.PhotoVoltaicCurrent = adc.read(ADC::Pin::PV_CURRENT) / 100.; // TODO
   return true;
 }
 
@@ -80,7 +80,7 @@ bool CarControl::read_speed() {
   // speed
   float radius = 0.50; // m
   float speed = 3.1415 * radius * rpm / 60 * 3.6;
-  carState.Speed=(int)speed;
+  carState.Speed = (int)speed;
   debug_printf_l3("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
   return true;
 }
@@ -166,9 +166,9 @@ bool CarControl::read_paddles() {
   //   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   // }
 
-  carState.Acceleration=valueAcc;
-  carState.Deceleration=valueDec;
-  carState.AccelerationDisplay=valueDisplay;
+  carState.Acceleration = valueAcc;
+  carState.Deceleration = valueDec;
+  carState.AccelerationDisplay = valueDisplay;
 
   //  return valueDisplayLast;
   return true;

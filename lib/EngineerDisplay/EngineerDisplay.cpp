@@ -20,7 +20,7 @@ extern ADC adc;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
-DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
+DISPLAY_STATUS EngineerDisplay::display_setup() {
   // printf("[?] Setup 'EngineerDisplay'...\n");
   // bgColor = ILI9341_ORANGE;
   // int height = 0;
@@ -40,7 +40,7 @@ DISPLAY_STATUS EngineerDisplay::display_setup(DISPLAY_STATUS status) {
   //   throw ex;
   // }
   printf("[v] %s inited: screen ILI9341 with %d x %d.\n", getName().c_str(), height, width);
-  return DISPLAY_STATUS::BACKGROUNDENGINEER;
+  return DISPLAY_STATUS::ENGINEER_BACKGROUND;
 }
 
 void EngineerDisplay::draw_display_background() {
@@ -67,23 +67,24 @@ void EngineerDisplay::draw_display_background() {
 
 // void EngineerDisplay::print(string msg) { Display::print(msg); }
 
-DISPLAY_STATUS EngineerDisplay::task(DISPLAY_STATUS status, int lifeSignCounter) {
-  switch (status) {
+DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
+  DISPLAY_STATUS status = carState.displayStatus;
+  switch (carState.displayStatus) {
     // initializing states:
-  case DISPLAY_STATUS::SETUPENGINEER:
+  case DISPLAY_STATUS::ENGINEER_SETUP:
     re_init();
-    display_setup(status);
+    display_setup();
     justInited = true;
-    status = DISPLAY_STATUS::BACKGROUNDENGINEER;
+    status = DISPLAY_STATUS::ENGINEER_BACKGROUND;
     break;
-  case DISPLAY_STATUS::BACKGROUNDENGINEER:
+  case DISPLAY_STATUS::ENGINEER_BACKGROUND:
     clear_screen(bgColor);
     draw_display_background();
     set_SleepTime(500);
-    status = DISPLAY_STATUS::ENGINEER;
+    status = DISPLAY_STATUS::ENGINEER_RUNNING;
     break;
   // working state:
-  case DISPLAY_STATUS::ENGINEER:
+  case DISPLAY_STATUS::ENGINEER_RUNNING:
     BatteryOn.Value = carState.BatteryOn;
     PhotoVoltaicOn.Value = carState.PhotoVoltaicOn;
     MotorOn.Value = carState.MotorOn;

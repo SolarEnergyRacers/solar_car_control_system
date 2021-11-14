@@ -61,7 +61,6 @@ void app_main(void);
 }
 
 using namespace std;
-// using namespace DriverDisplay;
 
 ADC adc;
 CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
@@ -115,16 +114,19 @@ void app_main(void) {
   cout << "------------------------------" << endl;
 
   engineerDisplay.init();
-  engineerDisplay.print("[v] " + engineerDisplay.getName() + " task initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
+  engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
+  engineerDisplay.print("[v] " + engineerDisplay.getName() + " initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
   // ---- init modules ----
   if (INDICATOR_ON) {
     indicator.init();
     indicator.setIndicator(INDICATOR::OFF);
   }
   if (COMMANDHANDLER_ON) {
+    engineerDisplay.print("COMMANDHANDLER init...\n");
     cmdHandler.init();
   }
   if (ADC_ON) {
+    engineerDisplay.print("ADC init...\n");
     adc.init();
   }
   if (DS_ON) {
@@ -137,6 +139,7 @@ void app_main(void) {
     pwm.init();
   }
   if (RTC_ON) {
+    engineerDisplay.print("RTC init...\n");
     rtc.init();
   }
   if (SD_ON) {
@@ -147,6 +150,7 @@ void app_main(void) {
     gpio.register_gpio_interrupt();
   }
   if (IOEXT_ON) {
+    engineerDisplay.print("IOEXT init...\n");
     ioExt.init();
   }
   if (DAC_ON) {
@@ -158,7 +162,7 @@ void app_main(void) {
   if (CAN_ON) {
     can.init();
   }
-
+  engineerDisplay.print("Startup sequence(s) finished.\n");
   if (!startOk) {
     cout << "ERROR in init sequence(s). System halted!" << endl;
     exit(0);
@@ -245,14 +249,14 @@ void app_main(void) {
     engineerDisplay.print("-");
   }
   engineerDisplay.print("start");
-  engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+  engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
   //------------------------------------------------------------
   if (ENGINEER_DISPLAY_ON) {
-    engineerDisplay.create_task(4);
+    engineerDisplay.create_task(10);
   }
   if (DRIVER_DISPLAY_ON) {
     driverDisplay.init();
-    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
     driverDisplay.create_task(16);
     cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << endl;
   }
@@ -262,8 +266,8 @@ void app_main(void) {
   cout << "-----------------------------------------------------------------" << endl;
   cout << "Creating FreeRTOS tasks successful. System running." << endl;
   cout << "-----------------------------------------------------------------" << endl;
-  driverDisplay.print("FreeRTOS tasks created successfully. System running.");
-  driverDisplay.print("ok.");
+  // driverDisplay.print("FreeRTOS tasks created successfully. System running.");
+  // driverDisplay.print("ok.");
   cout << endl;
   cout << carState.print("Initial car state:") << endl;
 }

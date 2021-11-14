@@ -3,7 +3,10 @@
 //
 #include <definitions.h>
 
+// standard libraries
+#include <iostream>
 #include <stdio.h>
+#include <string>
 
 #include <PCF8574.h> // PCF8574
 #include <Wire.h>    // I2C
@@ -18,49 +21,10 @@ extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt ioExt;
 extern CarState carState;
-extern DriverDisplay driverDisplay;
-extern EngineerDisplay engineerDisplay;
+// extern EngineerDisplay engineerDisplay;
 extern bool systemOk;
 
 #define DEBUGIOEXT
-
-// ------------------
-// FreeRTOS functions
-
-void IOExt::re_init() { init(); }
-
-void IOExt::init() {
-  xSemaphoreTakeT(i2cBus.mutex);
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    printf("    Init IOExt %u...\n", devNr);
-    if (ioExt.IOExtDevs[devNr].begin()) {
-      printf("[x] Initialization of IOExt %u failed.\n", devNr);
-    } else {
-      char msg[100];
-      for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-        int idx = devNr * 8 + pinNr;
-        CarStatePin pin = carState.pins[idx];
-        carState.idxOfPin.insert(pair<string, int>{pin.name, idx});
-        ioExt.IOExtDevs[devNr].pinMode(pinNr, pin.mode);
-        pin.value = pin.oldValue = 1;
-        snprintf(msg, 100, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin.port, carState.getIdx(pin.name),
-                 pin.mode != OUTPUT ? "INPUT " : "OUTPUT", pin.value, pin.name.c_str());
-        printf(msg);
-      }
-      snprintf(msg, 100, "[v] %s[%d] initialized.\n", getName().c_str(), devNr);
-      printf(msg);
-      driverDisplay.print(msg);
-    }
-    xSemaphoreGive(i2cBus.mutex);
-  }
-  readAll();
-  set_SleepTime(100);
-}
-
-void IOExt::exit(void) {
-  // TODO
-}
-// ------------------
 
 CarStatePin CarState::pins[] = { // IOExtDev0
     {0x00, INPUT_PULLUP, 1, 1, false, 0l, PinBatOnOff, batteryOnOffHandler},
@@ -98,6 +62,45 @@ CarStatePin CarState::pins[] = { // IOExtDev0
     {0x35, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY36, NULL},
     {0x36, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
     {0x37, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY38, NULL}};
+
+// ------------------
+// FreeRTOS functions
+
+void IOExt::re_init() { init(); }
+
+void IOExt::init() {
+  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
+    printf("[?] Init IOExt %u...\n", devNr);
+    xSemaphoreTakeT(i2cBus.mutex);
+    bool ok = ioExt.IOExtDevs[devNr].begin();
+    xSemaphoreGive(i2cBus.mutex);
+    if (ok) {
+      printf("[x] Initialization of IOExt %u failed.\n", devNr);
+    } else {
+      char msg[100];
+      for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
+        int idx = devNr * 8 + pinNr;
+        CarStatePin pin = carState.pins[idx];
+        carState.idxOfPin.insert(pair<string, int>{pin.name, idx});
+        xSemaphoreTakeT(i2cBus.mutex);
+        ioExt.IOExtDevs[devNr].pinMode(pinNr, pin.mode);
+        xSemaphoreGive(i2cBus.mutex);
+        pin.value = pin.oldValue = 1;
+        snprintf(msg, 100, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin.port, carState.getIdx(pin.name),
+                 pin.mode != OUTPUT ? "INPUT " : "OUTPUT", pin.value, pin.name.c_str());
+        printf(msg);
+      }
+      printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
+    }
+  }
+  readAll();
+  set_SleepTime(100);
+}
+
+void IOExt::exit(void) {
+  // TODO
+}
+// ------------------
 
 void IOExt::handleIoInterrupt() {
 
@@ -214,9 +217,9 @@ void headLightHandler() {
   if (value == 0) {
     printf("Drive Light toggle\n");
     if (carState.Light == LIGHT::L2) {
-      carState.Light=LIGHT::L1;
+      carState.Light = LIGHT::L1;
     } else {
-      carState.Light=LIGHT::L2;
+      carState.Light = LIGHT::L2;
     }
   }
 }
@@ -224,13 +227,26 @@ void headLightHandler() {
 void nextScreenHandler() {
   if (carState.getPin(PinNextScreen)->value == 0) {
     printf("Switch Next Screen toggle\n");
-    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::HALTED) {
-      engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
-    } else {
-      driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-      engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
+    switch (carState.displayStatus) {
+    case DISPLAY_STATUS::ENGINEER_RUNNING:
+      carState.displayStatus = DISPLAY_STATUS::DRIVER_RUNNING;
+      cout << "switch from eng --> driver" << endl;
+      break;
+    case DISPLAY_STATUS::DRIVER_RUNNING:
+      carState.displayStatus = DISPLAY_STATUS::ENGINEER_RUNNING;
+      cout << "switch from driver --> eng" << endl;
+      break;
+    default:
+      break;
     }
+
+    //   if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::ENGINEER_HALTED) {
+    //     engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+    //     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
+    //   } else {
+    //     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+    //     engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
+    //   }
   }
 }
 
@@ -238,10 +254,10 @@ void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn) {
       printf("ConstantMode OFF\n");
-      carState.ConstantModeOn=false;
+      carState.ConstantModeOn = false;
     } else {
       printf("ConstantMode ON\n");
-      carState.ConstantModeOn=true;
+      carState.ConstantModeOn = true;
     }
   }
 }
@@ -250,9 +266,9 @@ void constantModeHandler() {
   if (carState.getPin(PinConstantMode)->value == 0) {
     printf("Constant mode toggle\n");
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
-      carState.ConstantMode=CONSTANT_MODE::SPEED;
+      carState.ConstantMode = CONSTANT_MODE::SPEED;
     } else {
-      carState.ConstantMode=CONSTANT_MODE::POWER;
+      carState.ConstantMode = CONSTANT_MODE::POWER;
     }
   }
 }

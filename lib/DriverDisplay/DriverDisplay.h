@@ -117,8 +117,8 @@ private:
   //==== Driver Display definition ==== END
 
 protected:
-  DISPLAY_STATUS display_setup(DISPLAY_STATUS status) override;
-  DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
+  DISPLAY_STATUS display_setup() override;
+  DISPLAY_STATUS task(int lifeSignCounter) override;
   //==== overwrites from base class ==== END
 
 private:

@@ -24,12 +24,12 @@ enum class CONSTANT_MODE { NONE, SPEED, POWER };
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 enum class LIGHT { OFF, L1, L2 };
 enum class DISPLAY_STATUS {
-  ENGINEER_CONSOLE,
   DRIVER_HALTED,
   DRIVER_SETUP,
   DRIVER_BACKGROUND,
   DRIVER_RUNNING,
   DRIVER_DEMOSCREEN,
+  ENGINEER_CONSOLE,
   ENGINEER_HALTED,
   ENGINEER_SETUP,
   ENGINEER_BACKGROUND,
@@ -51,7 +51,6 @@ class CarState {
 
 public:
   CarState() {
-    displayStatus = DISPLAY_STATUS::ENGINEER_HALTED;
     Speed = 0;
     Acceleration = 0;
     Deceleration = 0;
@@ -79,12 +78,14 @@ public:
   int Deceleration;        // ADC Steering Wheel
   int AccelerationDisplay; // Display Value (-99...+99)
 
-  bool BatteryOn;            // IO-In
+  bool BatteryOn;      // IO-In
+  bool PhotoVoltaicOn; // IO-in
+  bool MotorOn;        // IO-In
+  bool EcoOn;          // IO-In
+
   float BatteryVoltage;      // CAN
   float BatteryCurrent;      // CAN
-  bool PhotoVoltaicOn;       // IO-in
   float PhotoVoltaicCurrent; // CAN
-  bool MotorOn;              // IO-In
   float MotorVoltage;        // ADC
   float MotorCurrent;        // ADC
 
@@ -95,6 +96,11 @@ public:
   float Umin; // CAN
   float Uavg; // CAN
   float Umax; // CAN
+
+  float T1; // ??
+  float T2; // ??
+  float T3; // ??
+  float T4; // ??
 
   bool BreakPedal;
 
@@ -122,6 +128,8 @@ public:
 
   std::map<string, int> idxOfPin;
   // std::map<int, Pin> pins; // pins by index
+
+  void init_values();
 
   // tools
   const string print(string msg, bool withColors = true);

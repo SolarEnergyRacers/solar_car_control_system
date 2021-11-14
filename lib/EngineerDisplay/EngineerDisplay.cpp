@@ -6,40 +6,20 @@
 #include <abstract_task.h>
 #include <definitions.h>
 
-#include <ADC.h>
+// #include <ADC.h>
 #include <Display.h>
 #include <EngineerDisplay.h>
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 #include <CarState.h>
-#include <SPIBus.h>
 
 extern SPIBus spiBus;
-extern ADC adc;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup() {
-  // printf("[?] Setup 'EngineerDisplay'...\n");
-  // bgColor = ILI9341_ORANGE;
-  // int height = 0;
-  // int width = 0;
-  // try {
-  //   // xSemaphoreTakeT(spiBus.mutex);
-  //   // height = tft.height();
-  //   // width = tft.width();
-  //   // tft.setRotation(1);
-  //   // tft.setTextSize(1);
-  //   // tft.setTextColor(ILI9341_DARKGREEN);
-  //   // tft.setScrollMargins(10, width - 20);
-  //   // xSemaphoreGive(spiBus.mutex);
-  // } catch (__exception ex) {
-  //   xSemaphoreGive(spiBus.mutex);
-  //   printf("[x] EngineerDisplay: Unable to initialize screen ILI9341.\n");
-  //   throw ex;
-  // }
-  printf("[v] %s inited: screen ILI9341 with %d x %d.\n", getName().c_str(), height, width);
+  printf("[v] '%s' inited: screen D ILI9341 with %d x %d.\n", getName().c_str(), height, width);
   return DISPLAY_STATUS::ENGINEER_BACKGROUND;
 }
 

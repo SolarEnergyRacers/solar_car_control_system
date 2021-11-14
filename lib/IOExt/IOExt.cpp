@@ -21,10 +21,7 @@ extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt ioExt;
 extern CarState carState;
-// extern EngineerDisplay engineerDisplay;
 extern bool systemOk;
-
-#define DEBUGIOEXT
 
 CarStatePin CarState::pins[] = { // IOExtDev0
     {0x00, INPUT_PULLUP, 1, 1, false, 0l, PinBatOnOff, batteryOnOffHandler},
@@ -66,35 +63,37 @@ CarStatePin CarState::pins[] = { // IOExtDev0
 // ------------------
 // FreeRTOS functions
 
+volatile bool IOExt::ioInterruptRequest = false;
+
 void IOExt::re_init() { init(); }
 
 void IOExt::init() {
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     printf("[?] Init IOExt %u...\n", devNr);
     xSemaphoreTakeT(i2cBus.mutex);
-    bool ok = ioExt.IOExtDevs[devNr].begin();
+    bool isError = ioExt.IOExtDevs[devNr].begin();
     xSemaphoreGive(i2cBus.mutex);
-    if (ok) {
+    if (isError) {
       printf("[x] Initialization of IOExt %u failed.\n", devNr);
     } else {
       char msg[100];
       for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-        int idx = devNr * 8 + pinNr;
-        CarStatePin pin = carState.pins[idx];
-        carState.idxOfPin.insert(pair<string, int>{pin.name, idx});
+        CarStatePin *pin = carState.getPin(devNr, pinNr);
+        carState.idxOfPin.insert(pair<string, int>{pin->name, getIdx(devNr, pinNr)});
         xSemaphoreTakeT(i2cBus.mutex);
-        ioExt.IOExtDevs[devNr].pinMode(pinNr, pin.mode);
+        ioExt.IOExtDevs[devNr].pinMode(pinNr, pin->mode);
+        // if (pin->mode != OUTPUT) {
+        //   pin->value = pin->oldValue = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
+        // }
         xSemaphoreGive(i2cBus.mutex);
-        pin.value = pin.oldValue = 1;
-        snprintf(msg, 100, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin.port, carState.getIdx(pin.name),
-                 pin.mode != OUTPUT ? "INPUT " : "OUTPUT", pin.value, pin.name.c_str());
+        snprintf(msg, 100, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin->port, carState.getIdx(pin->name),
+                 pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
         printf(msg);
       }
       printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
     }
   }
-  readAll();
-  set_SleepTime(100);
+  set_SleepTime(400);
 }
 
 void IOExt::exit(void) {
@@ -103,7 +102,18 @@ void IOExt::exit(void) {
 // ------------------
 
 void IOExt::handleIoInterrupt() {
+  if (isInInterruptHandler) {
+    debug_printf("Jump out of interrupt handler at %ld\n", millis());
+    return;
+  }
+  isInInterruptHandler = true;
+  debug_printf("Do interrupt handler at %ld\n", millis());
+  readAll();
+  isInInterruptHandler = false;
+}
 
+void IOExt::readAll() {
+  debug_printf("Read all INPUT* IOs at %ld\n", millis());
   list<void (*)()> pinHandlerList;
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
@@ -114,48 +124,79 @@ void IOExt::handleIoInterrupt() {
         pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
         xSemaphoreGive(i2cBus.mutex);
 
-        // printf("0x%02x [%2d], %16s, %d ? %d ", pin->port, getIdx(pin->name), pin->name.c_str(), pin->value, pin->oldValue);
+        // if (pin->handlerFunction != NULL) {
         if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited)) {
-          // printf("!!");
           pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
           pin->oldValue = pin->value;
         }
-        // printf("\n");
       }
     }
   }
-
-#ifdef DEBUGIOEXT
-  printf("%s", carState.printIOs("").c_str());
-#endif
-
+  debug_printf("%s", carState.printIOs("").c_str());
+  // avoid multi registration:
   pinHandlerList.unique();
+  // call all handlers for changed pins
   for (void (*pinHandler)() : pinHandlerList) {
     pinHandler();
   }
   pinHandlerList.clear();
 }
 
-void IOExt::readAll() {
+void IOExt::setPortMode(int port, uint8_t mode) {
+  // get device & port
+  int idx = port >> 4;
+  int pin = port & 0xf;
+  xSemaphoreTakeT(i2cBus.mutex);
+  ioExt.IOExtDevs[idx].pinMode(pin, mode);
+  xSemaphoreGive(i2cBus.mutex);
+}
 
-  // for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-  //   for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-  //     CarStatePin *pin = carState.getPin(devNr, pinNr);
-  //     if (pin->mode != OUTPUT) {
-  //       xSemaphoreTakeT(i2cBus.mutex);
-  //       pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
-  //       xSemaphoreGive(i2cBus.mutex);
-  //       if (pin->value != pin->oldValue || !pin->inited) {
-  //         pin->oldValue = pin->value;
-  //       }
-  //     }
-  //   }
-  // }
-  handleIoInterrupt();
-#ifdef DEBUGIOEXT
-  printf("%s", carState.printIOs("").c_str());
-#endif
+void IOExt::setPort(int port, bool value) {
+  // get device & port
+  int idx = port >> 4;
+  int pin = port & 0xf;
+  // debug_printf("BOOL----------%ld-\n", millis());
+  xSemaphoreTakeT(i2cBus.mutex);
+  ioExt.IOExtDevs[idx].digitalWrite(pin, value ? 1 : 0);
+  xSemaphoreGive(i2cBus.mutex);
+}
+
+int IOExt::getPort(int port) {
+  // get device & port
+  int idx = port >> 4;
+  int pin = port & 0xf;
+  xSemaphoreTakeT(i2cBus.mutex);
+  int value = ioExt.IOExtDevs[idx].digitalRead(pin);
+  xSemaphoreGive(i2cBus.mutex);
+
+  debug_printf("0x%02x [%d|%d]: %d\n", port, idx, pin, value);
+  return value;
+}
+
+void IOExt::task() {
+
+  // polling loop
+  while (1) {
+    if (systemOk) {
+      // handle INPUT pin interrupts
+      if (ioInterruptRequest) {
+        debug_printf("ioInterruptRequest %ld\n", millis());
+        handleIoInterrupt();
+        ioInterruptRequest = false;
+      }
+      // update OUTPUT pins
+      for (auto &pin : carState.pins) {
+        if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited)) {
+          pin.oldValue = pin.value;
+          pin.inited = true;
+          setPort(pin.port, pin.value);
+        }
+      }
+    }
+    // sleep
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
+  }
 }
 
 // IO pin handler -----------------------------------------
@@ -175,7 +216,10 @@ void mcOnOffHandler() {
   printf("MC %s\n", (carState.MotorOn ? "On" : "Off"));
 }
 
-void ecoPowerHandler() { printf("EcoMowerMode %s\n", (carState.getPin(PinEcoPower)->value == 1 ? "Eco" : "Power")); }
+void ecoPowerHandler() {
+  carState.EcoOn = carState.getPin(PinEcoPower)->value == 1;
+  printf("EcoMowerMode %s\n", (carState.EcoOn ? "Eco" : "Power"));
+}
 
 void fwdBwdHandler() {
   carState.DriveDirection = carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD;
@@ -226,27 +270,18 @@ void headLightHandler() {
 
 void nextScreenHandler() {
   if (carState.getPin(PinNextScreen)->value == 0) {
-    printf("Switch Next Screen toggle\n");
     switch (carState.displayStatus) {
     case DISPLAY_STATUS::ENGINEER_RUNNING:
-      carState.displayStatus = DISPLAY_STATUS::DRIVER_RUNNING;
-      cout << "switch from eng --> driver" << endl;
+      carState.displayStatus = DISPLAY_STATUS::DRIVER_SETUP;
+      cout << "Switch Next Screen toggle: switch from eng --> driver" << endl;
       break;
     case DISPLAY_STATUS::DRIVER_RUNNING:
-      carState.displayStatus = DISPLAY_STATUS::ENGINEER_RUNNING;
-      cout << "switch from driver --> eng" << endl;
+      carState.displayStatus = DISPLAY_STATUS::ENGINEER_SETUP;
+      cout << "Switch Next Screen toggle: switch from driver --> eng" << endl;
       break;
     default:
       break;
     }
-
-    //   if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::ENGINEER_HALTED) {
-    //     engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-    //     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
-    //   } else {
-    //     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-    //     engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
-    //   }
   }
 }
 
@@ -273,68 +308,3 @@ void constantModeHandler() {
   }
 }
 // end IO pin handler -----------------------------------------
-
-void IOExt::setPortMode(int port, uint8_t mode) {
-  // get device & port
-  int idx = port >> 4;
-  int pin = port & 0xf;
-
-  xSemaphoreTakeT(i2cBus.mutex);
-  ioExt.IOExtDevs[idx].pinMode(pin, mode);
-  xSemaphoreGive(i2cBus.mutex);
-}
-
-void IOExt::setPort(int port, bool value) {
-  // get device & port
-  int idx = port >> 4;
-  int pin = port & 0xf;
-
-  xSemaphoreTakeT(i2cBus.mutex);
-  ioExt.IOExtDevs[idx].digitalWrite(pin, value);
-  xSemaphoreGive(i2cBus.mutex);
-}
-
-int IOExt::getPort(int port) {
-  // get device & port
-  int idx = port >> 4;
-  int pin = port & 0xf;
-  int value = 0;
-  xSemaphoreTakeT(i2cBus.mutex);
-  value = ioExt.IOExtDevs[idx].digitalRead(pin);
-  xSemaphoreGive(i2cBus.mutex);
-
-  printf("0x%02x [%d|%d]: %d\n", port, idx, pin, value);
-  return value;
-}
-
-void IOExt::getAll(CarStatePin *pins, int maxCount) {
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    printf("0x%02x: ", devNr);
-    for (int pin = 0; pin < PCF8574_NUM_PORTS; pin++) {
-      int id = (devNr << 4) + pin;
-      if (pins[id].value != 0) {
-        printf("%s: %d\n", pins[id].name.c_str(), pins[id].value);
-      }
-    }
-    printf("\n");
-  }
-}
-
-volatile bool IOExt::ioInterruptRequest = false;
-
-void IOExt::task() {
-
-  // polling loop
-  while (1) {
-    // handle input interrupts
-    if (ioInterruptRequest && !isInInterruptHandler) {
-      isInInterruptHandler = true;
-      handleIoInterrupt();
-      ioInterruptRequest = false;
-      isInInterruptHandler = false;
-    }
-
-    // sleep
-    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
-  }
-}

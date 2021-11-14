@@ -61,11 +61,13 @@ bool Indicator::getIndicatorRight() {
 }
 
 unsigned long lastFlip = 0;
+bool justSwitchedOff = true;
 void Indicator::task() {
   // do not add code here -- only controlling the blink frequency
   // polling loop
   while (1) {
     if (carState.Indicator != INDICATOR::OFF) {
+      justSwitchedOff = true;
       if (carState.IndicatorBlink && (millis() - lastFlip) > intervall_on) {
         lastFlip = millis();
         carState.IndicatorBlink = false;
@@ -73,9 +75,13 @@ void Indicator::task() {
         lastFlip = millis();
         carState.IndicatorBlink = true;
       }
+      carState.getPin(PinIndicatorOutLeft)->value = indicator.getIndicatorLeft();
+      carState.getPin(PinIndicatorOutRight)->value = indicator.getIndicatorRight();
+    } else if (justSwitchedOff) {
+      carState.getPin(PinIndicatorOutLeft)->value = 0;
+      carState.getPin(PinIndicatorOutRight)->value = 0;
+      justSwitchedOff = false;
     }
-    ioExt.setPort(carState.getPin(PinIndicatorOutLeft)->port, indicator.getIndicatorLeft());
-    ioExt.setPort(carState.getPin(PinIndicatorOutRight)->port, indicator.getIndicatorRight());
 
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

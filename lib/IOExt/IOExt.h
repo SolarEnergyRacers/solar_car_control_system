@@ -73,7 +73,6 @@ void constantModeOnOffHandler();
 
 class IOExt : public abstract_task {
 public:
-  static void keyPressedInterruptHandler() { ioInterruptRequest = true; };
 
   string getName(void) { return "IOExt"; };
 
@@ -85,21 +84,23 @@ public:
   void setPort(int port, bool value);
   int getPort(int port);
 
-  static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
-  static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
   void readAll();
 
+  static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
+  static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
+
 private:
-  void setPortMode(int port, uint8_t mode);
-  void getAll(CarStatePin *pins, int maxCount);
-  PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, keyPressedInterruptHandler)};
+  static volatile bool ioInterruptRequest;
   bool isInInterruptHandler = false;
 
-  static volatile bool ioInterruptRequest;
+  void setPortMode(int port, uint8_t mode);
   void handleIoInterrupt();
+  static void ioExt_interrupt_handler() { ioInterruptRequest = true; };
+
+  PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, ioExt_interrupt_handler),
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, ioExt_interrupt_handler),
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, ioExt_interrupt_handler),
+      PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT_PIN_PCF8574, ioExt_interrupt_handler)};
 };
 #endif // SER_IOEXT_H

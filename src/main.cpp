@@ -122,11 +122,9 @@ void app_main(void) {
     indicator.setIndicator(INDICATOR::OFF);
   }
   if (COMMANDHANDLER_ON) {
-    engineerDisplay.print("COMMANDHANDLER init...\n");
     cmdHandler.init();
   }
   if (ADC_ON) {
-    engineerDisplay.print("ADC init...\n");
     adc.init();
   }
   if (DS_ON) {
@@ -139,7 +137,6 @@ void app_main(void) {
     pwm.init();
   }
   if (RTC_ON) {
-    engineerDisplay.print("RTC init...\n");
     rtc.init();
   }
   if (SD_ON) {
@@ -150,7 +147,6 @@ void app_main(void) {
     gpio.register_gpio_interrupt();
   }
   if (IOEXT_ON) {
-    engineerDisplay.print("IOEXT init...\n");
     ioExt.init();
   }
   if (DAC_ON) {
@@ -162,7 +158,6 @@ void app_main(void) {
   if (CAN_ON) {
     can.init();
   }
-  engineerDisplay.print("Startup sequence(s) finished.\n");
   if (!startOk) {
     cout << "ERROR in init sequence(s). System halted!" << endl;
     exit(0);
@@ -204,15 +199,7 @@ void app_main(void) {
     gpio.create_task();
     engineerDisplay.print("[v] " + gpio.getName() + " task initialized.\n");
   }
-  if (IOEXT_ON) {
-    ioExt.create_task();
-    ioExt.readAll();
-    indicator.setIndicator(INDICATOR::OFF);
-    carState.Indicator = INDICATOR::OFF;
-    carState.ConstantModeOn = false;
-    carState.Light = LIGHT::OFF;
-    engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
-  }
+
   if (DAC_ON) {
     dac.init();
     printf(" - DAC DAC DAC\n");
@@ -223,7 +210,7 @@ void app_main(void) {
   }
   if (SERIAL_ON) {
     printf(" - serial_demo_task\n");
-    // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
     printf(" - read_can_demo_task\n");
@@ -237,6 +224,15 @@ void app_main(void) {
     carControl.init();
     carControl.create_task();
     engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");
+  }
+  if (IOEXT_ON) {
+    carState.Indicator = INDICATOR::OFF;
+    carState.ConstantModeOn = false;
+    carState.ConstantMode = CONSTANT_MODE::SPEED;
+    carState.Light = LIGHT::OFF;
+    ioExt.create_task();
+    engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
+    ioExt.readAll();
   }
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;
@@ -262,12 +258,13 @@ void app_main(void) {
   }
 
   systemOk = true;
+  sleep(1);
+  carState.init_values();
+  ioExt.readAll();
 
   cout << "-----------------------------------------------------------------" << endl;
   cout << "Creating FreeRTOS tasks successful. System running." << endl;
   cout << "-----------------------------------------------------------------" << endl;
-  // driverDisplay.print("FreeRTOS tasks created successfully. System running.");
-  // driverDisplay.print("ok.");
   cout << endl;
   cout << carState.print("Initial car state:") << endl;
 }

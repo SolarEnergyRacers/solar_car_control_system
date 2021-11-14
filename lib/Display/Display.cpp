@@ -33,7 +33,6 @@
 
 extern SPIBus spiBus;
 extern ADC adc;
-extern bool systemOk;
 extern CarState carState;
 
 //==== Display definitions ==== START
@@ -79,7 +78,6 @@ void Display::_setup() {
     uint8_t rdselfdiag = 0;
 
     xSemaphoreTakeT(spiBus.mutex);
-    // tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
     tft.begin();
     tft.setRotation(1);
     height = tft.height();
@@ -109,7 +107,6 @@ void Display::_setup() {
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  carState.displayStatus = DISPLAY_STATUS::ENGINEER_CONSOLE;
   printf("[v] '%s' Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", getName().c_str(), height, width,
          DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }
@@ -387,6 +384,7 @@ void Display::task(void) {
     switch (carState.displayStatus) {
     // initializing states:
     case DISPLAY_STATUS::DRIVER_SETUP:
+      bgColor = ILI9341_BLACK;
       carState.displayStatus = task(lifeSignCounter);
       break;
     case DISPLAY_STATUS::ENGINEER_SETUP:

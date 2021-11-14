@@ -17,13 +17,11 @@
 #include <abstract_task.h>
 #include <definitions.h>
 
-#include <ADC.h>
+// #include <ADC.h>
 #include <CarState.h>
 #include <Display.h>
 #include <DriverDisplay.h>
-#include <EngineerDisplay.h>
 #include <Helper.h>
-#include <SPIBus.h>
 
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
@@ -38,48 +36,13 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 extern SPIBus spiBus;
-extern ADC adc;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
-extern EngineerDisplay engineerDisplay;
 
 DISPLAY_STATUS DriverDisplay::display_setup() {
-  // printf("[?] Setup 'DriverDisplay'...\n");
-  // bgColor = ILI9341_BLACK;
-  // int height = 0;
-  // int width = 0;
-  // try {
-  //   xSemaphoreTakeT(spiBus.mutex);
-  //   height = tft.height();
-  //   width = tft.width();
-  //   tft.setRotation(1);
-  //   tft.setTextSize(1);
-  //   tft.setTextColor(ILI9341_BLUE);
-  //   tft.setScrollMargins(10, width - 20);
-  //   infoFrameSizeX = width;
-  //   speedFrameX = (width - speedFrameSizeX) / 2;
-  //   xSemaphoreGive(spiBus.mutex);
-  // } catch (__exception ex) {
-  //   xSemaphoreGive(spiBus.mutex);
-  //   printf("[x] DriverDisplay: Unable to initialize screen ILI9341.\n");
-  //   throw ex;
-  // }
-  printf("[v] %s inited: screen ILI9341 with %d x %d.\n", getName().c_str(), height, width);
-  return DISPLAY_STATUS::ENGINEER_CONSOLE;
+  printf("[v] '%s' inited: screen E ILI9341 with %d x %d.\n", getName().c_str(), height, width);
+  return DISPLAY_STATUS::DRIVER_BACKGROUND;
 }
-
-// void DriverDisplay::print(string msg) {
-//   if (get_DisplayStatus() == DISPLAY_STATUS::ENGINEER_CONSOLE) {
-//     xSemaphoreTakeT(spiBus.mutex);
-//     tft.setTextSize(1);
-//     tft.print(msg.c_str());
-//     xSemaphoreGive(spiBus.mutex);
-//   } else {
-//     carState.DriverInfo.set(msg);
-//     carState.DriverInfoType.set(INFO_TYPE::INFO);
-//     write_driver_info();
-//   }
-// }
 
 int DriverDisplay::getColorForInfoType(INFO_TYPE type) {
   int color;
@@ -490,11 +453,6 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     }
     justInited = false;
     break;
-
-    // case DISPLAY_STATUS::ENGINEER_SETUP:
-    //   engineerDisplay.create_task(4);
-    //   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
-    //   break;
 
   default:
     // ignore others

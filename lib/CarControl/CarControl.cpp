@@ -15,11 +15,21 @@
 #include <EngineerDisplay.h>
 #include <Helper.h>
 #include <I2CBus.h>
+#if IOEXT_ON
 #include <IOExt.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#endif
 
 extern I2CBus i2cBus;
 extern Indicator indicator;
+#if IOEXT_ON
 extern IOExt ioExt;
+#endif
+#if IOEXT2_ON
+extern IOExt2 ioExt;
+#endif
 extern ADC adc;
 extern DAC dac;
 extern CarState carState;

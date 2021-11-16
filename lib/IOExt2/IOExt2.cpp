@@ -1,26 +1,28 @@
 //
-// PCF8574 I/O Extension over I2C
+// MCP23017 I/O Extension over I2C
 //
 #include <definitions.h>
-#if IOEXT_ON
+#if IOEXT2_ON
+
+#include <stdio.h>
 
 // standard libraries
 #include <iostream>
 #include <stdio.h>
 #include <string>
 
-#include <PCF8574.h> // PCF8574
-#include <Wire.h>    // I2C
+#include <MCP23017.h> // MCP23017
+#include <Wire.h>     // I2C
 
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
 #include <I2CBus.h>
-#include <IOExt.h>
+#include <IOExt2.h>
 
 extern I2CBus i2cBus;
 extern Indicator indicator;
-extern IOExt ioExt;
+extern IOExt2 ioExt;
 extern CarState carState;
 extern bool systemOk;
 
@@ -64,45 +66,41 @@ CarStatePin CarState::pins[] = { // IOExtDev0
 // ------------------
 // FreeRTOS functions
 
-volatile bool IOExt::ioInterruptRequest = false;
+volatile bool IOExt2::ioInterruptRequest = false;
 
-void IOExt::re_init() { init(); }
+void IOExt2::re_init() { init(); }
 
-void IOExt::init() {
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    printf("[?] Init IOExt %u...\n", devNr);
+void IOExt2::init() {
+  for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+    printf("[?] Init IOExt2 %u...\n", devNr);
     xSemaphoreTakeT(i2cBus.mutex);
-    bool isError = ioExt.IOExtDevs[devNr].begin();
+    ioExt.IOExtDevs[devNr].init();
     xSemaphoreGive(i2cBus.mutex);
-    if (isError) {
-      printf("[x] Initialization of IOExt %u failed.\n", devNr);
-    } else {
-      char msg[100];
-      for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-        CarStatePin *pin = carState.getPin(devNr, pinNr);
-        carState.idxOfPin.insert(pair<string, int>{pin->name, getIdx(devNr, pinNr)});
-        xSemaphoreTakeT(i2cBus.mutex);
-        ioExt.IOExtDevs[devNr].pinMode(pinNr, pin->mode);
-        // if (pin->mode != OUTPUT) {
-        //   pin->value = pin->oldValue = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
-        // }
-        xSemaphoreGive(i2cBus.mutex);
-        snprintf(msg, 100, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin->port, carState.getIdx(pin->name),
-                 pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
-        printf(msg);
-      }
-      printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
+    char msg[100];
+    for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
+      carState.idxOfPin.insert(pair<string, int>{pin->name, getIdx(devNr, pinNr)});
+      xSemaphoreTakeT(i2cBus.mutex);
+      ioExt.IOExtDevs[devNr].pinMode(pinNr, pin->mode);
+      // if (pin->mode != OUTPUT) {
+      //   pin->value = pin->oldValue = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
+      // }
+      xSemaphoreGive(i2cBus.mutex);
+      snprintf(msg, 100, "  0x%02x [%02d], mode:%s, value=%d (%s)\n", pin->port, carState.getIdx(pin->name),
+               pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
+      printf(msg);
     }
+    printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
   }
   set_SleepTime(400);
 }
 
-void IOExt::exit(void) {
+void IOExt2::exit(void) {
   // TODO
 }
 // ------------------
 
-void IOExt::handleIoInterrupt() {
+void IOExt2::handleIoInterrupt() {
   if (isInInterruptHandler) {
     debug_printf("Jump out of interrupt handler at %ld\n", millis());
     return;
@@ -113,11 +111,11 @@ void IOExt::handleIoInterrupt() {
   isInInterruptHandler = false;
 }
 
-void IOExt::readAll() {
+void IOExt2::readAll() {
   debug_printf("Read all INPUT* IOs at %ld\n", millis());
   list<void (*)()> pinHandlerList;
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
+  for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+    for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->mode != OUTPUT) {
 
@@ -144,7 +142,7 @@ void IOExt::readAll() {
   pinHandlerList.clear();
 }
 
-void IOExt::setPortMode(int port, uint8_t mode) {
+void IOExt2::setPortMode(int port, uint8_t mode) {
   // get device & port
   int idx = port >> 4;
   int pin = port & 0xf;
@@ -153,7 +151,7 @@ void IOExt::setPortMode(int port, uint8_t mode) {
   xSemaphoreGive(i2cBus.mutex);
 }
 
-void IOExt::setPort(int port, bool value) {
+void IOExt2::setPort(int port, bool value) {
   // get device & port
   int idx = port >> 4;
   int pin = port & 0xf;
@@ -163,7 +161,7 @@ void IOExt::setPort(int port, bool value) {
   xSemaphoreGive(i2cBus.mutex);
 }
 
-int IOExt::getPort(int port) {
+int IOExt2::getPort(int port) {
   // get device & port
   int idx = port >> 4;
   int pin = port & 0xf;
@@ -175,7 +173,7 @@ int IOExt::getPort(int port) {
   return value;
 }
 
-void IOExt::task() {
+void IOExt2::task() {
 
   // polling loop
   while (1) {

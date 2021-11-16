@@ -37,7 +37,14 @@
 #include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
+#if IOEXT_ON == true
 #include <IOExt.h>
+#include <PCF8574.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#include <MCP23017.h>
+#endif
 #include <Indicator.h>
 #include <OneWireBus.h>
 #include <PWM.h>
@@ -76,7 +83,12 @@ GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
 I2CBus i2cBus;
 Indicator indicator; // INDICATOR_ON
+#if IOEXT_ON == true
 IOExt ioExt;
+#endif
+#if IOEXT2_ON
+IOExt2 ioExt;
+#endif
 OneWireBus oneWireBus;
 PWM pwm;
 RTC rtc;
@@ -146,9 +158,9 @@ void app_main(void) {
     gpio.init();
     gpio.register_gpio_interrupt();
   }
-  if (IOEXT_ON) {
-    ioExt.init();
-  }
+#if IOEXT_ON || IOEXT2_ON
+  ioExt.init();
+#endif
   if (DAC_ON) {
     dac.init();
   }
@@ -225,15 +237,15 @@ void app_main(void) {
     carControl.create_task();
     engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");
   }
-  if (IOEXT_ON) {
-    carState.Indicator = INDICATOR::OFF;
-    carState.ConstantModeOn = false;
-    carState.ConstantMode = CONSTANT_MODE::SPEED;
-    carState.Light = LIGHT::OFF;
-    ioExt.create_task();
-    engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
-    ioExt.readAll();
-  }
+#if IOEXT_ON || IOEXT2_ON
+  carState.Indicator = INDICATOR::OFF;
+  carState.ConstantModeOn = false;
+  carState.ConstantMode = CONSTANT_MODE::SPEED;
+  carState.Light = LIGHT::OFF;
+  ioExt.create_task();
+  engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
+  ioExt.readAll();
+#endif
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;
   engineerDisplay.print("\nready at ");
@@ -260,8 +272,9 @@ void app_main(void) {
   systemOk = true;
   sleep(1);
   carState.init_values();
+#if IOEXT_ON || IOEXT2_ON
   ioExt.readAll();
-
+#endif
   cout << "-----------------------------------------------------------------" << endl;
   cout << "Creating FreeRTOS tasks successful. System running." << endl;
   cout << "-----------------------------------------------------------------" << endl;

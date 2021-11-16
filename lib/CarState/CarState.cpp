@@ -3,7 +3,12 @@
 //
 
 #include <CarState.h>
+#if IOEXT_ON
 #include <IOExt.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#endif
 #include <Indicator.h>
 #include <definitions.h>
 
@@ -12,8 +17,14 @@ using namespace std;
 extern CarState carState;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
+#if IOEXT_ON
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
 CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(port)]); }
+#endif
+#if IOEXT2_ON
+CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
+CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt2::getIdx(port)]); }
+#endif
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
 static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASHR"};
@@ -118,6 +129,7 @@ const string CarState::printIOs(string msg, bool withColors) {
   stringstream ss(msg);
   if (msg.length() > 0)
     ss << msg << endl;
+#if IOEXT_ON
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     // printf("0x%2x0: ", devNr);
     ss << devNr << ": ";
@@ -135,6 +147,26 @@ const string CarState::printIOs(string msg, bool withColors) {
         ss << " - ";
     }
   }
+#endif
+#if IOEXT2_ON
+ for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+    // printf("0x%2x0: ", devNr);
+    ss << devNr << ": ";
+    for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
+      if (pin->mode == OUTPUT && withColors) {
+        ss << " " << highLightColor << pin->value << normalColor;
+      } else {
+        ss << pin->value;
+      }
+      if ((IOExt2::getIdx(devNr, pinNr) + 1) % 8 == 0)
+        ss << " | ";
+      else if ((IOExt2::getIdx(devNr, pinNr) + 1) % 4 == 0)
+        // printf(" - ");
+        ss << " - ";
+    }
+  }
+#endif
   ss << endl;
   return ss.str();
 }

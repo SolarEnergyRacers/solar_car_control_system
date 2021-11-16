@@ -6,13 +6,18 @@
 
 #include <Display.h>
 #include <DriverDisplay.h>
-#include <IOExt.h>
 #include <Indicator.h>
+#if IOEXT_ON
+#include <IOExt.h>
 #include <PCF8574.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#include <MCP23017.h>
+#endif
 
 extern CarState carState;
 extern DriverDisplay driverDisplay;
-extern IOExt ioExt;
 extern Indicator indicator;
 
 // ------------------

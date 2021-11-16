@@ -24,13 +24,23 @@
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
+#if IOEXT_ON
 #include <IOExt.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#endif
 #include <Indicator.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
+#if IOEXT_ON
 extern IOExt ioExt;
+#endif
+#if IOEXT2_ON
+extern IOExt2 ioExt;
+#endif
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
@@ -252,6 +262,7 @@ void CmdHandler::printSystemValues() {
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
   printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
+#if IOEXT_ON
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
@@ -260,5 +271,16 @@ void CmdHandler::printSystemValues() {
       }
     }
   }
+#endif
+#if IOEXT2_ON
+  for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+    for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
+      if (pin->value == 0) {
+        printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
+      }
+    }
+  }
+#endif
   printf("POT0 (accel)= %4d, POT1 (recup)= %4d\n", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
 }

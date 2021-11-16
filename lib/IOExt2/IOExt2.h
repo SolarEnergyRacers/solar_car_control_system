@@ -1,13 +1,14 @@
 /*
- * PCF8574 I/O Extension over I2C  !!! UNTESTED !!!
+ * MCP23017 I/O Extension over I2C  !!! UNTESTED !!!
  */
 
-#ifndef SER_IOEXT_H
-#define SER_IOEXT_H
+#ifndef SER_IOEXT2_H
+#define SER_IOEXT2_H
 
 #include <definitions.h>
-#if IOEXT_ON
+#if IOEXT2_ON
 
+#include <MCP23017.h>
 #include <list>
 #include <map>
 #include <string>
@@ -73,10 +74,9 @@ void constantModeHandler();
 void constantModeOnOffHandler();
 // end pin handler
 
-class IOExt : public abstract_task {
+class IOExt2 : public abstract_task {
 public:
-
-  string getName(void) { return "IOExt"; };
+  string getName(void) { return "IOExt2"; };
 
   void init(void);
   void re_init(void);
@@ -88,8 +88,8 @@ public:
 
   void readAll();
 
-  static int getIdx(int devNr, int pin) { return devNr * 8 + pin; };
-  static int getIdx(int port) { return (port >> 4) * 8 + (port & 0x0F); };
+  static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
+  static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
 private:
   static volatile bool ioInterruptRequest;
@@ -99,11 +99,10 @@ private:
   void handleIoInterrupt();
   static void ioExt_interrupt_handler() { ioInterruptRequest = true; };
 
-  PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler)};
+  MCP23017 IOExtDevs[2] = {
+      MCP23017(I2C_ADDRESS_MCP23017_IOExt0), // Pins 00-15: Main board
+      MCP23017(I2C_ADDRESS_MCP23017_IOExt1)  // Pins 16-31: Steering wheel
+  };
 };
 #endif
-#endif // SER_IOEXT_H
+#endif // SER_IOEXT2_H

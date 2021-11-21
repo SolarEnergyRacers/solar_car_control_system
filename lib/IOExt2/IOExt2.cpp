@@ -66,17 +66,26 @@ CarStatePin CarState::pins[] = { // IOExtDev0
 // ------------------
 // FreeRTOS functions
 
-volatile bool IOExt2::ioInterruptRequest = false;
+volatile bool ioInterruptRequest;
+void IRAM_ATTR ioExt_interrupt_handler() {
+  printf("xxxx\n");
+  ioInterruptRequest = true;
+};
+
+// volatile bool IOExt2::ioInterruptRequest = false;
 
 void IOExt2::re_init() { init(); }
 
 void IOExt2::init() {
+  char msg[100];
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     printf("[?] Init IOExt2 %u...\n", devNr);
     xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].init();
+    ioExt.IOExtDevs[devNr].interruptMode(MCP23017InterruptMode::Or);
+    ioExt.IOExtDevs[devNr].interrupt(MCP23017Port::A, CHANGE); // FALLING);
+    ioExt.IOExtDevs[devNr].interrupt(MCP23017Port::B, CHANGE); // FALLING);
     xSemaphoreGive(i2cBus.mutex);
-    char msg[100];
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       carState.idxOfPin.insert(pair<string, int>{pin->name, getIdx(devNr, pinNr)});
@@ -90,8 +99,11 @@ void IOExt2::init() {
                pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
       printf(msg);
     }
+    ioExt.IOExtDevs[devNr].clearInterrupts();
     printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
   }
+  ioInterruptRequest = false;
+  attachInterrupt(digitalPinToInterrupt(I2C_INTERRUPT), ioExt_interrupt_handler, CHANGE);
   set_SleepTime(400);
 }
 
@@ -178,11 +190,18 @@ void IOExt2::task() {
   // polling loop
   while (1) {
     if (systemOk) {
-      // handle INPUT pin interrupts
+           // handle INPUT pin interrupts
       if (ioInterruptRequest) {
         debug_printf("ioInterruptRequest %ld\n", millis());
         handleIoInterrupt();
         ioInterruptRequest = false;
+      } else {
+        debug_printf("clear interrupts   %ld\n", millis());
+        xSemaphoreTakeT(i2cBus.mutex);
+        for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+          ioExt.IOExtDevs[devNr].clearInterrupts();
+        }
+        xSemaphoreGive(i2cBus.mutex);
       }
       // update OUTPUT pins
       for (auto &pin : carState.pins) {

@@ -92,12 +92,12 @@ public:
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
 private:
-  static volatile bool ioInterruptRequest;
+  //static volatile bool ioInterruptRequest;
   bool isInInterruptHandler = false;
 
   void setPortMode(int port, uint8_t mode);
   void handleIoInterrupt();
-  static void ioExt_interrupt_handler() { ioInterruptRequest = true; };
+  // static void ioExt_interrupt_handler() { printf(".");ioInterruptRequest = true; };
 
   MCP23017 IOExtDevs[2] = {
       MCP23017(I2C_ADDRESS_MCP23017_IOExt0), // Pins 00-15: Main board

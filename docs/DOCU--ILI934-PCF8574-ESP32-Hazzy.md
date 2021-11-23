@@ -8,6 +8,7 @@ ILI9341 + PCF8574 + ADS1x15 controlled with ESP32-Hazzy
 
 - [Adafruit: HUZZAH32 – ESP32 Feather Board](https://www.adafruit.com/product/3405)
 - [Adafruit-ESP32-HUZZAH-Breakout (PCB)](https://github.com/adafruit/Adafruit-ESP32-HUZZAH-Breakout-PCB)
+- [ESP32 Wroom Interrupts](https://deepbluembedded.com/esp32-external-interrupts-pins-arduino-examples)
 
 ### Display 3.2" 320x240 ILI9341
 

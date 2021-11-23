@@ -27,7 +27,7 @@ string Indicator::getName(void) { return "Indicator"; };
 void Indicator::re_init() { init(); }
 
 void Indicator::init(void) {
-  set_SleepTime(500);
+  set_SleepTime(200);
   printf("[v] Indicator handler inited\n");
   driverDisplay.print("[v] " + getName() + " initialized.\n");
 }

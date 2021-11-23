@@ -32,11 +32,11 @@
 // IOExt1
 #define PinIndicatorOutLeft "IndicatorOutLeft"
 #define PinIndicatorOutRight "IndicatorOutRight"
-#define PinRalais12 "Ralais12"
-#define PinRelais31 "Relais31"
-#define PinRelais32 "Relais32"
+#define PinFanOut "PinFanOut"
+#define PinHornOut "PinHornOut"
+#define PinLightOut "PinLightOut"
 #define PinBreakPedal "BreakPedal"
-#define PinDUMMY19 "DUMMY19"
+#define PinHeadLightOut "PinHeadLightOut"
 #define PinDUMMY17 "DUMMY17"
 // IOExt2
 #define PinIndicatorBtnLeft "IndicatorBtnLeft"
@@ -86,7 +86,7 @@ public:
   void setPort(int port, bool value);
   int getPort(int port);
 
-  void readAll();
+  void readAll(bool deltaOnly = false);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
@@ -97,7 +97,7 @@ private:
 
   void setPortMode(int port, uint8_t mode);
   void handleIoInterrupt();
-  // static void ioExt_interrupt_handler() { printf(".");ioInterruptRequest = true; };
+  // static void ioExt_interrupt_handler() { ioInterruptRequest = true; };
 
   MCP23017 IOExtDevs[2] = {
       MCP23017(I2C_ADDRESS_MCP23017_IOExt0), // Pins 00-15: Main board

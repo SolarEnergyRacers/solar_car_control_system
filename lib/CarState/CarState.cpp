@@ -123,9 +123,10 @@ const string CarState::serialize(string msg) {
   return cJSON_Print(carData);
 }
 
-const string CarState::printIOs(string msg, bool withColors) {
+const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
   string normalColor = "\033[0;39m";
-  string highLightColor = "\033[1;31m";
+  string highLightColorOut = "\033[1;31m";
+  string highLightColorChg = "\033[1;36m";
   stringstream ss(msg);
   if (msg.length() > 0)
     ss << msg << endl;
@@ -149,24 +150,38 @@ const string CarState::printIOs(string msg, bool withColors) {
   }
 #endif
 #if IOEXT2_ON
- for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+  bool hasDelta = false;
+  for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     // printf("0x%2x0: ", devNr);
     ss << devNr << ": ";
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+      int idx = IOExt2::getIdx(devNr, pinNr);
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->mode == OUTPUT && withColors) {
-        ss << " " << highLightColor << pin->value << normalColor;
+        if (pin->value != pin->oldValue) {
+          hasDelta = true;
+          ss << highLightColorChg << pin->value << normalColor;
+        } else {
+          ss << highLightColorOut << pin->value << normalColor;
+        }
       } else {
-        ss << pin->value;
+        if (pin->value != pin->oldValue) {
+          hasDelta = true;
+          ss << highLightColorChg << pin->value << normalColor;
+        } else {
+          ss << pin->value;
+        }
       }
-      if ((IOExt2::getIdx(devNr, pinNr) + 1) % 8 == 0)
+      if ((idx + 1) % 8 == 0)
         ss << " | ";
-      else if ((IOExt2::getIdx(devNr, pinNr) + 1) % 4 == 0)
-        // printf(" - ");
-        ss << " - ";
+      else if ((idx + 1) % 4 == 0)
+        ss << "-";
     }
   }
 #endif
   ss << endl;
-  return ss.str();
+  if (hasDelta || !deltaOnly)
+    return ss.str();
+  else
+    return "";
 }

@@ -7,7 +7,7 @@
 #define CARCONTROL_ON true       // central car control task
 #define CARSPEED_ON false        // car pid speed controller
 #define COMMANDHANDLER_ON true   // command input and deploy
-#define DAC_ON false             // digital analog converter, I2C (DS1803)
+#define DAC_ON true             // digital analog converter, I2C (DS1803)
 #define DRIVER_DISPLAY_ON true   // driver display, SPI (ILI9341)
 #define DS_ON false              // 1-Wire Digital Thermometer (DS18B20)
 #define ENGINEER_DISPLAY_ON true // display elements
@@ -16,7 +16,7 @@
 #define INT_ON false             // interrupt for I/O Expander
 #define IOEXT_ON false            // 8-Bit I/O Expander for I2C Bus (PCF8574)
 #define IOEXT2_ON true            // 8-Bit I/O Expander for I2C Bus (MCP23017)
-#define LIFESIGN_ON false        // LifeSign on Screens
+#define LIFESIGN_ON true        // LifeSign on Screens
 #define PWM_ON false             // 16-channel, 12-bit PWM Fm, I2C (PCA9685)
 #define RTC_ON true              // real time clock, I2C
 #define SD_ON false              // SD card

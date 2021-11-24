@@ -87,7 +87,12 @@ void CmdHandler::task() {
         input = "h"; // help
       }
 
-      int accValue;
+      int intValue = 0;
+      float floatValue = 0.0;
+      if (input.length() > 1) {
+        intValue = atoi(&input[1]);
+        floatValue = atof(&input[1]);
+      }
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
@@ -114,56 +119,38 @@ void CmdHandler::task() {
           printf("%s\n", carState.serialize("Recent State").c_str());
         }
         break;
-      case '-':
-        carControl.adjust_paddles_min();
-        break;
-      case '=':
-        carControl.adjust_paddles_max();
-        break;
       case 's':
         if (input[2] == 'f') {
           carState.DriveDirection = DRIVE_DIRECTION::FORWARD;
         } else if (input[2] == 'b') {
           carState.DriveDirection = DRIVE_DIRECTION::BACKWARD;
         } else {
-          carState.Speed = atoi(&input[1]);
+          carState.Speed = intValue;
         }
         break;
       case 'b':
-        carState.BatteryVoltage = atof(&input[1]);
+        carState.BatteryVoltage = floatValue;
         break;
       case 'B':
-        carState.BatteryCurrent = atof(&input[1]);
+        carState.BatteryCurrent = floatValue;
         break;
       case 'p':
-        carState.PhotoVoltaicCurrent = atof(&input[1]);
+        carState.PhotoVoltaicCurrent = floatValue;
         break;
       case 'm':
-        carState.MotorCurrent = atof(&input[1]);
+        carState.MotorCurrent = floatValue;
+        break;
+      case '-':
+        carControl.adjust_paddles(10);
         break;
       case 'a':
-        accValue = atoi(&input[1]);
-        carState.Acceleration = accValue;
-        // TODO: where to put in this important
-        if (accValue > 0) {
-          dac.set_pot(accValue, DAC::POT_CHAN0);
+        carState.Acceleration = intValue;
+        if (intValue > 0) {
+          dac.set_pot(intValue, DAC::POT_CHAN0);
           dac.set_pot(0, DAC::POT_CHAN1);
-        } else if (accValue > 0) {
+        } else if (intValue < 0) {
           dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(accValue, DAC::POT_CHAN1);
-        } else {
-          dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(0, DAC::POT_CHAN1);
-        }
-        break;
-      case 'A':
-        value = atoi(&input[1]);
-        if (value > 0) {
-          dac.set_pot(value, DAC::POT_CHAN0);
-          dac.set_pot(0, DAC::POT_CHAN1);
-        } else if (value < 0) {
-          dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(value, DAC::POT_CHAN1);
+          dac.set_pot(intValue, DAC::POT_CHAN1);
         } else {
           dac.set_pot(0, DAC::POT_CHAN0);
           dac.set_pot(0, DAC::POT_CHAN1);
@@ -241,9 +228,6 @@ void CmdHandler::task() {
         break;
       case 'I':
         i2cBus.scan_i2c_devices();
-        break; // usage
-      case 'r':
-        ioExt.readAll();
         break;
       default:
         printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());

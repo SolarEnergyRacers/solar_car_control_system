@@ -20,7 +20,6 @@ extern DAC dac;
 extern DriverDisplay driverDisplay;
 
 void ADC::init() {
-
   // instantiate the devices with their corresponding address
   ads_addrs[0] = I2C_ADDRESS_ADS1x15_0;
   ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
@@ -66,7 +65,6 @@ void ADC::init() {
 }
 
 int16_t ADC::read(ADC::Pin port) {
-
   int idx = port >> 4;
   int pin = port & 0xf;
   debug_printf_l3("index: 0x%x, pin: 0x%x \n", idx, pin);
@@ -79,7 +77,9 @@ int16_t ADC::read(ADC::Pin port) {
   debug_printf_l3("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
   return value;
 }
+
 float ADC::get_multiplier(Pin port) {
   int devNr = port >> 4;
   return adss[devNr].toVoltage(1);
 }
+

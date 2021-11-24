@@ -404,7 +404,7 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (Speed.is_changed() || justInited) {
       write_speed();
     }
-    Acceleration.Value = carState.Acceleration;
+    Acceleration.Value = carState.AccelerationDisplay;
     if (Acceleration.is_changed() || justInited) {
       write_acceleration();
     }

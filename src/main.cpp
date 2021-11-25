@@ -71,6 +71,7 @@ using namespace std;
 
 ADC adc;
 CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
+CAN_device_t CAN_cfg;
 CarControl carControl;
 CarSpeed carSpeed;
 CarState carState;

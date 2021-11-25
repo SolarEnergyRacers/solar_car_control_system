@@ -3,7 +3,7 @@
 #define LocalFunctionsAndDevices_H
 
 #define ADC_ON true              // analog digital converte, I2C (ADS1015, ADS1115)
-#define CAN_ON false             // CAN bus (MPPT, BMS, ..)
+#define CAN_ON true             // CAN bus (MPPT, BMS, ..)
 #define CARCONTROL_ON true       // central car control task
 #define CARSPEED_ON false        // car pid speed controller
 #define COMMANDHANDLER_ON true   // command input and deploy

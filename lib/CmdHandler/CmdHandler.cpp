@@ -69,7 +69,6 @@ void CmdHandler::task() {
   while (1) {
 
     while (Serial.available() > 0) {
-      int value = 0;
       // read the incoming chars:
       String input = Serial.readString();
       Serial.flush();

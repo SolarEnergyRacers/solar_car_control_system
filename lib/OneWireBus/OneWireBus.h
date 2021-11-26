@@ -13,7 +13,7 @@
 class OneWireBus {
 private:
 public:
-  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t mutex = NULL;
   OneWire oneWire;
   void init();
   void re_init();

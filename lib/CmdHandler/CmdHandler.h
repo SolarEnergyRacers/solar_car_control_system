@@ -9,6 +9,7 @@
 
 class CmdHandler : public abstract_task {
 private:
+  uint32_t sleep_polling_ms = 250;
   string commands = "RECDS-=:!udsaAbBpm<>wlLciIr";
   string helpText = "Available commands (" + commands +
                     "):\n"
@@ -20,7 +21,7 @@ private:
                     "\t-        - set min accel and recup value (paddels released)\n"
                     "\t=        - set max accel and recup value (paddels pressed)\n"
                     "\tS        - print status of all values\n"
-                    "\t-------- DRIVER INFO COMMANDS -----------\n"
+                    "\t-------- DRIVER_RUNNING INFO COMMANDS -----------\n"
                     "\t:<text>  - display driver info text\n"
                     "\t!<text>  - display driver warn text\n"
                     "\tu [off]  - speed up arrow (green)      [|off]\n"

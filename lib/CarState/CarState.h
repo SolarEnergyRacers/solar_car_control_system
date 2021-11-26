@@ -10,74 +10,114 @@
 #include <sstream>
 #include <string>
 
-#include <CarStatePin.h>
-#include <CarStateValue.h>
 #include <definitions.h>
+
+#include <CarStatePin.h>
 
 using namespace std;
 
 // public structures
 enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 enum class LIGHT { OFF, L1, L2 };
-
+enum class DISPLAY_STATUS {
+  DRIVER_HALTED,
+  DRIVER_SETUP,
+  DRIVER_BACKGROUND,
+  DRIVER_RUNNING,
+  DRIVER_DEMOSCREEN,
+  ENGINEER_CONSOLE,
+  ENGINEER_HALTED,
+  ENGINEER_SETUP,
+  ENGINEER_BACKGROUND,
+  ENGINEER_RUNNING
+};
+static const char *DISPLAY_STATUS_str[] = {
+    "DRIVER_HALTED",       // no action on this display
+    "DRIVER_SETUP",        // driver screen setup
+    "DRIVER_BACKGROUND",   // create background for driver screen
+    "DRIVER_RUNNING",      // driver mode active
+    "DRIVER_DEMOSCREEN",   // demo
+    "ENGINEER_CONSOLE",    // console mode (engineer screen)
+    "ENGINEER_HALTED"      // no action on this display
+    "ENGINEER_SETUP",      // engineerscreen setup
+    "ENGINEER_BACKGROUND", // create background for engineer screen
+    "ENGINEER_RUNNING"     // enineer mode active
+};
 class CarState {
 
 public:
   CarState() {
-    Speed.set(0);
-    Acceleration.set(0);
-    Deceleration.set(0);
-    BatteryVoltage.set(0);
-    BatteryVoltage.set_epsilon(0.1);
-    BatteryCurrent.set(0);
-    BatteryCurrent.set_epsilon(0.1);
-    PhotoVoltaicCurrent.set(0);
-    PhotoVoltaicCurrent.set_epsilon(0.1);
-    MotorCurrent.set(0);
-    MotorCurrent.set_epsilon(0.1);
+    Speed = 0;
+    Acceleration = 0;
+    Deceleration = 0;
+    BatteryVoltage = 0;
+    BatteryCurrent = 0;
+    PhotoVoltaicCurrent = 0;
+    MotorCurrent = 0;
 
-    Indicator.set(INDICATOR::OFF);
-    DriveDirection.set(DRIVE_DIRECTION::FORWARD);
-    ConstantMode.set(CONSTANT_MODE::SPEED);
-    ConstantModeOn.set(false);
+    Indicator = INDICATOR::OFF;
+    DriveDirection = DRIVE_DIRECTION::FORWARD;
+    ConstantMode = CONSTANT_MODE::SPEED;
+    ConstantModeOn = false;
 
-    TargetSpeed.set(0);
-    TargetPower.set(0);
-    DriverInfo.set("ok.");
-    DriverInfoType.set(INFO_TYPE::STATUS);
-    Light.set(LIGHT::OFF);
+    TargetSpeed = 0;
+    TargetPower = 0;
+    DriverInfo = "ok.";
+    DriverInfoType = INFO_TYPE::STATUS;
+    Light = LIGHT::OFF;
   }
   ~CarState(){};
 
   // pyhsical car data (measurment values)
-  CarStateValue<int> Speed;
-  CarStateValue<int> Acceleration;
-  CarStateValue<int> AccelerationDisplay;
-  CarStateValue<int> Deceleration;
+  int Speed;               // ADC
+  int Acceleration;        // ADC Steering Wheel
+  int Deceleration;        // ADC Steering Wheel
+  int AccelerationDisplay; // Display Value (-99...+99)
 
-  CarStateValue<bool> BatteryOn;
-  CarStateValue<float> BatteryVoltage;
-  CarStateValue<float> BatteryCurrent;
-  CarStateValue<bool> PhotoVoltaicOn;
-  CarStateValue<float> PhotoVoltaicCurrent;
-  CarStateValue<bool> MotorOn;
-  CarStateValue<float> MotorCurrent;
-  CarStateValue<float> MotorVoltage;
+  bool BatteryOn;      // IO-In
+  bool PhotoVoltaicOn; // IO-in
+  bool MotorOn;        // IO-In
+  bool EcoOn;          // IO-In
+
+  float BatteryVoltage;      // CAN
+  float BatteryCurrent;      // CAN
+  float PhotoVoltaicCurrent; // CAN
+  float MotorVoltage;        // ADC
+  float MotorCurrent;        // ADC
+
+  float Mppt1Current; // CAN
+  float Mppt2Current; // CAN
+  float Mppt3Current; // CAN
+
+  float Umin; // CAN
+  float Uavg; // CAN
+  float Umax; // CAN
+
+  float T1; // ??
+  float T2; // ??
+  float T3; // ??
+  float T4; // ??
+
+  bool BreakPedal;
 
   // logical car data (values set by driver or chase car)
-  CarStateValue<DRIVE_DIRECTION> DriveDirection;
-  CarStateValue<CONSTANT_MODE> ConstantMode;
-  CarStateValue<bool> ConstantModeOn;
-  CarStateValue<INDICATOR> Indicator;
+  DISPLAY_STATUS displayStatus;
+  DRIVE_DIRECTION DriveDirection;
+  CONSTANT_MODE ConstantMode;
+  bool ConstantModeOn;
+  INDICATOR Indicator;
+  bool IndicatorBlink;
 
-  CarStateValue<int> TargetSpeed;
-  CarStateValue<int> TargetPower;
-  CarStateValue<string> DriverInfo;
-  CarStateValue<INFO_TYPE> DriverInfoType;
-  CarStateValue<LIGHT> Light;
+  int TargetSpeed;
+  int TargetPower;
+  string DriverInfo;
+  SPEED_ARROW SpeedArrow;
+  INFO_TYPE DriverInfoType;
+  LIGHT Light;
 
   // All IO pins
   static CarStatePin pins[IOExtPINCOUNT];
@@ -89,9 +129,11 @@ public:
   std::map<string, int> idxOfPin;
   // std::map<int, Pin> pins; // pins by index
 
+  void init_values();
+
   // tools
   const string print(string msg, bool withColors = true);
-  const string printIOs(string msg, bool withColors = true);
+  const string printIOs(string msg, bool withColors = true, bool deltaOnly = false);
   const string serialize(string msg);
 };
 

@@ -18,26 +18,38 @@
 #include <CarControl.h>
 #include <CarState.h>
 #include <CarStatePin.h>
-#include <CarStateValue.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
+#if IOEXT_ON
 #include <IOExt.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#endif
 #include <Indicator.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
+#if IOEXT_ON
 extern IOExt ioExt;
+#endif
+#if IOEXT2_ON
+extern IOExt2 ioExt;
+#endif
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
 extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
+
+// ------------------
+// FreeRTOS functions
 
 void CmdHandler::re_init() { init(); }
 
@@ -50,13 +62,13 @@ void CmdHandler::init() {
 void CmdHandler::exit() {
   // TODO
 }
+// ------------------
 
 void CmdHandler::task() {
 
   while (1) {
 
     while (Serial.available() > 0) {
-      int value = 0;
       // read the incoming chars:
       String input = Serial.readString();
       Serial.flush();
@@ -74,25 +86,30 @@ void CmdHandler::task() {
         input = "h"; // help
       }
 
-      int accValue;
+      int intValue = 0;
+      float floatValue = 0.0;
+      if (input.length() > 1) {
+        intValue = atoi(&input[1]);
+        floatValue = atof(&input[1]);
+      }
       switch (input[0]) {
       // ---------------- controller commands
       case 'R':
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
         driverDisplay.re_init();
         break;
       case 'C':
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::CONSOLE);
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
         driverDisplay.clear_screen(ILI9341_WHITE);
         break;
       case 'D':
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPDRIVER);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
         break;
       case 'E':
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::HALTED);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::SETUPENGINEER);
+        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
         break;
       case 'S':
         printSystemValues();
@@ -101,56 +118,38 @@ void CmdHandler::task() {
           printf("%s\n", carState.serialize("Recent State").c_str());
         }
         break;
-      case '-':
-        carControl.adjust_paddles_min();
-        break;
-      case '=':
-        carControl.adjust_paddles_max();
-        break;
       case 's':
         if (input[2] == 'f') {
-          carState.DriveDirection.set(DRIVE_DIRECTION::FORWARD);
+          carState.DriveDirection = DRIVE_DIRECTION::FORWARD;
         } else if (input[2] == 'b') {
-          carState.DriveDirection.set(DRIVE_DIRECTION::BACKWARD);
+          carState.DriveDirection = DRIVE_DIRECTION::BACKWARD;
         } else {
-          carState.Speed.set(atoi(&input[1]));
+          carState.Speed = intValue;
         }
         break;
       case 'b':
-        carState.BatteryVoltage.set(atof(&input[1]));
+        carState.BatteryVoltage = floatValue;
         break;
       case 'B':
-        carState.BatteryCurrent.set(atof(&input[1]));
+        carState.BatteryCurrent = floatValue;
         break;
       case 'p':
-        carState.PhotoVoltaicCurrent.set(atof(&input[1]));
+        carState.PhotoVoltaicCurrent = floatValue;
         break;
       case 'm':
-        carState.MotorCurrent.set(atof(&input[1]));
+        carState.MotorCurrent = floatValue;
+        break;
+      case '-':
+        carControl.adjust_paddles(10);
         break;
       case 'a':
-        accValue = atoi(&input[1]);
-        carState.Acceleration.set(accValue);
-        // TODO: where to put in this important
-        if (accValue > 0) {
-          dac.set_pot(accValue, DAC::POT_CHAN0);
+        carState.Acceleration = intValue;
+        if (intValue > 0) {
+          dac.set_pot(intValue, DAC::POT_CHAN0);
           dac.set_pot(0, DAC::POT_CHAN1);
-        } else if (accValue > 0) {
+        } else if (intValue < 0) {
           dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(accValue, DAC::POT_CHAN1);
-        } else {
-          dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(0, DAC::POT_CHAN1);
-        }
-        break;
-      case 'A':
-        value = atoi(&input[1]);
-        if (value > 0) {
-          dac.set_pot(value, DAC::POT_CHAN0);
-          dac.set_pot(0, DAC::POT_CHAN1);
-        } else if (value < 0) {
-          dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(value, DAC::POT_CHAN1);
+          dac.set_pot(intValue, DAC::POT_CHAN1);
         } else {
           dac.set_pot(0, DAC::POT_CHAN0);
           dac.set_pot(0, DAC::POT_CHAN1);
@@ -161,28 +160,28 @@ void CmdHandler::task() {
       case 'u':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_increase(false);
+          carState.SpeedArrow = SPEED_ARROW::OFF;
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_increase(true);
+          carState.SpeedArrow = SPEED_ARROW::INCREASE;
         }
         break;
       case 'd':
         if (string("off") == string(&input[2])) {
           debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_decrease(false);
+          carState.SpeedArrow = SPEED_ARROW::OFF;
         } else {
           debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          driverDisplay.arrow_decrease(true);
+          carState.SpeedArrow = SPEED_ARROW::DECREASE;
         }
         break;
       case ':':
-        carState.DriverInfoType.set(INFO_TYPE::INFO);
-        carState.DriverInfo.set(&input[1]);
+        carState.DriverInfoType = INFO_TYPE::INFO;
+        carState.DriverInfo = &input[1];
         break;
       case '!':
-        carState.DriverInfoType.set(INFO_TYPE::WARN);
-        carState.DriverInfo.set(&input[1]);
+        carState.DriverInfoType = INFO_TYPE::WARN;
+        carState.DriverInfo = &input[1];
         break;
       // -------------- steering wheel input element emulators
       case '<':
@@ -196,40 +195,38 @@ void CmdHandler::task() {
         break;
       case 'l':
         if (input[1] == '-') {
-          carState.Light.set(LIGHT::OFF);
+          carState.Light = LIGHT::OFF;
         } else {
-          carState.Light.set(LIGHT::L1);
+          carState.Light = LIGHT::L1;
         }
-        driverDisplay.show_light();
         break;
       case 'L':
         if (input[1] == '-') {
-          carState.Light.set(LIGHT::OFF);
+          carState.Light = LIGHT::OFF;
         } else {
-          carState.Light.set(LIGHT::L2);
+          carState.Light = LIGHT::L2;
         }
-        driverDisplay.show_light();
         break;
       case 'c':
         if (input[2] == 's') {
-          carState.ConstantMode.set(CONSTANT_MODE::SPEED);
+          carState.ConstantMode = CONSTANT_MODE::SPEED;
+          carState.ConstantModeOn = true;
         } else if (input[2] == 'p') {
-          carState.ConstantMode.set(CONSTANT_MODE::POWER);
-        } else if (input[2] == 'c') {
-          carState.ConstantMode.set(CONSTANT_MODE::NONE);
+          carState.ConstantMode = CONSTANT_MODE::POWER;
+          carState.ConstantModeOn = true;
         } else {
-          carState.ConstantModeOn.set(false);
+          if (carState.ConstantModeOn) {
+            carState.ConstantModeOn = false;
+          } else {
+            carState.ConstantModeOn = false;
+          }
         }
-        driverDisplay.constant_drive_mode_show();
         break;
       case 'i':
         ioExt.readAll();
         break;
       case 'I':
         i2cBus.scan_i2c_devices();
-        break; // usage
-      case 'r':
-        ioExt.readAll();
         break;
       default:
         printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
@@ -239,8 +236,7 @@ void CmdHandler::task() {
         break;
       }
     }
-    // sleep for sleep_polling_ms
-    this->sleep(200);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
 
@@ -249,6 +245,7 @@ void CmdHandler::printSystemValues() {
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
   printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
+#if IOEXT_ON
   for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
@@ -257,5 +254,16 @@ void CmdHandler::printSystemValues() {
       }
     }
   }
+#endif
+#if IOEXT2_ON
+  for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+    for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+      CarStatePin *pin = carState.getPin(devNr, pinNr);
+      if (pin->value == 0) {
+        printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
+      }
+    }
+  }
+#endif
   printf("POT0 (accel)= %4d, POT1 (recup)= %4d\n", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
 }

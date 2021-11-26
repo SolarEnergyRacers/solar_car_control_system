@@ -24,16 +24,21 @@ extern CarSpeed carSpeed;
 extern ADC adc;
 extern DAC dac;
 
+// ------------------
+// FreeRTOS functions
+
 void CarSpeed::re_init() { init(); }
 
 void CarSpeed::init() {
   target_speed = 0;
   // pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
-  printf("CarSpeed successfully initialized");
+  sleep_polling_ms = 400;
+  printf("[v] %s inited.\n", getName().c_str());
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }
+// ------------------
 
 void CarSpeed::set_target_speed(double speed) { target_speed = speed; }
 

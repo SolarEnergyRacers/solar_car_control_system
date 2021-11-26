@@ -1,5 +1,5 @@
 //
-// Display
+// EngineeringDisplay
 //
 
 #ifndef SER_ENGINEER_DISPLAY_H
@@ -12,11 +12,25 @@
 #include <definitions.h>
 
 class EngineerDisplay : public Display {
-private:
-  //==== Driver Display definitions ==== START
-  // display formats and sizes
-  int bgColor = ILI9341_ORANGE;
+public:
+  EngineerDisplay() { bgColor = ILI9341_ORANGE; };
+  ~EngineerDisplay(){};
+  //==== overwrites from base class ==== START
+  string getName(void) { return "EngineerDisplay"; };
 
+protected:
+  //==== overwrites from base class ==== START
+  DISPLAY_STATUS display_setup() override;
+  DISPLAY_STATUS task(int lifeSignCounter) override;
+  //==== overwrites from base class ==== END
+
+private:
+  //==== display cache =====================
+  // ... to avoid flickering
+  bool justInited;
+  //=======================================
+
+  //==== Driver Display definitions ==== START
   // Stati [On/Off]
   DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 10, "Bat  :", "%3s", "", ILI9341_BLUE);
   DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(4, 30, "PV   :", "%3s", "", ILI9341_BLUE);
@@ -26,7 +40,7 @@ private:
   DisplayValue<float> Mppt1 = DisplayValue<float>(160, 10, "MPPT-1:", "%5.2f", "A");
   DisplayValue<float> Mppt2 = DisplayValue<float>(160, 30, "MPPT-2:", "%5.2f", "A");
   DisplayValue<float> Mppt3 = DisplayValue<float>(160, 50, "MPPT-3:", "%5.2f", "A");
-  DisplayValue<float> Mppt4 = DisplayValue<float>(160, 70, "MPPT-4:", "%5.2f", "A");
+  // DisplayValue<float> Mppt4 = DisplayValue<float>(160, 70, "MPPT-4:", "%5.2f", "A");
 
   // Battery status [OK/Error]
   DisplayValue<string> BatteryStatus = DisplayValue<string>(4, 90, "Battery:", "%18s", "");
@@ -51,15 +65,6 @@ private:
   DisplayValue<float> VoltageMax = DisplayValue<float>(4, 210, "U-max:", "%5.3f", "V");
   //==== Driver Display definition ==buf[== END
 
-public:
-  string getName(void) { return "EngineerDisplay"; };
-
-  //==== overwrites from base class ==== START
-  DISPLAY_STATUS display_setup(DISPLAY_STATUS status) override;
-  DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
-  //==== overwrites from base class ==== END
-
-  void print(string msg);
   void draw_display_background();
 };
 

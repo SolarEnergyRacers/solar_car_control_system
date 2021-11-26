@@ -14,7 +14,7 @@
 void OneWireBus::init(void) {
 
   // init mutex (it is acquired)
-  mutex = xSemaphoreCreateBinary();
+  mutex = xSemaphoreCreateMutex();
 
   // init
   oneWire = OneWire(ONEWIRE_PIN);

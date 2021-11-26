@@ -12,6 +12,7 @@
 #include <ADC.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
+#include <Helper.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;
@@ -19,7 +20,6 @@ extern DAC dac;
 extern DriverDisplay driverDisplay;
 
 void ADC::init() {
-
   // instantiate the devices with their corresponding address
   ads_addrs[0] = I2C_ADDRESS_ADS1x15_0;
   ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
@@ -28,7 +28,7 @@ void ADC::init() {
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
     printf("[?] Init 'ADC[%d]' with address 0x%x ...", idx, ads_addrs[idx]);
 
-    xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+    xSemaphoreTakeT(i2cBus.mutex);
     adss[idx] = ADS1115(ads_addrs[idx]);
 
     bool result = adss[idx].begin();
@@ -57,23 +57,29 @@ void ADC::init() {
     }
     xSemaphoreGive(i2cBus.mutex);
 
-    printf("[v] ADC[%d] initialized.\n", idx);
     char msg[100];
     snprintf(msg, 100, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
+    printf(msg);
     driverDisplay.print(msg);
   }
 }
 
 int16_t ADC::read(ADC::Pin port) {
-
   int idx = port >> 4;
   int pin = port & 0xf;
-  debug_printf_l2("index: 0x%x, pin: 0x%x \n", idx, pin);
+  debug_printf_l3("index: 0x%x, pin: 0x%x \n", idx, pin);
 
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-  int16_t value = ADC::adss[idx].readADC(pin);
+  int16_t value = 0;
+  xSemaphoreTakeT(i2cBus.mutex);
+  value = ADC::adss[idx].readADC(pin);
   xSemaphoreGive(i2cBus.mutex);
 
-  debug_printf_l2("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
+  debug_printf_l3("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
   return value;
 }
+
+float ADC::get_multiplier(Pin port) {
+  int devNr = port >> 4;
+  return adss[devNr].toVoltage(1);
+}
+

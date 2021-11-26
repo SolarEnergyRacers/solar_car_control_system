@@ -4,29 +4,39 @@
 
 #include <definitions.h>
 
+#include <inttypes.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include <inttypes.h>
-#include <stdio.h>
-
 #include <Arduino.h>
+
+#include <DAC.h>
+#include <DriverDisplay.h>
 #include <Helper.h>
 #include <I2CBus.h>
 #include <SPI.h>
 #include <Wire.h> // I2C
-
-#include <DAC.h>
-#include <DriverDisplay.h>
 
 #define BASE_ADDR_CMD 0xA8
 
 extern I2CBus i2cBus;
 extern DriverDisplay driverDisplay;
 
+char msg[100];
+
 void DAC::re_init() { init(); }
 
-void DAC::init() { driverDisplay.print("[v] DAC initialized.\n"); }
+void DAC::init() {
+  cout << "[?] Setup 'DAC'..." << endl;
+  snprintf(msg, 100, "[v] DAC initialized with I2C_ADDRESS_DS1803=%02x.\n", I2C_ADDRESS_DS1803);
+  cout << msg;
+  driverDisplay.print(msg);
+}
+
 uint8_t DAC::get_cmd(pot_chan channel) {
   uint8_t command = BASE_ADDR_CMD;
   switch (channel) {
@@ -50,7 +60,7 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
   // setup command
   uint8_t command = get_cmd(channel);
 
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(i2cBus.mutex);
   Wire.beginTransmission(I2C_ADDRESS_DS1803);
   Wire.write(command);
   Wire.write(val); // first pot value
@@ -64,13 +74,12 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
 }
 
 uint16_t DAC::get_pot(pot_chan channel) {
-
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
+  uint8_t pot0 = 0; // get pot0
+  uint8_t pot1 = 0; // get pot1
+  xSemaphoreTakeT(i2cBus.mutex);
   Wire.requestFrom(I2C_ADDRESS_DS1803, 2); // request 2 bytes
-  uint8_t pot0 = Wire.read();              // get pot0
-  uint8_t pot1 = Wire.read();              // get pot1
-
+  pot0 = Wire.read();
+  pot1 = Wire.read();
   xSemaphoreGive(i2cBus.mutex);
 
   if (channel == POT_CHAN_ALL) {

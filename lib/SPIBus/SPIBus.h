@@ -11,7 +11,7 @@
 class SPIBus {
 private:
 public:
-  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t mutex = NULL;
   void init();
   void re_init();
 };

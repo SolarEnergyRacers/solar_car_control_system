@@ -13,8 +13,8 @@ void read_can_demo_task(void *pvParameter);
 class CanBus {
 private:
 public:
-  SemaphoreHandle_t mutex;
-  CAN_device_t cfg;
+  SemaphoreHandle_t mutex = NULL;
+  // CAN_device_t cfg;  needs to be global because of CAN library :(
   void init();
   void re_init();
 };

@@ -17,12 +17,12 @@ void abstract_task::init() {
 void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
 void abstract_task::sleep(int polling_ms) { vTaskDelay(polling_ms / portTICK_PERIOD_MS); };
 
-void abstract_task::create_task() {
+void abstract_task::create_task(int priority) {
   printf(" - create task '%s'...", getInfo().c_str());
 #if WithTaskSuspend == true
   xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, 1, &xHandle);
 #else
-  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, 1, NULL);
+  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, priority, NULL);
 #endif
   printf(" done.\n");
 };
@@ -40,3 +40,5 @@ void abstract_task::exit() {
 };
 
 string abstract_task::getInfo() { return getName(); }
+
+void abstract_task::set_SleepTime(int milliseconds) { sleep_polling_ms = milliseconds; }

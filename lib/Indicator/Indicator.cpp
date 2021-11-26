@@ -2,29 +2,52 @@
 // Display
 //
 
-#include <ADS1X15.h>
-#include <Adafruit_ILI9341.h>
+#include <definitions.h>
 
 #include <Display.h>
 #include <DriverDisplay.h>
 #include <Indicator.h>
-#include <definitions.h>
+#if IOEXT_ON
+#include <IOExt.h>
+#include <PCF8574.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#include <MCP23017.h>
+#endif
 
 extern CarState carState;
 extern DriverDisplay driverDisplay;
+extern Indicator indicator;
 
-INDICATOR Indicator::getIndicator() { return carState.Indicator.get(); }
+// ------------------
+// FreeRTOS functions
+string Indicator::getName(void) { return "Indicator"; };
+
+void Indicator::re_init() { init(); }
+
+void Indicator::init(void) {
+  set_SleepTime(200);
+  printf("[v] Indicator handler inited\n");
+  driverDisplay.print("[v] " + getName() + " initialized.\n");
+}
+
+void Indicator::exit(void){
+    // TODO
+};
+// ------------------
 
 void Indicator::setIndicator(INDICATOR state) {
-  if (carState.Indicator.get() == state) {
+  if (carState.Indicator == state) {
     debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
-    carState.Indicator.set(INDICATOR::OFF);
+    carState.Indicator = INDICATOR::OFF;
   } else {
     debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
-    carState.Indicator.set(state);
+    carState.Indicator = state;
   }
 }
 
+// pins are low active
 void Indicator::setIndicator(int left, int right) {
   if (left == 0 && right == 0)
     setIndicator(INDICATOR::WARN);
@@ -34,35 +57,38 @@ void Indicator::setIndicator(int left, int right) {
     setIndicator(INDICATOR::RIGHT);
 }
 
-void Indicator::re_init() { init(); }
-
-string Indicator::getName(void) { return "Indicator"; };
-
-void Indicator::exit(void){
-    // TODO
-};
-
-// ------------------
-// FreeRTOS INIT TASK
-// ------------------
-void Indicator::init(void) {
-  printf("[v] Indicator handler inited\n");
-  driverDisplay.print("[v] " + getName() + " initialized.\n");
-  vTaskDelay(1000 / portTICK_PERIOD_MS); // TODO: why sleep here?
+bool Indicator::getIndicatorLeft() {
+  return (carState.Indicator == INDICATOR::LEFT || carState.Indicator == INDICATOR::WARN) && carState.IndicatorBlink;
 }
-// -------------
-// FreeRTOS TASK
-// -------------
+
+bool Indicator::getIndicatorRight() {
+  return (carState.Indicator == INDICATOR::RIGHT || carState.Indicator == INDICATOR::WARN) && carState.IndicatorBlink;
+}
+
+unsigned long lastFlip = 0;
+bool justSwitchedOff = true;
 void Indicator::task() {
   // do not add code here -- only controlling the blink frequency
   // polling loop
   while (1) {
-    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER) {
-      driverDisplay.indicator_set_and_blink(carState.Indicator.get(), blinkState);
+    if (carState.Indicator != INDICATOR::OFF) {
+      justSwitchedOff = true;
+      if (carState.IndicatorBlink && (millis() - lastFlip) > intervall_on) {
+        lastFlip = millis();
+        carState.IndicatorBlink = false;
+      } else if (!carState.IndicatorBlink && (millis() - lastFlip) > intervall_off) {
+        lastFlip = millis();
+        carState.IndicatorBlink = true;
+      }
+      carState.getPin(PinIndicatorOutLeft)->value = indicator.getIndicatorLeft();
+      carState.getPin(PinIndicatorOutRight)->value = indicator.getIndicatorRight();
+    } else if (justSwitchedOff) {
+      carState.getPin(PinIndicatorOutLeft)->value = 0;
+      carState.getPin(PinIndicatorOutRight)->value = 0;
+      justSwitchedOff = false;
     }
-    blinkState = !blinkState;
 
     // sleep
-    vTaskDelay(200 / portTICK_PERIOD_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

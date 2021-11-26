@@ -1,5 +1,5 @@
 //
-// Display
+// DriverDisplay
 //
 
 #ifndef SER_DRIVER_DISPLAY_C_H
@@ -17,21 +17,41 @@
 
 using namespace std;
 
-// namespace DriverDisplayC {
-
 class DriverDisplay : public Display {
+public:
+  DriverDisplay() { bgColor = ILI9341_BLACK; };
+  ~DriverDisplay(){};
+  //==== overwrites from base class ==== START
+  string getName() { return "DriverDisplay"; };
 
 private:
-  DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 180, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);
-  DisplayValue<float> PhotoVoltaicCurrent = DisplayValue<float>(10, 200, "PV   :", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
-  DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 220, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
-  DisplayValue<bool> BatteryOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
-  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(160, 200, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
-  DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 220, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<string> DriverInfo = DisplayValue<string>(0, 0, "", "%s", "");
+  DisplayValue<INFO_TYPE> DriverInfoType = DisplayValue<INFO_TYPE>(0, 0, "", "%s", "");
+  DisplayValue<DRIVE_DIRECTION> DriveDirection = DisplayValue<DRIVE_DIRECTION>(0, 0, "", "%s", "");
+  DisplayValue<LIGHT> Light = DisplayValue<LIGHT>(0, 0, "", "%s", "");
+  DisplayValue<CONSTANT_MODE> ConstantMode = DisplayValue<CONSTANT_MODE>(0, 0, "", "%s", "");
+  DisplayValue<bool> ConstantModeOn = DisplayValue<bool>(0, 0, "", "%s", "");
+  DisplayValue<INDICATOR> Indicator = DisplayValue<INDICATOR>(0, 0, ",", "", "");
+
+  DisplayValue<int> Speed = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
+  DisplayValue<int> Acceleration = DisplayValue<int>(0, -1, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
+  DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 180, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 200, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> BatteryOn = DisplayValue<bool>(160, 200, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+  DisplayValue<float> PhotoVoltaicCurrent = DisplayValue<float>(10, 220, "PV   :", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
+  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(160, 220, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
+
+  //==== display cache =====================
+  // ... to avoid flickering
+  int speedLast = -1;
+  int accelerationLast = -1;
+  bool blinkOn = true;
+  bool justInited = true;
+  //=======================================
 
   //==== Driver Display definitions ==== START
   // display formats and sizes
-  int bgColor = ILI9341_BLACK;
   int infoFrameX = 0;
   int infoFrameY = 0;
   int infoFrameSizeX = -1; // full tft width, calculated beow
@@ -94,44 +114,22 @@ private:
 
   int lightX = 250;
   int lightY = 138;
-
-  // INFO:ILI9341_WHITE
-  // STATUS:ILI9341_GREEN
-  // WARN.ILI9341_PURPLE
-  // ERROR.ILI9341_RED
   //==== Driver Display definition ==== END
 
-public:
-  virtual ~DriverDisplay() {}
-  DriverDisplay() {}
+protected:
+  DISPLAY_STATUS display_setup() override;
+  DISPLAY_STATUS task(int lifeSignCounter) override;
+  //==== overwrites from base class ==== END
 
 private:
-  uint32_t sleep_polling_ms = 1000;
-  float _write_float(int x, int y, float valueLast, float value, int textSize, int color);
-  int _write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color);
-  int _write_nat_999(int x, int y, int valueLast, int value, int textSize, int color);
   void _arrow_increase(int color);
   void _arrow_decrease(int color);
   // void _light1(bool lightOn);
   // void _light2(bool lightOn);
   void _hide_light();
-  void _drawCentreString(const string &buf, int x, int y);
-  int _getColorForInfoType(INFO_TYPE type);
   void _turn_Left(int color);
   void _turn_Right(int color);
   bool init_driver_display(void);
-
-public:
-  string getName() { return "DriverDisplay"; };
-
-  //==== overwrites from base class ==== START
-  DISPLAY_STATUS display_setup(DISPLAY_STATUS status) override;
-  DISPLAY_STATUS task(DISPLAY_STATUS status, int lifeSignCounter) override;
-  //==== overwrites from base class ==== END
-
-  void print(string msg);
-
-  // public functions
   void draw_display_border(int color);
   void draw_speed_border(int color);
   void draw_acceleration_border(int color);
@@ -144,9 +142,7 @@ public:
   void write_speed();
   void write_acceleration();
 
-  void indicator_set_and_blink(INDICATOR direction);
-  // void light1OnOff();
-  // void light2OnOff();
+  void show_indicator();
   void show_light();
 
   void speedCheck(int speed);
@@ -154,12 +150,7 @@ public:
   void arrow_decrease(bool on);
 
   void driver_display_demo_screen();
-
-  // internal functions for inner task communication
-  INDICATOR getIndicatorDirection();
-  void indicator_set_and_blink(INDICATOR direction, bool blinkOn);
-  bool getIndicatorState();
-  void setIndicatorState(bool state);
+  int getColorForInfoType(INFO_TYPE type);
 };
-//} // namespace DriverDisplay
+
 #endif // #ifndef SER_DRIVER_DISPLAY_C_H

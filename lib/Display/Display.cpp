@@ -13,11 +13,12 @@
 #include <definitions.h>
 
 #include <ADC.h>
-#include <Display.h>
-
 #include <CarState.h>
+#include <Display.h>
+#include <Helper.h>
 #include <SPIBus.h>
 
+#include <ADS1X15.h>
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 #include <Fonts/FreeMono12pt7b.h>
@@ -32,14 +33,9 @@
 
 extern SPIBus spiBus;
 extern ADC adc;
-extern bool systemOk;
 extern CarState carState;
 
-// Adafruit_ILI9341 tft = Adafruit_ILI9341(0, 0, 0, 0, 0, 0);
-// namespace Display {
-
 //==== Display definitions ==== START
-int bgColor = ILI9341_WHITE;
 // life sign for connection to microprocessor via rtx
 int lifeSignX = -1;
 int lifeSignY = -1;
@@ -57,7 +53,6 @@ void Display::init() {
   abstract_task::init();
   printf("\n");
   re_init();
-  status = DISPLAY_STATUS::CONSOLE;
 }
 
 void Display::re_init(void) {
@@ -65,37 +60,46 @@ void Display::re_init(void) {
   vTaskResume(getHandle());
 #endif
   _setup();
-  status = DISPLAY_STATUS::CONSOLE;
 }
 
+// Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_RST);
+Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
+
 void Display::_setup() {
-  printf("    Setup 'ILI9341' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO, SPI_CS_TFT);
-  status = DISPLAY_STATUS::CONSOLE;
-  int height = 0;
-  int width = 0;
+  printf("    Setup 'ILI9341' for '%s' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", getName().c_str(), SPI_CLK, SPI_MOSI,
+         SPI_MISO, SPI_CS_TFT);
+  height = 0;
+  width = 0;
   try {
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-    tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
+    uint8_t rdmode = 0;
+    uint8_t rdmadctl = 0;
+    uint8_t rdpixfmt = 0;
+    uint8_t rdimgfmt = 0;
+    uint8_t rdselfdiag = 0;
+
+    xSemaphoreTakeT(spiBus.mutex);
     tft.begin();
+    tft.setRotation(1);
     height = tft.height();
     width = tft.width();
-    tft.setRotation(1);
+    rdmode = tft.readcommand8(ILI9341_RDMODE);
+    rdmadctl = tft.readcommand8(ILI9341_RDMADCTL);
+    rdpixfmt = tft.readcommand8(ILI9341_RDPIXFMT);
+    rdimgfmt = tft.readcommand8(ILI9341_RDIMGFMT);
+    rdselfdiag = tft.readcommand8(ILI9341_RDSELFDIAG);
+    tft.setCursor(0, 0);
     tft.setTextSize(1);
-    tft.fillScreen(ILI9341_WHITE);
+    tft.fillScreen(bgColor);
     tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(0, height);
-    uint8_t rdmode = tft.readcommand8(ILI9341_RDMODE);
-    uint8_t rdmadctl = tft.readcommand8(ILI9341_RDMADCTL);
-    uint8_t rdpixfmt = tft.readcommand8(ILI9341_RDPIXFMT);
-    uint8_t rdimgfmt = tft.readcommand8(ILI9341_RDIMGFMT);
-    uint8_t rdselfdiag = tft.readcommand8(ILI9341_RDSELFDIAG);
-    tft.printf("Screen ILI9341 inited (%dx%d)-->%s\n", height, width, DISPLAY_STATUS_str[(int)status]);
+    tft.printf("%s inited (%dx%d)-->%s\n", getName().c_str(), height, width, DISPLAY_STATUS_str[(int)carState.displayStatus]);
     xSemaphoreGive(spiBus.mutex);
-    printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
+
     printf("    ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
     printf("    ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
     printf("    ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
     printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
+    printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
   } catch (__exception ex) {
     printf("[x] Display: Unable to initialize screen 'ILI9341'.\n");
     xSemaphoreGive(spiBus.mutex);
@@ -103,11 +107,12 @@ void Display::_setup() {
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  printf("[v] Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", height, width, DISPLAY_STATUS_str[(int)status]);
+  printf("[v] '%s' Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", getName().c_str(), height, width,
+         DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }
 
 void Display::clear_screen(int bgColor) {
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillScreen(bgColor);
   xSemaphoreGive(spiBus.mutex);
 }
@@ -121,8 +126,8 @@ int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
 }
 
 void Display::print(string msg) {
-  if (status == DISPLAY_STATUS::CONSOLE) {
-    xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  if (carState.displayStatus == DISPLAY_STATUS::ENGINEER_CONSOLE) {
+    xSemaphoreTakeT(spiBus.mutex);
     tft.setTextSize(1);
     tft.print(msg.c_str());
     xSemaphoreGive(spiBus.mutex);
@@ -131,6 +136,7 @@ void Display::print(string msg) {
 
 //------------------------------------------------------------------------
 void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
+  xSemaphoreTakeT(spiBus.mutex);
   tft.writeCommand(ILI9341_VSCRDEF); // Vertical scroll definition
   tft.write(TFA >> 8);
   tft.write(TFA);
@@ -138,15 +144,17 @@ void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
   tft.write(320 - TFA - BFA);
   tft.write(BFA >> 8);
   tft.write(BFA);
+  xSemaphoreGive(spiBus.mutex);
+  debug_printf("ERROR: Semaphore not found!%s", "\n");
 }
 
 int Display::scroll(int lines) {
-  int TEXT_HEIGHT = 8;    // Height of text to be printed and scrolled
+  // int TEXT_HEIGHT = 8;    // Height of text to be printed and scrolled
   int BOT_FIXED_AREA = 0; // Number of lines in bottom fixed area (lines counted from bottom of screen)
   int TOP_FIXED_AREA = 0;
   uint16_t yStart = TOP_FIXED_AREA;
-  uint16_t yArea = 320 - TOP_FIXED_AREA - BOT_FIXED_AREA;
-  uint16_t yDraw = 320 - BOT_FIXED_AREA - TEXT_HEIGHT;
+  // uint16_t yArea = 320 - TOP_FIXED_AREA - BOT_FIXED_AREA;
+  // uint16_t yDraw = 320 - BOT_FIXED_AREA - TEXT_HEIGHT;
   int yTemp = yStart;
   for (int i = 0; i < lines; i++) {
     yStart++;
@@ -158,9 +166,11 @@ int Display::scroll(int lines) {
 }
 
 void Display::scrollAddress(uint16_t VSP) {
+  xSemaphoreTakeT(spiBus.mutex);
   tft.writeCommand(ILI9341_VSCRSADD); // Vertical scrolling start address
   tft.write(VSP >> 8);
   tft.write(VSP);
+  xSemaphoreGive(spiBus.mutex);
 }
 
 //________________________________________________________________________
@@ -169,7 +179,6 @@ void exit(void) {}
 
 // writes Display::float value  in the range from -9999.9 to 9999.9
 float Display::write_float(int x, int y, float valueLast, float value, int textSize, int color) {
-
   if (value < -9999.9 || value > 9999.9) {
     printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
     return value;
@@ -194,8 +203,7 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
   int d4o = ((int)valOld / 1000) % 10;
   int d0o = (valOld - (int)valOld) * 10;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
-
+  xSemaphoreTakeT(spiBus.mutex);
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
@@ -246,7 +254,7 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
 // writes integer value in the range from -99 to +99
 int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < -99 || value > 999) {
-    printf("ERROR: call _write_ganz_99 with a value outside the range: '%d'", value);
+    printf("ERROR: call write_ganz_99 with a value outside the range: '%d'", value);
     return value;
   }
   // determine the sign of new and old value
@@ -263,7 +271,7 @@ int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize,
   int d1o = (int)valLast % 10;
   int d2o = ((int)valLast / 10) % 10;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
@@ -314,7 +322,7 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
   int d2o = ((int)valueLast / 10) % 10;
   int d3o = ((int)valueLast / 100) % 10;
 
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.setTextSize(textSize);
   tft.setTextColor(color);
   tft.setCursor(x, y);
@@ -344,16 +352,19 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
 
   return value;
 }
+
+#if LIFESIGN_ON == true
 void Display::lifeSign() {
-  xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(spiBus.mutex);
   tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : ILI9341_GREEN);
   xSemaphoreGive(spiBus.mutex);
 
   lifeSignState = !lifeSignState;
 }
+#endif
 
 void Display::drawCentreString(const string &buf, int x, int y) {
-  // xSemaphoreTake(spiBus.mutex, portMAX_DELAY);
+  // xSemaphoreTakeT(spiBus.mutex);
 
   // int16_t x1, y1;
   // uint16_t w, h;
@@ -361,30 +372,7 @@ void Display::drawCentreString(const string &buf, int x, int y) {
   // tft.setCursor(x - w / 2, y);
   // tft.print(buf.c_str());
 
-  // xSemaphoreGive(spiBus.mutex);
-}
-
-int Display::getColorForInfoType(INFO_TYPE type) {
-  int color;
-  switch (type) {
-  case INFO_TYPE::ERROR:
-    color = ILI9341_RED;
-    break;
-
-  case INFO_TYPE::WARN:
-    color = ILI9341_GREENYELLOW;
-    break;
-
-  case INFO_TYPE::STATUS:
-    color = ILI9341_GREEN;
-    break;
-
-  case INFO_TYPE::INFO:
-  default:
-    color = ILI9341_WHITE;
-    break;
-  }
-  return color;
+  // xSemaphoreGive(spiBus.mutex);}
 }
 
 // -------------
@@ -393,46 +381,56 @@ int Display::getColorForInfoType(INFO_TYPE type) {
 void Display::task(void) {
   // polling loop
   while (1) {
-    switch (status) {
+    switch (carState.displayStatus) {
     // initializing states:
-    case DISPLAY_STATUS::SETUPDRIVER:
-    case DISPLAY_STATUS::SETUPENGINEER:
-    case DISPLAY_STATUS::BACKGROUNDDRIVER:
-    case DISPLAY_STATUS::BACKGROUNDENGINEER:
-      debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
-      status = task(status, lifeSignCounter);
-      debug_printf_l3("%s.2-DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+    case DISPLAY_STATUS::DRIVER_SETUP:
+      bgColor = ILI9341_BLACK;
+      carState.displayStatus = task(lifeSignCounter);
       break;
-    case DISPLAY_STATUS::DEMOSCREEN:
-      status = task(status, lifeSignCounter);
+    case DISPLAY_STATUS::ENGINEER_SETUP:
+      bgColor = ILI9341_ORANGE;
+      carState.displayStatus = task(lifeSignCounter);
+      break;
+    case DISPLAY_STATUS::DRIVER_BACKGROUND:
+      carState.displayStatus = task(lifeSignCounter);
+      break;
+    case DISPLAY_STATUS::ENGINEER_BACKGROUND:
+      carState.displayStatus = task(lifeSignCounter);
+      break;
+    case DISPLAY_STATUS::DRIVER_DEMOSCREEN:
+      carState.displayStatus = task(lifeSignCounter);
       break;
     // working states:
-    case DISPLAY_STATUS::CONSOLE:
-      if (lifeSignCounter > 40) {
+    case DISPLAY_STATUS::ENGINEER_CONSOLE:
+      bgColor = ILI9341_WHITE;
+#if LIFESIGN_ON == true
+      if (lifeSignCounter > 2) {
         lifeSign();
         lifeSignCounter = 0;
       }
+#endif
       break;
-    case DISPLAY_STATUS::ENGINEER:
-      if (lifeSignCounter > 40) {
-        debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
-        status = task(status, lifeSignCounter);
-        debug_printf_l3("%s.2-DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+    case DISPLAY_STATUS::ENGINEER_RUNNING:
+      carState.displayStatus = task(lifeSignCounter);
+#if LIFESIGN_ON == true
+      if (lifeSignCounter > 2) {
         lifeSign();
         lifeSignCounter = 0;
       }
+#endif
       break;
-    case DISPLAY_STATUS::DRIVER:
-      if (lifeSignCounter > 20) {
-        debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
-        status = task(status, lifeSignCounter);
-        debug_printf_l3("%s.2-DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+    case DISPLAY_STATUS::DRIVER_RUNNING:
+      carState.displayStatus = task(lifeSignCounter);
+#if LIFESIGN_ON == true
+      if (lifeSignCounter > 1) {
         lifeSign();
         lifeSignCounter = 0;
       }
+#endif
       break;
-    case DISPLAY_STATUS::HALTED:
-      debug_printf_l3("%s.DISPLAY_STATUS::%s\n", getName().c_str(), DISPLAY_STATUS_str[(int)status]);
+    case DISPLAY_STATUS::ENGINEER_HALTED:
+      set_SleepTime(1500);
+      break;
 #if WithTaskSuspend == true
       vTaskSuspend(getHandle());
 #endif
@@ -441,9 +439,11 @@ void Display::task(void) {
       // ignore others
       break;
     }
+#if LIFESIGN_ON == true
     lifeSignCounter++;
-    // sleep for sleep_polling_ms
-    this->sleep(20);
+#endif
+    // debug_printf("%16s -- sleep_polling_ms: %d\n", getName().c_str(), sleep_polling_ms);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
 

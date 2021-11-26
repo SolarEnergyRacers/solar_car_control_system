@@ -7,6 +7,8 @@
 #define VERSION "v0.1"
 #define VERSION_PUBLISHED "2021.10"
 
+#include <LocalFunctionsAndDevices.h>
+
 /*
  *  GPIO
  */
@@ -26,17 +28,14 @@
 
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
-#define I2C_ADDRESS_ADS1x15_1 0x4A
-#define I2C_ADDRESS_ADS1x15_2 0x4B
+#define I2C_ADDRESS_ADS1x15_1 0x49
+#define I2C_ADDRESS_ADS1x15_2 0x4a
 
 #define PWM_NUM_PORTS 16
 #define PWM_MAX_VALUE 4096
 #define I2C_ADDRESS_PCA9685 0x42
 
-#define OLED_RESET 9
-#define OLED_WIDTH 128
-#define OLED_HEIGHT 64
-
+#if IOEXT_ON
 #define PCF8574_NUM_DEVICES 4
 #define PCF8574_NUM_PORTS 8
 #define IOExtPINCOUNT (PCF8574_NUM_DEVICES * PCF8574_NUM_PORTS)
@@ -44,7 +43,16 @@
 #define I2C_ADDRESS_PCF8574_IOExt1 0x21
 #define I2C_ADDRESS_PCF8574_IOExt2 0x22
 #define I2C_ADDRESS_PCF8574_IOExt3 0x23
-#define I2C_INTERRUPT_PIN_PCF8574 33
+#define I2C_INTERRUPT 33
+#endif
+#if IOEXT2_ON
+#define MCP23017_NUM_DEVICES 2
+#define MCP23017_NUM_PORTS 16
+#define IOExtPINCOUNT (MCP23017_NUM_DEVICES * MCP23017_NUM_PORTS)
+#define I2C_ADDRESS_MCP23017_IOExt0 0x20
+#define I2C_ADDRESS_MCP23017_IOExt1 0x21
+#define I2C_INTERRUPT 33
+#endif
 
 // address = b0101{DS1803_ADDR2, DS1803_ADDR1, DS1803_ADDR0}
 #define DS1803_BASE_ADDR 0x28
@@ -124,10 +132,10 @@
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 
-#define DEBUG3 true
+#define DEBUG3 false
 #define debug_printf_l3(fmt, ...)                                                                                                          \
   do {                                                                                                                                     \
-    if (DEBUG2)                                                                                                                            \
+    if (DEBUG3)                                                                                                                            \
       fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
   } while (0)
 

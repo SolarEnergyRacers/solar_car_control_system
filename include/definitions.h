@@ -66,14 +66,10 @@
 #define CAN_RX (gpio_num_t)25
 #define CAN_SPEED 250E3 //Change CAN Speed on BMS to 125
 #define BMS_BASE_ADDR 0x700
-#define MPPT0_BASE_ADDR 0x600
-#define MPPT1_BASE_ADDR 0x610
-#define MPPT2_BASE_ADDR 0x620
+#define MPPT1_BASE_ADDR 0x600
+#define MPPT2_BASE_ADDR 0x610
+#define MPPT3_BASE_ADDR 0x620
 #define CAN_RX_BUFFER_SIZE 20
-
-#ifndef ARDUINO_ARCH_ESP32
-  #define ARDUINO_ARCH_ESP32 0
-#endif
 
 /*
  *  SPI

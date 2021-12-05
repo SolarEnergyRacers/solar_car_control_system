@@ -18,6 +18,7 @@
 #include <Helper.h>
 #include <I2CBus.h>
 #include <IOExt2.h>
+#include <Indicator.h>
 #include <MCP23017.h>
 
 extern I2CBus i2cBus;
@@ -97,6 +98,7 @@ bool CarControl::read_paddles() {
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
 
   int16_t valueDecNorm = 0;
+  int16_t valueAccNorm = 0;
   int16_t valueDisplay = 0;
 
   // if (valueDec < ads_min_dec || valueDec > ads_max_dec) {
@@ -131,32 +133,39 @@ bool CarControl::read_paddles() {
   if (valueDecNorm > 0) {
     valueDisplay = -valueDecNorm;
   } else {
-    valueDisplay = CarControl::_normalize(0, MAX_DISPLAY_VALUE, ads_min_acc, ads_max_acc, valueAcc);
+    valueAccNorm = CarControl::_normalize(0, MAX_DISPLAY_VALUE, ads_min_acc, ads_max_acc, valueAcc);
+    if (valueAccNorm > 0) {
+      valueDisplay = valueAccNorm;
+    } else {
+      valueDisplay = 0;
+    }
   }
   // valueDisplay = (int)((valueDisplayLast * (SMOOTHING - 1) + valueDisplay) / SMOOTHING);
-  debug_printf("DEC %5d (%5d-%5d), ACC %5d (%5d-%5d) --> Display:%4d\n", valueDec, ads_min_dec, ads_max_dec, valueAcc, ads_min_acc,
-               ads_max_acc, valueDisplay);
+  // debug_printf("DEC %5d (%5d-%5d), ACC %5d (%5d-%5d) --> Display:%4d\n", valueDec, ads_min_dec, ads_max_dec, valueAcc, ads_min_acc,
+  //              ads_max_acc, valueDisplay);
 
   // prepare and write motor acceleration and recuperation values to DigiPot
-  // int valueDecPot = 0;
-  // int valueAccPot = 0;
-  // if (valueDisplay < 0) {
-  //   valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
-  // } else {
-  //   valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
-  // }
+  int valueDecPot = 0;
+  int valueAccPot = 0;
+  if (valueDisplay < 0) {
+    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+    valueAccPot = 0;
+  } else {
+    valueDecPot = 0;
+    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+  }
 
-  // if (valueDisplayLast != valueDisplay) {
-  //   debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | "
-  //                "ACCEL-DISPLAY: %3d"
-  //                " ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-  //                valueDec, valueDecNorm, valueAcc, valueAccNorm, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot,
-  //                ads_min_acc, ads_max_acc);
+  if (valueDisplayLast != valueDisplay) {
+    debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | "
+                 "ACCEL-DISPLAY: %3d"
+                 " ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+                 valueDec, valueDecNorm, valueAcc, valueAccNorm, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot,
+                 ads_min_acc, ads_max_acc);
 
-  //   valueDisplayLast = valueDisplay;
-  //   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
-  //   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
-  // }
+    valueDisplayLast = valueDisplay;
+  }
+  dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
+  dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
 
   carState.Deceleration = valueDec;
   carState.Acceleration = valueAcc;
@@ -215,6 +224,7 @@ void CarControl::adjust_paddles(int seconds) {
     delay(100);
   }
   ads_min_dec += 1000;
+  ads_min_acc += 1000;
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   cout << s;

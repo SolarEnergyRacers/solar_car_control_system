@@ -4,6 +4,7 @@
 
 #include <definitions.h>
 
+#include <fmt/core.h>
 #include <inttypes.h>
 #include <iostream>
 #include <stdio.h>
@@ -26,15 +27,13 @@
 extern I2CBus i2cBus;
 extern DriverDisplay driverDisplay;
 
-char msg[100];
-
 void DAC::re_init() { init(); }
 
 void DAC::init() {
   cout << "[?] Setup 'DAC'..." << endl;
-  snprintf(msg, 100, "[v] DAC initialized with I2C_ADDRESS_DS1803=%02x.\n", I2C_ADDRESS_DS1803);
-  cout << msg;
-  driverDisplay.print(msg);
+  string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:x}.\n", I2C_ADDRESS_DS1803);
+  cout << s;
+  driverDisplay.print(s.c_str());
 }
 
 uint8_t DAC::get_cmd(pot_chan channel) {

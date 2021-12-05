@@ -1,27 +1,31 @@
 //
 // I2C Bus
 //
+#include <definitions.h>
+
+#include <fmt/core.h>
+#include <iostream>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h> // semaphore
 
 #include <Wire.h> // Arduino I2C library
 
-#include <definitions.h>
-
 #include <I2CBus.h>
+
+using namespace std;
 
 void I2CBus::re_init() { init(); }
 
 void I2CBus::init(void) {
-  printf("[?] Init 'i2c bus'\n");
+  cout << "[?] Init '" << getName() << "'" << endl;
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
   Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
   xSemaphoreGive(mutex);
 
-  printf("[v] I2C inited: I2C_SDA=%d, I2C_SCL=%d, I2C_FREQ=%d.\n", I2C_SDA, I2C_SCL, I2C_FREQ);
+  cout << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << "." << endl;
   scan_i2c_devices();
 }
 
@@ -49,8 +53,9 @@ void I2CBus::scan_i2c_devices() {
       * Connect a 2.4k resistor between SDA and Vcc
       * Connect a 2.4k resistor between SCL and Vcc
   */
-  printf("    Scanning I2C addresses:\n    ");
+  cout << "    Scanning I2C addresses:" << endl << "    ";
   uint8_t cnt = 0;
+  string s;
 
   xSemaphoreTake(mutex, portMAX_DELAY);
   for (uint8_t addr = 0; addr < 0x80; addr++) {
@@ -62,16 +67,17 @@ void I2CBus::scan_i2c_devices() {
       // do nothing
     }
     if (ec == 0) {
-      printf("%02x ", addr);
+      s = fmt::format("{:02x} ", addr);
       cnt++;
     } else {
-      printf("-- ");
+      s = "-- ";
     }
     if ((addr & 0x0f) == 0x0f) {
-      printf("\n    ");
+      s.append("\n    ");
     }
+    cout << s;
   }
   xSemaphoreGive(mutex);
 
-  printf("Scan completed: %d I2C devices found.\n", cnt);
+  cout << "Scan completed: " << cnt << " I2C devices found." << endl;
 }

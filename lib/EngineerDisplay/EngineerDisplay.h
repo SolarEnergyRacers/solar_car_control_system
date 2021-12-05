@@ -32,9 +32,9 @@ private:
 
   //==== Driver Display definitions ==== START
   // Stati [On/Off]
-  DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 10, "Bat  :", "%3s", "", ILI9341_BLUE);
-  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(4, 30, "PV   :", "%3s", "", ILI9341_BLUE);
-  DisplayValue<bool> MotorOn = DisplayValue<bool>(4, 50, "MC   :", "%3s", "", ILI9341_BLUE);
+  DisplayValue<bool> MotorOn = DisplayValue<bool>(4, 10, "MC   :", "%3s", "", ILI9341_BLUE);
+  DisplayValue<bool> BatteryOn = DisplayValue<bool>(4, 30, "Bat  :", "%3s", "", ILI9341_BLUE);
+  DisplayValue<bool> PhotoVoltaicOn = DisplayValue<bool>(4, 50, "PV   :", "%3s", "", ILI9341_BLUE);
 
   // MPPTs 1...3 [A]
   DisplayValue<float> Mppt1 = DisplayValue<float>(160, 10, "MPPT-1:", "%5.2f", "A");

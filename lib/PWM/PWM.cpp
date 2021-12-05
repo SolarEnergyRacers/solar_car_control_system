@@ -4,6 +4,8 @@
 
 #include <definitions.h>
 
+#include <iostream>
+
 #include <Wire.h>
 
 #include <I2CBus.h>
@@ -65,7 +67,7 @@ void PWM::task() {
         update_pwm(output, i);
       }
       // report current value
-      printf("[PCA9685] set all outputs to: %d\n", i);
+      cout << "[PCA9685] set all outputs to: " << i;
 
       // sleep for 1s
       vTaskDelay(1000 / portTICK_PERIOD_MS);

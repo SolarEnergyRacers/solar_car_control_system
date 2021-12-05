@@ -3,12 +3,7 @@
 //
 
 #include <CarState.h>
-#if IOEXT_ON
-#include <IOExt.h>
-#endif
-#if IOEXT2_ON
 #include <IOExt2.h>
-#endif
 #include <Indicator.h>
 #include <definitions.h>
 
@@ -130,29 +125,9 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
   stringstream ss(msg);
   if (msg.length() > 0)
     ss << msg << endl;
-#if IOEXT_ON
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    // printf("0x%2x0: ", devNr);
-    ss << devNr << ": ";
-    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-      CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->mode == OUTPUT && withColors) {
-        ss << " " << highLightColor << pin->value << normalColor;
-      } else {
-        ss << pin->value;
-      }
-      if ((IOExt::getIdx(devNr, pinNr) + 1) % 8 == 0)
-        ss << " | ";
-      else if ((IOExt::getIdx(devNr, pinNr) + 1) % 4 == 0)
-        // printf(" - ");
-        ss << " - ";
-    }
-  }
-#endif
-#if IOEXT2_ON
+
   bool hasDelta = false;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-    // printf("0x%2x0: ", devNr);
     ss << devNr << ": ";
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       int idx = IOExt2::getIdx(devNr, pinNr);
@@ -178,7 +153,7 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
         ss << "-";
     }
   }
-#endif
+
   ss << endl;
   if (hasDelta || !deltaOnly)
     return ss.str();

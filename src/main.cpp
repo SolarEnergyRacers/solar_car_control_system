@@ -37,15 +37,9 @@
 #include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
-#if IOEXT_ON == true
-#include <IOExt.h>
-#include <PCF8574.h>
-#endif
-#if IOEXT2_ON
 #include <IOExt2.h>
-#include <MCP23017.h>
-#endif
 #include <Indicator.h>
+#include <MCP23017.h>
 #include <OneWireBus.h>
 #include <PWM.h>
 #include <RTC.h>
@@ -84,12 +78,7 @@ GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
 I2CBus i2cBus;
 Indicator indicator; // INDICATOR_ON
-#if IOEXT_ON == true
-IOExt ioExt;
-#endif
-#if IOEXT2_ON
 IOExt2 ioExt;
-#endif
 OneWireBus oneWireBus;
 PWM pwm;
 RTC rtc;
@@ -159,9 +148,9 @@ void app_main(void) {
     gpio.init();
     gpio.register_gpio_interrupt();
   }
-#if IOEXT_ON || IOEXT2_ON
-  ioExt.init();
-#endif
+  if (IOEXT2_ON) {
+    ioExt.init();
+  }
   if (DAC_ON) {
     dac.init();
   }
@@ -181,7 +170,7 @@ void app_main(void) {
   cout << endl;
   cout << "-----------------------------------------------------------------" << endl;
   cout << "Startup sequence(s) successful. System creating FreeRTOS tasks..." << endl;
-  cout << "-----------------------------------------------------------------" << endl;
+  cout << "-----------------------------------------------------------------" << endl << endl;
 
   // ---- create tasks ----
   if (INDICATOR_ON) {
@@ -215,18 +204,18 @@ void app_main(void) {
 
   if (DAC_ON) {
     dac.init();
-    printf(" - DAC DAC DAC\n");
+    cout << " - DAC DAC DAC" << endl;
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
   if (SERIAL_ON) {
-    printf(" - serial_demo_task\n");
+    cout << " - serial_demo_task" << endl;
     xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
-    printf(" - read_can_demo_task\n");
+    cout << " - read_can_demo_task" << endl;
     xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CARSPEED_ON) {
@@ -238,15 +227,15 @@ void app_main(void) {
     carControl.create_task();
     engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");
   }
-#if IOEXT_ON || IOEXT2_ON
-  carState.Indicator = INDICATOR::OFF;
-  carState.ConstantModeOn = false;
-  carState.ConstantMode = CONSTANT_MODE::SPEED;
-  carState.Light = LIGHT::OFF;
-  ioExt.create_task();
-  engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
-  ioExt.readAll();
-#endif
+  if (IOEXT2_ON) {
+    carState.Indicator = INDICATOR::OFF;
+    carState.ConstantModeOn = false;
+    carState.ConstantMode = CONSTANT_MODE::SPEED;
+    carState.Light = LIGHT::OFF;
+    ioExt.create_task();
+    engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
+    ioExt.readAll();
+  }
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;
   engineerDisplay.print("\nready at ");

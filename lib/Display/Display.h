@@ -58,6 +58,8 @@ public:
   char *get_DisplayStatus_text() { return (char *)DISPLAY_STATUS_str[(int)carState.displayStatus]; };
 
   void print(string msg);
+  int write_ganz_99(int x, int y, int valueLast, int value, int textSize, bool justInited = false, int color = ILI9341_ORANGE, int bgColor = ILI9341_BLACK);
+  void getCursor(int &x, int &y);
   void clear_screen(int bgColor);
   int getPixelWidthOfTexts(int textSize, string t1, string t2);
 
@@ -75,7 +77,6 @@ protected:
 
   // workers
   float write_float(int x, int y, float valueLast, float value, int textSize, int color);
-  int write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color);
   int write_nat_999(int x, int y, int valueLast, int value, int textSize, int color);
 
   void drawCentreString(const string &buf, int x, int y);

@@ -12,6 +12,9 @@
 #include <abstract_task.h>
 #include <definitions.h>
 
+#include <fmt/core.h>
+#include <iostream>
+
 #include <ADC.h>
 #include <CarState.h>
 #include <Display.h>
@@ -35,6 +38,8 @@ extern SPIBus spiBus;
 extern ADC adc;
 extern CarState carState;
 
+using namespace std;
+
 //==== Display definitions ==== START
 // life sign for connection to microprocessor via rtx
 int lifeSignX = -1;
@@ -51,7 +56,7 @@ string Display::getName() { return "Display"; };
 
 void Display::init() {
   abstract_task::init();
-  printf("\n");
+  cout << endl;
   re_init();
 }
 
@@ -66,8 +71,8 @@ void Display::re_init(void) {
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
 
 void Display::_setup() {
-  printf("    Setup 'ILI9341' for '%s' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d, SPI_CS_TFT=%d.\n", getName().c_str(), SPI_CLK, SPI_MOSI,
-         SPI_MISO, SPI_CS_TFT);
+  cout << "    Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
+       << ", SPI_MISO=" << SPI_MISO << ", SPI_CS_TFT=" << SPI_CS_TFT << endl;
   height = 0;
   width = 0;
   try {
@@ -101,14 +106,14 @@ void Display::_setup() {
     printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
     printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
   } catch (__exception ex) {
-    printf("[x] Display: Unable to initialize screen 'ILI9341'.\n");
+    cout << "[x] Display: Unable to initialize screen 'ILI9341'." << endl;
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  printf("[v] '%s' Display inited: screen 'ILI9341' with %d x %d. Status: %s\n", getName().c_str(), height, width,
-         DISPLAY_STATUS_str[(int)carState.displayStatus]);
+  cout << "[v] '" << getName() << "' Display inited: screen 'ILI9341' with " << height << " x " << width
+       << ". Status: " << DISPLAY_STATUS_str[(int)carState.displayStatus] << endl;
 }
 
 void Display::clear_screen(int bgColor) {
@@ -132,6 +137,13 @@ void Display::print(string msg) {
     tft.print(msg.c_str());
     xSemaphoreGive(spiBus.mutex);
   }
+}
+
+void Display::getCursor(int &x, int &y) {
+  xSemaphoreTakeT(spiBus.mutex);
+  x = tft.getCursorX();
+  y = tft.getCursorY();
+  xSemaphoreGive(spiBus.mutex);
 }
 
 //------------------------------------------------------------------------
@@ -180,7 +192,7 @@ void exit(void) {}
 // writes Display::float value  in the range from -9999.9 to 9999.9
 float Display::write_float(int x, int y, float valueLast, float value, int textSize, int color) {
   if (value < -9999.9 || value > 9999.9) {
-    printf("ERROR: call _write_float with a value outside the range: '%f'\n", value);
+    cout << "ERROR: call _write_float with a value outside the range: '" << value << "'" << endl;
     return value;
   }
   int digitWidth = textSize * 6;
@@ -252,9 +264,9 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
 }
 
 // writes integer value in the range from -99 to +99
-int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize, int color) {
+int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize, bool justInited, int color, int bgColor) {
   if (value < -99 || value > 999) {
-    printf("ERROR: call write_ganz_99 with a value outside the range: '%d'", value);
+    cout << "ERROR: call write_ganz_99 with a value outside the range: '" << value << "'" << endl;
     return value;
   }
   // determine the sign of new and old value
@@ -279,19 +291,19 @@ int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize,
   int digitHeight = textSize * 8;
   // if a change in the digit then replace the old with new value by
   // first deleting the digit area and second write the new value
-  if (d1 != d1o) { //|| d1o == 0) {
+  if (d1 != d1o || justInited) { //|| d1o == 0) {
     tft.fillRect(x + (digitWidth + 1) * 2, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 2, y);
     tft.print(d1);
   }
-  if (d2 != d2o || d2o == 0) {
+  if (d2 != d2o || d2o == 0 || justInited) {
     tft.fillRect(x + (digitWidth + 1) * 1, y, digitWidth, digitHeight, bgColor);
     tft.setCursor(x + (digitWidth + 1) * 1, y);
     if (abs(value) > 9) {
       tft.print(d2);
     }
   }
-  if (sign != signOld) {
+  if (sign != signOld || justInited) {
     tft.fillRect(x, y, (digitWidth + 1), digitHeight, bgColor);
     tft.setCursor(x, y);
     // if (sign == '-') {
@@ -307,7 +319,7 @@ int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize,
 // writes integer value in the range from 0 to 999
 int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < 0 || value > 999) {
-    printf("ERROR: call _write_nat_999 with a value outside the range: '%d'", value);
+    cout << "ERROR: call _write_nat_999 with a value outside the range: '" << value << "'" << endl;
     return value;
   }
   int digitWidth = textSize * 6;

@@ -4,6 +4,12 @@
 
 #include <definitions.h>
 
+// standard libraries
+#include <fmt/core.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <SD.h> // sd card
 #include <SPI.h>
 
@@ -23,10 +29,10 @@ void SDCard::re_init() { init(); }
 
 void SDCard::init() {
   inited = false;
-  char msg[100];
 
-  printf("[?] Init 'SDCard'...\n");
-  driverDisplay.print("[?] Init 'SDCard'...\n");
+  string s = "[?] Init 'SDCard'...\n";
+  cout << s;
+  driverDisplay.print(s.c_str());
 
   int count = 0;
   while (!inited && count < 10) {
@@ -39,16 +45,16 @@ void SDCard::init() {
   }
 
   if (!inited) {
-    snprintf(msg, 100, "[x] SDCard initialization failed.\n");
-    printf(msg);
-    driverDisplay.print(msg);
+    s = "[x] SDCard initialization failed.\n";
+    cout << s;
+    driverDisplay.print(s.c_str());
   } else {
-    snprintf(msg, 100, "[v] SDCard initialized.\n");
-    printf(msg);
-    driverDisplay.print(msg);
-    snprintf(msg, 100, "   Open file '%s' for append...", FILENAME);
-    printf(msg);
-    driverDisplay.print(msg);
+    s = "[v] SDCard initialized.\n";
+    cout << s;
+    driverDisplay.print(s.c_str());
+    s = fmt::format("   Open file '{}' for append...", FILENAME);
+    cout << s;
+    driverDisplay.print(s.c_str());
 
     xSemaphoreTakeT(spiBus.mutex);
     // open file
@@ -56,9 +62,9 @@ void SDCard::init() {
     xSemaphoreGive(spiBus.mutex);
 
     if (dataFile == 0) {
-      printf("failed.\n");
+      cout << "failed." << endl;
     } else {
-      printf("ok.\n");
+      cout << "ok." << endl;
     }
   }
 }

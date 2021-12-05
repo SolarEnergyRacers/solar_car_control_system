@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 // standard libraries
+#include <fmt/core.h>
+#include <inttypes.h>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -72,9 +74,9 @@ void IRAM_ATTR ioExt_interrupt_handler() { ioInterruptRequest = true; };
 void IOExt2::re_init() { init(); }
 
 void IOExt2::init() {
-  char msg[100];
+  string s;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-    printf("[?] Init IOExt2 %u...\n", devNr);
+    cout << "[?] Init IOExt2 " << devNr << endl;
     xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].init();
     ioExt.IOExtDevs[devNr].interruptMode(MCP23017InterruptMode::Or);
@@ -92,12 +94,12 @@ void IOExt2::init() {
       xSemaphoreGive(i2cBus.mutex);
       int dev = pin->port >> 4;
       int devPin = pin->port & 0xf;
-      snprintf(msg, 100, "  0x%02x [%02d] dev:%02d, devpin:%02d, mode:%s, value=%d (%s)\n", pin->port, carState.getIdx(pin->name), dev,
-               devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
-      printf(msg);
+      s = fmt::format("  {:#04x} [{:02d}] dev:{:02d}, devpin:{:02d}, mode:{}, value={} ({})\n", pin->port, carState.getIdx(pin->name), dev, devPin,
+                      pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
+      cout << s;
     }
     ioExt.IOExtDevs[devNr].clearInterrupts();
-    printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
+    cout << "[v] " << getName() << "[" << devNr << "] initialized." << endl;
   }
   ioInterruptRequest = false;
   pinMode(I2C_INTERRUPT, INPUT_PULLUP);
@@ -177,7 +179,7 @@ void IOExt2::setPort(int port, bool value) {
   // get device & port
   int devNr = port >> 4;
   int pin = port & 0xf;
-  //debug_printf("Set BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
+  // debug_printf("Set BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
   xSemaphoreTakeT(i2cBus.mutex);
   ioExt.IOExtDevs[devNr].digitalWrite(pin, value ? 1 : 0);
   xSemaphoreGive(i2cBus.mutex);
@@ -213,7 +215,7 @@ void IOExt2::task() {
         if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited)) {
           pin.oldValue = pin.value;
           pin.inited = true;
-          //debug_printf("Set %02x to %d\n", pin.port, pin.value);
+          // debug_printf("Set %02x to %d\n", pin.port, pin.value);
           setPort(pin.port, pin.value);
         }
       }

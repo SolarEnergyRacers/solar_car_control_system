@@ -73,6 +73,10 @@ int8_t CANPacket::getData_i8(uint8_t index){
     return (int8_t) (this->data >> (8*index)) & 0x00000000000000FF;
 }
 
+bool CANPacket::getData_b(uint8_t index){
+    return ((this->data >> index) & 0x0000000000000001);
+}
+
 float CANPacket::getData_f32(uint8_t index){
     uint32_t ival = (uint32_t) (this->data >> (32*index)) & 0x00000000FFFFFFFF;
     float fval = 0.0;

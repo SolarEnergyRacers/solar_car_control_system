@@ -37,5 +37,7 @@ class CANPacket {
         uint8_t getData_ui8(uint8_t index);
         int8_t getData_i8(uint8_t index);
 
+        bool getData_b(uint8_t index);
+
         float getData_f32(uint8_t index);
 };

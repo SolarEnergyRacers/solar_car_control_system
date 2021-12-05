@@ -38,10 +38,10 @@ void read_can_demo_task(void *pvParameter) {
   CAN_frame_t rx_frame;
 
   while (1) {
-    Serial.println("CAN While");
+    debug_printf_l3("CAN While%s", "\n");
     xSemaphoreTake(can.mutex, portMAX_DELAY);
 
-    Serial.println("Take Mutex");
+    debug_printf_l3("Take Mutex%s", "\n");
     if (xQueueReceive(CAN_cfg.rx_queue, &rx_frame, 3 * portTICK_PERIOD_MS) == pdTRUE) {
       if (rx_frame.FIR.B.FF == CAN_frame_std) {
         Serial.println("New standard frame");
@@ -49,15 +49,12 @@ void read_can_demo_task(void *pvParameter) {
         Serial.println("New extended Frame");
       }
 
-      Serial.println("from: ");
-      Serial.println(rx_frame.MsgID);
-      Serial.println("DLC: ");
-      Serial.println(rx_frame.FIR.B.DLC);
+      debug_printf_l3("from: %d\tDLC: %d\n", rx_frame.MsgID, rx_frame.FIR.B.DLC);
 
       for (int i = 0; i < rx_frame.FIR.B.DLC; i++) {
-        Serial.println(rx_frame.data.u8[i]);
+        debug_printf_l3(" %02d", rx_frame.data.u8[i]);
       }
-      Serial.println("--------------------");
+      debug_printf_l3("\n--------------------%s", "\n");
     }
     xSemaphoreGive(can.mutex);
 

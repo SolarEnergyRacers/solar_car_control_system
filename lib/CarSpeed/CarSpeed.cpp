@@ -8,6 +8,7 @@
 #include <freertos/task.h>
 
 #include <inttypes.h>
+#include <iostream>
 #include <stdio.h>
 
 #include <Arduino.h>
@@ -34,7 +35,7 @@ void CarSpeed::init() {
   // pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
   sleep_polling_ms = 400;
-  printf("[v] %s inited.\n", getName().c_str());
+  cout << "[v]" << getName() << " inited." << endl;
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }

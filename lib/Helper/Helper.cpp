@@ -4,7 +4,6 @@
 #include <definitions.h>
 
 #include <iostream>
-#include <stdio.h>
 #include <string>
 
 #include <freertos/FreeRTOS.h>
@@ -27,7 +26,7 @@ char *fgets_stdio_blocking(char *str, int n) {
     } else { // store char
       str[i++] = c;
     }
-    printf("[%d:%d]", i, c);
+    cout << "[" << i << ":" << c << "]";
   } while (i < (n - 1) && c != '\n' && c != '\r');
   str[i] = 0; // add zero-termination
 

@@ -40,7 +40,7 @@ extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS DriverDisplay::display_setup() {
-  printf("[v] '%s' inited: screen E ILI9341 with %d x %d.\n", getName().c_str(), height, width);
+  cout << "[v] '" << getName() << "' inited: screen E ILI9341 with " << height << " x " << width << "." << endl;
   return DISPLAY_STATUS::DRIVER_BACKGROUND;
 }
 
@@ -286,17 +286,15 @@ void DriverDisplay::write_speed() {
 void DriverDisplay::write_acceleration() {
   int value = Acceleration.get_recent_overtake_last();
   if (value >= -99 && value <= 99) {
-    if (justInited)
-      accelerationLast = -1;
-    accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, ILI9341_GREENYELLOW);
+    accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, justInited, ILI9341_GREENYELLOW);
   }
 }
 
 // commented out code is preparation for font usage
 void DriverDisplay::write_driver_info() {
-  string msg = DriverInfo.get_recent_overtake_last();
-  INFO_TYPE type = DriverInfoType.Value;
-  if (msg != DriverInfo.ValueLast || justInited) {
+  if (DriverInfo.Value != DriverInfo.ValueLast || justInited) {
+    string msg = DriverInfo.get_recent_overtake_last();
+    INFO_TYPE type = DriverInfoType.Value;
     int len = msg.length();
     int textSize = infoTextSize;
     if (len > 2 * 17)
@@ -317,49 +315,6 @@ void DriverDisplay::write_driver_info() {
   }
 }
 
-void DriverDisplay::driver_display_demo_screen() {
-  // printf("  Draw demo screen:\n");
-  // printf("   - driver info\n");
-  // write_driver_info("123456789_123456789_123456");
-  // printf("   - hazzard warn\n");
-  // indicator_set_and_blink(INDICATOR::WARN, true);
-  // printf("   - speed\n");
-  // write_speed(888);
-  // printf("   - acceleration\n");
-  // write_acceleration(888);
-  // printf("   - increase arrow\n");
-  // arrow_increase(true);
-  // printf("   - decrease arrow\n");
-  // arrow_decrease(true);
-  // // printf("   - light1 on\n");
-  // // LIGHT oldLight = carState.Light.get();
-  // // carState.Light.set(LIGHT::L1);
-  // // show_light();
-  // // sleep(250);
-  // // carState.Light.set(LIGHT::L2);
-  // // show_light();
-  // // sleep(250);
-  // // carState.Light.set(oldLight);
-  // // show_light();
-  // // printf("   - constant mode speed\n");
-  // // constant_drive_mode_set(CONSTANT_MODE::SPEED);
-  // // constant_drive_mode_show();
-  // printf("   - drive direction forwards\n");
-  // write_drive_direction(DRIVE_DIRECTION::FORWARD);
-  // printf("   - battery\n");
-  // write_bat(-8888.8);
-  // printf("   - photovoltaic\n");
-  // write_pv(-8888.8);
-  // printf("   - motor\n");
-  // write_motor(-8888.8);
-  // printf("   - constant mode power\n");
-  // // constant_drive_mode_set(CONSTANT_MODE::POWER);
-  // constant_drive_mode_show();
-  // printf("   - drive direction backwards\n");
-  // write_drive_direction(DRIVE_DIRECTION::BACKWARD);
-  // printf("  End of demo screen.\n");
-}
-
 DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
   DISPLAY_STATUS status = carState.displayStatus;
   switch (carState.displayStatus) {
@@ -370,12 +325,6 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     justInited = true;
     status = DISPLAY_STATUS::DRIVER_BACKGROUND;
     break;
-
-    // case DISPLAY_STATUS::DRIVER_DEMOSCREEN:
-    //   draw_display_background();
-    //   driver_display_demo_screen();
-    //   status = DISPLAY_STATUS::DRIVER_SETUP;
-    //   break;
 
   case DISPLAY_STATUS::DRIVER_BACKGROUND:
     clear_screen(bgColor);

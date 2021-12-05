@@ -1,22 +1,30 @@
 //
 // SPI Bus
 //
+#include <definitions.h>
+
+#include <definitions.h>
+
+#include <fmt/core.h>
+#include <inttypes.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h> // semaphore
 
 #include <SPI.h>
-
-#include <definitions.h>
-
 #include <SPIBus.h>
 
 extern SPIClass SPI;
 
+using namespace std;
+
 void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
-  printf("[?] Init 'SPI bus' with: SPI_CLK=%d, SPI_MOSI=%d, SPI_MISO=%d.\n", SPI_CLK, SPI_MOSI, SPI_MISO);
+  cout << "[?] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "." << endl;
 
   // init mutex (it is acquired)
   mutex = xSemaphoreCreateMutex();
@@ -30,5 +38,5 @@ void SPIBus::init(void) {
   xSemaphoreGive(mutex);
   // // CRITICAL SECTION SPI: end
 
-  printf("[v] SPI inited.\n");
+  cout << "[v] SPI inited." << endl;
 }

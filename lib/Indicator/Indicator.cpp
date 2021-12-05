@@ -4,17 +4,16 @@
 
 #include <definitions.h>
 
+#include <fmt/core.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <Display.h>
 #include <DriverDisplay.h>
-#include <Indicator.h>
-#if IOEXT_ON
-#include <IOExt.h>
-#include <PCF8574.h>
-#endif
-#if IOEXT2_ON
 #include <IOExt2.h>
+#include <Indicator.h>
 #include <MCP23017.h>
-#endif
 
 extern CarState carState;
 extern DriverDisplay driverDisplay;
@@ -28,8 +27,9 @@ void Indicator::re_init() { init(); }
 
 void Indicator::init(void) {
   set_SleepTime(200);
-  printf("[v] Indicator handler inited\n");
-  driverDisplay.print("[v] " + getName() + " initialized.\n");
+  string s = "[v] " + getName() + " initialized.\n";
+  cout <<s;
+  driverDisplay.print(s.c_str());
 }
 
 void Indicator::exit(void){

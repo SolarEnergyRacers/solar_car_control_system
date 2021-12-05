@@ -4,6 +4,11 @@
 
 #include <definitions.h>
 
+#include <fmt/core.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <DriverDisplay.h>
 #include <ESP32Time.h>
 #include <Helper.h>
@@ -26,13 +31,13 @@ void RTC::exit() {
 }
 
 void RTC::init(void) {
-  char msg[100];
-  printf("[?] Init 'RTC'...\n");
+  string s;
+  cout << "[?] Init 'RTC'..." << endl;
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  printf("    [INFO] rtc compile date/time: %02u/%02u/%04u %02u:%02u:%02u\n", compiled.Month(), compiled.Day(), compiled.Year(),
-         compiled.Hour(), compiled.Minute(), compiled.Second());
-
+  s = fmt::format("    [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}", compiled.Month(), compiled.Day(),
+                  compiled.Year(), compiled.Hour(), compiled.Minute(), compiled.Second());
+  cout << s << endl;
   xSemaphoreTakeT(i2cBus.mutex);
   Rtc.Begin();
 
@@ -40,12 +45,12 @@ void RTC::init(void) {
   if (!Rtc.IsDateTimeValid()) {
     // check & report error
     if (Rtc.LastError() != 0) {
-      printf("    [INFO] rtc Communication error %d\n", Rtc.LastError());
+      cout << "    [INFO] rtc Communication error " << Rtc.LastError() << endl;
     } else {
       // Common Causes:
       //    1) first time you ran and the device wasn't running yet
       //    2) the battery on the device is low or even missing
-      printf("    [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n");
+      cout << "    [WARN] rtc lost confidence. Set datetime to compile time of this binary." << endl;
       Rtc.SetDateTime(compiled);
     }
   }
@@ -53,19 +58,19 @@ void RTC::init(void) {
 
   // start device
   if (!Rtc.GetIsRunning()) {
-    printf("    [INFO] rtc was not actively running, starting now\n");
+    cout << "    [INFO] rtc was not actively running, starting now" << endl;
     Rtc.SetIsRunning(true);
   }
 
   // check time
   RtcDateTime now = Rtc.GetDateTime();
   if (now < compiled) {
-    printf("   [INFO] rtc time older than compile time! Updating DateTime.\n");
+    cout << "   [INFO] rtc time older than compile time! Updating DateTime." << endl;
     Rtc.SetDateTime(compiled);
   } else if (now > compiled) {
-    printf("   [INFO] rtc time newer than compile time.\n");
+    cout << "   [INFO] rtc time newer than compile time." << endl;
   } else if (now == compiled) {
-    printf("   [INFO] rtc time equal to compile time.\n");
+    cout << "   [INFO] rtc time equal to compile time." << endl;
   }
 
   // set pin
@@ -74,9 +79,9 @@ void RTC::init(void) {
   xSemaphoreGive(i2cBus.mutex);
 
   set_SleepTime(1000);
-  snprintf(msg, 100, "[v] Init 'RTC' inited\n");
-  printf(msg);
-  driverDisplay.print(msg);
+  s = "[v] Init 'RTC' inited\n";
+  cout << s;
+  driverDisplay.print(s.c_str());
 }
 
 RtcDateTime RTC::read_rtc_datetime(void) {
@@ -86,12 +91,12 @@ RtcDateTime RTC::read_rtc_datetime(void) {
   if (!Rtc.IsDateTimeValid()) {
     if (Rtc.LastError() != 0) {
       // report
-      printf("[RTC] i2c communications error: %d\n", Rtc.LastError());
+      cout << "[RTC] i2c communications error: " << Rtc.LastError() << endl;
     } else {
       // Common Causes:
       //   - the battery on the device is low or even missing and the power line
       //   was disconnected
-      printf("[RTC] lost confidence in the datetime\n");
+      cout << "[RTC] lost confidence in the datetime" << endl;
     }
   }
   // get datetime

@@ -44,8 +44,8 @@ private:
 
   //==== display cache =====================
   // ... to avoid flickering
-  int speedLast = -1;
-  int accelerationLast = -1;
+  int speedLast = 1000;
+  int accelerationLast = 1000;
   bool blinkOn = true;
   bool justInited = true;
   //=======================================
@@ -149,7 +149,6 @@ private:
   void arrow_increase(bool on);
   void arrow_decrease(bool on);
 
-  void driver_display_demo_screen();
   int getColorForInfoType(INFO_TYPE type);
 };
 

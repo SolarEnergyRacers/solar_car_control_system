@@ -68,7 +68,7 @@ void Display::re_init(void) {
 }
 
 // Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_RST);
-//Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
+// Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(&spiBus.spi, SPI_DC, SPI_CS_TFT, SPI_RST);
 
 void Display::_setup() {

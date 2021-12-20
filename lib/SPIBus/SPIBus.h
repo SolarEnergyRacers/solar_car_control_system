@@ -10,8 +10,10 @@
 
 class SPIBus {
 private:
+
 public:
   SemaphoreHandle_t mutex = NULL;
+  SPIClass spi;
   void init();
   void re_init();
 };

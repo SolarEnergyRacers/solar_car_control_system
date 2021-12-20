@@ -91,10 +91,16 @@ const string CarState::print(string msg, bool withColors) {
 }
 
 const string CarState::serialize(string msg) {
+  time_t theTime = time(NULL);
+  struct tm t = *localtime(&theTime);
+  string timeStamp = asctime(&t);
+
   cJSON *carData = cJSON_CreateObject();
   cJSON *dynData = cJSON_CreateObject();
   cJSON *ctrData = cJSON_CreateObject();
+
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
+  cJSON_AddStringToObject(dynData, "timeStamp", timeStamp.c_str());
   cJSON_AddNumberToObject(dynData, "speed", Speed);
   cJSON_AddBoolToObject(dynData, "batteryOn", BatteryOn);
   cJSON_AddNumberToObject(dynData, "batteryVoltage", BatteryVoltage);
@@ -115,7 +121,8 @@ const string CarState::serialize(string msg) {
 
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
-  return cJSON_Print(carData);
+  // return cJSON_Print(carData);
+  return cJSON_PrintUnformatted(carData);
 }
 
 const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {

@@ -30,6 +30,7 @@
 #include <Helper.h>
 #include <IOExt2.h>
 #include <Indicator.h>
+#include <SDCard.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;
@@ -41,6 +42,7 @@ extern CarState carState;
 extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
+extern SDCard sdCard;
 
 using namespace std;
 
@@ -112,7 +114,10 @@ void CmdHandler::task() {
         printSystemValues();
         cout << carState.print("Recent State") << endl;
         if (input[1] == 'J') {
-          cout << carState.serialize("Recent State") << endl;
+          string state = carState.serialize("Recent State");
+          cout << state;
+          sdCard.write(state + "\n");
+          cout << endl << "Writing on sd card ready." << endl;
         }
         break;
       case 's':

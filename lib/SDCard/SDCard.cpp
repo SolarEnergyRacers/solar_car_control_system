@@ -10,7 +10,9 @@
 #include <stdio.h>
 #include <string>
 
+#include <FS.h>
 #include <SD.h> // sd card
+#include <SD_MMC.h>
 #include <SPI.h>
 
 #include <DriverDisplay.h>
@@ -20,12 +22,35 @@
 
 #define FILENAME "/test.txt"
 
-extern SPIClass SPI;
 extern SPIBus spiBus;
 extern SDCard sdCard;
 extern DriverDisplay driverDisplay;
 
 void SDCard::re_init() { init(); }
+
+void printDirectory(File dir, int numTabs) {
+  while (true) {
+
+    File entry = dir.openNextFile();
+    if (!entry) {
+      // no more files
+      break;
+    }
+    for (uint8_t i = 0; i < numTabs; i++) {
+      Serial.print('\t');
+    }
+    Serial.print(entry.name());
+    if (entry.isDirectory()) {
+      Serial.println("/");
+      printDirectory(entry, numTabs + 1);
+    } else {
+      // files have sizes, directories do not
+      Serial.print("\t\t");
+      Serial.println(entry.size(), DEC);
+    }
+    entry.close();
+  }
+}
 
 void SDCard::init() {
   inited = false;
@@ -34,38 +59,51 @@ void SDCard::init() {
   cout << s;
   driverDisplay.print(s.c_str());
 
-  int count = 0;
-  while (!inited && count < 10) {
-    count++;
-
-    xSemaphoreTakeT(spiBus.mutex);
-    // inited = SD.begin(SPI_CS_SDCARD, SPI, 4000000U, "/x");
-    inited = SD.begin(SPI_CS_SDCARD, SPI);
-    xSemaphoreGive(spiBus.mutex);
+  if (!SD.begin(SPI_CS_SDCARD, spiBus.spi)) {
+    cout << "initialization failed!";
+    return;
   }
 
-  if (!inited) {
-    s = "[x] SDCard initialization failed.\n";
-    cout << s;
-    driverDisplay.print(s.c_str());
+  s = "[v] SDCard initialized.\n";
+  cout << s;
+  driverDisplay.print(s.c_str());
+  cout << "    SD-Card content:" << endl;
+  File root = SD.open("/");
+  printDirectory(root, 1);
+  s = fmt::format("   Open file '{}' for append...", FILENAME);
+  cout << s;
+  driverDisplay.print(s.c_str());
+
+  xSemaphoreTakeT(spiBus.mutex);
+  // open file
+  dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
+
+  if (dataFile == 0) {
+    cout << "failed." << endl;
   } else {
-    s = "[v] SDCard initialized.\n";
-    cout << s;
-    driverDisplay.print(s.c_str());
-    s = fmt::format("   Open file '{}' for append...", FILENAME);
-    cout << s;
-    driverDisplay.print(s.c_str());
+    cout << "ok." << endl;
+  }
+  string msg = "Hallo ESP SD Card.";
+  dataFile.printf("Message ():\n%s\n", msg.c_str());
+  dataFile.flush();
+  // dataFile.close();
+  // s = fmt::format("   File '{}' closed.", FILENAME);
+  // cout << s;
+  // driverDisplay.print(s.c_str());
+  // SD.end();
+  xSemaphoreGive(spiBus.mutex);
+  inited = true;
+  s = fmt::format("   ok.");
+  cout << s;
+  driverDisplay.print(s.c_str());
+}
 
+void SDCard::write(string msg) {
+  if (sdCard.isInited() && sdCard.dataFile) {
     xSemaphoreTakeT(spiBus.mutex);
-    // open file
-    dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
+    sdCard.dataFile.print(msg.c_str());
+    sdCard.dataFile.flush();
     xSemaphoreGive(spiBus.mutex);
-
-    if (dataFile == 0) {
-      cout << "failed." << endl;
-    } else {
-      cout << "ok." << endl;
-    }
   }
 }
 
@@ -75,18 +113,19 @@ void write_sdcard_demo_task(void *pvParameter) {
   int counter = 0;
 
   while (1) {
-    xSemaphoreTakeT(spiBus.mutex);
+    time_t theTime = time(NULL);
+    struct tm t = *localtime(&theTime);
     // check file open
     if (sdCard.isInited() && sdCard.dataFile) {
       // write counter value
-      sdCard.dataFile.print(counter);
-      sdCard.dataFile.println("");
+      xSemaphoreTakeT(spiBus.mutex);
+      sdCard.dataFile.printf("%4d\t%s\n", counter, asctime(&t));
       debug_printf("[SDCard] Write to sdcard: %d\n", counter++);
+      sdCard.dataFile.flush(); // ensure write-back
+      xSemaphoreGive(spiBus.mutex);
     } else {
-      // debug_printf("[SDCard] Error opening file.%s", " \n");
+      cout << "ERROR: sd card not writable" << endl;
     }
-    sdCard.dataFile.flush(); // ensure write-back
-    xSemaphoreGive(spiBus.mutex);
 
     // sleep for 1s
     vTaskDelay(1000 / portTICK_PERIOD_MS);

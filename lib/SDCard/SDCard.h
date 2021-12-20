@@ -19,5 +19,7 @@ public:
   void init();
   void re_init();
   bool isInited() { return inited; }
+  //void write(char *msg);
+  void write(string msg);
 };
 #endif // SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H

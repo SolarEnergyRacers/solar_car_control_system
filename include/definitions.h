@@ -86,7 +86,7 @@
 #define SPI_DC 4
 #define SPI_RST 21
 
-#define SPI_CS_TFT 36
+#define SPI_CS_TFT 32
 #define SPI_CS_SDCARD 14
 
 /*

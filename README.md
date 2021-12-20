@@ -29,7 +29,7 @@
 | **ESP32:13** | GPIO:LED_BUILTIN       |
 | ESP32:33     | GPIO:PCF8574_INTERRUPT |
 | **ESP32:14** | SPI:CS_SD_CARD         |
-| ESP32:36     | SPI:CS_TFT_SCREEN      |
+| ESP32:32     | SPI:CS_TFT_SCREEN      |
 | ESP32:4      | SPI:DC                 |
 | ESP32:21     | SPI:RST                |
 | ESP32:25 DAC | CAN:TX                 |

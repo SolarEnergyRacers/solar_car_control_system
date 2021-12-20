@@ -83,15 +83,13 @@ void SDCard::init() {
   } else {
     cout << "ok." << endl;
   }
-  string msg = "Hallo ESP SD Card.";
-  dataFile.printf("Message ():\n%s\n", msg.c_str());
+  time_t theTime = time(NULL);
+  struct tm t = *localtime(&theTime);
+  string msg = fmt::format("Start log SD Card at {}\n", asctime(&t));
+  dataFile.printf(msg.c_str());
   dataFile.flush();
-  // dataFile.close();
-  // s = fmt::format("   File '{}' closed.", FILENAME);
-  // cout << s;
-  // driverDisplay.print(s.c_str());
-  // SD.end();
   xSemaphoreGive(spiBus.mutex);
+
   inited = true;
   s = fmt::format("   ok.");
   cout << s;
@@ -104,30 +102,5 @@ void SDCard::write(string msg) {
     sdCard.dataFile.print(msg.c_str());
     sdCard.dataFile.flush();
     xSemaphoreGive(spiBus.mutex);
-  }
-}
-
-void write_sdcard_demo_task(void *pvParameter) {
-
-  // demo counter (written to file)
-  int counter = 0;
-
-  while (1) {
-    time_t theTime = time(NULL);
-    struct tm t = *localtime(&theTime);
-    // check file open
-    if (sdCard.isInited() && sdCard.dataFile) {
-      // write counter value
-      xSemaphoreTakeT(spiBus.mutex);
-      sdCard.dataFile.printf("%4d\t%s\n", counter, asctime(&t));
-      debug_printf("[SDCard] Write to sdcard: %d\n", counter++);
-      sdCard.dataFile.flush(); // ensure write-back
-      xSemaphoreGive(spiBus.mutex);
-    } else {
-      cout << "ERROR: sd card not writable" << endl;
-    }
-
-    // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }

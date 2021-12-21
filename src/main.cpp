@@ -86,7 +86,6 @@ EngineerDisplay engineerDisplay;
 ESP32Time esp32time;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
-I2CBus i2cBus;
 Indicator indicator; // INDICATOR_ON
 #if IOEXT_ON == true
 IOExt ioExt;
@@ -94,12 +93,8 @@ IOExt ioExt;
 #if IOEXT2_ON
 IOExt2 ioExt;
 #endif
-OneWireBus oneWireBus;
 PWM pwm;
 RTC rtc;
-SDCard sdCard;
-SPIBus spiBus;
-Temp ds;   // temperature
 Uart uart; // SERIAL
 
 bool startOk = true;

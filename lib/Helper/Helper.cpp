@@ -1,15 +1,19 @@
 //
 // Helper Functions
 //
-
-#include <stdio.h>
-
 #include <definitions.h>
 
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <freertos/FreeRTOS.h>
+#include <freertos/semphr.h>
 #include <freertos/task.h>
 
-#include "Helper.h"
+#include <Helper.h>
+
+using namespace std;
 
 char *fgets_stdio_blocking(char *str, int n) {
 
@@ -29,4 +33,11 @@ char *fgets_stdio_blocking(char *str, int n) {
 
   // on success
   return str;
+}
+
+void xSemaphoreTakeT(QueueHandle_t mutex) {
+  if (!xSemaphoreTake(mutex, portMAX_DELAY)) {
+    cout << "ERROR: mutex ************************************ " << mutex << " ****************" << endl;
+    throw runtime_error("ERROR: mutex");
+  }
 }

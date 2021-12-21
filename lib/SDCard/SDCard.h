@@ -2,8 +2,8 @@
 // SD Card
 //
 
-#ifndef SDCARD_H
-#define SDCARD_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H
+#define SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H
 
 #include <SD.h>
 
@@ -12,9 +12,12 @@ void write_sdcard_demo_task(void *pvParameter); // TODO: not sure yet if we want
 
 class SDCard {
 private:
+  bool inited;
+
 public:
   File dataFile;
   void init();
   void re_init();
+  bool isInited() { return inited; }
 };
-#endif // SDCARD_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H

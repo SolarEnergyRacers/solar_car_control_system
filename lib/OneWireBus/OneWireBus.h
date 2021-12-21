@@ -2,8 +2,8 @@
 // One Wire Bus
 //
 
-#ifndef ONEWIREBUS_H
-#define ONEWIREBUS_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_ONEWIREBUS_H
+#define SOLAR_CAR_CONTROL_SYSTEM_ONEWIREBUS_H
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -13,10 +13,10 @@
 class OneWireBus {
 private:
 public:
-  SemaphoreHandle_t mutex;
+  SemaphoreHandle_t mutex = NULL;
   OneWire oneWire;
   void init();
   void re_init();
 };
 
-#endif // ONEWIREBUS_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_ONEWIREBUS_H

@@ -5,7 +5,7 @@
 
 ## Pinout and Usage
 
-![image-20210605181710276](.ADS1115--ADC0_ADC1_ADC2-infos/image-20210605181710276.png)
+![GroveADS1115-front-back](assets.ADS1115--ADC0_ADC1_ADC2-infos/GroveADS1115-front-back.png)
 
 Board size: 42x24, height with jumpers and plugs : 14
 
@@ -21,7 +21,13 @@ Usage in car hull:
 
 ## Diagram
 
-![img](.ADS1115--ADC0_ADC1_ADC2-infos/FSR-CurcuitDiagram.drawio.png)
+![img](assets.ADS1115--ADC0_ADC1_ADC2-infos/FSR-CurcuitDiagram.drawio.png)
+
+### Board Assembly
+
+![image-20210823130410331](assets.ADS1115--ADC0_ADC1_ADC2-infos/GroveADS1115-usedPins.png)
+
+![image-20210823130639854](assets.ADS1115--ADC0_ADC1_ADC2-infos/GroveADS1115-rastersize.png)
 
 ## Hints and Discussion
 

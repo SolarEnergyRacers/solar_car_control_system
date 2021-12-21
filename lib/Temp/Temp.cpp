@@ -4,7 +4,7 @@
 
 #include <OneWireBus.h>
 
-#include "Temp.h"
+#include <Temp.h>
 
 #include <DallasTemperature.h> // DS18B20
 

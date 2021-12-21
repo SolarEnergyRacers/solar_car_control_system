@@ -7,11 +7,14 @@
  */
 
 // standard libraries
+#include <iostream>
 #include <stdio.h>
+#include <string>
 
 // FreeRTOS / Arduino
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
+#include <freertos/FreeRTOSConfig.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
 
@@ -24,14 +27,24 @@
 // local libs
 #include <ADC.h>
 #include <CANBus.h>
+#include <CarSpeed.h>
 #include <CmdHandler.h>
 #include <DAC.h>
 #include <Display.h>
-#include <DriverDisplayC.h>
+#include <DriverDisplay.h>
+#include <ESP32Time.h>
+#include <EngineerDisplay.h>
 #include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
+#if IOEXT_ON == true
 #include <IOExt.h>
+#include <PCF8574.h>
+#endif
+#if IOEXT2_ON
+#include <IOExt2.h>
+#include <MCP23017.h>
+#endif
 #include <Indicator.h>
 #include <OneWireBus.h>
 #include <PWM.h>
@@ -40,11 +53,14 @@
 #include <SPIBus.h>
 #include <Serial.h>
 #include <Temp.h>
-#include <string>
 #include <system.h>
 
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
+
+#include <CarControl.h>
+#include <CarState.h>
+#include <CarStatePin.h>
 
 // add C linkage definition
 extern "C" {
@@ -52,7 +68,6 @@ void app_main(void);
 }
 
 using namespace std;
-// using namespace DriverDisplayC;
 
 ADC adc;
 CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
@@ -61,16 +76,31 @@ SPIBus spiBus;
 I2CBus i2cBus;
 Temp ds; // temperature
 SDCard sdCard;
+CarControl carControl;
+CarSpeed carSpeed;
+CarState carState;
 CmdHandler cmdHandler;
 DAC dac;
-Uart uart; // SERIAL
-GyroAcc gyroAcc;
-Indicator indicator; // DISPLAY_LARGE_INDICATOR_ON
-IOExt ioExt;
-PWM pwm;
-Display disp;
-RTC rtc;
+DriverDisplay driverDisplay;
+EngineerDisplay engineerDisplay;
+ESP32Time esp32time;
 GPInputOutput gpio; // I2C Interrupts
+GyroAcc gyroAcc;
+I2CBus i2cBus;
+Indicator indicator; // INDICATOR_ON
+#if IOEXT_ON == true
+IOExt ioExt;
+#endif
+#if IOEXT2_ON
+IOExt2 ioExt;
+#endif
+OneWireBus oneWireBus;
+PWM pwm;
+RTC rtc;
+SDCard sdCard;
+SPIBus spiBus;
+Temp ds;   // temperature
+Uart uart; // SERIAL
 
 bool startOk = true;
 bool systemOk = false;
@@ -83,37 +113,36 @@ void app_main(void) {
   // init serial output for  console
 
   Serial.begin(115200);
-  delay(2000);
-  printf("\n--------------------\n");
-  Serial.println("esp32dev + free RTOS\n");
-  printf("--------------------\n");
+  delay(300);
+  cout << endl;
+  cout << "--------------------" << endl;
+  cout << "esp32dev + free RTOS" << endl;
+  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << endl;
+  cout << "--------------------" << endl;
 
   // report chip info
+  cout << "-chip info -------------------" << endl;
   chip_info();
-
+  cout << "-init bus systems ------------" << endl;
   // init buses
+  spiBus.init();
   oneWireBus.init();
   i2cBus.init();
-  spiBus.init();
+  cout << "------------------------------" << endl;
 
-  // i2cBus.scan_i2c_devices();
-
+  engineerDisplay.init();
+  engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
+  engineerDisplay.print("[v] " + engineerDisplay.getName() + " initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
   // ---- init modules ----
-  if (BLINK_ON) {
-  }
-  if (DISPLAY_LARGE_ON) {
-    DriverDisplayC::instance()->init();
-  }
-  if (DISPLAY_LARGE_INDICATOR_ON) {
-    // startOk &= init_indicator(); // TODO: restore this functionality
+  if (INDICATOR_ON) {
     indicator.init();
+    indicator.setIndicator(INDICATOR::OFF);
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.init();
   }
   if (ADC_ON) {
     adc.init();
-    // example: printf("Motor speed is: %d\n", adc.read(ADC::Pin::MOTOR_SPEED));
   }
   if (DS_ON) {
     ds.init();
@@ -134,12 +163,9 @@ void app_main(void) {
     gpio.init();
     gpio.register_gpio_interrupt();
   }
-  if (DISPLAY_ON) {
-    disp.init();
-  }
-  if (IOEXT_ON) {
-    ioExt.init();
-  }
+#if IOEXT_ON || IOEXT2_ON
+  ioExt.init();
+#endif
   if (DAC_ON) {
     dac.init();
   }
@@ -149,80 +175,114 @@ void app_main(void) {
   if (CAN_ON) {
     can.init();
   }
-
   if (!startOk) {
-    printf("ERROR in init sequence(s). System halted!\n");
+    cout << "ERROR in init sequence(s). System halted!" << endl;
     exit(0);
   }
-  printf("\n-----------------------------------------------------------------\n");
-  printf("Startup sequence(s) successful. System creating FreeRTOS tasks...\n");
-  printf("-----------------------------------------------------------------\n");
+
+  engineerDisplay.print("Startup sequence(s) successful.\n");
+  engineerDisplay.print("System creating FreeRTOS tasks...\n");
+  cout << endl;
+  cout << "-----------------------------------------------------------------" << endl;
+  cout << "Startup sequence(s) successful. System creating FreeRTOS tasks..." << endl;
+  cout << "-----------------------------------------------------------------" << endl;
 
   // ---- create tasks ----
-  if (DISPLAY_ON) {
-    disp.create_task();
-  }
-  if (DISPLAY_LARGE_ON) {
-    DriverDisplayC::instance()->create_task();
-  }
-
-  if (DISPLAY_LARGE_INDICATOR_ON) {
+  if (INDICATOR_ON) {
     indicator.create_task();
+    engineerDisplay.print("[v] " + indicator.getName() + " task initialized.\n");
   }
-  //    if (BLINK_ON) { // not activated
-  //        printf(" - blink_demo_task\n");
-  //        xTaskCreate(&blink_demo_task, "blink_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  //    }
-  // if (ADC_ON) {
-  //   printf(" - read_adc_task\n");
-  //   xTaskCreate(&read_adc_acc_dec, "read_adc_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  // }
   if (DS_ON) {
-    printf(" - read_ds_demo_task\n");
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (GYRO_ACC_ON) {
-    printf(" - read_gyro_acc_demo_task\n");
     xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (PWM_ON) {
-    printf(" - update_pwm_demo_task\n");
     pwm.create_task();
+    engineerDisplay.print("[v] " + pwm.getName() + " task initialized.\n");
   }
   if (RTC_ON) {
-    rtc.create_task();
+    RtcDateTime now = rtc.read_rtc_datetime();
+    debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
+                 now.Second());
+    esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
+    engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
   }
   if (SD_ON) {
-    printf(" - write_sdcard_demo_task\n");
     xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (INT_ON) {
     gpio.create_task();
+    engineerDisplay.print("[v] " + gpio.getName() + " task initialized.\n");
   }
-  if (IOEXT_ON) {
-    ioExt.create_task();
-  }
+
   if (DAC_ON) {
+    dac.init();
     printf(" - DAC DAC DAC\n");
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
+    engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
   if (SERIAL_ON) {
     printf(" - serial_demo_task\n");
-    // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
     printf(" - can_task\n");
     can.create_task();
   }
+  if (CARSPEED_ON) {
+    carSpeed.create_task();
+    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
+  }
+  if (CARCONTROL_ON) {
+    carControl.init();
+    carControl.create_task();
+    engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");
+  }
+#if IOEXT_ON || IOEXT2_ON
+  carState.Indicator = INDICATOR::OFF;
+  carState.ConstantModeOn = false;
+  carState.ConstantMode = CONSTANT_MODE::SPEED;
+  carState.Light = LIGHT::OFF;
+  ioExt.create_task();
+  engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
+  ioExt.readAll();
+#endif
+  //--let the bootscreen visible for a moment ------------------
+  int waitAtConsoleView = 5;
+  engineerDisplay.print("\nready at ");
+  engineerDisplay.print(esp32time.getDateTime().c_str());
+  engineerDisplay.print(".\nWaiting for start of life display: ");
+  while (waitAtConsoleView-- > 0) {
+    engineerDisplay.print(to_string(waitAtConsoleView));
+    sleep(1);
+    engineerDisplay.print("-");
+  }
+  engineerDisplay.print("start");
+  engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+  //------------------------------------------------------------
+  if (ENGINEER_DISPLAY_ON) {
+    engineerDisplay.create_task(10);
+  }
+  if (DRIVER_DISPLAY_ON) {
+    driverDisplay.init();
+    driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
+    driverDisplay.create_task(16);
+    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << endl;
+  }
 
   systemOk = true;
-
-  printf("-----------------------------------------------------------------\n");
-  printf("Creating FreeRTOS tasks successful. System running.\n");
-  printf("-----------------------------------------------------------------\n\n");
-  // if (DISPLAY_LARGE_ON) {
-  //   DriverDisplayC::instance()->driver_display_demo_screen();
-  // }
+  sleep(1);
+  carState.init_values();
+#if IOEXT_ON || IOEXT2_ON
+  ioExt.readAll();
+#endif
+  cout << "-----------------------------------------------------------------" << endl;
+  cout << "Creating FreeRTOS tasks successful. System running." << endl;
+  cout << "-----------------------------------------------------------------" << endl;
+  cout << endl;
+  cout << carState.print("Initial car state:") << endl;
 }

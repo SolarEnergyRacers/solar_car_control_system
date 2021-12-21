@@ -9,7 +9,10 @@
 #include <Arduino.h>
 #include <CAN.h>
 
-#include "CANBus.h"
+#include <CANBus.h>
+
+extern CAN_device_t CAN_cfg;
+extern CanBus can;
 
 extern CANBus can;
 
@@ -44,10 +47,12 @@ void CANBus::init() {
   xSemaphoreGive(mutex);
 }
 
+
 void CANBus::exit(){
   // Exit needs to be implemented for Task, here or in abstract_task
   CAN.end();
 }
+
 
 void CANBus::task(){
   CANPacket packet;
@@ -141,8 +146,6 @@ void CANBus::onReceive(int packetSize){
 
   CANPacket packet;
   uint64_t rxData = 0;
-
-  //ToDo implement Semaphore
 
   packet.setID(CAN.packetId());
 

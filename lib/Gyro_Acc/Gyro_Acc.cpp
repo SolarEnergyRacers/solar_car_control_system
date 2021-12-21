@@ -4,10 +4,10 @@
 
 #include <definitions.h>
 
-#include "BMI088.h" // gyro & acc lib
+#include <BMI088.h> // gyro & acc lib
 #include <I2CBus.h>
 
-#include "Gyro_Acc.h"
+#include <Gyro_Acc.h>
 
 extern I2CBus i2cBus;
 

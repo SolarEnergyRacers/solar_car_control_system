@@ -2,8 +2,8 @@
 // General Purpose Input / Output
 //
 
-#ifndef GPIO_H
-#define GPIO_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_GPIO_H
+#define SOLAR_CAR_CONTROL_SYSTEM_GPIO_H
 
 #include <abstract_task.h>
 #include <definitions.h>
@@ -13,7 +13,7 @@ class GPInputOutput : public abstract_task { // Note: This class is called weird
 private:
   // add local variables required for the handler
 public:
-  string getName(void);
+  string getName(void) { return "GPInputOutput"; };
   void init(void);
   void re_init(void);
   void exit(void);
@@ -31,4 +31,4 @@ public:
   };
 };
 
-#endif // GPIO_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_GPIO_H

@@ -2,8 +2,8 @@
 // Software Serial (Interconnection to Telemetry / PC)
 //
 
-#ifndef SERIAL_H
-#define SERIAL_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_SERIAL_H
+#define SOLAR_CAR_CONTROL_SYSTEM_SERIAL_H
 
 #include <SoftwareSerial.h>
 
@@ -17,4 +17,4 @@ public:
   void re_init();
 };
 
-#endif // SERIAL_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_SERIAL_H

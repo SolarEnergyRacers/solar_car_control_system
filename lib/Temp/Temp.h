@@ -2,8 +2,8 @@
 // Temperature Sensor Array (1-Wire)
 //
 
-#ifndef TEMP_H
-#define TEMP_H
+#ifndef SOLAR_CAR_CONTROL_SYSTEM_TEMP_H
+#define SOLAR_CAR_CONTROL_SYSTEM_TEMP_H
 
 #include <DallasTemperature.h> // DS18B20
 
@@ -22,4 +22,4 @@ public:
   float read_tempF_index(int index);
 };
 
-#endif // TEMP_H
+#endif // SOLAR_CAR_CONTROL_SYSTEM_TEMP_H

@@ -37,16 +37,15 @@ void printDirectory(File dir, int numTabs) {
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      Serial.print('\t');
+      cout << '\t';
     }
-    Serial.print(entry.name());
+    cout << entry.name();
     if (entry.isDirectory()) {
-      Serial.println("/");
+      cout << "/" << endl;
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      Serial.print("\t\t");
-      Serial.println(entry.size(), DEC);
+      cout << "\t\t" << entry.size() << endl;
     }
     entry.close();
   }

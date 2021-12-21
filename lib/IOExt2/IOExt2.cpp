@@ -158,7 +158,7 @@ void IOExt2::readAll(bool deltaOnly) {
   }
   string outString = carState.printIOs("", true, deltaOnly);
   if (outString.length() > 0)
-    debug_printf("%s", outString.c_str());
+    debug_printf("%s\n", outString.c_str());
   // avoid multi registration:
   pinHandlerList.unique();
   // call all handlers for changed pins

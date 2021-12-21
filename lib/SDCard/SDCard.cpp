@@ -20,7 +20,7 @@
 #include <SDCard.h>
 #include <SPIBus.h>
 
-#define FILENAME "/test.txt"
+#define FILENAME "/ser4data.log"
 
 extern SPIBus spiBus;
 extern SDCard sdCard;

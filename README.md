@@ -26,6 +26,7 @@
 | ESP32:19     | SPI:MISO               |
 | ESP32:5      | SPI:CLK                |
 | ESP32:12     | 1Wire                  |
+
 | **ESP32:13** | GPIO:LED_BUILTIN       |
 | ESP32:33     | GPIO:PCF8574_INTERRUPT |
 | **ESP32:14** | SPI:CS_SD_CARD         |

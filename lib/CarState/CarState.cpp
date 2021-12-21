@@ -29,7 +29,7 @@ CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt2::getIdx(
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
 static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASHR"};
-static const char *CONSTANT_MODE_str[] = {"NONE", "spSPEEDeed", "POWER"};
+static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
 static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
 static const char *BOOL_str[] = {"false", "true"};
 static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
@@ -100,6 +100,7 @@ const string CarState::serialize(string msg) {
   time_t theTime = time(NULL);
   struct tm t = *localtime(&theTime);
   string timeStamp = asctime(&t);
+  timeStamp.erase(timeStamp.end() - 1);
 
   cJSON *carData = cJSON_CreateObject();
   cJSON *dynData = cJSON_CreateObject();
@@ -108,26 +109,41 @@ const string CarState::serialize(string msg) {
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
   cJSON_AddStringToObject(dynData, "timeStamp", timeStamp.c_str());
   cJSON_AddNumberToObject(dynData, "speed", Speed);
+  cJSON_AddNumberToObject(dynData, "Acceleration", Acceleration);
+  cJSON_AddNumberToObject(dynData, "Deceleration", Deceleration);
+  cJSON_AddNumberToObject(dynData, "AccelerationDisplay", AccelerationDisplay);
   cJSON_AddBoolToObject(dynData, "batteryOn", BatteryOn);
-  cJSON_AddNumberToObject(dynData, "batteryVoltage", BatteryVoltage);
-  cJSON_AddNumberToObject(dynData, "batteryCurrent", BatteryCurrent);
+  cJSON_AddNumberToObject(dynData, "batteryVoltage", floor(BatteryVoltage * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "batteryCurrent", floor(BatteryCurrent * 1000.0 + .5) / 1000.0);
   cJSON_AddBoolToObject(dynData, "pvOn", PhotoVoltaicOn);
-  cJSON_AddNumberToObject(dynData, "pvCurrent", PhotoVoltaicCurrent);
+  cJSON_AddNumberToObject(dynData, "pvCurrent", floor(PhotoVoltaicCurrent * 1000.0 + .5) / 1000.0);
   cJSON_AddBoolToObject(dynData, "motorOn", MotorOn);
-  cJSON_AddNumberToObject(dynData, "motorCurrent", MotorCurrent);
+  cJSON_AddNumberToObject(dynData, "motorCurrent", floor(MotorCurrent * 1000.0 + .5) / 1000.0);
+
+  cJSON_AddNumberToObject(dynData, "mppt1Current", floor(Mppt1Current * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "mppt2Current", floor(Mppt2Current * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "mppt3Current", floor(Mppt3Current * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "voltageMin", floor(Umin * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "voltageAvg", floor(Uavg * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "voltageMax", floor(Umax * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "t1", floor(T1 * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "t2", floor(T2 * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "t3", floor(T3 * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "t4", floor(T4 * 1000.0 + .5) / 1000.0);
 
   cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator)]);
+  cJSON_AddStringToObject(dynData, "driveDirection", DRIVE_DIRECTION_str[(int)(DriveDirection)]);
+  cJSON_AddStringToObject(dynData, "constantModeOn", BOOL_str[(int)(ConstantModeOn)]);
 
   cJSON_AddItemToObject(carData, "controlData", ctrData);
+  cJSON_AddStringToObject(ctrData, "displayStatus", DISPLAY_STATUS_str[(int)displayStatus]);
+  cJSON_AddStringToObject(ctrData, "constantMode", CONSTANT_MODE_str[(int)(ConstantMode)]);
   cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed);
-
-  char buf[100];
-  snprintf(buf, 100, "[%s] %s", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str());
-  cJSON_AddStringToObject(ctrData, "driverInfo", buf);
-
+  cJSON_AddNumberToObject(ctrData, "targetPower", TargetPower);
+  cJSON_AddStringToObject(ctrData, "driverInfo", fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str()).c_str());
+  cJSON_AddStringToObject(ctrData, "speedArrow", SPEED_ARROW_str[(int)SpeedArrow]);
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
-  // return cJSON_Print(carData);
   return cJSON_PrintUnformatted(carData);
 }
 
@@ -160,14 +176,16 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
           ss << pin->value;
         }
       }
-      if ((idx + 1) % 8 == 0)
-        ss << " | ";
-      else if ((idx + 1) % 4 == 0)
-        ss << "-";
+      if (idx < MCP23017_NUM_DEVICES * MCP23017_NUM_PORTS - 1) {
+        if ((idx + 1) % 8 == 0)
+          ss << " | ";
+        else if ((idx + 1) % 4 == 0)
+          ss << "-";
+      }
     }
   }
 
-  ss << endl;
+  // ss << endl;
   if (hasDelta || !deltaOnly)
     return ss.str();
   else

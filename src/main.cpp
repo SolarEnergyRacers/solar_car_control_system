@@ -195,10 +195,7 @@ void app_main(void) {
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
     engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
   }
-  // if (SD_ON) {
-  //   xTaskCreate(&write_sdcard_demo_task, "write_sdcard_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  // }
-  if (INT_ON) {
+    if (INT_ON) {
     gpio.create_task();
     engineerDisplay.print("[v] " + gpio.getName() + " task initialized.\n");
   }

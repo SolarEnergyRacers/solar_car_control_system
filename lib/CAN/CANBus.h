@@ -7,22 +7,21 @@
 
 void read_can_demo_task(void *pvParameter);
 
-class CANBus : public abstract_task{
+class CANBus : public abstract_task {
 
-  private:
-    CANRxBuffer rxBuffer;
-    
-  public:
-    string getName(void);
-    void re_init(void);
-    void init(void);
-    void exit(void);
-    void task(void);
+private:
+  CANRxBuffer rxBuffer;
 
-    //void create_task(void);
+public:
+  string getName(void);
+  void re_init(void);
+  void init(void);
+  void exit(void);
+  void task(void);
 
-    void onReceive(int packetSize);
-    
-    SemaphoreHandle_t mutex;
+  // void create_task(void);
+
+  void onReceive(int packetSize);
+
+  SemaphoreHandle_t mutex;
 };
-

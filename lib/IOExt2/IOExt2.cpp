@@ -177,7 +177,7 @@ void IOExt2::setPort(int port, bool value) {
   // get device & port
   int devNr = port >> 4;
   int pin = port & 0xf;
-  //debug_printf("Set BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
+  // debug_printf("Set BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
   xSemaphoreTakeT(i2cBus.mutex);
   ioExt.IOExtDevs[devNr].digitalWrite(pin, value ? 1 : 0);
   xSemaphoreGive(i2cBus.mutex);
@@ -213,7 +213,7 @@ void IOExt2::task() {
         if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited)) {
           pin.oldValue = pin.value;
           pin.inited = true;
-          //debug_printf("Set %02x to %d\n", pin.port, pin.value);
+          // debug_printf("Set %02x to %d\n", pin.port, pin.value);
           setPort(pin.port, pin.value);
         }
       }

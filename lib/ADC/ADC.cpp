@@ -82,4 +82,3 @@ float ADC::get_multiplier(Pin port) {
   int devNr = port >> 4;
   return adss[devNr].toVoltage(1);
 }
-

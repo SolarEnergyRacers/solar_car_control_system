@@ -75,7 +75,6 @@ void constantModeOnOffHandler();
 
 class IOExt : public abstract_task {
 public:
-
   string getName(void) { return "IOExt"; };
 
   void init(void);
@@ -99,11 +98,10 @@ private:
   void handleIoInterrupt();
   static void ioExt_interrupt_handler() { ioInterruptRequest = true; };
 
-  PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
-      PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler)};
+  PCF8574 IOExtDevs[PCF8574_NUM_DEVICES] = {PCF8574(I2C_ADDRESS_PCF8574_IOExt0, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
+                                            PCF8574(I2C_ADDRESS_PCF8574_IOExt1, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
+                                            PCF8574(I2C_ADDRESS_PCF8574_IOExt2, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler),
+                                            PCF8574(I2C_ADDRESS_PCF8574_IOExt3, I2C_SDA, I2C_SCL, I2C_INTERRUPT, ioExt_interrupt_handler)};
 };
 #endif
 #endif // SER_IOEXT_H

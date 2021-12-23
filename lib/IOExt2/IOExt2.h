@@ -92,7 +92,7 @@ public:
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
 private:
-  //static volatile bool ioInterruptRequest;
+  // static volatile bool ioInterruptRequest;
   bool isInInterruptHandler = false;
 
   void setPortMode(int port, uint8_t mode);

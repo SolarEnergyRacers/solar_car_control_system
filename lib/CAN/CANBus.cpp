@@ -11,9 +11,6 @@
 
 #include <CANBus.h>
 
-extern CAN_device_t CAN_cfg;
-extern CanBus can;
-
 extern CANBus can;
 
 void onReceiveForwarder(int packetSize) { can.onReceive(packetSize); }

@@ -83,6 +83,10 @@ PWM pwm;
 RTC rtc;
 Uart uart; // SERIAL
 
+CarSpeed carSpeed;
+CarControl carControl;
+CarState carState;
+
 bool startOk = true;
 bool systemOk = false;
 

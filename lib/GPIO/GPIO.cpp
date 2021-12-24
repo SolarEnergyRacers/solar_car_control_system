@@ -4,13 +4,17 @@
 
 #include <definitions.h>
 
+#include <fmt/core.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
 #include <Arduino.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
-#include <driver/gpio.h>
-
 #include <GPIO.h>
+#include <driver/gpio.h>
 
 void GPInputOutput::re_init() { init(); }
 
@@ -25,7 +29,7 @@ void GPInputOutput::exit() {
 void GPInputOutput::register_gpio_interrupt() {
 
   // report
-  printf("[HW Interrupt] Register GPInputOutput interrupt pin %d (falling edge)\n", GPIO_INTERRUPT_PIN);
+  cout << "[HW Interrupt] Register GPInputOutput interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)" << endl;
 
   // set operating mode of interrupt pin to pull-up (i.e. interrupt is generated
   // if pin is getting grounded)
@@ -46,7 +50,7 @@ void GPInputOutput::task() {
     // print the number of interrupts handled by the interrupt handler
     // handle_gpio_interrupt
     if (interrupt_counter > 0) {
-      printf("[INT] Number of interrupts: %d\n", interrupt_counter);
+      cout << "[INT] Number of interrupts: " << interrupt_counter << endl;
       interrupt_counter = 0;
     }
 

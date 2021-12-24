@@ -1,6 +1,7 @@
 //
 // EngineeringDisplay
 //
+#include <iostream>
 
 #include <LocalFunctionsAndDevices.h>
 #include <abstract_task.h>
@@ -19,7 +20,7 @@ extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup() {
-  printf("[v] '%s' inited: screen D ILI9341 with %d x %d.\n", getName().c_str(), height, width);
+  cout << "[v] '" << getName() << "' inited: screen D ILI9341 with " << height << " x " << width << "." << endl;
   return DISPLAY_STATUS::ENGINEER_BACKGROUND;
 }
 

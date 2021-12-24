@@ -4,6 +4,7 @@
 
 #include <definitions.h>
 
+#include <fmt/core.h>
 #include <inttypes.h>
 #include <iostream>
 #include <stdio.h>
@@ -26,15 +27,13 @@
 extern I2CBus i2cBus;
 extern DriverDisplay driverDisplay;
 
-char msg[100];
-
 void DAC::re_init() { init(); }
 
 void DAC::init() {
   cout << "[?] Setup 'DAC'..." << endl;
-  snprintf(msg, 100, "[v] DAC initialized with I2C_ADDRESS_DS1803=%02x.\n", I2C_ADDRESS_DS1803);
-  cout << msg;
-  driverDisplay.print(msg);
+  string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:x}.\n", I2C_ADDRESS_DS1803);
+  cout << s;
+  driverDisplay.print(s.c_str());
 }
 
 uint8_t DAC::get_cmd(pot_chan channel) {
@@ -57,20 +56,21 @@ uint8_t DAC::get_cmd(pot_chan channel) {
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
-  // setup command
-  uint8_t command = get_cmd(channel);
+  if (val >= 0) { // setup command
+    uint8_t command = get_cmd(channel);
 
-  xSemaphoreTakeT(i2cBus.mutex);
-  Wire.beginTransmission(I2C_ADDRESS_DS1803);
-  Wire.write(command);
-  Wire.write(val); // first pot value
-  if (channel == POT_CHAN_ALL) {
-    Wire.write(val); // second pot value
+    xSemaphoreTakeT(i2cBus.mutex);
+    Wire.beginTransmission(I2C_ADDRESS_DS1803);
+    Wire.write(command);
+    Wire.write(val); // first pot value
+    if (channel == POT_CHAN_ALL) {
+      Wire.write(val); // second pot value
+    }
+    Wire.endTransmission();
+    xSemaphoreGive(i2cBus.mutex);
+    debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command, val,
+                 get_pot(channel));
   }
-  Wire.endTransmission();
-  xSemaphoreGive(i2cBus.mutex);
-
-  debug_printf("Write motor potentiometer [0x%02x] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, command, val, get_pot(channel));
 }
 
 uint16_t DAC::get_pot(pot_chan channel) {

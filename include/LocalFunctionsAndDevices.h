@@ -14,7 +14,6 @@
 #define GYRO_ACC_ON false        // 6-axis Motion Tracking (BMI088)
 #define INDICATOR_ON true        // indicator blink
 #define INT_ON false             // interrupt for I/O Expander
-#define IOEXT_ON false           // 8-Bit I/O Expander for I2C Bus (PCF8574)
 #define IOEXT2_ON true           // 8-Bit I/O Expander for I2C Bus (MCP23017)
 #define LIFESIGN_ON true         // LifeSign on Screens
 #define PWM_ON false             // 16-channel, 12-bit PWM Fm, I2C (PCA9685)

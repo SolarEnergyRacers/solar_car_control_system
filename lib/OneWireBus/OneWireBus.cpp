@@ -1,15 +1,21 @@
 //
 // One Wire Bus
 //
+#include <definitions.h>
+
+#include <fmt/core.h>
+#include <inttypes.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
 
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h> // semaphore
 
 #include <OneWire.h>
-
-#include <definitions.h>
-
 #include <OneWireBus.h>
+
+using namespace std;
 
 void OneWireBus::init(void) {
 
@@ -22,5 +28,5 @@ void OneWireBus::init(void) {
   // release mutex
   xSemaphoreGive(mutex);
 
-  printf("[v] OneWire inited: ONEWIRE_PIN=%d.\n", ONEWIRE_PIN);
+  cout << "[v] OneWire inited: ONEWIRE_PIN=" << ONEWIRE_PIN << endl;
 }

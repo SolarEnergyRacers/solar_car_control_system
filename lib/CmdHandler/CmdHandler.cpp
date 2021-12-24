@@ -3,16 +3,20 @@
 //
 // reads commands from serial console and deploy it
 #include <definitions.h>
+
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <string>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
 #include <Arduino.h>
 #include <I2CBus.h>
 #include <Wire.h> // I2C
-#include <inttypes.h>
-#include <sstream>
-#include <stdio.h>
-#include <string>
 
 #include <ADC.h>
 #include <CarControl.h>
@@ -24,29 +28,21 @@
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
-#if IOEXT_ON
-#include <IOExt.h>
-#endif
-#if IOEXT2_ON
 #include <IOExt2.h>
-#endif
 #include <Indicator.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;
 extern ADC adc;
-#if IOEXT_ON
-extern IOExt ioExt;
-#endif
-#if IOEXT2_ON
 extern IOExt2 ioExt;
-#endif
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
 extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
+
+using namespace std;
 
 // ------------------
 // FreeRTOS functions
@@ -55,8 +51,9 @@ void CmdHandler::re_init() { init(); }
 
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
-  printf("[v] Command handler inited\n");
-  driverDisplay.print("[v] " + getName() + " initialized.\n");
+  string s = "[v] " + getName() + " initialized.\n";
+  cout << s;
+  driverDisplay.print(s.c_str());
 }
 
 void CmdHandler::exit() {
@@ -113,9 +110,9 @@ void CmdHandler::task() {
         break;
       case 'S':
         printSystemValues();
-        printf("%s\n", carState.print("Recent State").c_str());
+        cout << carState.print("Recent State") << endl;
         if (input[1] == 'J') {
-          printf("%s\n", carState.serialize("Recent State").c_str());
+          cout << carState.serialize("Recent State") << endl;
         }
         break;
       case 's':
@@ -140,7 +137,7 @@ void CmdHandler::task() {
         carState.MotorCurrent = floatValue;
         break;
       case '-':
-        carControl.adjust_paddles(10);
+        carControl.adjust_paddles(3);
         break;
       case 'a':
         carState.Acceleration = intValue;
@@ -229,10 +226,10 @@ void CmdHandler::task() {
         i2cBus.scan_i2c_devices();
         break;
       default:
-        printf("ERROR:: Unknown command '%s'\n%s\n", input.c_str(), helpText.c_str());
+        cout << "ERROR:: Unknown command '" << input << "' " << endl << helpText << endl;
         break;
       case 'h':
-        printf("%s", helpText.c_str());
+        cout << helpText << endl;
         break;
       }
     }
@@ -244,26 +241,19 @@ void CmdHandler::printSystemValues() {
 
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-  printf("v0: %5d\tv1: %5d\n", valueRec, valueAcc);
-#if IOEXT_ON
-  for (int devNr = 0; devNr < PCF8574_NUM_DEVICES; devNr++) {
-    for (int pinNr = 0; pinNr < PCF8574_NUM_PORTS; pinNr++) {
-      CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->value == 0) {
-        printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
-      }
-    }
-  }
-#endif
-#if IOEXT2_ON
+  string s = fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
+  cout << s;
+
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->value == 0) {
-        printf("%s: SET 0x%02x\n", pin->name.c_str(), pin->port);
+        s = fmt::format("{}: SET {:#04x}", pin->name, pin->port);
+        cout << s << endl;
       }
     }
   }
-#endif
-  printf("POT0 (accel)= %4d, POT1 (recup)= %4d\n", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
+  s = fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0),
+                  dac.get_pot(DAC::pot_chan::POT_CHAN1));
+  cout << s << endl;
 }

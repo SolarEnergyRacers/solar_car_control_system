@@ -13,8 +13,6 @@
 #include <map>
 #include <string>
 
-#include <PCF8574.h>
-
 #include <abstract_task.h>
 
 #include <CarState.h>
@@ -51,7 +49,7 @@
 #define PinDUMMY31 "DUMMY31"
 #define PinReserve1 "Reserve1"
 #define PinDUMMY33 "DUMMY33"
-#define PinDUMMY34 "DUMMY34"
+#define PinPaddleAdjust "PaddleAdjust"
 #define PinDUMMY35 "DUMMY35"
 #define PinDUMMY36 "DUMMY36"
 #define PinDUMMY37 "DUMMY37"
@@ -72,6 +70,7 @@ void lightHandler();
 void headLightHandler();
 void constantModeHandler();
 void constantModeOnOffHandler();
+void paddleAdjustHandler();
 // end pin handler
 
 class IOExt2 : public abstract_task {

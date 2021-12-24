@@ -7,6 +7,8 @@
 #include <stdio.h>
 
 // standard libraries
+#include <fmt/core.h>
+#include <inttypes.h>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -14,6 +16,7 @@
 #include <MCP23017.h> // MCP23017
 #include <Wire.h>     // I2C
 
+#include <CarControl.h>
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
@@ -24,6 +27,7 @@ extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt2 ioExt;
 extern CarState carState;
+extern CarControl carControl;
 extern bool systemOk;
 
 CarStatePin CarState::pins[] = { // IOExtDev0-PortA
@@ -57,7 +61,7 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x18, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY31, NULL},
     {0x19, INPUT_PULLUP, 1, 1, false, 0l, PinReserve1, NULL},
     {0x1a, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY33, NULL},
-    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY34, NULL},
+    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler},
     {0x1c, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY35, NULL},
     {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY36, NULL},
     {0x1e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
@@ -72,9 +76,9 @@ void IRAM_ATTR ioExt_interrupt_handler() { ioInterruptRequest = true; };
 void IOExt2::re_init() { init(); }
 
 void IOExt2::init() {
-  char msg[100];
+  string s;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-    printf("[?] Init IOExt2 %u...\n", devNr);
+    cout << "[?] Init IOExt2 " << devNr << endl;
     xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].init();
     ioExt.IOExtDevs[devNr].interruptMode(MCP23017InterruptMode::Or);
@@ -92,12 +96,12 @@ void IOExt2::init() {
       xSemaphoreGive(i2cBus.mutex);
       int dev = pin->port >> 4;
       int devPin = pin->port & 0xf;
-      snprintf(msg, 100, "  0x%02x [%02d] dev:%02d, devpin:%02d, mode:%s, value=%d (%s)\n", pin->port, carState.getIdx(pin->name), dev,
-               devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
-      printf(msg);
+      s = fmt::format("  {:#04x} [{:02d}] dev:{:02d}, devpin:{:02d}, mode:{}, value={} ({})\n", pin->port, carState.getIdx(pin->name), dev,
+                      devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
+      cout << s;
     }
     ioExt.IOExtDevs[devNr].clearInterrupts();
-    printf("[v] %s[%d] initialized.\n", getName().c_str(), devNr);
+    cout << "[v] " << getName() << "[" << devNr << "] initialized." << endl;
   }
   ioInterruptRequest = false;
   pinMode(I2C_INTERRUPT, INPUT_PULLUP);
@@ -227,7 +231,7 @@ void IOExt2::task() {
 
 void batteryOnOffHandler() {
   carState.BatteryOn = carState.getPin(PinBatOnOff)->value == 1;
-  printf("Battery %s\n", (carState.BatteryOn ? "On" : "Off"));
+  cout << "Battery " << (carState.BatteryOn ? "On" : "Off") << endl;
 }
 
 void pvOnOffHandler() {
@@ -322,10 +326,10 @@ void nextScreenHandler() {
 void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn) {
-      printf("ConstantMode OFF\n");
+      cout << "ConstantMode OFF" << endl;
       carState.ConstantModeOn = false;
     } else {
-      printf("ConstantMode ON\n");
+      cout << "ConstantMode ON" << endl;
       carState.ConstantModeOn = true;
     }
   }
@@ -339,6 +343,13 @@ void constantModeHandler() {
     } else {
       carState.ConstantMode = CONSTANT_MODE::POWER;
     }
+  }
+}
+
+void paddleAdjustHandler() {
+  if (carState.getPin(PinPaddleAdjust)->value == 0) {
+    carControl.adjust_paddles(3);
+    cout << "Request Paddle Adjust" << endl;
   }
 }
 // end IO pin handler -----------------------------------------

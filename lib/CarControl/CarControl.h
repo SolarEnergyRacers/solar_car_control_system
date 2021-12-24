@@ -10,7 +10,6 @@
 #include <string>
 
 #include <MCP23017.h>
-#include <PCF8574.h>
 
 #include <abstract_task.h>
 #include <definitions.h>
@@ -39,7 +38,7 @@ private:
   const int MIN_ADJUST_GAP = 10; // 0...Gap units show 0 (real reachable null point)
   const int MAX_ADJUST_GAP = 10; // max ... max+Gap to avoid max higher then adjusted max
   const int SMOOTHING = 1;
-  const int MIN_DISPLAY_VALUE = 99; // abs value auf negative scaling
+  const int MIN_DISPLAY_VALUE = 99; // absolute of minimal value for negative scaling
   const int MAX_DISPLAY_VALUE = 99;
 
   int ads_min_dec = 50000;

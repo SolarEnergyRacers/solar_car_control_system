@@ -1,9 +1,13 @@
 //
 // Analog to Digital Converter
 //
-
-#include <abstract_task.h>
 #include <definitions.h>
+
+#include <fmt/core.h>
+#include <inttypes.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
 
 #include <ADS1X15.h>
 #include <I2CBus.h>
@@ -13,31 +17,35 @@
 #include <DAC.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
+#include <abstract_task.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;
 extern DAC dac;
 extern DriverDisplay driverDisplay;
 
+using namespace std;
+
 void ADC::init() {
   // instantiate the devices with their corresponding address
   ads_addrs[0] = I2C_ADDRESS_ADS1x15_0;
   ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
-
+  string s;
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-    printf("[?] Init 'ADC[%d]' with address 0x%x ...", idx, ads_addrs[idx]);
-
+    s = fmt::format("[?] Init 'ADC[{}]' with address {:#04x} ...", idx, ads_addrs[idx]);
+    cout << s;
     xSemaphoreTakeT(i2cBus.mutex);
     adss[idx] = ADS1115(ads_addrs[idx]);
 
     bool result = adss[idx].begin();
     if (!result) {
-      printf(" ERROR: Wrong ADS1x15 address 0x%x.\n", ads_addrs[idx]);
+      s = fmt::format(" ERROR: Wrong ADS1x15 address {:#04x}.\n", ads_addrs[idx]);
+      cout << s;
       xSemaphoreGive(i2cBus.mutex);
       continue;
     }
-    printf("\n");
+    cout << endl;
     // set gain amplifier value
     // 2/3x gain +/- 6.144V
     // 1 bit = 3mV (ADS1015) / 0.1875mV (ADS1115)
@@ -49,18 +57,17 @@ void ADC::init() {
     // bit-value -> mV: 2/3x gain +/- 6.144V
     // 1 bit = 3mV (ADS1015) 0.1875mV (ADS1115)
     float multiplier = adss[idx].toVoltage(1); // voltage factor
-    printf("    Max voltage=%f with multiplier=%f\n", adss[idx].getMaxVoltage(), multiplier);
+    cout << "    Max voltage=" << adss[idx].getMaxVoltage() << " with multiplier=" << multiplier << endl;
     // read all inputs & report
     for (int i = 0; i < 4; i++) {
       int16_t value = adss[idx].readADC(i);
-      printf("      [ADS1x15] AIN%d --> %d: %fmV\n", i, value, multiplier * value);
+      cout << "      [ADS1x15] AIN" << i << " --> " << value << ": " << multiplier * value << "mV\n";
     }
     xSemaphoreGive(i2cBus.mutex);
 
-    char msg[100];
-    snprintf(msg, 100, "[v] ADC[%d] at 0x%x initialized.\n", idx, ads_addrs[idx]);
-    printf(msg);
-    driverDisplay.print(msg);
+    string s = fmt::format("[v] ADC[{}] at 0x{:x} initialized.\n", idx, ads_addrs[idx]);
+    cout << s;
+    driverDisplay.print(s.c_str());
   }
 }
 

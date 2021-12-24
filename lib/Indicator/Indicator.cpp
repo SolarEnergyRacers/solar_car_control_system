@@ -28,7 +28,7 @@ void Indicator::re_init() { init(); }
 void Indicator::init(void) {
   set_SleepTime(200);
   string s = "[v] " + getName() + " initialized.\n";
-  cout <<s;
+  cout << s;
   driverDisplay.print(s.c_str());
 }
 

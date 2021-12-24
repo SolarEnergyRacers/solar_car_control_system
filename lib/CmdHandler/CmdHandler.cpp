@@ -253,6 +253,7 @@ void CmdHandler::printSystemValues() {
       }
     }
   }
-  s = fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0), dac.get_pot(DAC::pot_chan::POT_CHAN1));
+  s = fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0),
+                  dac.get_pot(DAC::pot_chan::POT_CHAN1));
   cout << s << endl;
 }

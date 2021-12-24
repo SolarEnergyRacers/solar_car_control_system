@@ -13,11 +13,11 @@
 #include <I2CBus.h>
 #include <Wire.h> // I2C
 
-#include <abstract_task.h>
 #include <ADC.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
+#include <abstract_task.h>
 
 extern I2CBus i2cBus;
 extern ADC adc;

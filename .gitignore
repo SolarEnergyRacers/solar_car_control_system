@@ -1,7 +1,8 @@
 # exclude platformio build directory
 .pio
-# exclude clion build directory
+# exclude build directory
 cmake-build-debug
+build
 # exclude vscode config directory
 .vscode
 # exclude generated config

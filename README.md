@@ -35,6 +35,8 @@
 | ESP32:25 DAC | CAN:TX                 |
 | ESP32:26 DAC | CAN:RX                 |
 
+Some further information are collected in [DOCU--ILI934-PCF8574-ESP32-Hazzy](docs/DOCU--ILI934-PCF8574-ESP32-Hazzy.md)
+
 | **_ADS1x15_**                            |    Analog to digital converter     |
 | :--------------------------------------- | :--------------------------------: |
 | ADC0, I2C Addr 0x48                      |                                    |
@@ -53,7 +55,7 @@
 | ADC2:2                                   |                                    |
 | ADC2:3                                   |                                    |
 
-| **_PCF8574_**           |      Input/Output extender      |
+| **_MCP23014_**           |      Input/Output extender      |
 | :---------------------- | :-----------------------------: |
 | IOExt0, I2C Addr (TODO) |                                 |
 | IOExt0:0 in             | switch (status): battery on/off |
@@ -144,6 +146,11 @@
 | :-------- | :-------------------------------------: |
 | CAN Lo    |            see ESP32:CAN:Lo             |
 | CAN Hi    |            see ESP32:CAN:Hi             |
+
+### Further Documentation and Findings
+
+- [DOCU--ILI934-PCF8574-ESP32-Hazzy](docs/DOCU--ILI934-PCF8574-ESP32-Hazzy.md)
+
 
 ## PlatformIO - Command Guide
 

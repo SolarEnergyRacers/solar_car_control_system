@@ -24,7 +24,7 @@ Display SPI mode: connect **IM1**, **IM2** and **IM3** pins to 3.3V. Do not sold
 
 > If you really don't want to solder them, you can also wire the breakout pins to the **3vo** pin, just make sure you don't tie them to 5V by accident! For that reason, we suggest going with the solder-jumper route.
 >
-> [Adafruit](https://learn.adafruit.com/adafruit-2-8-and-3-2-color-tft-touchscreen-breakout-v2/pinouts)
+> [Adafruit pinout](https://learn.adafruit.com/adafruit-2-8-and-3-2-color-tft-touchscreen-breakout-v2/pinouts)
 
 ![pinout circuit view](assets.DOCU--ILI934-PCF8574-ESP32-Hazzy.assets/ILI9341-backside.png)
 

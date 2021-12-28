@@ -97,5 +97,4 @@ It was measured at full screen black and full screen white (without any addition
 - [Hardware Adoption forum.pjrc.com/threads/28106-Display_ili9341](https://forum.pjrc.com/threads/28106-Display_ili9341?p=72889&viewfull=1#post72889)
 - [ILI9341 optimized library](https://www.pjrc.com/store/display_ili9341_touch.html)
 - [SD Card init](https://randomnerdtutorials.com/esp32-microsd-card-arduino/)
-- 
 

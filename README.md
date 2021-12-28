@@ -20,16 +20,16 @@
 | **_ESP32_**  | main micro processor   |
 | ESP32:22     | I2C:SCL                |
 | ESP32:23     | I2C:SDA                |
-| **ESP32:15** | SERIAL:TX              |
+| ESP32:15     | SERIAL:TX              |
 | ESP32:16     | SERIAL:RX              |
 | ESP32:18     | SPI:MOSI               |
 | ESP32:19     | SPI:MISO               |
 | ESP32:5      | SPI:CLK                |
 | ESP32:12     | 1Wire                  |
 
-| **ESP32:13** | GPIO:LED_BUILTIN       |
+| ESP32:13     | GPIO:LED_BUILTIN       |
 | ESP32:33     | GPIO:PCF8574_INTERRUPT |
-| **ESP32:14** | SPI:CS_SD_CARD         |
+| ESP32:14     | SPI:CS_SD_CARD         |
 | ESP32:32     | SPI:CS_TFT_SCREEN      |
 | ESP32:4      | SPI:DC                 |
 | ESP32:21     | SPI:RST                |
@@ -83,6 +83,8 @@
 | IOExt2:5                |          button: next           |
 | IOExt2:6                |       button: power/speed       |
 | IOExt2:7                |        button: set/reset        |
+
+- Docu [MCP23017](docs/MCP23017.md)
 
 | **_ILI9341_** |            3.2" 320x240 display             |
 | :------------ | :-----------------------------------------: |

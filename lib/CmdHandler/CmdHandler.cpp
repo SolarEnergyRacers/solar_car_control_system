@@ -142,7 +142,7 @@ void CmdHandler::task() {
         carState.MotorCurrent = floatValue;
         break;
       case '-':
-        carControl.adjust_paddles(3);
+        carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
         break;
       case 'a':
         carState.Acceleration = intValue;

@@ -26,7 +26,6 @@
 | ESP32:19     | SPI:MISO               |
 | ESP32:5      | SPI:CLK                |
 | ESP32:12     | 1Wire                  |
-
 | ESP32:13     | GPIO:LED_BUILTIN       |
 | ESP32:33     | GPIO:PCF8574_INTERRUPT |
 | ESP32:14     | SPI:CS_SD_CARD         |
@@ -147,11 +146,6 @@
 | CAN Lo    |            see ESP32:CAN:Lo             |
 | CAN Hi    |            see ESP32:CAN:Hi             |
 
-### Further Documentation and Findings
-
-- [DOCU--ILI934-MCP230176-ESP32-Hazzy](docs/DOCU--ILI934-MCP23017-ESP32-Hazzy.md)
-- Docu [MCP23017](docs/MCP23017.md)
-
 | **_ILI9341_** |            3.2" 320x240 display             |
 | :------------ | :-----------------------------------------: |
 | CS            |         see ESP32:SPI:CS_TFT_SCREEN         |
@@ -213,6 +207,11 @@
 | :-------- | :-------------------------------------: |
 | CAN Lo    |            see ESP32:CAN:Lo             |
 | CAN Hi    |            see ESP32:CAN:Hi             |
+
+### Further Documentation and Findings
+
+- [DOCU--ILI934-MCP230176-ESP32-Hazzy](docs/DOCU--ILI934-MCP23017-ESP32-Hazzy.md)
+- Docu [MCP23017](docs/MCP23017.md)
 
 ## PlatformIO - Command Guide
 

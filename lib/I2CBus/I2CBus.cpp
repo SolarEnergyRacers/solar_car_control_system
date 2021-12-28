@@ -79,5 +79,5 @@ void I2CBus::scan_i2c_devices() {
   }
   xSemaphoreGive(mutex);
 
-  cout << "Scan completed: " << cnt << " I2C devices found." << endl;
+  cout << "Scan completed: " << fmt::format("{}", cnt) << " I2C devices found." << endl;
 }

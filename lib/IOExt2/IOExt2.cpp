@@ -158,7 +158,7 @@ void IOExt2::readAll(bool deltaOnly) {
   }
   string outString = carState.printIOs("", true, deltaOnly);
   if (outString.length() > 0)
-    debug_printf("%s", outString.c_str());
+    debug_printf("%s\n", outString.c_str());
   // avoid multi registration:
   pinHandlerList.unique();
   // call all handlers for changed pins
@@ -348,7 +348,7 @@ void constantModeHandler() {
 
 void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
-    carControl.adjust_paddles(3);
+    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
     cout << "Request Paddle Adjust" << endl;
   }
 }

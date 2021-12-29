@@ -84,13 +84,14 @@
 | IOExt2:6                |       button: power/speed       |
 | IOExt2:7                |        button: set/reset        |
 
-| **_ILI9341_** |            3.2" 320x240 display             |
-| :------------ | :-----------------------------------------: |
-| CS            |         see ESP32:SPI:CS_TFT_SCREEN         |
-| MOSI          |             see ESP32:SPI:MOSI              |
-| MISO          | see ESP32:SPI:MISO (Pull Down: 10kΏ to GND) |
-| CLK           |              see ESP32:SPI:CLK              |
-| D/S           |           Pull Down: 10kΏ to GND            |
+| **_ILI9341_**  |            3.2" 320x240 display             |
+| :------------- | :-----------------------------------------: |
+| ILI9341: CS    |         see ESP32:SPI:CS_TFT_SCREEN         |
+| ILI9341: MOSI  |             see ESP32:SPI:MOSI              |
+| ILI9341: MISO  | see ESP32:SPI:MISO (Pull Down: 10kΏ to GND) |
+| ILI9341: CLK   |              see ESP32:SPI:CLK              |
+| ILI9341: D/S   |           Pull Down: 10kΏ to GND            |
+| ILI9341: SD_CS |                                             |
 
 | **_DS1803_** |       digital potentiometer       |
 | :----------- | :-------------------------------: |

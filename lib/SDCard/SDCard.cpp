@@ -11,16 +11,18 @@
 #include <string>
 
 #include <FS.h>
-#include <SD.h> // sd card
+#include <SD.h>
 #include <SD_MMC.h>
 #include <SPI.h>
 
+#include <ADS1X15.h>
+#include <Adafruit_ILI9341.h>
+#include <CarState.h>
+#include <Display.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
 #include <SDCard.h>
 #include <SPIBus.h>
-
-#define FILENAME "/ser4data.log"
 
 extern SPIBus spiBus;
 extern SDCard sdCard;
@@ -28,16 +30,27 @@ extern DriverDisplay driverDisplay;
 
 void SDCard::re_init() { init(); }
 
-void printDirectory(File dir, int numTabs) {
-  while (true) {
+string SDCard::directory() {
+  if (!sdCard.isInited()) {
+    re_init();
+  }
+  stringstream ss("SD-Card content:\n");
+  File root = SD.open("/");
+  printDirectory(root, 1);
+  root.close();
+  ss << "~~~~~~~~~~~~~~~~" << endl;
+  return ss.str();
+}
 
+void SDCard::printDirectory(File dir, int numTabs) {
+  while (true) {
     File entry = dir.openNextFile();
     if (!entry) {
       // no more files
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      cout << '\t';
+      cout << '  '; // TAB size: 2
     }
     cout << entry.name();
     if (entry.isDirectory()) {
@@ -45,7 +58,7 @@ void printDirectory(File dir, int numTabs) {
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      cout << "\t\t" << entry.size() << endl;
+      cout << " [" << entry.size() << "]" << endl;
     }
     entry.close();
   }
@@ -59,38 +72,29 @@ void SDCard::init() {
   driverDisplay.print(s.c_str());
 
   if (!SD.begin(SPI_CS_SDCARD, spiBus.spi)) {
-    cout << "initialization failed!";
+    cout << "initialization failed!" << endl;
     return;
   }
 
   s = "[v] SDCard initialized.\n";
   cout << s;
   driverDisplay.print(s.c_str());
-  cout << "    SD-Card content:" << endl;
-  File root = SD.open("/");
-  printDirectory(root, 1);
   s = fmt::format("   Open file '{}' for append...", FILENAME);
   cout << s;
   driverDisplay.print(s.c_str());
 
   xSemaphoreTakeT(spiBus.mutex);
-  // open file
+  // open log file
   dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
-
+  xSemaphoreGive(spiBus.mutex);
   if (dataFile == 0) {
     cout << "failed." << endl;
   } else {
     cout << "ok." << endl;
+    inited = true;
+    write(carState.csv("Initial State", true));
   }
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
-  string msg = fmt::format("Start log SD Card at {}\n", asctime(&t));
-  dataFile.printf(msg.c_str());
-  dataFile.flush();
-  xSemaphoreGive(spiBus.mutex);
-
-  inited = true;
-  s = fmt::format("   ok.");
+  s = fmt::format("   ok.\n");
   cout << s;
   driverDisplay.print(s.c_str());
 }
@@ -98,8 +102,31 @@ void SDCard::init() {
 void SDCard::write(string msg) {
   if (sdCard.isInited() && sdCard.dataFile) {
     xSemaphoreTakeT(spiBus.mutex);
-    sdCard.dataFile.print(msg.c_str());
-    sdCard.dataFile.flush();
+    try {
+      dataFile.print(msg.c_str());
+      dataFile.flush();
+    } catch (exception &ex) {
+      cout << "ERROR writing SD card: " << ex.what() << endl;
+      unmount();
+    }
     xSemaphoreGive(spiBus.mutex);
+  } else {
+    re_init();
+  }
+}
+
+void SDCard::unmount() {
+  if (sdCard.isInited() && sdCard.dataFile) {
+    xSemaphoreTakeT(spiBus.mutex);
+    try {
+      dataFile.flush();
+      dataFile.close();
+      SD.end();
+      xSemaphoreGive(spiBus.mutex);
+      cout << "SD card unmounted." << endl;
+    } catch (exception &ex) {
+      cout << "ERROR unmouning SD card: " << ex.what() << endl;
+    }
+    inited = false;
   }
 }

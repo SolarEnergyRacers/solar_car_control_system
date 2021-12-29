@@ -64,7 +64,7 @@ const string CarState::print(string msg, bool withColors) {
   stringstream ss(msg);
   ss << "====SER4 Car Status====" << VERSION << "==" << VERSION_PUBLISHED << "====";
   ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
-  ss << "====" << millis() / 1000 << "s====" << asctime(&t) << endl;
+  ss << "====uptime: " << millis() / 1000 << "s====" << asctime(&t);
   if (msg.length() > 0)
     ss << msg << endl;
   // ss << ss.fixed << ss.precision(3) << ss.width(7)
@@ -91,7 +91,7 @@ const string CarState::print(string msg, bool withColors) {
      << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
   ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << "]" << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
-  ss << "IO ....................." << printIOs("", false);
+  ss << "IO ....................." << printIOs("", false) << endl;
   ss << "===========================================================================================" << endl;
   return ss.str();
 }
@@ -108,10 +108,12 @@ const string CarState::serialize(string msg) {
 
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
   cJSON_AddStringToObject(dynData, "timeStamp", timeStamp.c_str());
+  cJSON_AddNumberToObject(dynData, "uptime", millis());
+  cJSON_AddStringToObject(dynData, "msg", msg.c_str());
   cJSON_AddNumberToObject(dynData, "speed", Speed);
-  cJSON_AddNumberToObject(dynData, "Acceleration", Acceleration);
-  cJSON_AddNumberToObject(dynData, "Deceleration", Deceleration);
-  cJSON_AddNumberToObject(dynData, "AccelerationDisplay", AccelerationDisplay);
+  cJSON_AddNumberToObject(dynData, "acceleration", Acceleration);
+  cJSON_AddNumberToObject(dynData, "deceleration", Deceleration);
+  cJSON_AddNumberToObject(dynData, "accelerationDisplay", AccelerationDisplay);
   cJSON_AddBoolToObject(dynData, "batteryOn", BatteryOn);
   cJSON_AddNumberToObject(dynData, "batteryVoltage", floor(BatteryVoltage * 1000.0 + .5) / 1000.0);
   cJSON_AddNumberToObject(dynData, "batteryCurrent", floor(BatteryCurrent * 1000.0 + .5) / 1000.0);
@@ -144,7 +146,99 @@ const string CarState::serialize(string msg) {
   cJSON_AddStringToObject(ctrData, "speedArrow", SPEED_ARROW_str[(int)SpeedArrow]);
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
-  return cJSON_PrintUnformatted(carData);
+  return fmt::format("%s\n", cJSON_PrintUnformatted(carData));
+}
+
+const string CarState::csv(string msg, bool withHeader) {
+  time_t theTime = time(NULL);
+  struct tm t = *localtime(&theTime);
+  string timeStamp = asctime(&t);
+  timeStamp.erase(timeStamp.end() - 1);
+
+  stringstream ss(msg);
+  if (withHeader) {
+    // header
+    ss << "timeStamp, ";
+    ss << "uptime, ";
+    ss << "msg, ";
+    ss << "speed, ";
+    ss << "acceleration, ";
+    ss << "deceleration, ";
+    ss << "accelerationDisplay, ";
+    ss << "batteryOn, ";
+    ss << "batteryVoltage, ";
+    ss << "batteryCurrent, ";
+    ss << "pvOn, ";
+    ss << "pvCurrent, ";
+    ss << "motorOn, ";
+    ss << "motorCurrent, ";
+
+    ss << "mppt1Current, ";
+    ss << "mppt2Current, ";
+    ss << "mppt3Current, ";
+    ss << "voltageMin, ";
+    ss << "voltageAvg, ";
+    ss << "voltageMax, ";
+    ss << "t1, ";
+    ss << "t2, ";
+    ss << "t3, ";
+    ss << "t4, ";
+
+    ss << "indicator, ";
+    ss << "driveDirection, ";
+    ss << "constantModeOn, ";
+
+    ss << "displayStatus, ";
+    ss << "constantMode, ";
+    ss << "targetSpeed, ";
+    ss << "targetPower, ";
+    ss << "driverInfo, ";
+    ss << "speedArrow, ";
+    ss << "light, ";
+    ss << "io ";
+    ss << endl;
+  }
+  // data
+  ss << timeStamp.c_str() << ", ";
+  ss << millis() << ", ";
+  ss << msg.c_str() << ", ";
+  ss << Speed << ", ";
+  ss << Acceleration << ", ";
+  ss << Deceleration << ", ";
+  ss << AccelerationDisplay << ", ";
+  ss << BatteryOn << ", ";
+  ss << floor(BatteryVoltage * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(BatteryCurrent * 1000.0 + .5) / 1000.0 << ", ";
+  ss << PhotoVoltaicOn << ", ";
+  ss << floor(PhotoVoltaicCurrent * 1000.0 + .5) / 1000.0 << ", ";
+  ss << MotorOn << ", ";
+  ss << floor(MotorCurrent * 1000.0 + .5) / 1000.0 << ", ";
+
+  ss << floor(Mppt1Current * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Mppt2Current * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Mppt3Current * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Umin * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Uavg * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Umax * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(T1 * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(T2 * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(T3 * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(T4 * 1000.0 + .5) / 1000.0 << ", ";
+
+  ss << INDICATOR_str[(int)(Indicator)] << ", ";
+  ss << DRIVE_DIRECTION_str[(int)(DriveDirection)] << ", ";
+  ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
+
+  ss << DISPLAY_STATUS_str[(int)displayStatus] << ", ";
+  ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
+  ss << TargetSpeed << ", ";
+  ss << TargetPower << ", ";
+  ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str()).c_str() << ", ";
+  ss << SPEED_ARROW_str[(int)SpeedArrow] << ", ";
+  ss << LIGHT_str[(int)(Light)] << ", ";
+  ss << printIOs("", false).c_str() << ", ";
+  ss << endl;
+  return ss.str();
 }
 
 const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {

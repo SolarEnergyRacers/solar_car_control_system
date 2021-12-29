@@ -20,6 +20,7 @@
 #include <IOExt2.h>
 #include <Indicator.h>
 #include <MCP23017.h>
+#include <SDCard.h>
 
 extern I2CBus i2cBus;
 extern Indicator indicator;
@@ -30,9 +31,11 @@ extern CarState carState;
 extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
+extern SDCard sdCard;
 
 using namespace std;
 
+unsigned long lastMillis = 0;
 // ------------------
 // FreeRTOS functions
 
@@ -43,7 +46,7 @@ void CarControl::init() {
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
-  adjust_paddles(5);
+  adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
   cout << s;
@@ -223,8 +226,8 @@ void CarControl::adjust_paddles(int seconds) {
     }
     delay(100);
   }
-  ads_min_dec += 1000;
-  ads_min_acc += 1000;
+  ads_min_dec += 5000;
+  ads_min_acc += 5000;
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   cout << s;
@@ -259,6 +262,12 @@ void CarControl::task() {
     someThingChanged |= read_speed();
 
     _handle_indicator();
+
+    // one data row per second
+    if (millis() - lastMillis > 1000) {
+      sdCard.write(carState.csv("Recent State"));
+      lastMillis = millis();
+    }
 
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

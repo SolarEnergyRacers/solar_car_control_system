@@ -134,7 +134,8 @@ public:
   // tools
   const string print(string msg, bool withColors = true);
   const string printIOs(string msg, bool withColors = true, bool deltaOnly = false);
-  const string serialize(string msg);
+  const string serialize(string msg = "");
+  const string csv(string msg = "", bool withHeader = false);
 };
 
 #endif // CARSTATE_H

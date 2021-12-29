@@ -58,18 +58,20 @@ uint8_t DAC::get_cmd(pot_chan channel) {
 void DAC::set_pot(uint8_t val, pot_chan channel) {
   if (val >= 0) { // setup command
     uint8_t command = get_cmd(channel);
-
-    xSemaphoreTakeT(i2cBus.mutex);
-    Wire.beginTransmission(I2C_ADDRESS_DS1803);
-    Wire.write(command);
-    Wire.write(val); // first pot value
-    if (channel == POT_CHAN_ALL) {
-      Wire.write(val); // second pot value
+    uint8_t oldValue = get_pot(channel);
+    if (oldValue != val) {
+      xSemaphoreTakeT(i2cBus.mutex);
+      Wire.beginTransmission(I2C_ADDRESS_DS1803);
+      Wire.write(command);
+      Wire.write(val); // first pot value
+      // if (channel == POT_CHAN_ALL) {
+      //   Wire.write(val); // second pot value
+      // }
+      Wire.endTransmission();
+      xSemaphoreGive(i2cBus.mutex);
+      debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command, val,
+                   get_pot(channel));
     }
-    Wire.endTransmission();
-    xSemaphoreGive(i2cBus.mutex);
-    debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command, val,
-                 get_pot(channel));
   }
 }
 

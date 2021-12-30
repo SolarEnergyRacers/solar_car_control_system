@@ -44,7 +44,7 @@ void SDCard::init() {
   cout << s;
   driverDisplay.print(s.c_str());
 
-  s = fmt::format("   Open '{}' (append)...", FILENAME);
+  s = fmt::format("    Open '{}' (append)...", FILENAME);
   cout << s;
   driverDisplay.print(s.c_str());
 
@@ -64,6 +64,7 @@ bool SDCard::mount() {
     mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
+      cout << "SD card unmounted." << endl;
       return true;
     }
     cout << "ERROR mouning SD card." << endl;
@@ -85,6 +86,7 @@ bool SDCard::open_log_file() {
       dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
       xSemaphoreGive(spiBus.mutex);
       if (dataFile != 0) {
+        cout << "Log file opend for append." << endl;
         return true;
       }
       cout << "ERROR opening '" << FILENAME << "'" << endl;

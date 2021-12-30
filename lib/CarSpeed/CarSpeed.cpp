@@ -12,18 +12,19 @@
 #include <stdio.h>
 
 #include <Arduino.h>
-#include <Helper.h>
-
-#include <CarSpeed.h>
 
 #include <ADC.h>
+#include <CarSpeed.h>
+#include <CarState.h>
 #include <DAC.h>
+#include <Helper.h>
 #include <PID_v1.h>
 
 extern PID pid;
 extern CarSpeed carSpeed;
 extern ADC adc;
 extern DAC dac;
+extern CarState carState;
 
 // ------------------
 // FreeRTOS functions
@@ -65,10 +66,18 @@ void CarSpeed::task() {
 
   // polling loop
   while (1) {
-    // update pid controller
-    input_value = get_current_speed();
-    pid.Compute();
-    dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // TOOD: check that the value is in range
+    if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
+      // update pid controller
+      input_value = get_current_speed();
+      pid.Compute();
+      if (output_setpoint < 0)
+        output_setpoint = 0;
+      if (output_setpoint > DAC_MAX)
+        output_setpoint = DAC_MAX;
+
+      dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0);
+      // TOOD: use deceleration too
+    }
 
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

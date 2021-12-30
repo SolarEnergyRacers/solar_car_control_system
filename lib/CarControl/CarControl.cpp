@@ -35,7 +35,9 @@ extern SDCard sdCard;
 
 using namespace std;
 
-unsigned long lastMillis = 0;
+#define LOG_INTERVALL 1000;
+unsigned long millisNextStamp = millis();
+
 // ------------------
 // FreeRTOS functions
 
@@ -97,40 +99,17 @@ bool CarControl::read_speed() {
 }
 
 bool CarControl::read_paddles() {
+  bool hasChanged = false;
+  if (carState.BreakPedal) {
+    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
+    return true;
+  }
   int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
 
   int16_t valueDecNorm = 0;
   int16_t valueAccNorm = 0;
-  int16_t valueDisplay = 0;
-
-  // if (valueDec < ads_min_dec || valueDec > ads_max_dec) {
-  //   // filter artefacts
-  //   valueDec = carState.Deceleration;
-  // }
-
-  // if (valueAcc < ads_min_acc || valueAcc > ads_max_acc) {
-  //   // filter artefacts
-  //   valueAcc = carState.Acceleration;
-  // }
-
-  // readjust paddle area
-  // if (ads_min_dec > valueDec) {
-  //   debug_printf("Adopt ads_min_dec (%5d) to valueDec (%5d - %d)\n", ads_min_dec, valueDec, MIN_ADJUST_GAP);
-  //   ads_min_dec = valueDec; // - MIN_ADJUST_GAP;
-  // }
-  // if (ads_max_dec < valueDec) {
-  //   debug_printf("Adopt ads_max_dec (%5d) to valueDec (%5d + %d)\n", ads_max_dec, valueDec, MAX_ADJUST_GAP);
-  //   ads_max_dec = valueDec; // + MAX_ADJUST_GAP;
-  // }
-  // if (ads_min_acc > valueAcc) {
-  //   debug_printf("Adopt ads_min_acc (%5d) to valueDec (%5d - %d)\n", ads_min_acc, valueAcc, MIN_ADJUST_GAP);
-  //   ads_min_acc = valueAcc; // - MIN_ADJUST_GAP;
-  // }
-  // if (ads_max_acc < valueAcc) {
-  //   debug_printf("Adopt ads_max_acc (%5d) to valueAcc (%5d + %d)\n", ads_max_acc, valueAcc, MAX_ADJUST_GAP);
-  //   ads_max_acc = valueAcc; // + MAX_ADJUST_GAP;
-  // }
+  int valueDisplay = 0;
 
   valueDecNorm = CarControl::_normalize(0, MIN_DISPLAY_VALUE, ads_min_dec, ads_max_dec, valueDec);
   if (valueDecNorm > 0) {
@@ -143,19 +122,15 @@ bool CarControl::read_paddles() {
       valueDisplay = 0;
     }
   }
-  // valueDisplay = (int)((valueDisplayLast * (SMOOTHING - 1) + valueDisplay) / SMOOTHING);
-  // debug_printf("DEC %5d (%5d-%5d), ACC %5d (%5d-%5d) --> Display:%4d\n", valueDec, ads_min_dec, ads_max_dec, valueAcc, ads_min_acc,
-  //              ads_max_acc, valueDisplay);
-
   // prepare and write motor acceleration and recuperation values to DigiPot
   int valueDecPot = 0;
   int valueAccPot = 0;
   if (valueDisplay < 0) {
-    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * DAC_MAX);
     valueAccPot = 0;
   } else {
     valueDecPot = 0;
-    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * DAC_MAX);
   }
 
   if (valueDisplayLast != valueDisplay) {
@@ -166,16 +141,20 @@ bool CarControl::read_paddles() {
                  ads_min_acc, ads_max_acc);
 
     valueDisplayLast = valueDisplay;
+    hasChanged = true;
+    _set_dec_acc_values(valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
   }
+
+  return hasChanged;
+}
+
+void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
 
   carState.Deceleration = valueDec;
   carState.Acceleration = valueAcc;
   carState.AccelerationDisplay = valueDisplay;
-
-  //  return valueDisplayLast;
-  return true;
 }
 
 void CarControl::adjust_paddles(int seconds) {
@@ -261,12 +240,16 @@ void CarControl::task() {
     someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
 
+    if (carState.BreakPedal) {
+      _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
+    }
+
     _handle_indicator();
 
     // one data row per second
-    if (millis() - lastMillis > 1000) {
+    if (sdCard.logEnabled && (millis() > millisNextStamp)) {
+      millisNextStamp = millis() + LOG_INTERVALL;
       sdCard.write(carState.csv("Recent State"));
-      lastMillis = millis();
     }
 
     // sleep

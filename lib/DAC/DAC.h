@@ -5,6 +5,8 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_DAC_H
 #define SOLAR_CAR_CONTROL_SYSTEM_DAC_H
 
+#define DAC_MAX 256
+
 class DAC {
 private:
 public:

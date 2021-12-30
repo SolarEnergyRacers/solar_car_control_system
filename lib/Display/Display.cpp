@@ -19,6 +19,7 @@
 #include <CarState.h>
 #include <Display.h>
 #include <Helper.h>
+#include <SDCard.h>
 #include <SPIBus.h>
 
 #include <ADS1X15.h>
@@ -37,6 +38,7 @@
 extern SPIBus spiBus;
 extern ADC adc;
 extern CarState carState;
+extern SDCard sdCard;
 
 using namespace std;
 
@@ -368,8 +370,12 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
 
 #if LIFESIGN_ON == true
 void Display::lifeSign() {
+  int color = ILI9341_GREEN;
+  if (!sdCard.isReadyForLog()) {
+    color = ILI9341_RED;
+  }
   xSemaphoreTakeT(spiBus.mutex);
-  tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : ILI9341_GREEN);
+  tft.fillCircle(lifeSignX, lifeSignY, lifeSignRadius, lifeSignState ? ILI9341_DARKGREEN : color);
   xSemaphoreGive(spiBus.mutex);
 
   lifeSignState = !lifeSignState;

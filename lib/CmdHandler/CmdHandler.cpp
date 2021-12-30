@@ -127,6 +127,9 @@ void CmdHandler::task() {
         case 'U':
           sdCard.unmount();
           break;
+        case 'M':
+          sdCard.logEnabled = sdCard.mount();
+          break;
         // -------------- chase car commands
         case '-':
           carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)

@@ -31,6 +31,7 @@
 #include <IOExt2.h>
 #include <Indicator.h>
 #include <SDCard.h>
+#include <system.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;
@@ -112,7 +113,7 @@ void CmdHandler::task() {
           cout << carState.print("Recent State:") << endl;
           break;
         case 'J':
-          state = carState.serialize("Recent State:");
+          state = carState.serialize("Recent State");
           cout << state << endl;
           sdCard.write(state + "\n");
           break;
@@ -129,6 +130,9 @@ void CmdHandler::task() {
           break;
         case 'M':
           sdCard.logEnabled = sdCard.mount();
+          break;
+        case 'H':
+          memory_info();
           break;
         // -------------- chase car commands
         case '-':

@@ -64,13 +64,13 @@ bool SDCard::mount() {
     mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
-      cout << "SD card unmounted." << endl;
+      cout << "SD card mounted." << endl;
       return true;
     }
-    cout << "ERROR mouning SD card." << endl;
+    cout << "ERROR mounting SD card." << endl;
   } catch (exception &ex) {
     xSemaphoreGive(spiBus.mutex);
-    cout << "ERROR mouning SD card: " << ex.what() << endl;
+    cout << "ERROR mounting SD card: " << ex.what() << endl;
   }
   return false;
 }
@@ -120,7 +120,7 @@ void SDCard::unmount() {
       cout << "SD card unmounted." << endl;
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      cout << "ERROR unmouning SD card: " << ex.what() << endl;
+      cout << "ERROR unmounting SD card: " << ex.what() << endl;
     }
     mounted = false;
   }

@@ -7,7 +7,7 @@
 
 #include <SD.h>
 
-#define FILENAME "/ser4data.log"
+#define FILENAME "/ser4data.csv"
 
 class SDCard {
 private:

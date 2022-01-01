@@ -208,6 +208,7 @@ void CarControl::adjust_paddles(int seconds) {
     }
     delay(100);
   }
+  // make sure null level to avoid automatic acceleration/deceleration
   ads_min_dec += 5000;
   ads_min_acc += 5000;
 

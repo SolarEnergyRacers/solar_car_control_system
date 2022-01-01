@@ -369,6 +369,7 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
 }
 
 #if LIFESIGN_ON == true
+unsigned long secLast = 0;
 void Display::lifeSign() {
   int color = ILI9341_GREEN;
   if (!sdCard.isReadyForLog()) {
@@ -379,6 +380,12 @@ void Display::lifeSign() {
   xSemaphoreGive(spiBus.mutex);
 
   lifeSignState = !lifeSignState;
+
+  unsigned long allSeconds = millis() / 1000;
+   if (secLast < allSeconds) {
+     secLast = allSeconds;
+     cout << getTimeStamp(allSeconds) << endl;
+   }
 }
 #endif
 

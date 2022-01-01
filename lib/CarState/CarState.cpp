@@ -9,6 +9,7 @@
 #include <string>
 
 #include <CarState.h>
+#include <Helper.h>
 #include <IOExt2.h>
 #include <Indicator.h>
 #include <definitions.h>
@@ -18,14 +19,8 @@ using namespace std;
 extern CarState carState;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
-#if IOEXT_ON
-CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
-CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(port)]); }
-#endif
-#if IOEXT2_ON
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
 CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt2::getIdx(port)]); }
-#endif
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
 static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASHR"};
@@ -64,7 +59,7 @@ const string CarState::print(string msg, bool withColors) {
   stringstream ss(msg);
   ss << "====SER4 Car Status====" << VERSION << "==" << VERSION_PUBLISHED << "====";
   ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
-  ss << "====uptime: " << millis() / 1000 << "s====" << asctime(&t);
+  ss << "====uptime: " << getTimeStamp(millis() / 1000) << "s====" << asctime(&t);
   if (msg.length() > 0)
     ss << msg << endl;
   // ss << ss.fixed << ss.precision(3) << ss.width(7)
@@ -108,7 +103,7 @@ const string CarState::serialize(string msg) {
 
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
   cJSON_AddStringToObject(dynData, "timeStamp", timeStamp.c_str());
-  cJSON_AddNumberToObject(dynData, "uptime", millis());
+  cJSON_AddStringToObject(dynData, "uptime", getTimeStamp(millis() / 1000).c_str());
   cJSON_AddStringToObject(dynData, "msg", msg.c_str());
   cJSON_AddNumberToObject(dynData, "speed", Speed);
   cJSON_AddNumberToObject(dynData, "acceleration", Acceleration);
@@ -146,7 +141,7 @@ const string CarState::serialize(string msg) {
   cJSON_AddStringToObject(ctrData, "speedArrow", SPEED_ARROW_str[(int)SpeedArrow]);
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
-  return fmt::format("%s\n", cJSON_PrintUnformatted(carData));
+  return fmt::format("{}\n", cJSON_PrintUnformatted(carData));
 }
 
 const string CarState::csv(string msg, bool withHeader) {
@@ -200,7 +195,7 @@ const string CarState::csv(string msg, bool withHeader) {
   }
   // data
   ss << timeStamp.c_str() << ", ";
-  ss << millis() << ", ";
+  ss << getTimeStamp(millis() / 1000).c_str() << ", ";
   ss << msg.c_str() << ", ";
   ss << Speed << ", ";
   ss << Acceleration << ", ";

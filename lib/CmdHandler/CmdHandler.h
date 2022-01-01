@@ -10,9 +10,8 @@
 class CmdHandler : public abstract_task {
 private:
   uint32_t sleep_polling_ms = 250;
-  string commands = "RECDsPSJVMU-:!ud<>wlLciIr";
-  string helpText = "Available commands (" + commands +
-                    "):\n"
+  string commands = "RECDsPSJVMUH-:!ud<>wlLciIr";
+  string helpText = "Available commands (" + commands +   "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
                     "\tR        - reset and reinit driver display\n"
                     "\tC        - switch to console screen\n"
@@ -26,6 +25,7 @@ private:
                     "\tV        - write CSV status to sdcard\n"
                     "\tM        - mount sdcard and eneable logging\n"
                     "\tU        - unmount sdcard and disable logging\n"
+                    "\tH        - memory_info\n"
                     "\t-------- DRIVER_RUNNING INFO COMMANDS -----------\n"
                     "\t:<text>  - display driver info text\n"
                     "\t!<text>  - display driver warn text\n"

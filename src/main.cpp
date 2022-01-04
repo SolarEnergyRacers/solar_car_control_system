@@ -64,11 +64,12 @@ void app_main(void);
 using namespace std;
 
 ADC adc;
-CanBus can; // TODO: gets a linking-error if we set CAN_ON to true
-CAN_device_t CAN_cfg;
-CarControl carControl;
-CarSpeed carSpeed;
-CarState carState;
+CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
+OneWireBus oneWireBus;
+SPIBus spiBus;
+I2CBus i2cBus;
+Temp ds; // temperature
+SDCard sdCard;
 CmdHandler cmdHandler;
 DAC dac;
 DriverDisplay driverDisplay;
@@ -76,16 +77,15 @@ EngineerDisplay engineerDisplay;
 ESP32Time esp32time;
 GPInputOutput gpio; // I2C Interrupts
 GyroAcc gyroAcc;
-I2CBus i2cBus;
 Indicator indicator; // INDICATOR_ON
 IOExt2 ioExt;
-OneWireBus oneWireBus;
 PWM pwm;
 RTC rtc;
-SDCard sdCard;
-SPIBus spiBus;
-Temp ds;   // temperature
 Uart uart; // SERIAL
+
+CarSpeed carSpeed;
+CarControl carControl;
+CarState carState;
 
 bool startOk = true;
 bool systemOk = false;
@@ -214,7 +214,7 @@ void app_main(void) {
   }
   if (CAN_ON) {
     cout << " - read_can_demo_task" << endl;
-    xTaskCreate(&read_can_demo_task, "can_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    can.create_task();
   }
   if (CARSPEED_ON) {
     carSpeed.create_task();

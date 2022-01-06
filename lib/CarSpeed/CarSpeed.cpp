@@ -77,9 +77,9 @@ void CarSpeed::task() {
     pid.Compute();
 
     // set acceleration & deceleration // TOOD: check that the value is in range
-    if(output_setpoint > 0){
-      dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0);  // acceleration
-      dac.set_pot(0, DAC::pot_chan::POT_CHAN1);                // deceleration
+    if (output_setpoint > 0) {
+      dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
+      dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
     } else {
       dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
       dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration

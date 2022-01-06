@@ -32,7 +32,7 @@ void CarSpeed::re_init() { init(); }
 
 void CarSpeed::init() {
   target_speed = 0;
-  // pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
+  pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
   sleep_polling_ms = 400;
   cout << "[v]" << getName() << " inited." << endl;
@@ -42,6 +42,10 @@ void CarSpeed::exit(void) { set_target_speed(0); }
 // ------------------
 
 void CarSpeed::set_target_speed(double speed) { target_speed = speed; }
+
+void CarSpeed::target_speed_incr(void) { target_speed += speed_increment; }
+
+void CarSpeed::target_speed_decr(void) { target_speed -= speed_increment; }
 
 double CarSpeed::get_target_speed() { return target_speed; }
 
@@ -65,10 +69,21 @@ void CarSpeed::task() {
 
   // polling loop
   while (1) {
-    // update pid controller
+
+    // read target speed
     input_value = get_current_speed();
+
+    // update pid controller
     pid.Compute();
-    dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // TOOD: check that the value is in range
+
+    // set acceleration & deceleration // TOOD: check that the value is in range
+    if(output_setpoint > 0){
+      dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0);  // acceleration
+      dac.set_pot(0, DAC::pot_chan::POT_CHAN1);                // deceleration
+    } else {
+      dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
+      dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+    }
 
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

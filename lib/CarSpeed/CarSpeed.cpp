@@ -70,7 +70,6 @@ void CarSpeed::task() {
 
   // polling loop
   while (1) {
-
     if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
       // read target speed
       input_value = get_current_speed();
@@ -96,3 +95,4 @@ void CarSpeed::task() {
       vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
     }
   }
+}

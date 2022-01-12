@@ -2,21 +2,26 @@
 // CAN Bus
 //
 
-#ifndef SOLAR_CAR_CONTROL_SYSTEM_CAN_H
-#define SOLAR_CAR_CONTROL_SYSTEM_CAN_H
-
-#include <CAN_config.h>
-#include <ESP32CAN.h>
+#include "CANRxBuffer.h"
+#include "abstract_task.h"
 
 void read_can_demo_task(void *pvParameter);
 
-class CanBus {
-private:
-public:
-  SemaphoreHandle_t mutex = NULL;
-  // CAN_device_t cfg;  needs to be global because of CAN library :(
-  void init();
-  void re_init();
-};
+class CANBus : public abstract_task {
 
-#endif // SOLAR_CAR_CONTROL_SYSTEM_CAN_H
+private:
+  CANRxBuffer rxBuffer;
+
+public:
+  string getName(void);
+  void re_init(void);
+  void init(void);
+  void exit(void);
+  void task(void);
+
+  // void create_task(void);
+
+  void onReceive(int packetSize);
+
+  SemaphoreHandle_t mutex;
+};

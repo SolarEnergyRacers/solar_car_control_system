@@ -255,7 +255,7 @@ void fwdBwdHandler() {
 }
 
 void breakPedalHandler() {
-  carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
+  carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
   printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
 }
 
@@ -330,6 +330,8 @@ void constantModeOnOffHandler() {
       carState.ConstantModeOn = false;
     } else {
       cout << "ConstantMode ON" << endl;
+      carState.TargetSpeed = carState.Speed;
+      carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
       carState.ConstantModeOn = true;
     }
   }

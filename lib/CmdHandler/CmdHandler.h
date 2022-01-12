@@ -10,7 +10,7 @@
 class CmdHandler : public abstract_task {
 private:
   uint32_t sleep_polling_ms = 250;
-  string commands = "RECDS-=:!udsaAbBpm<>wlLciIr";
+  string commands = "RECDsPSJVMUH-:!ud<>wlLciIr";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
@@ -19,23 +19,20 @@ private:
                     "\tE        - switch to engineer screen\n"
                     "\tD        - switch to driver display\n"
                     "\t-        - adjust paddels\n"
-                    "\tS        - print status of all values\n"
+                    "\ts        - print status of all values\n"
+                    "\tP        - print directory of sdcard\n"
+                    "\tS        - print status\n"
+                    "\tJ        - write JSON status to sdcard\n"
+                    "\tV        - write CSV status to sdcard\n"
+                    "\tM        - mount sdcard and eneable logging\n"
+                    "\tU        - unmount sdcard and disable logging\n"
+                    "\tH        - memory_info\n"
                     "\t-------- DRIVER_RUNNING INFO COMMANDS -----------\n"
                     "\t:<text>  - display driver info text\n"
                     "\t!<text>  - display driver warn text\n"
                     "\tu [off]  - speed up arrow (green)      [|off]\n"
                     "\td [off]  - speed down arrow (red)      [|off]\n"
-                    "\t-------- TEST COMMANDS ------------------\n"
-                    "\ts ddd    - speed value                 [0...999]\n"
-                    "\ts [f|b]  - drive forward|backward      [f|b]\n"
-
-                    "\ta dd     - acceleration value          [-9...+9]\n"
-                    "\tA ddd    - set poti recu: [-255...0] / accel: [0...255]\n"
-
-                    "\tb fff.f  - battary voltage             [0...999]\n"
-                    "\tB fff.f  - battary current             [0...999]\n"
-                    "\tp ffff.f - photovoltaics current       [-999...+999]\n"
-                    "\tm ffff.f - motor current               [-999...+999]\n"
+                    "\t-------- SUPPORT COMMANDS ------------------\n"
                     "\t< [off]  - left indicator              [|off]\n"
                     "\t> [off]  - right indicator             [|off]\n"
                     "\tw [off]  - hazard warning lights       [|off]\n"

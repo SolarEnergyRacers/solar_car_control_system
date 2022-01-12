@@ -20,6 +20,7 @@
 #include <IOExt2.h>
 #include <Indicator.h>
 #include <MCP23017.h>
+#include <SDCard.h>
 
 extern I2CBus i2cBus;
 extern Indicator indicator;
@@ -30,8 +31,11 @@ extern CarState carState;
 extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
+extern SDCard sdCard;
 
 using namespace std;
+
+unsigned long millisNextStamp = millis();
 
 // ------------------
 // FreeRTOS functions
@@ -43,7 +47,7 @@ void CarControl::init() {
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
-  adjust_paddles(5);
+  adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
   cout << s;
@@ -94,40 +98,18 @@ bool CarControl::read_speed() {
 }
 
 bool CarControl::read_paddles() {
+  bool hasChanged = false;
+  if (carState.BreakPedal) {
+    cout << "Break Pedal Pressed (paddle control)" << endl;
+    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
+    return true;
+  }
   int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
 
   int16_t valueDecNorm = 0;
   int16_t valueAccNorm = 0;
-  int16_t valueDisplay = 0;
-
-  // if (valueDec < ads_min_dec || valueDec > ads_max_dec) {
-  //   // filter artefacts
-  //   valueDec = carState.Deceleration;
-  // }
-
-  // if (valueAcc < ads_min_acc || valueAcc > ads_max_acc) {
-  //   // filter artefacts
-  //   valueAcc = carState.Acceleration;
-  // }
-
-  // readjust paddle area
-  // if (ads_min_dec > valueDec) {
-  //   debug_printf("Adopt ads_min_dec (%5d) to valueDec (%5d - %d)\n", ads_min_dec, valueDec, MIN_ADJUST_GAP);
-  //   ads_min_dec = valueDec; // - MIN_ADJUST_GAP;
-  // }
-  // if (ads_max_dec < valueDec) {
-  //   debug_printf("Adopt ads_max_dec (%5d) to valueDec (%5d + %d)\n", ads_max_dec, valueDec, MAX_ADJUST_GAP);
-  //   ads_max_dec = valueDec; // + MAX_ADJUST_GAP;
-  // }
-  // if (ads_min_acc > valueAcc) {
-  //   debug_printf("Adopt ads_min_acc (%5d) to valueDec (%5d - %d)\n", ads_min_acc, valueAcc, MIN_ADJUST_GAP);
-  //   ads_min_acc = valueAcc; // - MIN_ADJUST_GAP;
-  // }
-  // if (ads_max_acc < valueAcc) {
-  //   debug_printf("Adopt ads_max_acc (%5d) to valueAcc (%5d + %d)\n", ads_max_acc, valueAcc, MAX_ADJUST_GAP);
-  //   ads_max_acc = valueAcc; // + MAX_ADJUST_GAP;
-  // }
+  int valueDisplay = 0;
 
   valueDecNorm = CarControl::_normalize(0, MIN_DISPLAY_VALUE, ads_min_dec, ads_max_dec, valueDec);
   if (valueDecNorm > 0) {
@@ -140,30 +122,33 @@ bool CarControl::read_paddles() {
       valueDisplay = 0;
     }
   }
-  // valueDisplay = (int)((valueDisplayLast * (SMOOTHING - 1) + valueDisplay) / SMOOTHING);
-  // debug_printf("DEC %5d (%5d-%5d), ACC %5d (%5d-%5d) --> Display:%4d\n", valueDec, ads_min_dec, ads_max_dec, valueAcc, ads_min_acc,
-  //              ads_max_acc, valueDisplay);
-
   // prepare and write motor acceleration and recuperation values to DigiPot
   int valueDecPot = 0;
   int valueAccPot = 0;
   if (valueDisplay < 0) {
-    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * DAC_MAX);
     valueAccPot = 0;
   } else {
     valueDecPot = 0;
-    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * 1024);
+    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * DAC_MAX);
   }
 
   if (valueDisplayLast != valueDisplay) {
-    debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | "
-                 "ACCEL-DISPLAY: %3d"
-                 " ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-                 valueDec, valueDecNorm, valueAcc, valueAccNorm, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot,
-                 ads_min_acc, ads_max_acc);
-
-    valueDisplayLast = valueDisplay;
+    // debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | ACCEL-DISPLAY: %3d"
+    //              " ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+    //              valueDec, valueDecNorm, valueAcc, valueAccNorm, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot,
+    //              ads_min_acc, ads_max_acc);
+    hasChanged = true;
+    _set_dec_acc_values(valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
   }
+
+  return hasChanged;
+}
+
+void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
+  debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+               valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
+
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
 
@@ -171,8 +156,7 @@ bool CarControl::read_paddles() {
   carState.Acceleration = valueAcc;
   carState.AccelerationDisplay = valueDisplay;
 
-  //  return valueDisplayLast;
-  return true;
+  valueDisplayLast = valueDisplay;
 }
 
 void CarControl::adjust_paddles(int seconds) {
@@ -223,8 +207,9 @@ void CarControl::adjust_paddles(int seconds) {
     }
     delay(100);
   }
-  ads_min_dec += 1000;
-  ads_min_acc += 1000;
+  // make sure null level to avoid automatic acceleration/deceleration
+  ads_min_dec += 5000;
+  ads_min_acc += 5000;
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   cout << s;
@@ -259,6 +244,12 @@ void CarControl::task() {
     someThingChanged |= read_speed();
 
     _handle_indicator();
+
+    // one data row per second
+    if (sdCard.logEnabled && (millis() > millisNextStamp)) {
+      millisNextStamp = millis() + LOG_INTERVALL;
+      sdCard.write(carState.csv("Recent State"));
+    }
 
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

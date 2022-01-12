@@ -256,9 +256,11 @@ void DriverDisplay::show_indicator() {
 
   case INDICATOR::LEFT:
     _turn_Left(ILI9341_YELLOW);
+    _turn_Right(bgColor);
     break;
 
   case INDICATOR::RIGHT:
+    _turn_Left(bgColor);
     _turn_Right(ILI9341_YELLOW);
     break;
 

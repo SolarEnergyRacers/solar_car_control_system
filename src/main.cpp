@@ -75,7 +75,7 @@ DAC dac;
 DriverDisplay driverDisplay;
 EngineerDisplay engineerDisplay;
 ESP32Time esp32time;
-GPInputOutput gpio; // I2C Interrupts
+GPInputOutput gpio; // I2C Interrupts, GPIO pin settings
 GyroAcc gyroAcc;
 Indicator indicator; // INDICATOR_ON
 IOExt2 ioExt;
@@ -108,6 +108,8 @@ void app_main(void) {
   // report chip info
   cout << "-chip info -------------------" << endl;
   chip_info();
+  cout << "-gpio pin settings ----------" << endl;
+  gpio.init();
   cout << "-init bus systems ------------" << endl;
   // init buses
   spiBus.init();
@@ -142,11 +144,7 @@ void app_main(void) {
   if (RTC_ON) {
     rtc.init();
   }
-  if (SD_ON) {
-    sdCard.init();
-  }
   if (INT_ON) {
-    gpio.init();
     gpio.register_gpio_interrupt();
   }
   if (IOEXT2_ON) {
@@ -160,6 +158,9 @@ void app_main(void) {
   }
   if (CAN_ON) {
     can.init();
+  }
+  if (SD_ON) {
+    sdCard.init();
   }
   if (!startOk) {
     cout << "ERROR in init sequence(s). System halted!" << endl;

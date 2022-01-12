@@ -3,6 +3,7 @@
 //
 #include <definitions.h>
 
+#include <fmt/core.h>
 #include <iostream>
 #include <string>
 
@@ -34,9 +35,17 @@ char *fgets_stdio_blocking(char *str, int n) {
   return str;
 }
 
-void xSemaphoreTakeT(QueueHandle_t mutex) {
+void xSemaphoreTakeT(xQueueHandle mutex) {
   if (!xSemaphoreTake(mutex, portMAX_DELAY)) {
     cout << "ERROR: mutex ************************************ " << mutex << " ****************" << endl;
     throw runtime_error("ERROR: mutex");
   }
+}
+
+std::string getTimeStamp(unsigned long seconds) {
+  int secsRemaining = seconds % 3600;
+  int runHours = seconds / 3600;
+  int runMinutes = secsRemaining / 60;
+  int runSeconds = secsRemaining % 60;
+  return fmt::format("{:02d}:{:02d}:{:02d}", runHours, runMinutes, runSeconds);
 }

@@ -8,8 +8,6 @@
 #include <ADS1X15.h>
 #include <definitions.h>
 
-#define ADC_MAX 65535
-
 class ADC {
 private:
   ADS1115 adss[NUM_ADC_DEVICES]; // for ADS1115 use: ADS1115 ads[NUM_ADS_DEVICES];

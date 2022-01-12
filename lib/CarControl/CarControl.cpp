@@ -35,7 +35,6 @@ extern SDCard sdCard;
 
 using namespace std;
 
-#define LOG_INTERVALL 1000;
 unsigned long millisNextStamp = millis();
 
 // ------------------

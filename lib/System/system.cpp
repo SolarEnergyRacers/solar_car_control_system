@@ -37,7 +37,7 @@ void chip_info(void) {
 string memory_info(void) {
   stringstream ss("Not implemented yet.");
   // ss << min_free_8bit_cap;
-  //heap_caps_dump_all();
+  // heap_caps_dump_all();
   return ss.str();
 }
 

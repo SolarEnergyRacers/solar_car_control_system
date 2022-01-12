@@ -11,7 +11,8 @@ class CmdHandler : public abstract_task {
 private:
   uint32_t sleep_polling_ms = 250;
   string commands = "RECDsPSJVMUH-:!ud<>wlLciIr";
-  string helpText = "Available commands (" + commands +   "):\n"
+  string helpText = "Available commands (" + commands +
+                    "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
                     "\tR        - reset and reinit driver display\n"
                     "\tC        - switch to console screen\n"

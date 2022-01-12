@@ -382,10 +382,10 @@ void Display::lifeSign() {
   lifeSignState = !lifeSignState;
 
   unsigned long allSeconds = millis() / 1000;
-   if (secLast < allSeconds) {
-     secLast = allSeconds;
-     cout << getTimeStamp(allSeconds) << endl;
-   }
+  if (secLast < allSeconds) {
+    secLast = allSeconds;
+    cout << getTimeStamp(allSeconds) << endl;
+  }
 }
 #endif
 

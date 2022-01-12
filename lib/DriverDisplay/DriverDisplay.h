@@ -5,10 +5,8 @@
 #ifndef SER_DRIVER_DISPLAY_C_H
 #define SER_DRIVER_DISPLAY_C_H
 
-#define ILI9341 // (320x240)
-
 #include <ADS1X15.h>
-#include <Adafruit_ILI9341.h> // placed here for display colors in other moduls
+#include <Adafruit_ILI9341.h>
 
 #include <CarState.h>
 #include <Display.h>

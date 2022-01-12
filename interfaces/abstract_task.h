@@ -24,7 +24,7 @@ private:
 #endif
 
 protected:
-  uint32_t sleep_polling_ms = 1111;
+  uint32_t sleep_polling_ms = 300;
 
 public:
   virtual string getName(void);

@@ -5,7 +5,7 @@
 #define DEFINITIONS_H
 
 #define VERSION "v0.1"
-#define VERSION_PUBLISHED "2021.10"
+#define VERSION_PUBLISHED "2022.01"
 
 #include <LocalFunctionsAndDevices.h>
 
@@ -24,12 +24,15 @@
  */
 #define I2C_SDA 23
 #define I2C_SCL 22
-#define I2C_FREQ 100000 // 100kHz
+#define I2C_FREQ 200000 // 200kHz
+//#define I2C_FREQ 100000 // 100kHz
+//#define I2C_FREQ 50000 // 50kHz
 
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
 #define I2C_ADDRESS_ADS1x15_1 0x49
 #define I2C_ADDRESS_ADS1x15_2 0x4a
+#define ADC_MAX 65535
 
 #define PWM_NUM_PORTS 16
 #define PWM_MAX_VALUE 4096
@@ -109,6 +112,11 @@
  *  General ESP32 Pinout:
  * https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
  */
+
+/*
+ * carState and carControl
+ */
+#define LOG_INTERVALL 1000;
 
 #define DEBUG true
 #define debug_printf(fmt, ...)                                                                                                             \

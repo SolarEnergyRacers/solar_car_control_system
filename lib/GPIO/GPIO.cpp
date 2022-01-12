@@ -19,7 +19,12 @@
 void GPInputOutput::re_init() { init(); }
 
 void GPInputOutput::init() {
-  // TODO
+  // Init GPIO pins for CS of SD-card and TFT
+  pinMode(SPI_CS_SDCARD, OUTPUT);
+  digitalWrite(SPI_CS_SDCARD, HIGH);
+  pinMode(SPI_CS_TFT, OUTPUT);
+  digitalWrite(SPI_CS_TFT, HIGH);
+  cout << "SPI_CS for TFT and SD card set." << endl;
 }
 
 void GPInputOutput::exit() {
@@ -34,7 +39,6 @@ void GPInputOutput::register_gpio_interrupt() {
   // set operating mode of interrupt pin to pull-up (i.e. interrupt is generated
   // if pin is getting grounded)
   pinMode(GPIO_INTERRUPT_PIN, INPUT_PULLUP);
-
   // register interrupt routine
   attachInterrupt(digitalPinToInterrupt(GPIO_INTERRUPT_PIN), handle_gpio_interrupt, FALLING);
 }

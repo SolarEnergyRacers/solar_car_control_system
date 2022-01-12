@@ -3,8 +3,6 @@
 //
 #include <definitions.h>
 
-#include <definitions.h>
-
 #include <fmt/core.h>
 #include <inttypes.h>
 #include <iostream>
@@ -23,6 +21,7 @@ void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
   cout << "[?] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "." << endl;
+
   mutex = xSemaphoreCreateMutex();
   spi = SPIClass(VSPI);
   // init mutex (it is acquired)

@@ -2,6 +2,14 @@
 // System Utility and Helper Functions
 //
 
+// standard libraries
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <iostream>
+#include <sstream>
+#include <stdio.h>
+#include <string>
+
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
@@ -9,6 +17,8 @@
 #include <esp_system.h>
 
 #include <system.h>
+
+using namespace std;
 
 void chip_info(void) {
 
@@ -22,6 +32,13 @@ void chip_info(void) {
 
   printf("%dMB %s flash\n", spi_flash_get_chip_size() / (1024 * 1024),
          (chip_info.features & CHIP_FEATURE_EMB_FLASH) ? "embedded" : "external");
+}
+
+string memory_info(void) {
+  stringstream ss("Not implemented yet.");
+  // ss << min_free_8bit_cap;
+  // heap_caps_dump_all();
+  return ss.str();
 }
 
 void restart(void) {

@@ -41,15 +41,16 @@ private:
   const int MIN_DISPLAY_VALUE = 99; // absolute of minimal value for negative scaling
   const int MAX_DISPLAY_VALUE = 99;
 
-  int ads_min_dec = 50000;
-  int ads_min_acc = 50000;
-  int ads_max_dec = 0;
-  int ads_max_acc = 0;
+  int ads_min_dec = 14000; // paddle_adjust in the boot sequence overwrites this value
+  int ads_min_acc = 21000;
+  int ads_max_dec = 22000;
+  int ads_max_acc = 23000;
   int accelLast = 0;
   int recupLast = 0;
   int valueDisplayLast = 0;
   bool justInited = true;
 
+  void _set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay);
   void _handle_indicator();
 
   static volatile int valueChangeRequest;

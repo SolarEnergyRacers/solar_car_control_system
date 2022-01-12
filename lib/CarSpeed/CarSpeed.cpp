@@ -12,18 +12,19 @@
 #include <stdio.h>
 
 #include <Arduino.h>
-#include <Helper.h>
-
-#include <CarSpeed.h>
 
 #include <ADC.h>
+#include <CarSpeed.h>
+#include <CarState.h>
 #include <DAC.h>
+#include <Helper.h>
 #include <PID_v1.h>
 
 extern PID pid;
 extern CarSpeed carSpeed;
 extern ADC adc;
 extern DAC dac;
+extern CarState carState;
 
 // ------------------
 // FreeRTOS functions
@@ -70,22 +71,28 @@ void CarSpeed::task() {
   // polling loop
   while (1) {
 
-    // read target speed
-    input_value = get_current_speed();
+    if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
+      // read target speed
+      input_value = get_current_speed();
 
-    // update pid controller
-    pid.Compute();
+      // update pid controller
+      pid.Compute();
 
-    // set acceleration & deceleration // TOOD: check that the value is in range
-    if (output_setpoint > 0) {
-      dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
-      dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
-    } else {
-      dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
-      dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+      if (output_setpoint < -DAC_MAX)
+        output_setpoint = -DAC_MAX;
+      if (output_setpoint > DAC_MAX)
+        output_setpoint = DAC_MAX;
+
+      // set acceleration & deceleration // TOOD: check that the value is in range
+      if (output_setpoint > 0) {
+        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
+      } else {
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
+        dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+      }
+
+      // sleep
+      vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
     }
-
-    // sleep
-    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
-}

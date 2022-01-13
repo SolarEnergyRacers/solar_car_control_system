@@ -1,6 +1,6 @@
-# Review Regulations WSC, ASC
+# Review Regulations World Solar Challenge (WSC), American Solar Challenge (ASC)
 
-## ASC2024-Regs-EXTERNAL-RELEASE-A.pdf  (2024)
+## ASC Regulaton [Release 2024 A](asc/ASC2024-Regs-EXTERNAL-RELEASE-A.pdf)
 ### 8.1. Sollar Collector (Jonas)
 ### 8.2 Energy Storage (Damian)
 ### 8.3 Protection Circuits (Karl)
@@ -10,14 +10,12 @@
 ### 8.7. Cables (Jonas)
 ### 8.8. Control (Karl)
 ### 8.9. Electrical Shock Hazard (Andi)
-
+- exposed conductors >32V must be protected from human contact and marked `High Voltage` in >=10mm letters
 ### 9.4. Lighting (Tobias)
 ### 9.5. E Rear Vision (Damian)
 ### 10.5. Breakes (Karl)
 
-## ASC2016_Protection-System-Test-Procedure.pdf (Damian, Jonas)
-
-## 2021_bwsc_regulations_release_version_1_19062020.pdf
+## WSC Regulation [Release 2021 B](wsc/2021_bwsc_regulations_release_version_1_19062020.pdf)
 ### 2.4. Solar colector (Jonas)
 ### 2.18. Rear vision (Damian)
 ### 2.211 Brakes (Karl)
@@ -25,8 +23,8 @@
 ### 2.25. (Tobias)
 ### 2.26. (Tobias, Karl)
 ### 2.27. Automatic functions (Karl)
-### 2.28., 2.29 Elactrical saftey, safe state (Jonas)
+### 2.28./2.29 Electrical saftey, safe state (Jonas)
 ### 3.8. Communication (Tobias)
-
 ### 3.13. Dynamic scrutineering (alle)
 
+## ASC2016_Protection-System-Test-Procedure.pdf (Damian, Jonas)

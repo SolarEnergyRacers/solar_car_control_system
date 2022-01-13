@@ -32,7 +32,6 @@ public:
   void update_pid(double Kp, double Ki, double Kd);
   void target_speed_incr(void);
   void target_speed_decr(void);
-
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H

@@ -15,9 +15,100 @@ extern CANBus can;
 
 void onReceiveForwarder(int packetSize) { can.onReceive(packetSize); }
 
-/*void can_task(void *pvParameter){
-  can.task();
-}*/
+CANBus::CANBus(){
+  //init max ages
+  this->max_ages[BMS_BASE_ADDR] = MAXAGE_BMU_HEARTBEAT;
+  this->max_ages[BMS_BASE_ADDR | 0x1] = MAXAGE_CMU_TEMP; //CMU1
+  this->max_ages[BMS_BASE_ADDR | 0x4] = MAXAGE_CMU_TEMP; //CMU2
+  this->max_ages[BMS_BASE_ADDR | 0x7] = MAXAGE_CMU_TEMP; //CMU3
+  this->max_ages[BMS_BASE_ADDR | 0x2] = MAXAGE_CMU_VOLTAGES; //CMU1
+  this->max_ages[BMS_BASE_ADDR | 0x3] = MAXAGE_CMU_VOLTAGES; //CMU1
+  this->max_ages[BMS_BASE_ADDR | 0x5] = MAXAGE_CMU_VOLTAGES; //CMU2
+  this->max_ages[BMS_BASE_ADDR | 0x6] = MAXAGE_CMU_VOLTAGES; //CMU2
+  this->max_ages[BMS_BASE_ADDR | 0x8] = MAXAGE_CMU_VOLTAGES; //CMU3
+  this->max_ages[BMS_BASE_ADDR | 0x9] = MAXAGE_CMU_VOLTAGES; //CMU3
+  this->max_ages[BMS_BASE_ADDR | 0xF4] = MAXAGE_PACK_SOC;
+  this->max_ages[BMS_BASE_ADDR | 0xF5] = MAXAGE_BALANCE_SOC;
+  this->max_ages[BMS_BASE_ADDR | 0xF6] = MAXAGE_CHARGER_CONTROL;
+  this->max_ages[BMS_BASE_ADDR | 0xF7] = MAXAGE_PRECHARGE_STATUS;
+  this->max_ages[BMS_BASE_ADDR | 0xF8] = MAXAGE_MIN_MAX_U_CELL;
+  this->max_ages[BMS_BASE_ADDR | 0xF9] = MAXAGE_MIN_MAX_T_CELL;
+  this->max_ages[BMS_BASE_ADDR | 0xFA] = MAXAGE_PACK_VOLTAGE;
+  this->max_ages[BMS_BASE_ADDR | 0xFB] = MAXAGE_PACK_STATUS;
+  this->max_ages[BMS_BASE_ADDR | 0xFC] = MAXAGE_PACK_FAN_STATUS;
+  this->max_ages[BMS_BASE_ADDR | 0xFD] = MAXAGE_EXT_PACK_STATUS;
+
+  this->max_ages[MPPT1_BASE_ADDR] = MAXAGE_MPPT_INPUT;
+  this->max_ages[MPPT1_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
+  this->max_ages[MPPT1_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
+  this->max_ages[MPPT1_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
+  this->max_ages[MPPT1_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
+  this->max_ages[MPPT1_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
+  this->max_ages[MPPT1_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
+
+  this->max_ages[MPPT2_BASE_ADDR] = MAXAGE_MPPT_INPUT;
+  this->max_ages[MPPT2_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
+  this->max_ages[MPPT2_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
+  this->max_ages[MPPT2_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
+  this->max_ages[MPPT2_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
+  this->max_ages[MPPT2_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
+  this->max_ages[MPPT2_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
+
+  this->max_ages[MPPT3_BASE_ADDR] = MAXAGE_MPPT_INPUT;
+  this->max_ages[MPPT3_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
+  this->max_ages[MPPT3_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
+  this->max_ages[MPPT3_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
+  this->max_ages[MPPT3_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
+  this->max_ages[MPPT3_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
+  this->max_ages[MPPT3_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
+
+
+  //init ages
+  this->ages[BMS_BASE_ADDR] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0x1] = INT32_MAX; //CMU1
+  this->ages[BMS_BASE_ADDR | 0x4] = INT32_MAX; //CMU2
+  this->ages[BMS_BASE_ADDR | 0x7] = INT32_MAX; //CMU3
+  this->ages[BMS_BASE_ADDR | 0x2] = INT32_MAX; //CMU1
+  this->ages[BMS_BASE_ADDR | 0x3] = INT32_MAX; //CMU1
+  this->ages[BMS_BASE_ADDR | 0x5] = INT32_MAX; //CMU2
+  this->ages[BMS_BASE_ADDR | 0x6] = INT32_MAX; //CMU2
+  this->ages[BMS_BASE_ADDR | 0x8] = INT32_MAX; //CMU3
+  this->ages[BMS_BASE_ADDR | 0x9] = INT32_MAX; //CMU3
+  this->ages[BMS_BASE_ADDR | 0xF4] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xF5] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xF6] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xF7] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xF8] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xF9] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xFA] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xFB] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xFC] = INT32_MAX;
+  this->ages[BMS_BASE_ADDR | 0xFD] = INT32_MAX;
+
+  this->ages[MPPT1_BASE_ADDR] = INT32_MAX;
+  this->ages[MPPT1_BASE_ADDR | 0x1] = INT32_MAX;
+  this->ages[MPPT1_BASE_ADDR | 0x2] = INT32_MAX;
+  this->ages[MPPT1_BASE_ADDR | 0x3] = INT32_MAX;
+  this->ages[MPPT1_BASE_ADDR | 0x4] = INT32_MAX;
+  this->ages[MPPT1_BASE_ADDR | 0x5] = INT32_MAX;
+  this->ages[MPPT1_BASE_ADDR | 0x6] = INT32_MAX;
+
+  this->ages[MPPT2_BASE_ADDR] = INT32_MAX;
+  this->ages[MPPT2_BASE_ADDR | 0x1] = INT32_MAX;
+  this->ages[MPPT2_BASE_ADDR | 0x2] = INT32_MAX;
+  this->ages[MPPT2_BASE_ADDR | 0x3] = INT32_MAX;
+  this->ages[MPPT2_BASE_ADDR | 0x4] = INT32_MAX;
+  this->ages[MPPT2_BASE_ADDR | 0x5] = INT32_MAX;
+  this->ages[MPPT2_BASE_ADDR | 0x6] = INT32_MAX;
+
+  this->ages[MPPT3_BASE_ADDR] = INT32_MAX;
+  this->ages[MPPT3_BASE_ADDR | 0x1] = INT32_MAX;
+  this->ages[MPPT3_BASE_ADDR | 0x2] = INT32_MAX;
+  this->ages[MPPT3_BASE_ADDR | 0x3] = INT32_MAX;
+  this->ages[MPPT3_BASE_ADDR | 0x4] = INT32_MAX;
+  this->ages[MPPT3_BASE_ADDR | 0x5] = INT32_MAX;
+  this->ages[MPPT3_BASE_ADDR | 0x6] = INT32_MAX;
+}
 
 string CANBus::getName() { return "CAN_Task"; }
 
@@ -30,7 +121,7 @@ void CANBus::init() {
   mutex = xSemaphoreCreateBinary();
 
   CAN.setPins(CAN_RX, CAN_TX);
-  CAN.onReceive(onReceiveForwarder); // not sure if works
+  CAN.onReceive(onReceiveForwarder); // couldn't get it to work with method of object
 
   if (!CAN.begin(CAN_SPEED)) {
     // opening CAN failed :,(
@@ -51,11 +142,13 @@ void CANBus::task() {
 
     while (this->rxBuffer.isAvailable()) {
       packet = this->rxBuffer.pop();
-
+      
+      /*
       printf("----------------\n");
       printf("id: %X\n", packet.getID());
       printf("data 32 0: %X\n", packet.getData_ui32(0));
       printf("data 32 1: %X\n", packet.getData_ui32(1));
+      */
 
       // Do something with packet
       switch (packet.getID()) {
@@ -128,7 +221,7 @@ void CANBus::task() {
         break;
       }
     }
-    this->sleep(50);
+    this->sleep(CAN_TASK_WAIT);
   }
 }
 
@@ -139,14 +232,19 @@ void CANBus::onReceive(int packetSize) {
 
   packet.setID(CAN.packetId());
 
-  for (int i = 0; i < packetSize; i++) {
-    if (CAN.available()) {
-      rxData = rxData | (((uint64_t)CAN.read()) << (i * 8));
+  if(this->max_ages[packet.getID()] == 0 || (this->max_ages[packet.getID()] != -1 && millis() - this->ages[packet.getID()] > this->max_ages[packet.getID()])){
+    
+    this->ages[packet.getID()] = millis();
+
+    for (int i = 0; i < packetSize; i++) {
+      if (CAN.available()) {
+        rxData = rxData | (((uint64_t)CAN.read()) << (i * 8));
+      }
     }
+
+    packet.setData(rxData);
+
+    // Add packet to buffer so task can handle it later
+    rxBuffer.push(packet);
   }
-
-  packet.setData(rxData);
-
-  // Add packet to buffer so task can handle it later
-  rxBuffer.push(packet);
 }

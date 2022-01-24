@@ -4,11 +4,23 @@
 ### 8.1. Sollar Collector (Jonas)
 ### 8.2 Energy Storage (Damian)
 ### 8.3 Protection Circuits (Karl)
-### 8.4. Battery Ennclosures (Damian)
+
+- [ ] Nachweis Batterieschultzschaltung
+- [ ] Alle Schutzschaltungen im Batteriekasten
+- [ ] max. 1mA Fehlerstrom
+- [ ] **Automatischer** Batterienotschalter
+  - [ ]  Batterienotschalter muss **manuell** und nicht fahrendem Fahrzeug wieder eingeschaltet werden
+- [ ] 8.3.A.7 Battery Protection System (BPS): 
+  - Monitoring und Auslösung: Überspannung, Übertemperatur, Überstrom, Unterspannung --> Zell-Level!
+- Bei Laden von Hilfsbatterien im Auto, müssen diese auch überwacht und geschützt sein
+
+
+### 8.4. Battery Enclosures (Damian)
 ### 8.5. Main Fuse (Jonas)
 ### 8.6. Power Switch (Jonas)
 ### 8.7. Cables (Jonas)
 ### 8.8. Control (Karl)
+
 ### 8.9. Electrical Shock Hazard (Andi)
 
 ### 9.4. Lighting (Tobias)

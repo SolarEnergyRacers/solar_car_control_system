@@ -20,6 +20,10 @@
 ### 8.6. Power Switch (Jonas)
 ### 8.7. Cables (Jonas)
 ### 8.8. Control (Karl)
+- [ ] 8.8.A Nur Fahrer darf essentielle Fahrparameter einstellen können
+- [x] Fahrpedal muss selbstständig zurückstellen
+- [x] Cruise Control deaktiviert bei Bremsbetätigung
+- [ ] Cruise Control deaktiviert bei Neustart 
 
 ### 8.9. Electrical Shock Hazard (Andi)
 - exposed conductors >32V must be protected from human contact and marked `High Voltage` in >=10mm letters

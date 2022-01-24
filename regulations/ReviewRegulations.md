@@ -30,11 +30,20 @@
 ### 9.4. Lighting (Tobias)
 ### 9.5. E Rear Vision (Damian)
 ### 10.5. Breakes (Karl)
+- [ ] Zweikreisbremssystem, nicht links/rechts asymetrisch (Recuperation) zählt nicht
+- [ ] Bremsflächje je Kontaktbereich: >6cm2
+- [ ] Bremsbelagdicke bei Rennbeginn >6mm
+- [ ] a-average >=4.72 m/s2 
+  - [ ]  nur mechanisch (geht bei uns nicht)
+  - [ ] Bei Hinterradbremsung: 10.5.G.2 Performance
+ - [ ] Handbremse: 10.6.A Performance
 
 ## WSC Regulation [Release 2021 B](wsc/2021_bwsc_regulations_release_version_1_19062020.pdf)
 ### 2.4. Solar colector (Jonas)
 ### 2.18. Rear vision (Damian)
 ### 2.211 Brakes (Karl)
+
+
 ### 2.24 Lightinh (Tobias)
 ### 2.25. (Tobias)
 ### 2.26. (Tobias, Karl)

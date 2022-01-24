@@ -84,13 +84,12 @@ void CarSpeed::task() {
 
       // set acceleration & deceleration // TOOD: check that the value is in range
       if (output_setpoint > 0) {
-        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
+        carState.Acceleration = output_setpoint; // acceleration
+        carState.Deceleration = 0;               // deceleration
       } else {
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
-        dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+        carState.Acceleration= 0;                // acceleration
+        carState.Deceleration = -output_setpoint; // deceleration
       }
-
       // sleep
       vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
     }

@@ -97,7 +97,7 @@ void app_main(void) {
 
   // init serial output for  console
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUDRATE);
   delay(300);
   cout << endl;
   cout << "--------------------" << endl;

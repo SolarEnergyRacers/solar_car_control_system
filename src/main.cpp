@@ -162,6 +162,9 @@ void app_main(void) {
   if (SD_ON) {
     sdCard.init();
   }
+  if (CARSPEED_ON) {
+    carSpeed.init();
+  }
   if (!startOk) {
     cout << "ERROR in init sequence(s). System halted!" << endl;
     exit(0);
@@ -217,10 +220,6 @@ void app_main(void) {
     cout << " - read_can_demo_task" << endl;
     can.create_task();
   }
-  if (CARSPEED_ON) {
-    carSpeed.create_task();
-    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
-  }
   if (CARCONTROL_ON) {
     carControl.init();
     carControl.create_task();
@@ -234,6 +233,10 @@ void app_main(void) {
     ioExt.create_task();
     engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
     ioExt.readAll();
+  }
+  if (CARSPEED_ON) {
+    carSpeed.create_task();
+    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
   }
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;

@@ -5,7 +5,7 @@
 #define ADC_ON true              // analog digital converte, I2C (ADS1015, ADS1115)
 #define CAN_ON true              // CAN bus (MPPT, BMS, ..)
 #define CARCONTROL_ON true       // central car control task
-#define CARSPEED_ON false        // car pid speed controller
+#define CARSPEED_ON true        // car pid speed controller
 #define COMMANDHANDLER_ON true   // command input and deploy
 #define DAC_ON true              // digital analog converter, I2C (DS1803)
 #define DRIVER_DISPLAY_ON true   // driver display, SPI (ILI9341)

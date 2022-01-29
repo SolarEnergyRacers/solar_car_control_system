@@ -2,6 +2,9 @@
 
 ## ASC Regulaton [Release 2024 A](asc/ASC2024-Regs-EXTERNAL-RELEASE-A.pdf)
 ### 8.1 Sollar Collector (Jonas)
+- [ ] Eine einzelne Solarzelle muss beim Scrutineering gezeigt werden.
+- [ ] Mit einer Handpumpe darf Wasser auf die Solarzellen gesprüht werden, wenn das Solarauto stationär ist.
+
 ### 8.2 Energy Storage (Damian)
 - [ ] Min. 3 Einzelzellen müssen bereitgestellt werden.
 - [ ] 8.2.C.3: Bei einem Batteriefehler muss eine Hilfsbatterie das BMS, Strobe und Fehler Indication Licht betreiben.
@@ -25,8 +28,21 @@
 - [ ] ventilation systems must pull exhaust to the exterior of the solar car (Abzug-Prinzip?)
 
 ### 8.5 Main Fuse (Jonas)
+- [ ] Eine DC-Sicherung (hight speed, kein Leistungsschalter) muss direkt an den positiven Pol der Batterie verbunden sein. -> Also Schmelzsicherung?
+- [ ] All other wiring branching off the main bus circuit must have properly sized fuses. 
+- [ ] Alle Messverbindungen vom BMS zu den Batteriezellen müssen abgesichert oder auf 1mA begrenzt werden. 
+
 ### 8.6 Power Switch (Jonas)
+- [ ] Der Fahrer muss den Power Switch jederzeit ein- und ausschalten können.
+- [ ] Der Powerswitch  muss mit den Worten "POWER", "ON" und "OFF" gekennzeichnet werden welche mindestens 10 mm hoch sind. Er muss vom Fahrer einfach erreichbar sein.
+- [ ] In der OFF-Position muss die Batterie, der Motor und die Solarzellen voneinander getrennt sein. 
+- [ ] Der Fahrer muss eine leuchtende Anzeige von einem allfälligen BMS-Fehler haben.
+- [ ] Der externe Power Switch (aussen am Solarauto) muss auf der Fahrerseite sein und auf einer nach oben zeigenden Oberfläche angebracht werden. 
+- [ ] Der Externe Powerswitch darf nur durch **Drücken** betätigt werden können und muss rot sein und einen Durchmesser von 20 mm haben.
+- [ ] Die Betätigung muss ebenfalls die leuchtende Anzeige des BMS-Fehler aktivieren sowie den BMS Fault Dash Indicator (was ist das?).
+
 ### 8.7 Cables (Jonas)
+
 ### 8.8 Control (Karl)
 - [ ] 8.8.A Nur Fahrer darf essentielle Fahrparameter einstellen können
 - [x] Fahrpedal muss selbstständig zurückstellen
@@ -50,6 +66,7 @@
 
 ## WSC Regulation [Release 2021 B](wsc/2021_bwsc_regulations_release_version_1_19062020.pdf)
 ### 2.4 Solar colector (Jonas)
+- 
 ### 2.18 Rear vision (Damian)
 - [ ] Siehe Diagramm
 - [x] Kamerasystem ist ok.
@@ -75,6 +92,12 @@
 - [ ] Cruise Control deaktiviert bei Neustart 
 
 ### 2.28/2.29 Electrical saftey, safe state (Jonas)
+- [ ] Zum Schutz vor Hiht-voltage müssen doppelte Isolation oder Abdeckungen beutzt werden. Diese dprfen nur durch Tool entfernt werden können.
+- [ ] Beim Fahrer muss zum Schutz vor High-voltage alle Abdeckungen maximal einen Spalt von 1mm aufweisen. Ansonsten muss dieser Spalt so klein sein, dass keine Finger dazwischen passen.
+- [ ] The resistance between any exposed conductive part and each terminal of the energy storage system must exceed 100 V ohms, where V is the nominal voltage of the energy storage system.
+- [ ]  A system must be implemented to monitor the isolation of the solar car’s chassis and body as per Regulations 2.28.7 and 2.28.8. This system may take the form of a permanently connected electronic device or a properly documented procedure of regular manual checks. 
+
+
 ### 3.8 Communication (Tobias)
 ### 3.13 Dynamic scrutineering (alle)
 

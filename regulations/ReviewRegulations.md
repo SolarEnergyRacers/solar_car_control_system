@@ -3,6 +3,8 @@
 ## ASC Regulaton [Release 2024 A](asc/ASC2024-Regs-EXTERNAL-RELEASE-A.pdf)
 ### 8.1 Sollar Collector (Jonas)
 ### 8.2 Energy Storage (Damian)
+- [ ] Min. 3 Einzelzellen müssen bereitgestellt werden.
+- [ ] 8.2.C.3: Bei einem Batteriefehler muss eine Hilfsbatterie das BMS, Strobe und Fehler Indication Licht betreiben.
 ### 8.3 Protection Circuits (Karl)
 
 - [ ] Nachweis Batterieschultzschaltung
@@ -16,6 +18,12 @@
 
 
 ### 8.4 Battery Enclosures (Damian)
+- [x] Nicht Leitfähig
+- [ ] Elektrolyt-Resistent 
+- [ ] Chassis Isolation von 1MOhm
+- [ ] Kleber mit “Caution: Chemical Hazard” and “High Voltage” und Batterietyp min 10mm hoch.
+- [ ] ventilation systems must pull exhaust to the exterior of the solar car (Abzug-Prinzip?)
+
 ### 8.5 Main Fuse (Jonas)
 ### 8.6 Power Switch (Jonas)
 ### 8.7 Cables (Jonas)
@@ -29,6 +37,8 @@
 - exposed conductors >32V must be protected from human contact and marked `High Voltage` in >=10mm letters
 ### 9.4 Lighting (Tobias)
 ### 9.5 E Rear Vision (Damian)
+- [ ] 60° FOV
+- [ ] 200mm-dicker Pfeil muss in 15m entfernung erkennt werden.
 ### 10.5 Breakes (Karl)
 - [ ] Zweikreisbremssystem, nicht links/rechts asymetrisch (Recuperation) zählt nicht
 - [ ] Bremsflächje je Kontaktbereich: >6cm2
@@ -41,6 +51,9 @@
 ## WSC Regulation [Release 2021 B](wsc/2021_bwsc_regulations_release_version_1_19062020.pdf)
 ### 2.4 Solar colector (Jonas)
 ### 2.18 Rear vision (Damian)
+- [ ] Siehe Diagramm
+- [x] Kamerasystem ist ok.
+- [x] Nicht Seitenverkehrt
 ### 2.21 Brakes (Karl)
 - [ ] Bremssystem zertifiziert
 - [ ] Zweikreisbremssystem, nicht links/recht
@@ -66,3 +79,4 @@
 ### 3.13 Dynamic scrutineering (alle)
 
 ## ASC2016_Protection-System-Test-Procedure.pdf (Damian, Jonas)
+- [ ] Sämtliche Schutzfunktionen des BMS werden getestet, man muss Messpunkte für Fehler-Signal-Injektion bereitstellen.

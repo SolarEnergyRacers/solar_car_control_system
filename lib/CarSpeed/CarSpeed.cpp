@@ -11,9 +11,8 @@
 #include <iostream>
 #include <stdio.h>
 
-#include <Arduino.h>
+//#include <Arduino.h>
 
-#include <ADC.h>
 #include <CarSpeed.h>
 #include <CarState.h>
 #include <DAC.h>
@@ -22,7 +21,7 @@
 
 extern PID pid;
 extern CarSpeed carSpeed;
-extern ADC adc;
+// extern ADC adc;
 extern DAC dac;
 extern CarState carState;
 
@@ -54,7 +53,9 @@ double CarSpeed::get_current_speed() {
   // TODO: this function can be heavily optimized (i.e. use int instead of float, use less arithmetic operations
 
   // read analog value
-  int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
+  // TODO: Which methode?
+  // int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
+  int16_t value = carState.Speed;
 
   // convert value to voltage
   float voltage = value * 5.0 / 65536; // TODO: check if we really use 16bit ADS1115
@@ -71,23 +72,41 @@ void CarSpeed::task() {
   // polling loop
   while (1) {
     if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
-
       // read target speed
-      input_value = get_current_speed();
+      // input_value = get_current_speed();
+      input_value = carState.Speed;
+      target_speed = carState.TargetSpeed;
 
       // update pid controller
       pid.Compute();
+
+      if (output_setpoint < -DAC_MAX)
+        output_setpoint = -DAC_MAX;
+      if (output_setpoint > DAC_MAX)
+        output_setpoint = DAC_MAX;
+
+      // set acceleration & deceleration // TOOD: check that the value is in range
+      // if (output_setpoint < 0) {
+      //   carState.Acceleration = output_setpoint; // acceleration
+      //   carState.Deceleration = 0;               // deceleration
+      //   cout << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint << endl;
+      // } else {
+      //   carState.Acceleration = 0;                // acceleration
+      //   carState.Deceleration = -output_setpoint; // deceleration
+      //   cout << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << endl;
+      // }
 
       // set acceleration & deceleration // TOOD: check that the value is in range
       if (output_setpoint > 0) {
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
         dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
+        cout << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint << endl;
       } else {
         dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
         dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+        cout << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << endl;
       }
     }
-
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

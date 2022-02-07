@@ -38,13 +38,13 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x04, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
     {0x05, INPUT_PULLUP, 1, 1, false, 0l, PinFwdBwd, fwdBwdHandler},
     {0x06, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY07, NULL},
-    {0x07, OUTPUT, 0, 0, false, 0l, PinHornOut, NULL},
+    {0x07, OUTPUT, 0, 0, false, 0l, PinFanOut, NULL},
     // IOExtDev0-PortB
     {0x08, OUTPUT, 0, 0, false, 0l, PinIndicatorOutLeft, NULL},
     {0x09, OUTPUT, 0, 0, false, 0l, PinIndicatorOutRight, NULL},
-    {0x0a, OUTPUT, 0, 0, false, 0l, PinFanOut, NULL},
-    {0x0b, OUTPUT, 0, 0, false, 0l, PinLightOut, NULL},
-    {0x0c, OUTPUT, 0, 0, false, 0l, PinHeadLightOut, NULL},
+    {0x0a, OUTPUT, 0, 0, false, 0l, PinHornOut, NULL},
+    {0x0b, OUTPUT, 0, 0, false, 0l, PinHeadLightOut, NULL},
+    {0x0c, OUTPUT, 0, 0, false, 0l, PinLightOut, NULL},
     {0x0d, INPUT_PULLUP, 1, 1, false, 0l, PinBreakPedal, breakPedalHandler},
     {0x0e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
     {0x0f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY17, NULL},
@@ -328,21 +328,25 @@ void constantModeOnOffHandler() {
     if (carState.ConstantModeOn) {
       cout << "ConstantMode OFF" << endl;
       carState.ConstantModeOn = false;
+      carState.TargetSpeed = 0;
+      carState.TargetPower = 0;
     } else {
-      cout << "ConstantMode ON" << endl;
       carState.TargetSpeed = carState.Speed;
       carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
       carState.ConstantModeOn = true;
+      cout << "ConstantMode ON, with speed " << carState.TargetSpeed << "km/h and power=" << carState.TargetPower << "W" << endl;
     }
   }
 }
 
 void constantModeHandler() {
   if (carState.getPin(PinConstantMode)->value == 0) {
-    printf("Constant mode toggle\n");
+    cout << "Constant mode toggle" << endl;
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
+      carState.TargetPower = 0;
       carState.ConstantMode = CONSTANT_MODE::SPEED;
     } else {
+      carState.TargetSpeed = 0;
       carState.ConstantMode = CONSTANT_MODE::POWER;
     }
   }

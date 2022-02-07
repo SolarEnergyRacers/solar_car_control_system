@@ -163,6 +163,8 @@ void CarControl::adjust_paddles(int seconds) {
   int x, y;
   int16_t value;
 
+  dac.reset_and_lock_pot();
+
   ads_min_acc = 50000;
   ads_min_dec = 50000;
   ads_max_acc = 0;
@@ -217,6 +219,9 @@ void CarControl::adjust_paddles(int seconds) {
     carState.DriverInfo = fmt::format("==> dec {:5}-{:5}       ==> acc {:5}-{:5}", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   } else {
     engineerDisplay.print(s.c_str());
+  }
+  if (carState.AccelerationDisplay == 0) {
+    dac.unlock();
   }
 }
 

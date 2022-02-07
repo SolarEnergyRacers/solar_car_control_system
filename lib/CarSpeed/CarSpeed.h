@@ -17,6 +17,7 @@ private:
   double Kp = 2;
   double Ki = 5;
   double Kd = 1;
+  double speed_increment = 1.0;
   PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
 
 public:
@@ -29,6 +30,8 @@ public:
   double get_target_speed();
   double get_current_speed(); // speed in m/s
   void update_pid(double Kp, double Ki, double Kd);
+  void target_speed_incr(void);
+  void target_speed_decr(void);
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H

@@ -106,8 +106,8 @@ void CarSpeed::task() {
         dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
         cout << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << endl;
       }
-      // sleep
     }
+    // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

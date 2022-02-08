@@ -229,6 +229,7 @@ void app_main(void) {
   if (IOEXT2_ON) {
     carState.Indicator = INDICATOR::OFF;
     carState.ConstantModeOn = false;
+    carState.SdCardDetect = false;
     carState.ConstantMode = CONSTANT_MODE::SPEED;
     carState.Light = LIGHT::OFF;
     ioExt.create_task();

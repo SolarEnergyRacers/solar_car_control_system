@@ -63,7 +63,7 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x1a, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY33, NULL},
     {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler},
     {0x1c, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY35, NULL},
-    {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY36, NULL},
+    {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinSdCardDetect, sdCardDetectHandler},
     {0x1e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
     {0x1f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY38, NULL}};
 
@@ -146,8 +146,8 @@ void IOExt2::readAll(bool deltaOnly) {
         xSemaphoreTakeT(i2cBus.mutex);
         pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
         xSemaphoreGive(i2cBus.mutex);
+        // printf("%2d: dev: %d, pin:%x  -- value:%d\n", pin->port, devNr, pinNr, pin->value);
 
-        // if (pin->handlerFunction != NULL) {
         if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited)) {
           pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
@@ -256,7 +256,7 @@ void fwdBwdHandler() {
 
 void breakPedalHandler() {
   carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
-  printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
+  printf("----------------------------------------------Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
 }
 
 void indicatorHandler() {
@@ -352,6 +352,15 @@ void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
     carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
     cout << "Request Paddle Adjust" << endl;
+  }
+}
+
+void sdCardDetectHandler() {
+  carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
+  if (carState.SdCardDetect) {
+    cout << "SD card removed." << endl;
+  } else {
+    cout << "SD card detected." << endl;
   }
 }
 // end IO pin handler -----------------------------------------

@@ -20,6 +20,7 @@ public:
   void init();
   void re_init();
   void reset_and_lock_pot();
+  void lock() { isLocked = true; };
   void unlock() { isLocked = false; };
   void set_pot(uint8_t val, pot_chan channel);
   uint16_t get_pot(pot_chan channel);

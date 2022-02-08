@@ -111,6 +111,7 @@ public:
   bool ConstantModeOn;
   INDICATOR Indicator;
   bool IndicatorBlink;
+  bool SdCardDetect;
 
   int TargetSpeed;
   int TargetPower;

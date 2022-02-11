@@ -2,7 +2,7 @@
 
 ## Hardware Changes
 
-### DSUB Stecker Main Board to Steering Wheel: SD_CS
+### DSUB Plug Main Board to Steering Wheel: SD_CS
 
 Kabel Pin | Platine / Device
 ---|---
@@ -19,9 +19,14 @@ SteeringWheel DB12 | ILI9341:SPI_CS_SDCARD
 ### SteeringWheel Board
 
 
-|
---|--
-SD Card detect | IOExt2:5 
-SD Card Select	| D-SUB pin 
-ILI C/D Low active	| R to VCC 
-	|  
+|Old|New
+--|--|--
+SD Card detect |% | IOExt2:5      
+ILI C/D Low active	|R to GND	| R to VCC 
+	|	|  
+
+### Main Board
+
+|Old|New
+--|--|--
+ xbee | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug 

@@ -15,3 +15,13 @@ SteeringWheel DB12 | ILI9341:SPI_CS_SDCARD
 | ------------------ | -------- | -------- |
 | ILI9341:SPI_CS_TFT | ESP32:36 | ESP32:32 |
 |                    |          |          |
+
+### SteeringWheel Board
+
+
+|
+--|--
+SD Card detect | IOExt2:5 
+SD Card Select	| D-SUB pin 
+ILI C/D Low active	| R to VCC 
+	|  

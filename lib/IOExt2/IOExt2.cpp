@@ -350,8 +350,8 @@ void constantModeHandler() {
 
 void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
-    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
     cout << "Request Paddle Adjust" << endl;
+    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
   }
 }
 

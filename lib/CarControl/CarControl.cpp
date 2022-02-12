@@ -171,9 +171,6 @@ void CarControl::adjust_paddles(int seconds) {
   ads_max_acc = 0;
   ads_max_dec = 0;
 
-  cout << DISPLAY_STATUS_str[(int)engineerDisplay.get_DisplayStatus()] << " | "
-       << DISPLAY_STATUS_str[(int)driverDisplay.get_DisplayStatus()] << endl;
-
   int cycles = (seconds * 10);
   if (cycles < 1)
     cycles = 1;
@@ -186,7 +183,7 @@ void CarControl::adjust_paddles(int seconds) {
     engineerDisplay.getCursor(x, y);
   }
   while (cycles-- > 0) {
-    s = fmt::format(" {}", cycles);
+    s = fmt::format(" paddle adjust:\n {:2d}", cycles);
     cout << s;
     if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
       carState.DriverInfo = s;

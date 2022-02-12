@@ -79,14 +79,22 @@ void DAC::reset_and_lock_pot() {
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
   if (isLocked) {
-     if (carState.PaddlesJustAdjusted && carState.AccelerationDisplay == 0) {
-     unlock();
-     carState.AccelerationLocked = false;
-     cout << "DAC unlocked." << endl;
-   }else {
-    debug_printf("Motor potentiometer locked!%s", "\n");
-    return;
-   }
+    if (carState.PaddlesJustAdjusted && carState.AccelerationDisplay == 0) {
+      unlock();
+      carState.AccelerationLocked = false;
+      string s = fmt::format("DAC unlocked.\n");
+      cout << s;
+      if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
+        driverDisplay.print(s.c_str());
+      }
+    } else {
+      string s = fmt::format("Motor potentiometer locked!\n");
+      cout << s;
+      if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
+        driverDisplay.print(s.c_str());
+      }
+      return;
+    }
   }
   if (val > DAC_MAX)
     val = DAC_MAX;

@@ -333,7 +333,7 @@ void constantModeOnOffHandler() {
       carState.TargetSpeed = carState.Speed;
       carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
       // TODO: remove line after test
-      //carState.TargetPower = round(carState.MotorCurrent * carState.BatteryVoltage);
+      // carState.TargetPower = round(carState.MotorCurrent * carState.BatteryVoltage);
       carState.ConstantModeOn = true;
     }
   }
@@ -349,7 +349,7 @@ void constantModeHandler() {
       carState.ConstantMode = CONSTANT_MODE::POWER;
       carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
       // TODO: remove line after test
-      //carState.TargetPower = round(carState.MotorCurrent * carState.BatteryVoltage);
+      // carState.TargetPower = round(carState.MotorCurrent * carState.BatteryVoltage);
     }
   }
 }

@@ -102,6 +102,10 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
   uint8_t command = get_cmd(channel);
   uint8_t oldValue = get_pot(channel);
   if (oldValue != val) {
+    //#SEC: Reset constant mode on deceleration paddel touched
+    if (channel == POT_CHAN1 || channel == POT_CHAN_ALL) {
+      carState.ConstantModeOn = false;
+    }
     xSemaphoreTakeT(i2cBus.mutex);
     Wire.beginTransmission(I2C_ADDRESS_DS1803);
     Wire.write(command);

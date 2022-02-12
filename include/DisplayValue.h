@@ -7,6 +7,7 @@
 
 //#define portMAX_DELAY (TickType_t)0x1000UL
 
+#include <LocalFunctionsAndDevices.h>
 #include <definitions.h>
 
 #include <Adafruit_GFX.h>     // graphics library
@@ -17,8 +18,7 @@
 
 #include <Display.h>
 #include <Helper.h>
-#include <LocalFunctionsAndDevices.h>
-#include <SPIBus.h>
+#include <../lib/SPIBus/SPIBus.h>
 
 extern SPIBus spiBus;
 

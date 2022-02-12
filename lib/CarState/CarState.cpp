@@ -66,13 +66,14 @@ const string CarState::print(string msg, bool withColors) {
   // ss << ss.fixed << ss.precision(3) << ss.width(7)
   ss << "Display Status ........ " << DISPLAY_STATUS_str[(int)displayStatus] << endl;
   ss << "Speed ................. " << Speed << endl;
+  ss << "Acceleration locked ... " << BOOL_str[(int)(AccelerationLocked)] << endl;
   ss << "Acceleration .......... " << Acceleration << endl;
   ss << "Deceleration .......... " << Deceleration << endl;
-  ss << "Acceleration Display... " << AccelerationDisplay << endl;
-  ss << "Break pedal pressed.... " << BOOL_str[(int)(BreakPedal)] << endl;
-  ss << "Battery On............. " << BatteryOn << endl;
-  ss << "Battery Voltage........ " << BatteryVoltage << endl;
-  ss << "Battery Current........ " << BatteryCurrent << endl;
+  ss << "Acceleration Display .. " << AccelerationDisplay << endl;
+  ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
+  ss << "Battery On ............ " << BatteryOn << endl;
+  ss << "Battery Voltage ....... " << BatteryVoltage << endl;
+  ss << "Battery Current ....... " << BatteryCurrent << endl;
   ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
   ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent << endl;
   ss << "Motor On .............. " << MotorOn << endl;

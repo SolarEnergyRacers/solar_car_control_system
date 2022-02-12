@@ -69,6 +69,10 @@ public:
     DriverInfo = "ok.";
     DriverInfoType = INFO_TYPE::STATUS;
     Light = LIGHT::OFF;
+
+    // init state flags
+    PaddlesJustAdjusted = false;
+    AccelerationLocked = true;
   }
   ~CarState(){};
 
@@ -76,6 +80,8 @@ public:
   int Speed;               // ADC
   int Acceleration;        // ADC Steering Wheel
   int Deceleration;        // ADC Steering Wheel
+  bool AccelerationLocked; // DSC lock
+  bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
   int AccelerationDisplay; // Display Value (-99...+99)
 
   bool BatteryOn;      // IO-In

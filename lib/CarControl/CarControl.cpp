@@ -47,6 +47,7 @@ void CarControl::init() {
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
+  carState.AccelerationDisplay = -99;
   adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
@@ -220,9 +221,7 @@ void CarControl::adjust_paddles(int seconds) {
   } else {
     engineerDisplay.print(s.c_str());
   }
-  if (carState.AccelerationDisplay == 0) {
-    dac.unlock();
-  }
+  carState.PaddlesJustAdjusted = true;
 }
 
 int CarControl::_normalize(int minDisplayValue, int maxDisplayValue, int minValue, int maxValue, int value) {

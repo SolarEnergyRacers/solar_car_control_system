@@ -16,9 +16,9 @@
 #include <stdlib.h>           /* abs */
 #include <typeinfo>
 
+#include <../lib/SPIBus/SPIBus.h>
 #include <Display.h>
 #include <Helper.h>
-#include <../lib/SPIBus/SPIBus.h>
 
 extern SPIBus spiBus;
 
@@ -78,6 +78,8 @@ public:
     return Value;
   }
 
+  void change_format(string fmt) { Format = fmt; }
+
   void set_epsilon(T theEpsilon) { _epsilon = theEpsilon; }
 
   // check if there is a vaue difference between current and last
@@ -88,7 +90,7 @@ public:
     snprintf(label, 15, "%s", Label.c_str());
     int16_t x1, y1;
     uint16_t w, h;
-    vWidth = atoi(Format.substr(1, 1).c_str()) * TextSize * 6 + 2;
+    vWidth = atoi(Format.substr(1, 1).c_str()) * TextSize * 6 + 4;
     debug_printf_l2("%s -- vFormat %s (%s): %dc --> %dpx\n", Label.c_str(), Format.c_str(), Format.substr(1, 1).c_str(),
                     atoi(Format.substr(1, 1).c_str()), vWidth);
     xSemaphoreTakeT(spiBus.mutex);
@@ -97,6 +99,8 @@ public:
     tft.setCursor(X, Y);
     tft.print(label);
     tft.getTextBounds(label, X, Y, &x1, &y1, &w, &h);
+    if (h == 0)
+      h = TextSize * 8;
     tft.setCursor(X + w + vWidth, Y);
     tft.printf("%s", Unit.c_str());
     xSemaphoreGive(spiBus.mutex);
@@ -136,8 +140,6 @@ public:
   }
 
   void _showValue(Adafruit_ILI9341 tft, const char *value) {
-    // int valX = X + Label.length() * TextSize * 6 * 5;
-
     xSemaphoreTakeT(spiBus.mutex);
     tft.setTextSize(TextSize);
     tft.setTextColor(TextColor);

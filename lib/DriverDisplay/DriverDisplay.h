@@ -33,6 +33,7 @@ private:
 
   DisplayValue<int> Speed = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
   DisplayValue<int> Acceleration = DisplayValue<int>(0, -1, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
+  DisplayValue<float> TargetSpeedPower = DisplayValue<float>(240, 130, " ", "%5.0f", "", ILI9341_WHITE, ILI9341_BLACK);
   DisplayValue<float> MotorCurrent = DisplayValue<float>(10, 180, "Motor:", "%5.1f", "A", ILI9341_ORANGE, ILI9341_BLACK);
   DisplayValue<bool> MotorOn = DisplayValue<bool>(160, 180, "-", "%3s", "", ILI9341_MAROON, ILI9341_BLACK);
   DisplayValue<float> BatteryVoltage = DisplayValue<float>(10, 200, "Bat  :", "%5.1f", "V", ILI9341_ORANGE, ILI9341_BLACK);
@@ -44,6 +45,7 @@ private:
   // ... to avoid flickering
   int speedLast = 1000;
   int accelerationLast = 1000;
+  int targetValueLast = 1000;
   bool blinkOn = true;
   bool justInited = true;
   //=======================================
@@ -65,6 +67,13 @@ private:
   int speedFrameSizeX = 156;
   int speedFrameSizeY = 76;
   int speedTextSize = 8;
+
+  // target speed/power display
+  int targetValueFrameX = -1; // get calculated later: (speedFrameX + speedFrameSizeX + 1;
+  int targetValueFrameY = 118;
+  int targetValueFrameSizeX = 40;
+  int targetValueFrameSizeY = 38;
+  int targetValueTextSize = 4;
 
   // acceleration display
   int accFrameX = 2;
@@ -94,7 +103,7 @@ private:
   // ---- voltage and current displays ---- END
 
   // constant mode speed or power display
-  int constantModeX = 250;
+  int constantModeX = 242; // 250;
   int constantModeY = 158;
   int constantModeTextSize = 2;
 
@@ -111,7 +120,7 @@ private:
   int indicatorHeight = 20;
 
   int lightX = 250;
-  int lightY = 138;
+  int lightY = 198; // 138;
   //==== Driver Display definition ==== END
 
 protected:
@@ -131,6 +140,7 @@ private:
   void draw_display_border(int color);
   void draw_speed_border(int color);
   void draw_acceleration_border(int color);
+  void draw_target_value_border(int color);
   void draw_display_background();
 
   void constant_drive_mode_show();
@@ -139,6 +149,7 @@ private:
   void write_driver_info();
   void write_speed();
   void write_acceleration();
+  void write_target_value();
 
   void show_indicator();
   void show_light();

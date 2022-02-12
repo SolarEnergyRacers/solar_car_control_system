@@ -16,9 +16,9 @@
 #include <stdlib.h>           /* abs */
 #include <typeinfo>
 
+#include <../lib/SPIBus/SPIBus.h>
 #include <Display.h>
 #include <Helper.h>
-#include <../lib/SPIBus/SPIBus.h>
 
 extern SPIBus spiBus;
 

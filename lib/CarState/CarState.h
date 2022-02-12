@@ -77,12 +77,12 @@ public:
   ~CarState(){};
 
   // pyhsical car data (measurment values)
-  int Speed;               // ADC
-  int Acceleration;        // ADC Steering Wheel
-  int Deceleration;        // ADC Steering Wheel
-  bool AccelerationLocked; // DSC lock
+  int Speed;                // ADC
+  int Acceleration;         // ADC Steering Wheel
+  int Deceleration;         // ADC Steering Wheel
+  bool AccelerationLocked;  // DSC lock
   bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
-  int AccelerationDisplay; // Display Value (-99...+99)
+  int AccelerationDisplay;  // Display Value (-99...+99)
 
   bool BatteryOn;      // IO-In
   bool PhotoVoltaicOn; // IO-in

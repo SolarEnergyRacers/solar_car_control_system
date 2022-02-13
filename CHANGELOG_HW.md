@@ -19,14 +19,14 @@ SteeringWheel DB12 | ILI9341:SPI_CS_SDCARD
 ### SteeringWheel Board
 
 
-|Old|New
+Old|New
 --|--|--
-SD Card detect |% | IOExt2:5      
+SD Card detect |% | IOExt2:5  
 ILI C/D Low active	|R to GND	| R to VCC 
 	|	|  
 
 ### Main Board
 
-|Old|New
+Old|New
 --|--|--
  xbee | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug 

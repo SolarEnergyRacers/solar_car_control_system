@@ -8,6 +8,8 @@
  ***/
 
 // standard libraries
+#include <fmt/core.h>
+#include <fmt/format.h>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -306,7 +308,7 @@ void DriverDisplay::write_acceleration() {
 void DriverDisplay::write_driver_info() {
   if (DriverInfo.Value != DriverInfo.ValueLast || justInited) {
     string msg = DriverInfo.get_recent_overtake_last();
-    INFO_TYPE type = DriverInfoType.Value;
+    int color = getColorForInfoType(carState.DriverInfoType);
     int len = msg.length();
     int textSize = infoTextSize;
     if (len > 2 * 17)
@@ -320,7 +322,7 @@ void DriverDisplay::write_driver_info() {
     // tft.setFont(&FreeSans18pt7b);
     tft.setTextSize(textSize);
     tft.setTextWrap(true);
-    tft.setTextColor(getColorForInfoType(type));
+    tft.setTextColor(color);
     tft.setCursor(infoFrameX, infoFrameY);
     tft.print(msg.c_str());
     xSemaphoreGive(spiBus.mutex);
@@ -365,6 +367,16 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     Speed.Value = carState.Speed;
     if (Speed.is_changed() || justInited) {
       write_speed();
+    }
+    if (carState.SpeedArrow == SPEED_ARROW::DECREASE) {
+      arrow_increase(false);
+      arrow_decrease(true);
+    } else if (carState.SpeedArrow == SPEED_ARROW::INCREASE) {
+      arrow_increase(true);
+      arrow_decrease(false);
+    } else {
+      arrow_increase(false);
+      arrow_decrease(false);
     }
     Acceleration.Value = carState.AccelerationDisplay;
     if (Acceleration.is_changed() || justInited) {

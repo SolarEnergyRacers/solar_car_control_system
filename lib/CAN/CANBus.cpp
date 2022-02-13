@@ -10,8 +10,10 @@
 #include <CAN.h>
 
 #include <CANBus.h>
+#include <ESP32SJA1000.h>
 
 extern CANBus can;
+extern ESP32SJA1000Class CAN;
 
 void onReceiveForwarder(int packetSize) { can.onReceive(packetSize); }
 

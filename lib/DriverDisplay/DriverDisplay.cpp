@@ -302,20 +302,6 @@ void DriverDisplay::write_acceleration() {
   }
 }
 
-// void DriverDisplay::write_target_value() {
-//   int value = TargetSpeedPower.get_recent_overtake_last();
-//   if (value >= 0 || value <= 999) {
-//     if (justInited)
-//       targetValueLast = -1;
-//     if (carState.ConstantMode == CONSTANT_MODE::SPEED) {
-//       speedLast = write_nat_999(targetValueFrameX + 4, targetValueFrameY + 4, targetValueLast, value, targetValueTextSize,
-//       ILI9341_WHITE);
-//     } else {
-//       powerLast = write_float(targetValueFrameX + 4, targetValueFrameY + 4, targetValueLast, value, targetValueTextSize, ILI9341_WHITE);
-//     }
-//   }
-// }
-
 // commented out code is preparation for font usage
 void DriverDisplay::write_driver_info() {
   if (DriverInfo.Value != DriverInfo.ValueLast || justInited) {

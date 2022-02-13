@@ -56,12 +56,12 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x14, INPUT_PULLUP, 1, 1, false, 0l, PinNextScreen, nextScreenHandler},
     {0x15, INPUT_PULLUP, 1, 1, false, 0l, PinConstantMode, constantModeHandler},
     {0x16, INPUT_PULLUP, 1, 1, false, 0l, PinIndicatorBtnRight, indicatorHandler},
-    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler},
+    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler}, //#SAVETY#: deceleration unlock const mode
     // IOExtDev1-PortB
     {0x18, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY31, NULL},
     {0x19, INPUT_PULLUP, 1, 1, false, 0l, PinReserve1, NULL},
     {0x1a, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY33, NULL},
-    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler},
+    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler}, //#SAVETY#: lock acceleration
     {0x1c, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY35, NULL},
     {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinSdCardDetect, sdCardDetectHandler},
     {0x1e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
@@ -327,12 +327,12 @@ void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn) {
       cout << "ConstantMode OFF" << endl;
-      carState.ConstantModeOn = false;
+      carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
     } else {
       cout << "ConstantMode ON" << endl;
-      carState.TargetSpeed = carState.Speed;                                        // unit: km/h
+      carState.TargetSpeed = carState.Speed;                                       // unit: km/h
       carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
-      carState.ConstantModeOn = true;
+      carState.ConstantModeOn = true;                                              //#SAVETY#: deceleration unlock const mode
     }
   }
 }
@@ -345,7 +345,7 @@ void constantModeHandler() {
     } else {
       carState.ConstantMode = CONSTANT_MODE::POWER;
     }
-    carState.TargetSpeed = carState.Speed;                                        // unit: km/h
+    carState.TargetSpeed = carState.Speed;                                       // unit: km/h
     carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
   }
 }

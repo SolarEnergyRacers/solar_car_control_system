@@ -43,7 +43,7 @@ void CarState::init_values() {
   Indicator = INDICATOR::OFF;
   DriveDirection = DRIVE_DIRECTION::FORWARD;
   ConstantMode = CONSTANT_MODE::SPEED;
-  ConstantModeOn = false;
+  ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
   SdCardDetect = false;
 
   TargetSpeed = 0;

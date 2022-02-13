@@ -29,4 +29,4 @@ ILI C/D Low active	|R to GND	| R to VCC
 
 Old|New
 --|--|--
- xbee | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug 
+ LTC4311 | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug 

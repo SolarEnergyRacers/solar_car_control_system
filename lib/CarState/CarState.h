@@ -119,8 +119,8 @@ public:
   bool IndicatorBlink;
   bool SdCardDetect;
 
-  int TargetSpeed;
-  int TargetPower;
+  float TargetSpeed;
+  float TargetPower;
   string DriverInfo;
   SPEED_ARROW SpeedArrow;
   INFO_TYPE DriverInfoType;

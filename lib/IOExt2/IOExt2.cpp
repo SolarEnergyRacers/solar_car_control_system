@@ -330,10 +330,8 @@ void constantModeOnOffHandler() {
       carState.ConstantModeOn = false;
     } else {
       cout << "ConstantMode ON" << endl;
-      carState.TargetSpeed = carState.Speed;
-      carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
-      // TODO: remove line after test
-      // carState.TargetPower = round(carState.MotorCurrent * carState.BatteryVoltage);
+      carState.TargetSpeed = carState.Speed;                                        // unit: km/h
+      carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
       carState.ConstantModeOn = true;
     }
   }
@@ -344,13 +342,11 @@ void constantModeHandler() {
     printf("Constant mode toggle\n");
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
       carState.ConstantMode = CONSTANT_MODE::SPEED;
-      carState.TargetSpeed = carState.Speed;
     } else {
       carState.ConstantMode = CONSTANT_MODE::POWER;
-      carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
-      // TODO: remove line after test
-      // carState.TargetPower = round(carState.MotorCurrent * carState.BatteryVoltage);
     }
+    carState.TargetSpeed = carState.Speed;                                        // unit: km/h
+    carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
   }
 }
 

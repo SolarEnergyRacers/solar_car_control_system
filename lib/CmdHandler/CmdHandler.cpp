@@ -139,16 +139,16 @@ void CmdHandler::task() {
           carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
           break;
         case 'u':
-          if (string("off") == string(&input[2])) {
-            debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
+          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
+            debug_printf("Speed arrow UP (%s):%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
+            debug_printf("Speed arrow DOWN (%s):%s-->on\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
           break;
         case 'd':
-          if (string("off") == string(&input[2])) {
+          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
             debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {

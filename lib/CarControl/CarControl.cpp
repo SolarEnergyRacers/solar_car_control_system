@@ -223,7 +223,7 @@ void CarControl::adjust_paddles(int seconds) {
   } else {
     engineerDisplay.print(s.c_str());
   }
-  // SAFTY
+  //#SAFTY#
   carState.PaddlesJustAdjusted = true;
 }
 

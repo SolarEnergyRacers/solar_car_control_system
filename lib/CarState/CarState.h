@@ -87,6 +87,7 @@ public:
   bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
   int AccelerationDisplay;  // Display Value (-99...+99)
   //#SAVETY-END#
+
   bool BatteryOn;      // IO-In
   bool PhotoVoltaicOn; // IO-in
   bool MotorOn;        // IO-In

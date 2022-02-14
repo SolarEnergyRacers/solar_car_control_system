@@ -19,7 +19,7 @@
 
 ### SteeringWheel Board
 
-| Old                | New      |          |
+|                    | Old      | New      |
 | ------------------ | -------- | -------- |
 | SD Card detect     | %        | IOExt2:5 |
 | ILI C/D Low active | R to GND | R to VCC |
@@ -29,10 +29,10 @@
 
 | Old     | New                      |                                             |
 | ------- | ------------------------ | ------------------------------------------- |
-| xbee    | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug                 |
+| Serial Tranceiver | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug                 |
 | LTC4311 | Integrate into mainboard | remark: near ESP32 SDA,SCL or near MCP23017 |
 
 |                    | Old      | New      |
 | ------------------ | -------- | -------- |
 | SD Card detect | % | IOExt2:5 |
-|ILI C/D Low active	| R to GND	| R to VCC |  
+| ILI C/D Low active	| R to GND	| R to VCC |  

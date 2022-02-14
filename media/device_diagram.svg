@@ -23,15 +23,15 @@
      guidetolerance="10"
      inkscape:pageopacity="0"
      inkscape:pageshadow="2"
-     inkscape:window-width="2560"
-     inkscape:window-height="1369"
+     inkscape:window-width="3840"
+     inkscape:window-height="2137"
      id="namedview954"
      showgrid="false"
-     inkscape:zoom="1"
-     inkscape:cx="652.30099"
-     inkscape:cy="478.53849"
-     inkscape:window-x="677"
-     inkscape:window-y="2160"
+     inkscape:zoom="1.4142136"
+     inkscape:cx="54.628356"
+     inkscape:cy="465.54068"
+     inkscape:window-x="0"
+     inkscape:window-y="0"
      inkscape:window-maximized="1"
      inkscape:current-layer="layer1"
      inkscape:document-rotation="0"
@@ -54,12 +54,12 @@
      transform="translate(0,-87)"
      id="layer1">
     <rect
-       y="205.86859"
-       x="105.66096"
-       height="20.208067"
-       width="29.90983"
+       y="206.11671"
+       x="102.76412"
+       height="41.804543"
+       width="30.64032"
        id="rect815"
-       style="fill:#87cdde;fill-opacity:1;stroke:#000000;stroke-width:1.301;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill" />
+       style="fill:#87cdde;fill-opacity:1;stroke:#000000;stroke-width:1.89394033;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-opacity:1;paint-order:stroke markers fill" />
     <rect
        y="182.42664"
        x="4.4973741"
@@ -73,9 +73,10 @@
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        id="path836"
-       d="M 11.088398,208.00035 V 96.546759 H 275.08248"
+       d="M 11.088398,208.00035 V 96.546759 l 229.382682,0"
        style="fill:none;stroke:#000000;stroke-width:0.260178px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccc" />
     <rect
        y="91.083466"
        x="144.55226"
@@ -455,7 +456,7 @@
            id="tspan987-4-8"
            x="261.19626"
            y="122.04156"
-           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.76111126px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458299">IOExt2</tspan></text>
+           style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.76111126px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458299">IOExt1</tspan></text>
     </g>
     <rect
        style="fill:#ffdd55;fill-opacity:1;stroke:#000000;stroke-width:0.856713;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
@@ -474,23 +475,6 @@
          y="284.0929"
          x="157.27856"
          id="tspan987-4-8-2">IOExt0</tspan></text>
-    <rect
-       style="fill:#ffdd55;fill-opacity:1;stroke:#000000;stroke-width:0.856713;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
-       id="rect985-5-8-8-7"
-       width="27.435654"
-       height="16.208141"
-       x="118.97073"
-       y="273.39893" />
-    <text
-       id="text989-0-0-6-8"
-       y="284.05136"
-       x="120.24178"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       xml:space="preserve"><tspan
-         style="font-size:7.05556px;stroke-width:0.264583"
-         y="284.05136"
-         x="120.24178"
-         id="tspan987-4-8-2-2">IOExt1</tspan></text>
     <rect
        style="fill:#ffdd55;fill-opacity:1;stroke:#000000;stroke-width:0.856713;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect985-5-8-8-7-9"
@@ -526,41 +510,36 @@
          y="224.02899"
          x="34.271278">Gyro &amp; Acc</tspan></text>
     <rect
-       style="fill:#87deaa;fill-opacity:1;stroke:#000000;stroke-width:0.94271;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
+       style="fill:#87deaa;fill-opacity:1;stroke:#000000;stroke-width:0.94270998;stroke-linecap:round;stroke-linejoin:round;stroke-miterlimit:4;stroke-dasharray:none;stroke-dashoffset:0;stroke-opacity:1;paint-order:stroke markers fill"
        id="rect985-5-8-8-7-9-2-1"
        width="33.397278"
        height="16.122145"
-       x="101.73019"
-       y="239.47057" />
+       x="149.2507"
+       y="136.94597" />
     <text
        id="text989-0-0-6-8-2-8-3"
-       y="250.08"
-       x="102.95827"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="147.36832"
+       x="151.41423"
+       style="font-style:normal;font-weight:normal;font-size:10.58329964px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458299"
        xml:space="preserve"><tspan
          id="tspan1287-2"
-         style="font-size:7.05556px;stroke-width:0.264583"
-         y="250.08"
-         x="102.95827">SD Card</tspan></text>
+         style="font-size:7.05556011px;stroke-width:0.26458299"
+         y="147.36832"
+         x="151.41423">SD Card</tspan></text>
     <path
        id="path1338"
-       d="M 11.091685,286.96473 H 117.49182"
-       style="fill:none;stroke:#000000;stroke-width:0.261354px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       inkscape:connector-curvature="0" />
-    <path
-       id="path1340"
-       d="m 100.77953,222.51359 h -3.377345 v 23.6455"
-       style="fill:none;stroke:#000000;stroke-width:0.191628px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="M 11.091685,284.94607 H 154.93197"
+       style="fill:none;stroke:#000000;stroke-width:0.30387735px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        inkscape:connector-curvature="0" />
     <text
        id="text961-1"
-       y="220.634"
-       x="94.37719"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
+       y="216.14388"
+       x="139.83974"
+       style="font-style:normal;font-weight:normal;font-size:10.58329964px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458299"
        xml:space="preserve"><tspan
-         style="font-size:4.23333px;stroke-width:0.264583"
-         y="220.634"
-         x="94.37719"
+         style="font-size:4.23332977px;stroke-width:0.26458299"
+         y="216.14388"
+         x="139.83974"
          id="tspan959-3">SPI</tspan></text>
     <rect
        y="275.62073"
@@ -682,8 +661,9 @@
        style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
     <path
        id="path1494"
-       d="M 97.565103,246.16221 H 100.0692"
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1" />
+       d="m 11.178645,245.71719 h 3.231701"
+       style="fill:none;stroke:#000000;stroke-width:0.30057436px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       inkscape:connector-curvature="0" />
     <path
        id="path1496"
        d="M 57.121652,241.81548 H 59.34226"
@@ -720,15 +700,15 @@
          style="font-size:16px"
          id="flowPara1536" /></flowRoot>    <text
        xml:space="preserve"
-       style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
-       x="107.94481"
+       style="font-style:normal;font-weight:normal;font-size:10.58329964px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458299"
+       x="106.3573"
        y="218.53749"
        id="text4661"><tspan
          sodipodi:role="line"
          id="tspan4659"
-         x="107.94481"
+         x="106.3573"
          y="218.53749"
-         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05556px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:0.264583">ESP32</tspan></text>
+         style="font-style:normal;font-variant:normal;font-weight:bold;font-stretch:normal;font-size:7.05556011px;font-family:sans-serif;-inkscape-font-specification:'sans-serif Bold';stroke-width:0.26458299">ESP32</tspan></text>
     <text
        xml:space="preserve"
        style="font-style:normal;font-weight:normal;font-size:10.5833px;line-height:1.25;font-family:sans-serif;letter-spacing:0px;word-spacing:0px;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.264583"
@@ -746,33 +726,19 @@
        id="path4679"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 274.90838,96.539257 v 9.990813"
-       id="path4681"
-       inkscape:connector-curvature="0" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.24564181px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 97.012964,230.33638 H 140.34646 V 101.36773 h 45.59931 v 4.10929"
+       style="fill:none;stroke:#000000;stroke-width:0.17590392px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 135.40778,217.74673 4.04544,0 -0.56127,-116.379 47.05382,0 v 3.70815"
        id="path4683"
-       inkscape:connector-curvature="0" />
+       inkscape:connector-curvature="0"
+       sodipodi:nodetypes="ccccc" />
     <path
-       id="path4689"
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 150.01875,262.33958 v -29.36875 m -36.77708,53.975 v -24.60625 h 41.80416" />
-    <circle
-       id="path4691"
-       style="fill:#000000;stroke:none;stroke-width:0.264583"
-       cx="150.01875"
-       cy="232.97083"
-       r="0.39687499" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 150.01875,232.97083 h 4.49791"
+       style="fill:none;stroke:#000000;stroke-width:0.26458299px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 150.01875,230.07096 h 4.49791"
        id="path4693"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 150.01875,262.33958 v 24.34167 h 5.02708"
+       style="fill:none;stroke:#000000;stroke-width:0.28293857px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 150.02273,230.16009 v 27.88718 h 5.0179"
        id="path4695"
        inkscape:connector-curvature="0" />
     <text
@@ -874,11 +840,6 @@
        cy="154.78645"
        rx="1.7859781"
        ry="1.9182698" />
-    <path
-       style="fill:none;stroke:#000000;stroke-width:0.264583px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="M 264.05416,132.16458 279.4,150.95"
-       id="path4844"
-       inkscape:connector-curvature="0" />
     <text
        xml:space="preserve"
        style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23332977px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458299"
@@ -965,24 +926,6 @@
        style="fill:none;stroke:#000000;stroke-width:0.238199px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 184.61642,222.44109 h 11.28871 v 6.26028 h 4.15133"
        id="path1071-8" />
-    <rect
-       style="fill:#ffdd55;fill-opacity:1;stroke:#010000;stroke-width:0.52916667;stroke-opacity:1;stroke-miterlimit:4;stroke-dasharray:none"
-       id="rect992"
-       width="28.363075"
-       height="23.264095"
-       x="259.09192"
-       y="107.063" />
-    <text
-       xml:space="preserve"
-       style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:4.23333311px;line-height:1.25;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;letter-spacing:0px;word-spacing:0px;writing-mode:lr-tb;text-anchor:start;fill:#000000;fill-opacity:1;stroke:none;stroke-width:0.26458332"
-       x="259.88864"
-       y="121.56322"
-       id="text996"><tspan
-         sodipodi:role="line"
-         id="tspan994"
-         x="259.88864"
-         y="121.56322"
-         style="font-style:normal;font-variant:normal;font-weight:normal;font-stretch:normal;font-size:7.76111126px;font-family:sans-serif;-inkscape-font-specification:'sans-serif, Normal';font-variant-ligatures:normal;font-variant-caps:normal;font-variant-numeric:normal;font-feature-settings:normal;text-align:start;writing-mode:lr-tb;text-anchor:start;stroke-width:0.26458332">IOExt3</tspan></text>
     <path
        style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        d="m 211.28898,96.546347 0.15934,10.197963"
@@ -1004,14 +947,19 @@
        id="path1004"
        inkscape:connector-curvature="0" />
     <path
-       style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 264.05416,132.16458 v 19.57917"
-       id="path1008"
+       style="fill:none;stroke:#000000;stroke-width:0.41144779px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
+       d="m 241.94438,132.13111 37.65868,20.09055"
+       id="path1010"
        inkscape:connector-curvature="0" />
     <path
        style="fill:none;stroke:#000000;stroke-width:0.26458332px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
-       d="m 241.88286,132.07986 16.35047,19.13472"
-       id="path1010"
+       d="m 150.01923,258.05836 v 26.59379"
+       id="path996"
+       inkscape:connector-curvature="0" />
+    <path
+       id="path1494-8"
+       d="m 11.183368,221.79219 h 3.496285"
+       style="fill:none;stroke:#000000;stroke-width:0.31263652px;stroke-linecap:butt;stroke-linejoin:miter;stroke-opacity:1"
        inkscape:connector-curvature="0" />
   </g>
 </svg>

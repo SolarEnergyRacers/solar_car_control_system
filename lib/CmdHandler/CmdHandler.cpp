@@ -31,6 +31,7 @@
 #include <IOExt2.h>
 #include <Indicator.h>
 #include <SDCard.h>
+#include <system.h>
 
 extern I2CBus i2cBus;
 extern DAC dac;
@@ -64,179 +65,160 @@ void CmdHandler::exit() {
 // ------------------
 
 void CmdHandler::task() {
-
+  string state;
   while (1) {
+    try {
+      while (Serial.available() > 0) {
+        // read the incoming chars:
+        String input = Serial.readString();
+        Serial.flush();
 
-    while (Serial.available() > 0) {
-      // read the incoming chars:
-      String input = Serial.readString();
-      Serial.flush();
+        if (input.endsWith("\n")) {
+          input = input.substring(0, input.length() - 1);
+        }
+        if (input.endsWith("\r")) {
+          input = input.substring(0, input.length() - 1);
+        }
 
-      if (input.endsWith("\n")) {
-        input = input.substring(0, input.length() - 1);
-      }
-      if (input.endsWith("\r")) {
-        input = input.substring(0, input.length() - 1);
-      }
+        debug_printf("Received: %s\n", input.c_str());
 
-      debug_printf("Received: %s\n", input.c_str());
+        if (input.length() < 1 || commands.find(input[0], 0) == -1) {
+          input = "h"; // help
+        }
 
-      if (input.length() < 1 || commands.find(input[0], 0) == -1) {
-        input = "h"; // help
-      }
-
-      int intValue = 0;
-      float floatValue = 0.0;
-      if (input.length() > 1) {
-        intValue = atoi(&input[1]);
-        floatValue = atof(&input[1]);
-      }
-      switch (input[0]) {
-      // ---------------- controller commands
-      case 'R':
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-        driverDisplay.re_init();
-        break;
-      case 'C':
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-        driverDisplay.clear_screen(ILI9341_WHITE);
-        break;
-      case 'D':
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
-        break;
-      case 'E':
-        driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-        engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
-        break;
-      case 'S':
-        printSystemValues();
-        cout << carState.print("Recent State") << endl;
-        if (input[1] == 'J') {
-          string state = carState.serialize("Recent State");
-          cout << state;
+        switch (input[0]) {
+        // ---------------- controller commands
+        case 'R':
+          engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+          driverDisplay.re_init();
+          break;
+        case 'C':
+          driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
+          engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+          driverDisplay.clear_screen(ILI9341_WHITE);
+          break;
+        case 'D':
+          engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+          driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
+          break;
+        case 'E':
+          driverDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
+          engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
+          break;
+        case 's':
+          cout << carState.print("Recent State") << endl;
+          printSystemValues();
+          break;
+        case 'S':
+          cout << carState.print("Recent State:") << endl;
+          break;
+        case 'J':
+          state = carState.serialize("Recent State");
+          cout << state << endl;
           sdCard.write(state + "\n");
-          cout << endl << "Writing on sd card ready." << endl;
-        }
-        break;
-      case 's':
-        if (input[2] == 'f') {
-          carState.DriveDirection = DRIVE_DIRECTION::FORWARD;
-        } else if (input[2] == 'b') {
-          carState.DriveDirection = DRIVE_DIRECTION::BACKWARD;
-        } else {
-          carState.Speed = intValue;
-        }
-        break;
-      case 'b':
-        carState.BatteryVoltage = floatValue;
-        break;
-      case 'B':
-        carState.BatteryCurrent = floatValue;
-        break;
-      case 'p':
-        carState.PhotoVoltaicCurrent = floatValue;
-        break;
-      case 'm':
-        carState.MotorCurrent = floatValue;
-        break;
-      case '-':
-        carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
-        break;
-      case 'a':
-        carState.Acceleration = intValue;
-        if (intValue > 0) {
-          dac.set_pot(intValue, DAC::POT_CHAN0);
-          dac.set_pot(0, DAC::POT_CHAN1);
-        } else if (intValue < 0) {
-          dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(intValue, DAC::POT_CHAN1);
-        } else {
-          dac.set_pot(0, DAC::POT_CHAN0);
-          dac.set_pot(0, DAC::POT_CHAN1);
-        }
-        break;
-
-      // -------------- chase car commands
-      case 'u':
-        if (string("off") == string(&input[2])) {
-          debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          carState.SpeedArrow = SPEED_ARROW::OFF;
-        } else {
-          debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          carState.SpeedArrow = SPEED_ARROW::INCREASE;
-        }
-        break;
-      case 'd':
-        if (string("off") == string(&input[2])) {
-          debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
-          carState.SpeedArrow = SPEED_ARROW::OFF;
-        } else {
-          debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
-          carState.SpeedArrow = SPEED_ARROW::DECREASE;
-        }
-        break;
-      case ':':
-        carState.DriverInfoType = INFO_TYPE::INFO;
-        carState.DriverInfo = &input[1];
-        break;
-      case '!':
-        carState.DriverInfoType = INFO_TYPE::WARN;
-        carState.DriverInfo = &input[1];
-        break;
-      // -------------- steering wheel input element emulators
-      case '<':
-        indicator.setIndicator(INDICATOR::LEFT);
-        break;
-      case '>':
-        indicator.setIndicator(INDICATOR::RIGHT);
-        break;
-      case 'w':
-        indicator.setIndicator(INDICATOR::WARN);
-        break;
-      case 'l':
-        if (input[1] == '-') {
-          carState.Light = LIGHT::OFF;
-        } else {
-          carState.Light = LIGHT::L1;
-        }
-        break;
-      case 'L':
-        if (input[1] == '-') {
-          carState.Light = LIGHT::OFF;
-        } else {
-          carState.Light = LIGHT::L2;
-        }
-        break;
-      case 'c':
-        if (input[2] == 's') {
-          carState.ConstantMode = CONSTANT_MODE::SPEED;
-          carState.ConstantModeOn = true;
-        } else if (input[2] == 'p') {
-          carState.ConstantMode = CONSTANT_MODE::POWER;
-          carState.ConstantModeOn = true;
-        } else {
-          if (carState.ConstantModeOn) {
-            carState.ConstantModeOn = false;
+          break;
+        case 'V':
+          state = carState.csv("Recent State");
+          cout << state;
+          sdCard.write(state);
+          break;
+        case 'P': {
+          sdCard.directory();
+        } break;
+        case 'U':
+          sdCard.unmount();
+          break;
+        case 'M':
+          sdCard.logEnabled = sdCard.mount();
+          break;
+        case 'H':
+          memory_info();
+          break;
+        // -------------- chase car commands
+        case '-':
+          carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
+          break;
+        case 'u':
+          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
+            debug_printf("Speed arrow UP (%s):%s-->off\n", input.c_str(), &input[2]);
+            carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            carState.ConstantModeOn = false;
+            debug_printf("Speed arrow DOWN (%s):%s-->on\n", input.c_str(), &input[2]);
+            carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
+          break;
+        case 'd':
+          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
+            debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
+            carState.SpeedArrow = SPEED_ARROW::OFF;
+          } else {
+            debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
+            carState.SpeedArrow = SPEED_ARROW::DECREASE;
+          }
+          break;
+        case ':':
+          carState.DriverInfoType = INFO_TYPE::INFO;
+          carState.DriverInfo = &input[1];
+          break;
+        case '!':
+          carState.DriverInfoType = INFO_TYPE::WARN;
+          carState.DriverInfo = &input[1];
+          break;
+        // -------------- steering wheel input element emulators
+        case '<':
+          indicator.setIndicator(INDICATOR::LEFT);
+          break;
+        case '>':
+          indicator.setIndicator(INDICATOR::RIGHT);
+          break;
+        case 'w':
+          indicator.setIndicator(INDICATOR::WARN);
+          break;
+        case 'l':
+          if (input[1] == '-') {
+            carState.Light = LIGHT::OFF;
+          } else {
+            carState.Light = LIGHT::L1;
+          }
+          break;
+        case 'L':
+          if (input[1] == '-') {
+            carState.Light = LIGHT::OFF;
+          } else {
+            carState.Light = LIGHT::L2;
+          }
+          break;
+        case 'c':
+          if (input[2] == 's') {
+            carState.ConstantMode = CONSTANT_MODE::SPEED;
+            carState.ConstantModeOn = true;
+          } else if (input[2] == 'p') {
+            carState.ConstantMode = CONSTANT_MODE::POWER;
+            carState.ConstantModeOn = true;
+          } else {
+            if (carState.ConstantModeOn) {
+              carState.ConstantModeOn = false;
+            } else {
+              carState.ConstantModeOn = false;
+            }
+          }
+          break;
+        case 'i':
+          ioExt.readAll();
+          break;
+        case 'I':
+          i2cBus.scan_i2c_devices();
+          break;
+        default:
+          cout << "ERROR:: Unknown command '" << input << "' " << endl << helpText << endl;
+          break;
+        case 'h':
+          cout << helpText << endl;
+          break;
         }
-        break;
-      case 'i':
-        ioExt.readAll();
-        break;
-      case 'I':
-        i2cBus.scan_i2c_devices();
-        break;
-      default:
-        cout << "ERROR:: Unknown command '" << input << "' " << endl << helpText << endl;
-        break;
-      case 'h':
-        cout << helpText << endl;
-        break;
       }
+    } catch (exception &ex) {
+      cout << "Exception:" << ex.what() << endl;
     }
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

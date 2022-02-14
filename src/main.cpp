@@ -75,7 +75,7 @@ DAC dac;
 DriverDisplay driverDisplay;
 EngineerDisplay engineerDisplay;
 ESP32Time esp32time;
-GPInputOutput gpio; // I2C Interrupts
+GPInputOutput gpio; // I2C Interrupts, GPIO pin settings
 GyroAcc gyroAcc;
 Indicator indicator; // INDICATOR_ON
 IOExt2 ioExt;
@@ -97,7 +97,7 @@ void app_main(void) {
 
   // init serial output for  console
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUDRATE);
   delay(300);
   cout << endl;
   cout << "--------------------" << endl;
@@ -108,6 +108,8 @@ void app_main(void) {
   // report chip info
   cout << "-chip info -------------------" << endl;
   chip_info();
+  cout << "-gpio pin settings ----------" << endl;
+  gpio.init();
   cout << "-init bus systems ------------" << endl;
   // init buses
   spiBus.init();
@@ -142,11 +144,7 @@ void app_main(void) {
   if (RTC_ON) {
     rtc.init();
   }
-  if (SD_ON) {
-    sdCard.init();
-  }
   if (INT_ON) {
-    gpio.init();
     gpio.register_gpio_interrupt();
   }
   if (IOEXT2_ON) {
@@ -160,6 +158,12 @@ void app_main(void) {
   }
   if (CAN_ON) {
     can.init();
+  }
+  if (SD_ON) {
+    sdCard.init();
+  }
+  if (CARSPEED_ON) {
+    carSpeed.init();
   }
   if (!startOk) {
     cout << "ERROR in init sequence(s). System halted!" << endl;
@@ -216,10 +220,6 @@ void app_main(void) {
     cout << " - read_can_demo_task" << endl;
     can.create_task();
   }
-  if (CARSPEED_ON) {
-    carSpeed.create_task();
-    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
-  }
   if (CARCONTROL_ON) {
     carControl.init();
     carControl.create_task();
@@ -233,6 +233,10 @@ void app_main(void) {
     ioExt.create_task();
     engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
     ioExt.readAll();
+  }
+  if (CARSPEED_ON) {
+    carSpeed.create_task();
+    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
   }
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;

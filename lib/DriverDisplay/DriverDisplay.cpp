@@ -104,6 +104,15 @@ void DriverDisplay::draw_acceleration_border(int color) {
   xSemaphoreGive(spiBus.mutex);
 }
 
+// write color of the border of the acceleration display
+void DriverDisplay::draw_target_value_border(int color) {
+  targetValueFrameX = speedFrameX + speedFrameSizeX + 1;
+  targetValueFrameSizeX = tft.width() - accFrameSizeX - speedFrameSizeX - 6;
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.drawRoundRect(targetValueFrameX, targetValueFrameY, targetValueFrameSizeX, targetValueFrameSizeY, 4, color);
+  xSemaphoreGive(spiBus.mutex);
+}
+
 void DriverDisplay::draw_display_background() {
   xSemaphoreTakeT(spiBus.mutex);
   infoFrameSizeX = tft.width();
@@ -113,6 +122,7 @@ void DriverDisplay::draw_display_background() {
   draw_display_border(ILI9341_GREEN);
   draw_speed_border(ILI9341_YELLOW);
   draw_acceleration_border(ILI9341_YELLOW);
+  draw_target_value_border(ILI9341_YELLOW);
 }
 
 void DriverDisplay::_arrow_increase(int color) {
@@ -153,8 +163,8 @@ void DriverDisplay::arrow_increase(bool on) {
   _arrow_increase(color);
 }
 
-#define SPEED_STRING "Speed"
-#define POWER_STRING "Power"
+#define SPEED_STRING " Speed"
+#define POWER_STRING " Power"
 void DriverDisplay::constant_drive_mode_show() {
   CONSTANT_MODE mode = ConstantMode.get_recent_overtake_last();
   bool isOn = ConstantModeOn.get_recent_overtake_last();
@@ -343,6 +353,7 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     MotorCurrent.showLabel(tft);
     MotorCurrent.set_epsilon(0.1);
     MotorOn.showLabel(tft);
+    TargetSpeedPower.showLabel(tft);
     set_SleepTime(300);
     status = DISPLAY_STATUS::DRIVER_RUNNING;
     break;
@@ -371,6 +382,16 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (Acceleration.is_changed() || justInited) {
       write_acceleration();
     }
+    TargetSpeedPower.Value = carState.ConstantMode == CONSTANT_MODE::SPEED ? carState.TargetSpeed : carState.TargetPower;
+    if (TargetSpeedPower.is_changed() || justInited) {
+      // write_target_value()
+      if (carState.ConstantMode == CONSTANT_MODE::SPEED)
+        TargetSpeedPower.change_format("%5.0f");
+      else
+        TargetSpeedPower.change_format("%3.1f");
+      TargetSpeedPower.showValue(tft);
+    }
+
     DriveDirection.Value = carState.DriveDirection;
     if (DriveDirection.Value != DriveDirection.ValueLast || justInited) {
       write_drive_direction();

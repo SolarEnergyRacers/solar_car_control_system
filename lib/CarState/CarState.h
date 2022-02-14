@@ -114,6 +114,8 @@ public:
 
   bool BreakPedal;
 
+  int ReferenceSolarCell;
+
   // logical car data (values set by driver or chase car)
   DISPLAY_STATUS displayStatus;
   DRIVE_DIRECTION DriveDirection;

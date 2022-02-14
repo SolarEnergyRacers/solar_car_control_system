@@ -81,6 +81,11 @@ bool CarControl::read_pv_data() {
   return true;
 }
 
+bool CarControl::read_reference_cell_data() {
+  carState.ReferenceSolarCell = adc.read(ADC::Pin::REFERENCE_CELL);
+  return true;
+}
+
 bool CarControl::read_speed() {
   // native input
   // xSemaphoreTakeT(carControl.mutex);
@@ -244,6 +249,7 @@ void CarControl::task() {
     someThingChanged |= read_battery_data();
     someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
+    someThingChanged |= read_reference_cell_data();
 
     _handle_indicator();
 

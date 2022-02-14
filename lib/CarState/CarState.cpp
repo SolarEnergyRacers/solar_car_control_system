@@ -38,6 +38,7 @@ void CarState::init_values() {
   BatteryVoltage = 0;
   BatteryCurrent = 0;
   PhotoVoltaicCurrent = 0;
+  ReferenceSolarCell = 0;
   MotorCurrent = 0;
 
   Indicator = INDICATOR::OFF;
@@ -76,6 +77,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Battery Current ....... " << BatteryCurrent << endl;
   ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
   ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent << endl;
+  ss << "Photo Reference Cell .. " << ReferenceSolarCell << endl;
   ss << "Motor On .............. " << MotorOn << endl;
   ss << "Motor Current ......... " << MotorCurrent << endl;
   ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection)] << endl;

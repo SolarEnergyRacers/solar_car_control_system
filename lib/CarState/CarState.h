@@ -62,22 +62,31 @@ public:
     Indicator = INDICATOR::OFF;
     DriveDirection = DRIVE_DIRECTION::FORWARD;
     ConstantMode = CONSTANT_MODE::SPEED;
-    ConstantModeOn = false;
+
+    ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
 
     TargetSpeed = 0;
     TargetPower = 0;
     DriverInfo = "ok.";
     DriverInfoType = INFO_TYPE::STATUS;
     Light = LIGHT::OFF;
+
+    // init state flags
+    //#SAVETY#: acceleration lock
+    PaddlesJustAdjusted = false;
+    AccelerationLocked = true;
   }
   ~CarState(){};
 
   // pyhsical car data (measurment values)
-  int Speed;               // ADC
-  int Acceleration;        // ADC Steering Wheel
-  int Deceleration;        // ADC Steering Wheel
-  int AccelerationDisplay; // Display Value (-99...+99)
-
+  int Speed;        // ADC
+  int Acceleration; // ADC Steering Wheel
+  int Deceleration; // ADC Steering Wheel
+  //#SAVETY#: acceleration lock
+  bool AccelerationLocked;  // DSC lock
+  bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
+  int AccelerationDisplay;  // Display Value (-99...+99)
+  //#SAVETY-END#
   bool BatteryOn;      // IO-In
   bool PhotoVoltaicOn; // IO-in
   bool MotorOn;        // IO-In
@@ -108,12 +117,13 @@ public:
   DISPLAY_STATUS displayStatus;
   DRIVE_DIRECTION DriveDirection;
   CONSTANT_MODE ConstantMode;
-  bool ConstantModeOn;
+  bool ConstantModeOn; //#SAVETY#: deceleration unlock const mode
   INDICATOR Indicator;
   bool IndicatorBlink;
+  bool SdCardDetect;
 
-  int TargetSpeed;
-  int TargetPower;
+  float TargetSpeed;
+  float TargetPower;
   string DriverInfo;
   SPEED_ARROW SpeedArrow;
   INFO_TYPE DriverInfoType;

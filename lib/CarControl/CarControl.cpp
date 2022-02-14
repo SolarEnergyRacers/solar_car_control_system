@@ -47,6 +47,7 @@ void CarControl::init() {
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
+  carState.AccelerationDisplay = -99;
   adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
@@ -146,8 +147,8 @@ bool CarControl::read_paddles() {
 }
 
 void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
-  debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-               valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
+  // debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+  //              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
 
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
@@ -163,13 +164,12 @@ void CarControl::adjust_paddles(int seconds) {
   int x, y;
   int16_t value;
 
+  dac.reset_and_lock_pot();
+
   ads_min_acc = 50000;
   ads_min_dec = 50000;
   ads_max_acc = 0;
   ads_max_dec = 0;
-
-  cout << DISPLAY_STATUS_str[(int)engineerDisplay.get_DisplayStatus()] << " | "
-       << DISPLAY_STATUS_str[(int)driverDisplay.get_DisplayStatus()] << endl;
 
   int cycles = (seconds * 10);
   if (cycles < 1)
@@ -183,7 +183,7 @@ void CarControl::adjust_paddles(int seconds) {
     engineerDisplay.getCursor(x, y);
   }
   while (cycles-- > 0) {
-    s = fmt::format(" {}", cycles);
+    s = fmt::format(" paddle adjust:\n {:2d}", cycles);
     cout << s;
     if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
       carState.DriverInfo = s;
@@ -218,6 +218,8 @@ void CarControl::adjust_paddles(int seconds) {
   } else {
     engineerDisplay.print(s.c_str());
   }
+  // SAFTY
+  carState.PaddlesJustAdjusted = true;
 }
 
 int CarControl::_normalize(int minDisplayValue, int maxDisplayValue, int minValue, int maxValue, int value) {

@@ -9,6 +9,7 @@
 | MainBoard DB12     | ESP32:14              |
 | SteeringWheel DB12 | ILI9341:SPI_CS_SDCARD |
 
+
 ### GPIO Pin 36 is not usable
 
 |                    | Old      | New      |
@@ -30,3 +31,8 @@
 | ------- | ------------------------ | ------------------------------------------- |
 | xbee    | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug                 |
 | LTC4311 | Integrate into mainboard | remark: near ESP32 SDA,SCL or near MCP23017 |
+
+|                    | Old      | New      |
+| ------------------ | -------- | -------- |
+| SD Card detect | % | IOExt2:5 |
+|ILI C/D Low active	| R to GND	| R to VCC |  

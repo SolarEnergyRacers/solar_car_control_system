@@ -9,9 +9,13 @@
 #include <Arduino.h>
 #include <CAN.h>
 
+#include <CarState.h>
 #include <CANBus.h>
 
+
+extern CarState carState;
 extern CANBus can;
+
 
 void onReceiveForwarder(int packetSize) { can.onReceive(packetSize); }
 
@@ -108,6 +112,8 @@ CANBus::CANBus(){
   this->ages[MPPT3_BASE_ADDR | 0x4] = INT32_MAX;
   this->ages[MPPT3_BASE_ADDR | 0x5] = INT32_MAX;
   this->ages[MPPT3_BASE_ADDR | 0x6] = INT32_MAX;
+
+  
 }
 
 string CANBus::getName() { return "CAN_Task"; }
@@ -156,10 +162,15 @@ void CANBus::task() {
         // heartbeat packet.getData_ui32(0)
         break;
       case BMS_BASE_ADDR | 0xFA:
+        carState.BatteryVoltage = (float)packet.getData_ui32(0) / 1000.0;
+        carState.Uavg = carState.BatteryVoltage / 30; //
+        carState.BatteryCurrent = (float)packet.getData_i32(1) / 1000.0;
         // Battery Voltage mV packet.getData_ui32(0)
         // Battery Current mA packet.getData_i32(1)
         break;
       case BMS_BASE_ADDR | 0xF8:
+        carState.Umin = packet.getData_ui16(0);
+        carState.Umax = packet.getData_ui16(1);
         // Battery min Cell Voltage mV packet.getData_ui16(0)
         // Battery max Cell Voltage mV packet.getData_ui16(1)
         // CMU number with min Cell Voltage packet.getData_ui8(4)
@@ -172,7 +183,6 @@ void CANBus::task() {
         // Contactor 2 driver error packet.getData_b(1)
         // Contactor 1 driver output status packet.getData_b(2)
         // Contactor 2 driver output status packet.getData_b(3)
-
         // 12V contactor supply OK packet.getData_b(4)
         // Contactor 3 driver error packet.getData_b(5)
         // Contactor 3 driver output status packet.getData_b(6)
@@ -186,10 +196,40 @@ void CANBus::task() {
             4=Run
             5=Enable Pack
         */
+        switch(packet.getData_ui8(1)){
+          case 0:
+            carState.PrechargeState = PRECHARGE_STATE::ERROR;
+            break;
+          case 1:
+            carState.PrechargeState = PRECHARGE_STATE::IDLE;
+            break;
+          case 2:
+            carState.PrechargeState = PRECHARGE_STATE::MEASURE;
+            break;
+          case 3:
+            carState.PrechargeState = PRECHARGE_STATE::PRECHARGE;
+            break;
+          case 4:
+            carState.PrechargeState = PRECHARGE_STATE::RUN;
+            break;
+          case 5:
+            carState.PrechargeState = PRECHARGE_STATE::ENABLE_PACK;
+            break;
+        }
+    
 
         // Precharge Timer info also available
         break;
       case BMS_BASE_ADDR | 0xFD:
+        carState.BatteryErrors.clear();
+        
+        if(packet.getData_ui32(0) > 0){ // Saving CPU time in case there are no errors
+          for(int i = 0; i < 13; i++){
+            if(packet.getData_b(i)){
+              carState.BatteryErrors.push_front(static_cast<BATTERY_ERROR>(i));
+            }
+          }
+        }
         // Cell over voltage packet.getData_b(0)
         // Cell under voltage packet.getData_b(1)
         // Cell over Temp packet.getData_b(2)
@@ -199,7 +239,7 @@ void CANBus::task() {
         // Vehicle Comm Timeout packet.getData_b(5)
         // BMU in Setup Mode packet.getData_b(6)
         // CMU CAN Power Status packet.getData_b(7)
-
+      
         // Pack isolation test fail packet.getData_b(8)
         // SOC measurement invalid packet.getData_b(9)
         // CAN 12V in low, about to shutdown packet.getData_b(10)
@@ -208,14 +248,23 @@ void CANBus::task() {
         // Extra Cell present packet.getData_b(12)
         break;
       case MPPT1_BASE_ADDR | 0x1:
+        carState.Mppt1Current = packet.getData_f32(1);
+        //carState.PhotoVoltaicCurrent = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+
         // MPPT1 Output Voltage V packet.getData_f32(0)
         // MPPT1 Output Current A packet.getData_f32(1)
         break;
       case MPPT2_BASE_ADDR | 0x1:
+        carState.Mppt2Current = packet.getData_f32(1);
+        //carState.PhotoVoltaicCurrent = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+
         // MPPT2 Output Voltage V packet.getData_f32(0)
         // MPPT2 Output Current A packet.getData_f32(1)
         break;
       case MPPT3_BASE_ADDR | 0x1:
+        carState.Mppt3Current = packet.getData_f32(1);
+        //carState.PhotoVoltaicCurrent = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+
         // MPPT3 Output Voltage V packet.getData_f32(0)
         // MPPT3 Output Current A packet.getData_f32(1)
         break;

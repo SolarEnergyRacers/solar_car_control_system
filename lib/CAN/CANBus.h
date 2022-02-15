@@ -4,6 +4,7 @@
 
 #include <map>
 
+#include <CarState.h>
 #include "CANRxBuffer.h"
 #include "abstract_task.h"
 
@@ -24,10 +25,12 @@ public:
   void init(void);
   void exit(void);
   void task(void);
+  void startBattery(void);
 
   // void create_task(void);
 
   void onReceive(int packetSize);
+
 
   SemaphoreHandle_t mutex;
 };

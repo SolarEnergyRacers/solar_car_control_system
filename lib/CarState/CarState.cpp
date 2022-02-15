@@ -37,7 +37,6 @@ void CarState::init_values() {
   Deceleration = 0;
   BatteryVoltage = 0;
   BatteryCurrent = 0;
-  PhotoVoltaicCurrent = 0;
   MotorCurrent = 0;
 
   Indicator = INDICATOR::OFF;
@@ -71,8 +70,12 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Battery On............. " << BatteryOn << endl;
   ss << "Battery Voltage........ " << BatteryVoltage << endl;
   ss << "Battery Current........ " << BatteryCurrent << endl;
+  ss << "Battery Errors ........." << batteryErrorsAsString();
+  ss << "Battery Precharge State " << PRECHARGE_STATE_str[(int)(PrechargeState)];
   ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
-  ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent << endl;
+  ss << "MPPT1 Current ......... " << Mppt1Current << endl;
+  ss << "MPPT2 Current ......... " << Mppt2Current << endl;
+  ss << "MPPT3 Current ......... " << Mppt3Current << endl;
   ss << "Motor On .............. " << MotorOn << endl;
   ss << "Motor Current ......... " << MotorCurrent << endl;
   ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection)] << endl;
@@ -113,7 +116,6 @@ const string CarState::serialize(string msg) {
   cJSON_AddNumberToObject(dynData, "batteryVoltage", floor(BatteryVoltage * 1000.0 + .5) / 1000.0);
   cJSON_AddNumberToObject(dynData, "batteryCurrent", floor(BatteryCurrent * 1000.0 + .5) / 1000.0);
   cJSON_AddBoolToObject(dynData, "pvOn", PhotoVoltaicOn);
-  cJSON_AddNumberToObject(dynData, "pvCurrent", floor(PhotoVoltaicCurrent * 1000.0 + .5) / 1000.0);
   cJSON_AddBoolToObject(dynData, "motorOn", MotorOn);
   cJSON_AddNumberToObject(dynData, "motorCurrent", floor(MotorCurrent * 1000.0 + .5) / 1000.0);
 
@@ -163,8 +165,9 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "batteryOn, ";
     ss << "batteryVoltage, ";
     ss << "batteryCurrent, ";
+    ss << "batteryErrors, ";
+    ss << "batteryPrechargeState, ";
     ss << "pvOn, ";
-    ss << "pvCurrent, ";
     ss << "motorOn, ";
     ss << "motorCurrent, ";
 
@@ -204,8 +207,9 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << BatteryOn << ", ";
   ss << floor(BatteryVoltage * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(BatteryCurrent * 1000.0 + .5) / 1000.0 << ", ";
+  ss << batteryErrorsAsString();
+  ss << PRECHARGE_STATE_str[(int)(PrechargeState)];
   ss << PhotoVoltaicOn << ", ";
-  ss << floor(PhotoVoltaicCurrent * 1000.0 + .5) / 1000.0 << ", ";
   ss << MotorOn << ", ";
   ss << floor(MotorCurrent * 1000.0 + .5) / 1000.0 << ", ";
 
@@ -279,4 +283,15 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
     return ss.str();
   else
     return "";
+}
+
+const string CarState::batteryErrorsAsString(){
+  stringstream ss;
+  ss << "[";
+  for (auto const& battErr : BatteryErrors) {
+    ss << BATTERY_ERROR_str[(int)(battErr)] << "-";
+  }
+  ss << "]";
+
+  return ss.str();
 }

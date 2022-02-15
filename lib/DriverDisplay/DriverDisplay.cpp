@@ -386,7 +386,7 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (BatteryOn.is_changed() || justInited) {
       BatteryOn.showValue(tft);
     }
-    PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent;
+    PhotoVoltaicCurrent.Value = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
     if (PhotoVoltaicCurrent.is_changed() || justInited) {
       PhotoVoltaicCurrent.showValue(tft);
     }

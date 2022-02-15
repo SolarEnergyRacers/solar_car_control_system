@@ -75,11 +75,6 @@ bool CarControl::read_motor_data() {
   return true;
 }
 
-bool CarControl::read_pv_data() {
-  carState.PhotoVoltaicCurrent = adc.read(ADC::Pin::PV_CURRENT) / 100.; // TODO
-  return true;
-}
-
 bool CarControl::read_speed() {
   // native input
   // xSemaphoreTakeT(carControl.mutex);
@@ -240,7 +235,6 @@ void CarControl::task() {
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();
     someThingChanged |= read_battery_data();
-    someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
 
     _handle_indicator();

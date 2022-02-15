@@ -214,8 +214,8 @@ void app_main(void) {
     xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
-    cout << " - read_can_demo_task" << endl;
     can.create_task();
+    engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");
   }
   if (CARSPEED_ON) {
     carSpeed.create_task();

@@ -5,8 +5,6 @@
 #ifndef SER_DISPLAYVALUE_H
 #define SER_DISPLAYVALUE_H
 
-//#define portMAX_DELAY (TickType_t)0x1000UL
-
 #include <LocalFunctionsAndDevices.h>
 #include <definitions.h>
 
@@ -16,9 +14,8 @@
 #include <stdlib.h>           /* abs */
 #include <typeinfo>
 
-#include <../lib/SPIBus/SPIBus.h>
-#include <Display.h>
 #include <Helper.h>
+#include <SPIBus.h>
 
 extern SPIBus spiBus;
 

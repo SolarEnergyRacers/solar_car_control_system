@@ -47,7 +47,7 @@ void CarControl::init() {
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
-  adjust_paddles(5); // manually adjust paddles (5s handling time)
+  //adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
   cout << s;
@@ -213,6 +213,7 @@ void CarControl::adjust_paddles(int seconds) {
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   cout << s;
+  sssss
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
     carState.DriverInfo = fmt::format("==> dec {:5}-{:5}       ==> acc {:5}-{:5}", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   } else {

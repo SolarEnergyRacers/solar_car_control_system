@@ -35,9 +35,9 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x01, INPUT_PULLUP, 1, 1, false, 0l, PinPvOnOff, pvOnOffHandler},
     {0x02, INPUT_PULLUP, 1, 1, false, 0l, PinMcOnOff, mcOnOffHandler},
     {0x03, INPUT_PULLUP, 1, 1, false, 0l, PinEcoPower, ecoPowerHandler},
-    {0x04, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
+    {0x04, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY04, NULL},
     {0x05, INPUT_PULLUP, 1, 1, false, 0l, PinFwdBwd, fwdBwdHandler},
-    {0x06, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY07, NULL},
+    {0x06, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
     {0x07, OUTPUT, 0, 0, false, 0l, PinHornOut, NULL},
     // IOExtDev0-PortB
     {0x08, OUTPUT, 0, 0, false, 0l, PinIndicatorOutLeft, NULL},
@@ -46,8 +46,8 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x0b, OUTPUT, 0, 0, false, 0l, PinLightOut, NULL},
     {0x0c, OUTPUT, 0, 0, false, 0l, PinHeadLightOut, NULL},
     {0x0d, INPUT_PULLUP, 1, 1, false, 0l, PinBreakPedal, breakPedalHandler},
-    {0x0e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
-    {0x0f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY17, NULL},
+    {0x0e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY14, NULL},
+    {0x0f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY15, NULL},
     // IOExtDev1-PortA
     {0x10, INPUT_PULLUP, 1, 1, false, 0l, PinIndicatorBtnLeft, indicatorHandler},
     {0x11, INPUT_PULLUP, 1, 1, false, 0l, PinHeadLight, headLightHandler},
@@ -255,7 +255,11 @@ void fwdBwdHandler() {
 }
 
 void breakPedalHandler() {
+#if UCC_12V
   carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
+#else // UCC_5V
+  carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
+#endif
   printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
 }
 

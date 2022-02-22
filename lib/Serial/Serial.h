@@ -7,14 +7,15 @@
 
 #include <SoftwareSerial.h>
 
-void serial_demo_task(void *pvParameter);
-
-class Uart {
+class Uart : public abstract_task {
 private:
 public:
   SoftwareSerial serial;
   void init();
   void re_init();
+  string getName() { return "Serial"; };
+  void exit(void);
+  void task(void);
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_SERIAL_H

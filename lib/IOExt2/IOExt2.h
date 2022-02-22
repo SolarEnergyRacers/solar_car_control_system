@@ -19,15 +19,15 @@
 #include <CarStatePin.h>
 #include <Indicator.h>
 
+// IOExtDevX
 #define PinBatOnOff "BatOnOff"
 #define PinPvOnOff "PvOnOff"
 #define PinMcOnOff "McOnOff"
 #define PinEcoPower "EcoPower"
+#define PinDUMMY04 "DUMMY04"
 #define PinFwdBwd "FwdBwd"
 #define PinDUMMY06 "DUMMY06"
-#define PinDUMMY07 "DUMMY07"
 #define PinRelais11 "Relais11"
-// IOExt1
 #define PinIndicatorOutLeft "IndicatorOutLeft"
 #define PinIndicatorOutRight "IndicatorOutRight"
 #define PinFanOut "PinFanOut"
@@ -35,8 +35,8 @@
 #define PinLightOut "PinLightOut"
 #define PinBreakPedal "BreakPedal"
 #define PinHeadLightOut "PinHeadLightOut"
-#define PinDUMMY17 "DUMMY17"
-// IOExt2
+#define PinDUMMY14 "DUMMY14"
+#define PinDUMMY15 "DUMMY15"
 #define PinIndicatorBtnLeft "IndicatorBtnLeft"
 #define PinIndicatorBtnRight "IndicatorBtnRight"
 #define PinLight "Light"
@@ -45,7 +45,6 @@
 #define PinConstantModeOn "ConstantModeOn"
 #define PinHorn "Horn"
 #define PinNextScreen "NextScreen"
-// IOExt3
 #define PinDUMMY31 "DUMMY31"
 #define PinReserve1 "Reserve1"
 #define PinDUMMY33 "DUMMY33"

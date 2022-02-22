@@ -211,7 +211,8 @@ void app_main(void) {
   }
   if (SERIAL_ON) {
     cout << " - serial_demo_task" << endl;
-    xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    uart.create_task();
+    // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
     cout << " - read_can_demo_task" << endl;

@@ -57,7 +57,7 @@
  */
 #define SERIAL_RX 16
 #define SERIAL_TX 17
-#define SERIAL_BAUDRATE 115200
+#define SERIAL_BAUDRATE 9600 /*115200*/
 
 /*
  * CAN Bus

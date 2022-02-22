@@ -50,7 +50,7 @@
 #define PinDUMMY33 "DUMMY33"
 #define PinPaddleAdjust "PaddleAdjust"
 #define PinDUMMY35 "DUMMY35"
-#define PinDUMMY36 "DUMMY36"
+#define PinSdCardDetect "PinSdCardDetect"
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
@@ -70,6 +70,7 @@ void headLightHandler();
 void constantModeHandler();
 void constantModeOnOffHandler();
 void paddleAdjustHandler();
+void sdCardDetectHandler();
 // end pin handler
 
 class IOExt2 : public abstract_task {

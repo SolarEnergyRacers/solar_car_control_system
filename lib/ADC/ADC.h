@@ -23,6 +23,7 @@ public:
     // ADC1
     BAT_VOLTAGE = 0x10,
     MOTOR_VOLTAGE = 0x11,
+    REFERENCE_CELL = 0x12,
     // ADC2 (steering wheel)
     STW_ACC = 0x20,
     STW_DEC = 0x21

@@ -139,16 +139,16 @@ void CmdHandler::task() {
           carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
           break;
         case 'u':
-          if (string("off") == string(&input[2])) {
-            debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
+          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
+            debug_printf("Speed arrow UP (%s):%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
+            debug_printf("Speed arrow DOWN (%s):%s-->on\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
           break;
         case 'd':
-          if (string("off") == string(&input[2])) {
+          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
             debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
@@ -191,15 +191,15 @@ void CmdHandler::task() {
         case 'c':
           if (input[2] == 's') {
             carState.ConstantMode = CONSTANT_MODE::SPEED;
-            carState.ConstantModeOn = true;
+            carState.ConstantModeOn = true; //#SAVETY#: deceleration unlock const mode
           } else if (input[2] == 'p') {
             carState.ConstantMode = CONSTANT_MODE::POWER;
-            carState.ConstantModeOn = true;
+            carState.ConstantModeOn = true; //#SAVETY#: deceleration unlock const mode
           } else {
             if (carState.ConstantModeOn) {
-              carState.ConstantModeOn = false;
+              carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
             } else {
-              carState.ConstantModeOn = false;
+              carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
             }
           }
           break;

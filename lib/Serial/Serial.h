@@ -10,10 +10,11 @@
 class Uart : public abstract_task {
 private:
 public:
-  SoftwareSerial serial;
+  //use default Serial2 
+  //SoftwareSerial Serial2; 
   void init();
   void re_init();
-  string getName() { return "Serial"; };
+  string getName() { return "SerialRadio"; };
   void exit(void);
   void task(void);
 };

@@ -7,12 +7,15 @@
  */
 
 // standard libraries
+#include <Streaming.h>
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 
 // FreeRTOS / Arduino
 #include <Arduino.h>
+#include <SoftwareSerial.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/FreeRTOSConfig.h>
 #include <freertos/semphr.h>
@@ -98,24 +101,30 @@ void app_main(void) {
   // init serial output for  console
 
   Serial.begin(SERIAL_BAUDRATE);
+  Serial2.begin(SERIAL2_BAUDRATE, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
   delay(300);
-  cout << endl;
-  cout << "--------------------" << endl;
-  cout << "esp32dev + free RTOS" << endl;
-  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << endl;
-  cout << "--------------------" << endl;
+  cout << _EndLineCode::endl;
+  cout << "--------------------" << _EndLineCode::endl;
+  cout << "esp32dev + free RTOS" << _EndLineCode::endl;
+  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED <<_EndLineCode:: endl;
+  cout << "--------------------" << _EndLineCode::endl;
+
+  Serial2 << "--------------------" << _EndLineCode::endl;
+  Serial2 << "esp32dev + free RTOS" << _EndLineCode::endl;
+  Serial2 << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << _EndLineCode::endl;
+  Serial2 << "--------------------" << _EndLineCode::endl;
 
   // report chip info
-  cout << "-chip info -------------------" << endl;
+  cout << "-chip info -------------------" << _EndLineCode::endl;
   chip_info();
-  cout << "-gpio pin settings ----------" << endl;
+  cout << "-gpio pin settings ----------" << _EndLineCode::endl;
   gpio.init();
-  cout << "-init bus systems ------------" << endl;
+  cout << "-init bus systems ------------" << _EndLineCode::endl;
   // init buses
   spiBus.init();
   oneWireBus.init();
   i2cBus.init();
-  cout << "------------------------------" << endl;
+  cout << "------------------------------" << _EndLineCode::endl;
 
   engineerDisplay.init();
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
@@ -166,16 +175,16 @@ void app_main(void) {
     carSpeed.init();
   }
   if (!startOk) {
-    cout << "ERROR in init sequence(s). System halted!" << endl;
+    cout << "ERROR in init sequence(s). System halted!" << _EndLineCode::endl;
     exit(0);
   }
 
   engineerDisplay.print("Startup sequence(s) successful.\n");
   engineerDisplay.print("System creating FreeRTOS tasks...\n");
-  cout << endl;
-  cout << "-----------------------------------------------------------------" << endl;
-  cout << "Startup sequence(s) successful. System creating FreeRTOS tasks..." << endl;
-  cout << "-----------------------------------------------------------------" << endl << endl;
+  cout << _EndLineCode::endl;
+  cout << "-----------------------------------------------------------------" << _EndLineCode::endl;
+  cout << "Startup sequence(s) successful. System creating FreeRTOS tasks..." << _EndLineCode::endl;
+  cout << "-----------------------------------------------------------------" << _EndLineCode::endl << _EndLineCode::endl;
 
   // ---- create tasks ----
   if (INDICATOR_ON) {
@@ -206,19 +215,19 @@ void app_main(void) {
 
   if (DAC_ON) {
     dac.init();
-    cout << " - DAC DAC DAC" << endl;
+    cout << " - DAC DAC DAC" << _EndLineCode::endl;
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
   if (SERIAL_ON) {
-    cout << " - serial_demo_task" << endl;
+    cout << " - serial_demo_task" <<_EndLineCode::endl;
     uart.create_task();
     // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
-    cout << " - read_can_demo_task" << endl;
+    cout << " - read_can_demo_task" << _EndLineCode::endl;
     can.create_task();
   }
   if (CARCONTROL_ON) {
@@ -260,7 +269,7 @@ void app_main(void) {
     driverDisplay.init();
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
     driverDisplay.create_task(16);
-    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << endl;
+    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << _EndLineCode::endl;
   }
 
   systemOk = true;
@@ -269,9 +278,9 @@ void app_main(void) {
 #if IOEXT_ON || IOEXT2_ON
   ioExt.readAll();
 #endif
-  cout << "-----------------------------------------------------------------" << endl;
-  cout << "Creating FreeRTOS tasks successful. System running." << endl;
-  cout << "-----------------------------------------------------------------" << endl;
-  cout << endl;
-  cout << carState.print("Initial car state:") << endl;
+  cout << "-----------------------------------------------------------------" << _EndLineCode::endl;
+  cout << "Creating FreeRTOS tasks successful. System running." << _EndLineCode::endl;
+  cout << "-----------------------------------------------------------------" << _EndLineCode::endl;
+  cout << _EndLineCode::endl;
+  cout << carState.print("Initial car state:") << _EndLineCode::endl;
 }

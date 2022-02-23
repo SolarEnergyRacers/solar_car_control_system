@@ -193,7 +193,7 @@ public:
   const string printIOs(string msg, bool withColors = true, bool deltaOnly = false);
   const string serialize(string msg = "");
   const string csv(string msg = "", bool withHeader = false);
-  const string batteryErrorsAsString();
+  const string batteryErrorsAsString( bool verbose = false);
 };
 
 #endif // CARSTATE_H

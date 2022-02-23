@@ -285,7 +285,7 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
     return "";
 }
 
-const string CarState::batteryErrorsAsString( bool verbose = false ){
+const string CarState::batteryErrorsAsString( bool verbose /*= false*/ ){
   stringstream ss;
 
   ss << "[";

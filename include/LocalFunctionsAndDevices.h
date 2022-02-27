@@ -21,6 +21,8 @@
 #define SD_ON true               // SD card
 #define SERIAL_ON true          // write/read to/from console
 
+#define VCC_12V true
+
 #define DEBUGLEVEL_VERBOSED true
 
 #define WithTaskSuspend false // use of FreeRTOS task suspend functionality

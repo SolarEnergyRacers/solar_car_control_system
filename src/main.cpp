@@ -32,6 +32,7 @@
 #include <CANBus.h>
 #include <CarSpeed.h>
 #include <CmdHandler.h>
+#include <Console.h>
 #include <DAC.h>
 #include <Display.h>
 #include <DriverDisplay.h>
@@ -69,6 +70,7 @@ using namespace std;
 ADC adc;
 CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
 OneWireBus oneWireBus;
+Console console;
 SPIBus spiBus;
 I2CBus i2cBus;
 Temp ds; // temperature
@@ -106,13 +108,16 @@ void app_main(void) {
   cout << _EndLineCode::endl;
   cout << "--------------------" << _EndLineCode::endl;
   cout << "esp32dev + free RTOS" << _EndLineCode::endl;
-  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED <<_EndLineCode:: endl;
+  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << _EndLineCode::endl;
   cout << "--------------------" << _EndLineCode::endl;
 
-  Serial2 << "--------------------" << _EndLineCode::endl;
-  Serial2 << "esp32dev + free RTOS" << _EndLineCode::endl;
-  Serial2 << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << _EndLineCode::endl;
-  Serial2 << "--------------------" << _EndLineCode::endl;
+  // Serial2 << "--------------------" << _EndLineCode::endl;
+  // Serial2 << "esp32dev + free RTOS" << _EndLineCode::endl;
+  // Serial2 << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << _EndLineCode::endl;
+  // Serial2 << "--------------------" << _EndLineCode::endl;
+
+  string msg = "blabla";
+  console << msg << _EndLineCode::endl;
 
   // report chip info
   cout << "-chip info -------------------" << _EndLineCode::endl;
@@ -222,7 +227,7 @@ void app_main(void) {
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
   if (SERIAL_ON) {
-    cout << " - serial_demo_task" <<_EndLineCode::endl;
+    cout << " - serial_demo_task" << _EndLineCode::endl;
     uart.create_task();
     // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
@@ -269,7 +274,8 @@ void app_main(void) {
     driverDisplay.init();
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
     driverDisplay.create_task(16);
-    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << _EndLineCode::endl;
+    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "."
+         << _EndLineCode::endl;
   }
 
   systemOk = true;

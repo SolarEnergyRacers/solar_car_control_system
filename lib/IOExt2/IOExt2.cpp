@@ -255,11 +255,11 @@ void fwdBwdHandler() {
 }
 
 void breakPedalHandler() {
-#if UCC_12V
-  carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
-#else // UCC_5V
-  carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
-#endif
+  if (VCC_12V) { // break pedal relais works only with 12V
+    carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
+  } else { // UCC_5V
+    carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
+  }
   printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
 }
 

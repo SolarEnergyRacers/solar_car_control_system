@@ -17,6 +17,7 @@
 
 #include <ADC.h>
 #include <CarState.h>
+#include <Console.h>
 #include <Display.h>
 #include <Helper.h>
 #include <SDCard.h>
@@ -39,6 +40,7 @@ extern SPIBus spiBus;
 extern ADC adc;
 extern CarState carState;
 extern SDCard sdCard;
+extern Console console;
 
 using namespace std;
 
@@ -58,7 +60,7 @@ string Display::getName() { return "Display"; };
 
 void Display::init() {
   abstract_task::init();
-  cout << endl;
+  console << "\n";
   re_init();
 }
 
@@ -74,8 +76,8 @@ void Display::re_init(void) {
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(&spiBus.spi, SPI_DC, SPI_CS_TFT, SPI_RST);
 
 void Display::_setup() {
-  cout << "    Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
-       << ", SPI_MISO=" << SPI_MISO << ", SPI_CS_TFT=" << SPI_CS_TFT << endl;
+  console << "    Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
+          << ", SPI_MISO=" << SPI_MISO << ", SPI_CS_TFT=" << SPI_CS_TFT << "\n";
   height = 0;
   width = 0;
   try {
@@ -109,14 +111,14 @@ void Display::_setup() {
     printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
     printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
   } catch (__exception ex) {
-    cout << "[x] Display: Unable to initialize screen 'ILI9341'." << endl;
+    console << "[x] Display: Unable to initialize screen 'ILI9341'.\n";
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  cout << "[v] '" << getName() << "' Display inited: screen 'ILI9341' with " << height << " x " << width
-       << ". Status: " << DISPLAY_STATUS_str[(int)carState.displayStatus] << endl;
+  console << "[v] '" << getName() << "' Display inited: screen 'ILI9341' with " << height << " x " << width
+          << ". Status: " << DISPLAY_STATUS_str[(int)carState.displayStatus] << "\n";
 }
 
 void Display::clear_screen(int bgColor) {
@@ -195,7 +197,7 @@ void exit(void) {}
 // writes Display::float value  in the range from -9999.9 to 9999.9
 float Display::write_float(int x, int y, float valueLast, float value, int textSize, int color) {
   if (value < -9999.9 || value > 9999.9) {
-    cout << "ERROR: call _write_float with a value outside the range: '" << value << "'" << endl;
+    console << "ERROR: call _write_float with a value outside the range: '" << value << "'\n";
     return value;
   }
   int digitWidth = textSize * 6;
@@ -269,7 +271,7 @@ float Display::write_float(int x, int y, float valueLast, float value, int textS
 // writes integer value in the range from -99 to +99
 int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize, bool justInited, int color, int bgColor) {
   if (value < -99 || value > 999) {
-    cout << "ERROR: call write_ganz_99 with a value outside the range: '" << value << "'" << endl;
+    console << "ERROR: call write_ganz_99 with a value outside the range: '" << value << "'\n";
     return value;
   }
   // determine the sign of new and old value
@@ -322,7 +324,7 @@ int Display::write_ganz_99(int x, int y, int valueLast, int value, int textSize,
 // writes integer value in the range from 0 to 999
 int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize, int color) {
   if (value < 0 || value > 999) {
-    cout << "ERROR: call _write_nat_999 with a value outside the range: '" << value << "'" << endl;
+    console << "ERROR: call _write_nat_999 with a value outside the range: '" << value << "'\n";
     return value;
   }
   int digitWidth = textSize * 6;
@@ -384,7 +386,7 @@ void Display::lifeSign() {
   unsigned long allSeconds = millis() / 1000;
   if (secLast < allSeconds) {
     secLast = allSeconds;
-    cout << getTimeStamp(allSeconds) << endl;
+    console << getTimeStamp(allSeconds) << "\n";
   }
 }
 #endif

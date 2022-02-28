@@ -16,6 +16,7 @@
 #include <Arduino.h>
 
 #include <CarState.h>
+#include <Console.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
@@ -28,14 +29,15 @@
 extern CarState carState;
 extern DriverDisplay driverDisplay;
 extern I2CBus i2cBus;
+extern Console console;
 
 void DAC::re_init() { reset_and_lock_pot(); }
 
 void DAC::init() {
-  cout << "[?] Setup 'DAC'..." << endl;
+  console << "[?] Setup 'DAC'...\n";
   reset_and_lock_pot();
   string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:x}.\n", I2C_ADDRESS_DS1803);
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 }
 
@@ -85,13 +87,13 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
       unlock();
       carState.AccelerationLocked = false;
       string s = fmt::format("DAC unlocked.\n");
-      cout << s;
+      console << s;
       if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
         driverDisplay.print(s.c_str());
       }
     } else {
       string s = fmt::format("Motor potentiometer locked!\n");
-      cout << s;
+      console << s;
       if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
         driverDisplay.print(s.c_str());
       }

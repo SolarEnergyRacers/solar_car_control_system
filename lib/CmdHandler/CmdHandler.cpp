@@ -23,6 +23,7 @@
 #include <CarState.h>
 #include <CarStatePin.h>
 #include <CmdHandler.h>
+#include <Console.h>
 #include <DAC.h>
 #include <Display.h>
 #include <DriverDisplay.h>
@@ -44,6 +45,7 @@ extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 extern SDCard sdCard;
+extern Console console;
 
 using namespace std;
 
@@ -55,7 +57,7 @@ void CmdHandler::re_init() { init(); }
 void CmdHandler::init() {
   // nothing to do, i2c bus is getting initialized externally
   string s = "[v] " + getName() + " initialized.\n";
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 }
 
@@ -68,10 +70,17 @@ void CmdHandler::task() {
   string state;
   while (1) {
     try {
-      while (Serial.available() > 0) {
+      while (Serial.available() || Serial2.available()) {
         // read the incoming chars:
-        String input = Serial.readString();
-        Serial.flush();
+        String input = "";
+        if (Serial.available()) {
+          input = Serial.readString();
+          Serial.flush();
+        }
+        if (Serial2.available()) {
+          input = Serial2.readString();
+          Serial2.flush();
+        }
 
         if (input.endsWith("\n")) {
           input = input.substring(0, input.length() - 1);
@@ -106,20 +115,20 @@ void CmdHandler::task() {
           engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_SETUP);
           break;
         case 's':
-          cout << carState.print("Recent State") << endl;
+          console << carState.print("Recent State") << "\n";
           printSystemValues();
           break;
         case 'S':
-          cout << carState.print("Recent State:") << endl;
+          console << carState.print("Recent State:") << "\n";
           break;
         case 'J':
           state = carState.serialize("Recent State");
-          cout << state << endl;
+          console << state << "\n";
           sdCard.write(state + "\n");
           break;
         case 'V':
           state = carState.csv("Recent State");
-          cout << state;
+          console << state;
           sdCard.write(state);
           break;
         case 'P': {
@@ -210,15 +219,15 @@ void CmdHandler::task() {
           i2cBus.scan_i2c_devices();
           break;
         default:
-          cout << "ERROR:: Unknown command '" << input << "' " << endl << helpText << endl;
+          console << "ERROR:: Unknown command '" << input << "' \n" << helpText << "\n";
           break;
         case 'h':
-          cout << helpText << endl;
+          console << helpText << "\n";
           break;
         }
       }
     } catch (exception &ex) {
-      cout << "Exception:" << ex.what() << endl;
+      console << "Exception:" << ex.what() << "\n";
     }
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
@@ -229,18 +238,18 @@ void CmdHandler::printSystemValues() {
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
   string s = fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
-  cout << s;
+  console << s;
 
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->value == 0) {
         s = fmt::format("{}: SET {:#04x}", pin->name, pin->port);
-        cout << s << endl;
+        console << s << "\n";
       }
     }
   }
   s = fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0),
                   dac.get_pot(DAC::pot_chan::POT_CHAN1));
-  cout << s << endl;
+  console << s << "\n";
 }

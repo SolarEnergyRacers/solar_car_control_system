@@ -48,7 +48,7 @@ void CarControl::init() {
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
   carState.AccelerationDisplay = -99;
-  //adjust_paddles(5); // manually adjust paddles (5s handling time)
+  // adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
   cout << s;

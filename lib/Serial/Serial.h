@@ -14,7 +14,7 @@ public:
   // SoftwareSerial Serial2;
   void init();
   void re_init();
-  string getName() { return "SerialRadio"; };
+  string getName() { return "SerialWire-SerialRadio"; };
   void exit(void);
   void task(void);
 };

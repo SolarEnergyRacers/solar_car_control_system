@@ -97,18 +97,18 @@ bool systemOk = false;
 
 void app_main(void) {
 
-  // init serial output for  console
-  Serial.begin(SERIAL_BAUDRATE);
-  Serial2.begin(SERIAL2_BAUDRATE, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
-  delay(300);
+  if (SERIAL_ON) {
+    // init console IO and radio console
+    uart.init();
+  }
 
   // init arduino library
   initArduino();
 
   console << "\n--------------------\n";
   console << "esp32dev + free RTOS\n";
-  console << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << "\n";
-  console << "--------------------\n";
+  console << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED;
+  console << "\n--------------------\n";
 
   // report chip info
   console << "-chip info -------------------\n";
@@ -157,9 +157,6 @@ void app_main(void) {
   }
   if (DAC_ON) {
     dac.init();
-  }
-  if (SERIAL_ON) {
-    uart.init();
   }
   if (CAN_ON) {
     can.init();

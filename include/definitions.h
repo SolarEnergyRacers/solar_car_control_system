@@ -76,12 +76,12 @@
 #define CAN_TASK_WAIT 50
 
 /* CAN Frame max ages
-*  ------------------
-*  in ms
-*  0 = update every time
-*  -1 = ignore frames
-*  BMS
-*/
+ *  ------------------
+ *  in ms
+ *  0 = update every time
+ *  -1 = ignore frames
+ *  BMS
+ */
 #define MAXAGE_BMU_HEARTBEAT 0
 #define MAXAGE_CMU_TEMP 0
 #define MAXAGE_CMU_VOLTAGES 0
@@ -97,8 +97,8 @@
 #define MAXAGE_EXT_PACK_STATUS 0
 
 /*
-*  MPPTs
-*/
+ *  MPPTs
+ */
 #define MAXAGE_MPPT_INPUT 0
 #define MAXAGE_MPPT_OUTPUT 0
 #define MAXAGE_MPPT_TEMP 0
@@ -106,7 +106,6 @@
 #define MAXAGE_MPPT_LIMITS 0
 #define MAXAGE_MPPT_STATUS 0
 #define MAXAGE_MPPT_POWER_CONN 5000
-
 
 /*
  *  SPI

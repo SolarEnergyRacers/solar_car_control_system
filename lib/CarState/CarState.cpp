@@ -285,21 +285,21 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
     return "";
 }
 
-const string CarState::batteryErrorsAsString( bool verbose /*= false*/ ){
+const string CarState::batteryErrorsAsString(bool verbose /*= false*/) {
   stringstream ss;
 
   ss << "[";
-  
-  if(verbose){
-    for (auto const& battErr : BatteryErrors) {
+
+  if (verbose) {
+    for (auto const &battErr : BatteryErrors) {
       ss << BATTERY_ERROR_str[(int)(battErr)] << "-";
     }
-  }else{
-    for (auto const& battErr : BatteryErrors) {
+  } else {
+    for (auto const &battErr : BatteryErrors) {
       ss << (int)(battErr) << "-";
     }
   }
-  
+
   ss << "]";
 
   return ss.str();

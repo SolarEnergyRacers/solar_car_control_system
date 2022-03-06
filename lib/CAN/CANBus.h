@@ -4,9 +4,9 @@
 
 #include <map>
 
-#include <CarState.h>
 #include "CANRxBuffer.h"
 #include "abstract_task.h"
+#include <CarState.h>
 
 void read_can_demo_task(void *pvParameter);
 
@@ -16,7 +16,6 @@ private:
   CANRxBuffer rxBuffer;
   std::map<uint16_t, int32_t> max_ages;
   std::map<uint16_t, int32_t> ages;
-
 
 public:
   CANBus();
@@ -30,7 +29,6 @@ public:
   // void create_task(void);
 
   void onReceive(int packetSize);
-
 
   SemaphoreHandle_t mutex;
 };

@@ -149,13 +149,6 @@ void CANBus::task() {
     while (this->rxBuffer.isAvailable()) {
       packet = this->rxBuffer.pop();
       
-      /*
-      printf("----------------\n");
-      printf("id: %X\n", packet.getID());
-      printf("data 32 0: %X\n", packet.getData_ui32(0));
-      printf("data 32 1: %X\n", packet.getData_ui32(1));
-      */
-
       // Do something with packet
       switch (packet.getID()) {
       case BMS_BASE_ADDR:
@@ -216,11 +209,11 @@ void CANBus::task() {
             carState.PrechargeState = PRECHARGE_STATE::ENABLE_PACK;
             break;
         }
-    
 
         // Precharge Timer info also available
         break;
       case BMS_BASE_ADDR | 0xFD:
+        
         carState.BatteryErrors.clear();
         
         if(packet.getData_ui32(0) > 0){ // Saving CPU time in case there are no errors
@@ -230,6 +223,7 @@ void CANBus::task() {
             }
           }
         }
+
         // Cell over voltage packet.getData_b(0)
         // Cell under voltage packet.getData_b(1)
         // Cell over Temp packet.getData_b(2)

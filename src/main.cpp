@@ -6,6 +6,12 @@
  *    ./extras/format.sh
  */
 
+#include <fmt/core.h>
+#include <fmt/printf.h>
+
+// local definitions
+#include <definitions.h>
+
 // standard libraries
 #include <Streaming.h>
 #include <iostream>
@@ -23,9 +29,6 @@
 
 // project variables
 #include <sdkconfig.h>
-
-// local definitions
-#include <definitions.h>
 
 // local libs
 #include <ADC.h>
@@ -100,15 +103,16 @@ void app_main(void) {
   if (SERIAL_ON) {
     // init console IO and radio console
     uart.init();
+    delay(300);
   }
-
-  // init arduino library
-  initArduino();
 
   console << "\n--------------------\n";
   console << "esp32dev + free RTOS\n";
   console << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED;
   console << "\n--------------------\n";
+
+  // init arduino library
+  initArduino();
 
   // report chip info
   console << "-chip info -------------------\n";
@@ -196,8 +200,8 @@ void app_main(void) {
   }
   if (RTC_ON) {
     RtcDateTime now = rtc.read_rtc_datetime();
-    debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
-                 now.Second());
+    // console << fmt::sprintf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(),
+    //                        now.Minute(), now.Second());
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
     engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
   }
@@ -205,10 +209,8 @@ void app_main(void) {
     gpio.create_task();
     engineerDisplay.print("[v] " + gpio.getName() + " task initialized.\n");
   }
-
   if (DAC_ON) {
     dac.init();
-    console << " - DAC DAC DAC\n";
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
@@ -217,7 +219,6 @@ void app_main(void) {
   if (SERIAL_ON) {
     console << " - serial_demo_task\n";
     uart.create_task();
-    // xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (CAN_ON) {
     console << " - read_can_demo_task\n";

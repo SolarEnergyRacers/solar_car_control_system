@@ -21,6 +21,7 @@
 
 // #include <ADC.h>
 #include <CarState.h>
+#include <Console.h>
 #include <Display.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
@@ -37,12 +38,14 @@
 #include <Fonts/FreeSans24pt7b.h>
 #include <Fonts/FreeSans9pt7b.h>
 
+extern Console console;
 extern SPIBus spiBus;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS DriverDisplay::display_setup() {
-  cout << "[v] '" << getName() << "' inited: screen E ILI9341 with " << height << " x " << width << "." << endl;
+  console << "[v] '" << getName() << "' inited: screen E ILI9341 with " << height << " x " << width << "."
+          << "\n";
   return DISPLAY_STATUS::DRIVER_BACKGROUND;
 }
 

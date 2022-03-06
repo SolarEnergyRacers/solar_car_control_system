@@ -6,6 +6,7 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
+#include <fmt/printf.h>
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
@@ -89,7 +90,7 @@ void CmdHandler::task() {
           input = input.substring(0, input.length() - 1);
         }
 
-        debug_printf("Received: %s\n", input.c_str());
+        console << "Received: " << input.c_str() << "\n";
 
         if (input.length() < 1 || commands.find(input[0], 0) == -1) {
           input = "h"; // help
@@ -123,13 +124,13 @@ void CmdHandler::task() {
           break;
         case 'J':
           state = carState.serialize("Recent State");
-          console << state << "\n";
           sdCard.write(state + "\n");
+          console << state << "\n";
           break;
         case 'V':
           state = carState.csv("Recent State");
-          console << state;
           sdCard.write(state);
+          console << state;
           break;
         case 'P': {
           sdCard.directory();
@@ -149,19 +150,19 @@ void CmdHandler::task() {
           break;
         case 'u':
           if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
-            debug_printf("Speed arrow UP (%s):%s-->off\n", input.c_str(), &input[2]);
+            // console << fmt::sprintf("Speed arrow UP (%s):%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            debug_printf("Speed arrow DOWN (%s):%s-->on\n", input.c_str(), &input[2]);
+            // console << fmt::sprintf("Speed arrow DOWN (%s):%s-->on\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
           break;
         case 'd':
           if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
-            debug_printf("%s:%s-->off\n", input.c_str(), &input[2]);
+            // console << fmt::sprintf("%s:%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            debug_printf("%s:%s-->on\n", input.c_str(), &input[2]);
+            // console << fmt::sprintf("%s:%s-->on\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::DECREASE;
           }
           break;
@@ -237,19 +238,17 @@ void CmdHandler::printSystemValues() {
 
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-  string s = fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
-  console << s;
+  console << fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
 
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->value == 0) {
-        s = fmt::format("{}: SET {:#04x}", pin->name, pin->port);
-        console << s << "\n";
+        console << fmt::format("{}: SET {:#04x}", pin->name, pin->port) << "\n";
       }
     }
   }
-  s = fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0),
-                  dac.get_pot(DAC::pot_chan::POT_CHAN1));
-  console << s << "\n";
+  console << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0),
+                         dac.get_pot(DAC::pot_chan::POT_CHAN1))
+          << "\n";
 }

@@ -13,8 +13,11 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include <Console.h>
 #include <GPIO.h>
 #include <driver/gpio.h>
+
+extern Console console;
 
 void GPInputOutput::re_init() { init(); }
 
@@ -24,7 +27,8 @@ void GPInputOutput::init() {
   digitalWrite(SPI_CS_SDCARD, HIGH);
   pinMode(SPI_CS_TFT, OUTPUT);
   digitalWrite(SPI_CS_TFT, HIGH);
-  cout << "SPI_CS for TFT and SD card set." << endl;
+  console << "SPI_CS for TFT and SD card set."
+          << "\n";
 }
 
 void GPInputOutput::exit() {
@@ -34,7 +38,8 @@ void GPInputOutput::exit() {
 void GPInputOutput::register_gpio_interrupt() {
 
   // report
-  cout << "[HW Interrupt] Register GPInputOutput interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)" << endl;
+  console << "[HW Interrupt] Register GPInputOutput interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)"
+          << "\n";
 
   // set operating mode of interrupt pin to pull-up (i.e. interrupt is generated
   // if pin is getting grounded)
@@ -54,7 +59,7 @@ void GPInputOutput::task() {
     // print the number of interrupts handled by the interrupt handler
     // handle_gpio_interrupt
     if (interrupt_counter > 0) {
-      cout << "[INT] Number of interrupts: " << interrupt_counter << endl;
+      console << "[INT] Number of interrupts: " << interrupt_counter << "\n";
       interrupt_counter = 0;
     }
 

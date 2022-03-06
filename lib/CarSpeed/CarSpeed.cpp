@@ -15,10 +15,12 @@
 
 #include <CarSpeed.h>
 #include <CarState.h>
+#include <Console.h>
 #include <DAC.h>
 #include <Helper.h>
 #include <PID_v1.h>
 
+extern Console console;
 extern PID pid;
 extern CarSpeed carSpeed;
 // extern ADC adc;
@@ -35,7 +37,8 @@ void CarSpeed::init() {
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
   sleep_polling_ms = 400;
-  cout << "[v]" << getName() << " inited." << endl;
+  console << "[v]" << getName() << " inited."
+          << "\n";
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }
@@ -89,12 +92,12 @@ void CarSpeed::task() {
       // if (output_setpoint < 0) {
       //   carState.Acceleration = output_setpoint; // acceleration
       //   carState.Deceleration = 0;               // deceleration
-      //   cout << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint <<
+      //   console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint <<
       //   endl;
       // } else {
       //   carState.Acceleration = 0;                // acceleration
       //   carState.Deceleration = -output_setpoint; // deceleration
-      //   cout << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint <<
+      //   console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint <<
       //   endl;
       // }
 
@@ -102,11 +105,13 @@ void CarSpeed::task() {
       if (output_setpoint > 0) {
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
         dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
-        cout << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint << endl;
+        console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint
+                << "\n";
       } else {
         dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
         dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
-        cout << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << endl;
+        console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
+                << "\n";
       }
     }
     // sleep

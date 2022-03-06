@@ -162,7 +162,6 @@ void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
   tft.write(BFA >> 8);
   tft.write(BFA);
   xSemaphoreGive(spiBus.mutex);
-  debug_printf("ERROR: Semaphore not found!%s", "\n");
 }
 
 int Display::scroll(int lines) {
@@ -431,30 +430,24 @@ void Display::task(void) {
     // working states:
     case DISPLAY_STATUS::ENGINEER_CONSOLE:
       bgColor = ILI9341_WHITE;
-#if LIFESIGN_ON == true
       if (lifeSignCounter > 2) {
         lifeSign();
         lifeSignCounter = 0;
       }
-#endif
       break;
     case DISPLAY_STATUS::ENGINEER_RUNNING:
       carState.displayStatus = task(lifeSignCounter);
-#if LIFESIGN_ON == true
       if (lifeSignCounter > 2) {
         lifeSign();
         lifeSignCounter = 0;
       }
-#endif
       break;
     case DISPLAY_STATUS::DRIVER_RUNNING:
       carState.displayStatus = task(lifeSignCounter);
-#if LIFESIGN_ON == true
       if (lifeSignCounter > 1) {
         lifeSign();
         lifeSignCounter = 0;
       }
-#endif
       break;
     case DISPLAY_STATUS::ENGINEER_HALTED:
       set_SleepTime(1500);

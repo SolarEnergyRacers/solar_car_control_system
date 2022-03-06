@@ -79,8 +79,14 @@ public:
   //------- OUT ---------
   friend Console &operator<<(Console &c, const string &str);
   friend Console &operator<<(Console &c, const char &chr);
+  friend Console &operator<<(Console &c, const char *str);
   friend Console &operator<<(Console &c, const int &i);
+  friend Console &operator<<(Console &c, const volatile int &i);
+  friend Console &operator<<(Console &c, const long &l);
+  friend Console &operator<<(Console &c, const unsigned long &l);
   friend Console &operator<<(Console &c, const float &f);
+  friend Console &operator<<(Console &c, const double &d);
+  friend Console &operator<<(Console &c, const size_t &st);
   friend Console &operator<<(Console &c, const bool &b);
 
   //-------- IN ---------

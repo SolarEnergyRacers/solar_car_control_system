@@ -7,7 +7,9 @@
 #include <stdio.h>
 
 // standard libraries
+#include <Console.h>
 #include <fmt/core.h>
+#include <fmt/printf.h>
 #include <inttypes.h>
 #include <iostream>
 #include <stdio.h>
@@ -23,6 +25,7 @@
 #include <I2CBus.h>
 #include <IOExt2.h>
 
+extern Console console;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt2 ioExt;
@@ -78,7 +81,7 @@ void IOExt2::re_init() { init(); }
 void IOExt2::init() {
   string s;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-    cout << "[?] Init IOExt2 " << devNr << endl;
+    console << "[?] Init IOExt2 " << devNr << "\n";
     xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].init();
     ioExt.IOExtDevs[devNr].interruptMode(MCP23017InterruptMode::Or);
@@ -98,10 +101,11 @@ void IOExt2::init() {
       int devPin = pin->port & 0xf;
       s = fmt::format("  {:#04x} [{:02d}] dev:{:02d}, devpin:{:02d}, mode:{}, value={} ({})\n", pin->port, carState.getIdx(pin->name), dev,
                       devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
-      cout << s;
+      console << s;
     }
     ioExt.IOExtDevs[devNr].clearInterrupts();
-    cout << "[v] " << getName() << "[" << devNr << "] initialized." << endl;
+    console << "[v] " << getName() << "[" << devNr << "] initialized."
+            << "\n";
   }
   ioInterruptRequest = false;
   pinMode(I2C_INTERRUPT, INPUT_PULLUP);
@@ -116,7 +120,7 @@ void IOExt2::exit(void) {
 
 void IOExt2::handleIoInterrupt() {
   if (isInInterruptHandler) {
-    debug_printf("Jump out of interrupt handler at %ld\n", millis());
+    console << "Jump out of interrupt handler at " << millis() << "\n";
     return;
   }
   isInInterruptHandler = true;
@@ -158,7 +162,8 @@ void IOExt2::readAll(bool deltaOnly) {
   }
   string outString = carState.printIOs("", true, deltaOnly);
   if (outString.length() > 0)
-    debug_printf("%s\n", outString.c_str());
+    console << fmt::format("{}\n", outString.c_str());
+  // debug_printf("%s\n", outString.c_str());
   // avoid multi registration:
   pinHandlerList.unique();
   // call all handlers for changed pins
@@ -194,9 +199,9 @@ int IOExt2::getPort(int port) {
   xSemaphoreTakeT(i2cBus.mutex);
   int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
   xSemaphoreGive(i2cBus.mutex);
-  debug_printf("Get BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
+  console << fmt::sprintf("Get BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
 
-  debug_printf("0x%02x [%d|%d]: %d\n", port, devNr, pin, value);
+  console << fmt::sprintf("0x%02x [%d|%d]: %d\n", port, devNr, pin, value);
   return value;
 }
 
@@ -231,27 +236,27 @@ void IOExt2::task() {
 
 void batteryOnOffHandler() {
   carState.BatteryOn = carState.getPin(PinBatOnOff)->value == 1;
-  cout << "Battery " << (carState.BatteryOn ? "On" : "Off") << endl;
+  console << "Battery " << (carState.BatteryOn ? "On" : "Off") << "\n";
 }
 
 void pvOnOffHandler() {
   carState.PhotoVoltaicOn = carState.getPin(PinPvOnOff)->value == 1;
-  printf("PV %s\n", (carState.PhotoVoltaicOn ? "On" : "Off"));
+  console << "PV " << (carState.PhotoVoltaicOn ? "On" : "Off") << "\n";
 }
 
 void mcOnOffHandler() {
   carState.MotorOn = carState.getPin(PinMcOnOff)->value == 1;
-  printf("MC %s\n", (carState.MotorOn ? "On" : "Off"));
+  console << "MC " << (carState.MotorOn ? "On" : "Off") << "\n";
 }
 
 void ecoPowerHandler() {
   carState.EcoOn = carState.getPin(PinEcoPower)->value == 1;
-  printf("EcoMowerMode %s\n", (carState.EcoOn ? "Eco" : "Power"));
+  console << "EcoMowerMode " << (carState.EcoOn ? "Eco" : "Power") << "\n";
 }
 
 void fwdBwdHandler() {
   carState.DriveDirection = carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD;
-  printf("Direction %s\n", (carState.DriveDirection == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward"));
+  console << "Direction " << (carState.DriveDirection == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward") << "\n";
 }
 
 void breakPedalHandler() {
@@ -260,7 +265,7 @@ void breakPedalHandler() {
   } else { // UCC_5V
     carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
   }
-  printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
+  console << "Break pedal pressed " << (carState.BreakPedal ? "pressed" : "released") << "\n";
 }
 
 void indicatorHandler() {
@@ -276,13 +281,15 @@ void indicatorHandler() {
 void hornHandler() {
   int value = carState.getPin(PinHorn)->value;
   carState.getPin(PinHornOut)->value = (value == 0);
-  printf("Horn %s\n", (value == 0 ? "On" : "Off"));
+  console << "Horn " << (value == 0 ? "On" : "Off") << "\n";
 }
 
 void lightHandler() {
   int value = carState.getPin(PinLight)->value;
   if (value == 0) {
-    printf("Light toggle\n");
+    console << "Light toggle"
+            << "\n";
+    ;
     if (carState.Light == LIGHT::L1) {
       carState.Light = LIGHT::OFF;
       carState.getPin(PinLightOut)->value = 0;
@@ -297,7 +304,8 @@ void lightHandler() {
 void headLightHandler() {
   int value = carState.getPin(PinHeadLight)->value;
   if (value == 0) {
-    printf("Drive Light toggle\n");
+    console << "Drive Light toggle"
+            << "\n";
     if (carState.Light == LIGHT::L2) {
       carState.Light = LIGHT::L1;
       carState.getPin(PinLightOut)->value = 1;
@@ -315,11 +323,13 @@ void nextScreenHandler() {
     switch (carState.displayStatus) {
     case DISPLAY_STATUS::ENGINEER_RUNNING:
       carState.displayStatus = DISPLAY_STATUS::DRIVER_SETUP;
-      cout << "Switch Next Screen toggle: switch from eng --> driver" << endl;
+      console << "Switch Next Screen toggle: switch from eng --> driver"
+              << "\n";
       break;
     case DISPLAY_STATUS::DRIVER_RUNNING:
       carState.displayStatus = DISPLAY_STATUS::ENGINEER_SETUP;
-      cout << "Switch Next Screen toggle: switch from driver --> eng" << endl;
+      console << "Switch Next Screen toggle: switch from driver --> eng"
+              << "\n";
       break;
     default:
       break;
@@ -330,10 +340,12 @@ void nextScreenHandler() {
 void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn) {
-      cout << "ConstantMode OFF" << endl;
+      console << "ConstantMode OFF"
+              << "\n";
       carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
     } else {
-      cout << "ConstantMode ON" << endl;
+      console << "ConstantMode ON"
+              << "\n";
       carState.TargetSpeed = carState.Speed;                                       // unit: km/h
       carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
       carState.ConstantModeOn = true;                                              //#SAVETY#: deceleration unlock const mode
@@ -343,7 +355,8 @@ void constantModeOnOffHandler() {
 
 void constantModeHandler() {
   if (carState.getPin(PinConstantMode)->value == 0) {
-    cout << "Constant mode toggle" << endl;
+    console << "Constant mode toggle"
+            << "\n";
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
       carState.TargetPower = 0;
       carState.ConstantMode = CONSTANT_MODE::SPEED;
@@ -358,7 +371,8 @@ void constantModeHandler() {
 
 void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
-    cout << "Request Paddle Adjust" << endl;
+    console << "Request Paddle Adjust"
+            << "\n";
     carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
   }
 }
@@ -366,9 +380,11 @@ void paddleAdjustHandler() {
 void sdCardDetectHandler() {
   carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   if (carState.SdCardDetect) {
-    cout << "SD card removed." << endl;
+    console << "SD card removed."
+            << "\n";
   } else {
-    cout << "SD card detected." << endl;
+    console << "SD card detected."
+            << "\n";
   }
 }
 // end IO pin handler -----------------------------------------

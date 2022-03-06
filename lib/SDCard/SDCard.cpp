@@ -18,12 +18,14 @@
 #include <ADS1X15.h>
 #include <Adafruit_ILI9341.h>
 #include <CarState.h>
+#include <Console.h>
 #include <Display.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
 #include <SDCard.h>
 #include <SPIBus.h>
 
+extern Console console;
 extern SPIBus spiBus;
 extern SDCard sdCard;
 extern DriverDisplay driverDisplay;
@@ -33,28 +35,31 @@ void SDCard::re_init() { init(); }
 void SDCard::init() {
   logEnabled = false;
   string s = "[?] Init 'SDCard'...\n";
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 
   if (!mount()) {
-    cout << "initialization failed!" << endl;
+    console << "initialization failed!"
+            << "\n";
     return;
   }
   s = "[v] SDCard initialized.\n";
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 
   s = fmt::format("    Open '{}' (append)...", FILENAME);
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 
   if (open_log_file()) {
     logEnabled = true;
     write(carState.csv("Initial State", true));
-    cout << "ok." << endl;
+    console << "ok."
+            << "\n";
     driverDisplay.print("SD Card mounted.\n");
   } else {
-    cout << "failed." << endl;
+    console << "failed."
+            << "\n";
   }
 }
 
@@ -64,13 +69,15 @@ bool SDCard::mount() {
     mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
-      cout << "SD card mounted." << endl;
+      console << "SD card mounted."
+              << "\n";
       return true;
     }
-    cout << "ERROR mounting SD card." << endl;
+    console << "ERROR mounting SD card."
+            << "\n";
   } catch (exception &ex) {
     xSemaphoreGive(spiBus.mutex);
-    cout << "ERROR mounting SD card: " << ex.what() << endl;
+    console << "ERROR mounting SD card: " << ex.what() << "\n";
   }
   return false;
 }
@@ -86,13 +93,15 @@ bool SDCard::open_log_file() {
       dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
       xSemaphoreGive(spiBus.mutex);
       if (dataFile != 0) {
-        cout << "Log file opend for append." << endl;
+        console << "Log file opend for append."
+                << "\n";
         return true;
       }
-      cout << "ERROR opening '" << FILENAME << "'" << endl;
+      console << "ERROR opening '" << FILENAME << "'"
+              << "\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      cout << "ERROR opening '" << FILENAME << "': " << ex.what() << endl;
+      console << "ERROR opening '" << FILENAME << "': " << ex.what() << "\n";
     }
   }
   return false;
@@ -106,10 +115,11 @@ void SDCard::unmount() {
       dataFile.close();
       SD.end();
       xSemaphoreGive(spiBus.mutex);
-      cout << "Log file closed." << endl;
+      console << "Log file closed."
+              << "\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      cout << "ERROR closing log file: " << ex.what() << endl;
+      console << "ERROR closing log file: " << ex.what() << "\n";
     }
   }
   if (isMounted()) {
@@ -117,10 +127,11 @@ void SDCard::unmount() {
       xSemaphoreTakeT(spiBus.mutex);
       SD.end();
       xSemaphoreGive(spiBus.mutex);
-      cout << "SD card unmounted." << endl;
+      console << "SD card unmounted."
+              << "\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      cout << "ERROR unmounting SD card: " << ex.what() << endl;
+      console << "ERROR unmounting SD card: " << ex.what() << "\n";
     }
     mounted = false;
   }
@@ -137,7 +148,8 @@ string SDCard::directory() {
     File root = SD.open("/");
     printDirectory(root, 1);
     root.close();
-    ss << "~~~~~~~~~~~~~~~~" << endl;
+    ss << "~~~~~~~~~~~~~~~~"
+       << "\n";
     return ss.str();
   }
   return "ERROR reading SD card.";
@@ -151,15 +163,15 @@ void SDCard::printDirectory(File dir, int numTabs) {
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      cout << '\t'; // TAB size: 2
+      console << '\t'; // TAB size: 2
     }
-    cout << entry.name();
+    console << entry.name();
     if (entry.isDirectory()) {
-      cout << "/" << endl;
+      console << "/\n";
       printDirectory(entry, numTabs + 1);
     } else {
       // files have sizes, directories do not
-      cout << " [" << entry.size() << "]" << endl;
+      console << " [" << entry.size() << "]\n";
     }
     entry.close();
   }
@@ -181,7 +193,7 @@ void SDCard::write(string msg) {
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
       mounted = false; // prepare for complete re_init
-      cout << "ERROR writing SD card: " << ex.what() << endl;
+      console << "ERROR writing SD card: " << ex.what() << "\n";
     }
   }
 }

@@ -4,8 +4,8 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define VERSION "v0.1"
-#define VERSION_PUBLISHED "2022.01"
+#define VERSION "v0.2"
+#define VERSION_PUBLISHED "2022.02"
 
 #include <LocalFunctionsAndDevices.h>
 
@@ -118,26 +118,5 @@
  * carState and carControl
  */
 #define LOG_INTERVALL 1000;
-
-#define DEBUG true
-#define debug_printf(fmt, ...)                                                                                                             \
-  do {                                                                                                                                     \
-    if (DEBUG)                                                                                                                             \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
-  } while (0)
-
-#define DEBUG2 false
-#define debug_printf_l2(fmt, ...)                                                                                                          \
-  do {                                                                                                                                     \
-    if (DEBUG2)                                                                                                                            \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
-  } while (0)
-
-#define DEBUG3 false
-#define debug_printf_l3(fmt, ...)                                                                                                          \
-  do {                                                                                                                                     \
-    if (DEBUG3)                                                                                                                            \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
-  } while (0)
 
 #endif // DEFINITIONS_H

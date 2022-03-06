@@ -4,6 +4,7 @@
 #include <definitions.h>
 
 #include <fmt/core.h>
+#include <fmt/printf.h>
 #include <iostream>
 #include <stdio.h>
 #include <string>
@@ -12,6 +13,7 @@
 
 #include <ADC.h>
 #include <CarControl.h>
+#include <Console.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
@@ -22,6 +24,7 @@
 #include <MCP23017.h>
 #include <SDCard.h>
 
+extern Console console;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt2 ioExt;
@@ -43,7 +46,7 @@ unsigned long millisNextStamp = millis();
 void CarControl::re_init() { init(); }
 
 void CarControl::init() {
-  cout << "[?] Setup '" << getName() << "'...\n";
+  console << "[?] Setup '" << getName() << "'...\n";
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
@@ -51,7 +54,7 @@ void CarControl::init() {
   // adjust_paddles(5); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 }
 
@@ -99,14 +102,15 @@ bool CarControl::read_speed() {
   float radius = 0.50; // m
   float speed = 3.1415 * radius * rpm / 60 * 3.6;
   carState.Speed = (int)speed;
-  debug_printf_l3("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
+  // console << fmt::sprintf("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
   return true;
 }
 
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    cout << "Break Pedal Pressed (paddle control)" << endl;
+    console << "Break Pedal Pressed (paddle control)"
+            << "\n";
     _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
     return true;
   }
@@ -180,7 +184,7 @@ void CarControl::adjust_paddles(int seconds) {
   if (cycles < 1)
     cycles = 1;
   string s("    adjust...");
-  cout << s;
+  console << s;
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
     carState.DriverInfo = s;
   } else {
@@ -189,7 +193,7 @@ void CarControl::adjust_paddles(int seconds) {
   }
   while (cycles-- > 0) {
     s = fmt::format(" paddle adjust:\n {:2d}", cycles);
-    cout << s;
+    console << s;
     if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
       carState.DriverInfo = s;
     } else {
@@ -217,7 +221,7 @@ void CarControl::adjust_paddles(int seconds) {
   ads_min_acc += 5000;
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
-  cout << s;
+  console << s;
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
     carState.DriverInfo = fmt::format("==> dec {:5}-{:5}       ==> acc {:5}-{:5}", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   } else {

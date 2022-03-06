@@ -20,10 +20,12 @@
 
 using namespace std;
 
+#include <Console.h>
 #include <Serial.h>
 #include <SoftwareSerial.h>
 #include <Streaming.h>
 
+extern Console console;
 extern DriverDisplay driverDisplay;
 extern Console console;
 
@@ -35,22 +37,22 @@ void Uart::init() {
   // init serial for console IO
   Serial.begin(SERIAL_BAUDRATE);
   delay(1000);
-  cout << "[?] Setup '" << getName() << "'...\n";
-  cout << "    ---Serial------------\n";
-  cout << "    Serial TX0 is on pin: " << to_string(TX) << "\n";
-  cout << "    Serial RX0 is on pin: " << to_string(RX) << "\n";
-  cout << "    Serial Baud Rate:     " << SERIAL_BAUDRATE << "\n";
+  console << "[?] Setup '" << getName() << "'...\n";
+  console << "    ---Serial------------\n";
+  console << "    Serial TX0 is on pin: " << to_string(TX) << "\n";
+  console << "    Serial RX0 is on pin: " << to_string(RX) << "\n";
+  console << "    Serial Baud Rate:     " << SERIAL_BAUDRATE << "\n";
   // init serial for radio console IO
   Serial2.begin(SERIAL2_BAUDRATE, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
   // Serial2.enableIntTx(false);
   delay(1000);
   // both Serial and Serial2 inited -> from now the Console class is usable
-  cout << "    ---Serial2 HC-12------\n";
-  cout << "    Serial2 TX2 is on pin: " << to_string(SERIAL2_TX) << "\n";
-  cout << "    Serial2 RX2 is on pin: " << to_string(SERIAL2_RX) << "\n";
-  cout << "    Serial2 Baud Rate:     " << SERIAL2_BAUDRATE << "\n";
+  console << "    ---Serial2 HC-12------\n";
+  console << "    Serial2 TX2 is on pin: " << to_string(SERIAL2_TX) << "\n";
+  console << "    Serial2 RX2 is on pin: " << to_string(SERIAL2_RX) << "\n";
+  console << "    Serial2 Baud Rate:     " << SERIAL2_BAUDRATE << "\n";
 
-  cout << fmt::format("[v] {} inited.\n", getName());
+  console << fmt::format("[v] {} inited.\n", getName());
 }
 
 // bool payload1;
@@ -64,7 +66,7 @@ void Uart::task() {
     //   // payload2 = true;
     // }
     // // if (payload2) {
-    // //   Serial << "---read" << endl;
+    // //   Serial << "---read" << "\n";
     // // }
     // while (Serial.available()) {
     //   // Serial2.print(char(Serial.read()));

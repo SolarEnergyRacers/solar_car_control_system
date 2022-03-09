@@ -38,13 +38,13 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x04, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
     {0x05, INPUT_PULLUP, 1, 1, false, 0l, PinFwdBwd, fwdBwdHandler},
     {0x06, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY07, NULL},
-    {0x07, OUTPUT, 0, 0, false, 0l, PinHornOut, NULL},
+    {0x07, OUTPUT, 0, 0, false, 0l, PinFanOut, NULL},
     // IOExtDev0-PortB
     {0x08, OUTPUT, 0, 0, false, 0l, PinIndicatorOutLeft, NULL},
     {0x09, OUTPUT, 0, 0, false, 0l, PinIndicatorOutRight, NULL},
-    {0x0a, OUTPUT, 0, 0, false, 0l, PinFanOut, NULL},
-    {0x0b, OUTPUT, 0, 0, false, 0l, PinLightOut, NULL},
-    {0x0c, OUTPUT, 0, 0, false, 0l, PinHeadLightOut, NULL},
+    {0x0a, OUTPUT, 0, 0, false, 0l, PinHornOut, NULL},
+    {0x0b, OUTPUT, 0, 0, false, 0l, PinHeadLightOut, NULL},
+    {0x0c, OUTPUT, 0, 0, false, 0l, PinLightOut, NULL},
     {0x0d, INPUT_PULLUP, 1, 1, false, 0l, PinBreakPedal, breakPedalHandler},
     {0x0e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
     {0x0f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY17, NULL},
@@ -56,14 +56,14 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x14, INPUT_PULLUP, 1, 1, false, 0l, PinNextScreen, nextScreenHandler},
     {0x15, INPUT_PULLUP, 1, 1, false, 0l, PinConstantMode, constantModeHandler},
     {0x16, INPUT_PULLUP, 1, 1, false, 0l, PinIndicatorBtnRight, indicatorHandler},
-    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler},
+    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler}, //#SAVETY#: deceleration unlock const mode
     // IOExtDev1-PortB
     {0x18, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY31, NULL},
     {0x19, INPUT_PULLUP, 1, 1, false, 0l, PinReserve1, NULL},
     {0x1a, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY33, NULL},
-    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler},
+    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler}, //#SAVETY#: lock acceleration
     {0x1c, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY35, NULL},
-    {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY36, NULL},
+    {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinSdCardDetect, sdCardDetectHandler},
     {0x1e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
     {0x1f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY38, NULL}};
 
@@ -146,8 +146,8 @@ void IOExt2::readAll(bool deltaOnly) {
         xSemaphoreTakeT(i2cBus.mutex);
         pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
         xSemaphoreGive(i2cBus.mutex);
+        // printf("%2d: dev: %d, pin:%x  -- value:%d\n", pin->port, devNr, pinNr, pin->value);
 
-        // if (pin->handlerFunction != NULL) {
         if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited)) {
           pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
@@ -256,7 +256,7 @@ void fwdBwdHandler() {
 
 void breakPedalHandler() {
   carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
-  printf("Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
+  printf("----------------------------------------------Break pedal pressed %s\n", (carState.BreakPedal ? "pressed" : "released"));
 }
 
 void indicatorHandler() {
@@ -327,31 +327,44 @@ void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn) {
       cout << "ConstantMode OFF" << endl;
-      carState.ConstantModeOn = false;
+      carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
     } else {
       cout << "ConstantMode ON" << endl;
-      carState.TargetSpeed = carState.Speed;
-      carState.TargetPower = round(carState.MotorCurrent * carState.MotorVoltage);
-      carState.ConstantModeOn = true;
+      carState.TargetSpeed = carState.Speed;                                       // unit: km/h
+      carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
+      carState.ConstantModeOn = true;                                              //#SAVETY#: deceleration unlock const mode
     }
   }
 }
 
 void constantModeHandler() {
   if (carState.getPin(PinConstantMode)->value == 0) {
-    printf("Constant mode toggle\n");
+    cout << "Constant mode toggle" << endl;
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
+      carState.TargetPower = 0;
       carState.ConstantMode = CONSTANT_MODE::SPEED;
     } else {
+      carState.TargetSpeed = 0;
       carState.ConstantMode = CONSTANT_MODE::POWER;
     }
+    carState.TargetSpeed = carState.Speed;                                       // unit: km/h
+    carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
   }
 }
 
 void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
-    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
     cout << "Request Paddle Adjust" << endl;
+    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
+  }
+}
+
+void sdCardDetectHandler() {
+  carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
+  if (carState.SdCardDetect) {
+    cout << "SD card removed." << endl;
+  } else {
+    cout << "SD card detected." << endl;
   }
 }
 // end IO pin handler -----------------------------------------

@@ -28,6 +28,8 @@ public:
 
   bool read_battery_data();
   bool read_motor_data();
+  bool read_pv_data();
+  bool read_reference_cell_data();
   bool read_speed();
 
   bool read_paddles();

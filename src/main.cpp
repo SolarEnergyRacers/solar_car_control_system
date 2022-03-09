@@ -97,7 +97,7 @@ void app_main(void) {
 
   // init serial output for  console
 
-  Serial.begin(115200);
+  Serial.begin(SERIAL_BAUDRATE);
   delay(300);
   cout << endl;
   cout << "--------------------" << endl;
@@ -162,6 +162,9 @@ void app_main(void) {
   if (SD_ON) {
     sdCard.init();
   }
+  if (CARSPEED_ON) {
+    carSpeed.init();
+  }
   if (!startOk) {
     cout << "ERROR in init sequence(s). System halted!" << endl;
     exit(0);
@@ -217,10 +220,6 @@ void app_main(void) {
     can.create_task();
     engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");
   }
-  if (CARSPEED_ON) {
-    carSpeed.create_task();
-    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
-  }
   if (CARCONTROL_ON) {
     carControl.init();
     carControl.create_task();
@@ -228,12 +227,17 @@ void app_main(void) {
   }
   if (IOEXT2_ON) {
     carState.Indicator = INDICATOR::OFF;
-    carState.ConstantModeOn = false;
+    carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+    carState.SdCardDetect = false;
     carState.ConstantMode = CONSTANT_MODE::SPEED;
     carState.Light = LIGHT::OFF;
     ioExt.create_task();
     engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
     ioExt.readAll();
+  }
+  if (CARSPEED_ON) {
+    carSpeed.create_task();
+    engineerDisplay.print("[v] " + carSpeed.getName() + " task initialized.\n");
   }
   //--let the bootscreen visible for a moment ------------------
   int waitAtConsoleView = 5;

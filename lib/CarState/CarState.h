@@ -84,6 +84,7 @@ public:
     Deceleration = 0;
     BatteryVoltage = 0;
     BatteryCurrent = 0;
+    PhotoVoltaicCurrent = 0;
     MotorCurrent = 0;
 
     Indicator = INDICATOR::OFF;
@@ -123,10 +124,11 @@ public:
   PRECHARGE_STATE PrechargeState;    // CAN
   list<BATTERY_ERROR> BatteryErrors; // CAN
 
-  float BatteryVoltage; // CAN
-  float BatteryCurrent; // CAN
-  float MotorVoltage;   // ADC
-  float MotorCurrent;   // ADC
+  float BatteryVoltage;      // CAN
+  float BatteryCurrent;      // CAN
+  float PhotoVoltaicCurrent; // ADC
+  float MotorVoltage;        // ADC
+  float MotorCurrent;        // ADC
 
   float Mppt1Current; // CAN
   float Mppt2Current; // CAN

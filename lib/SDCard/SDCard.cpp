@@ -153,7 +153,7 @@ void SDCard::printDirectory(File dir, int numTabs) {
       break;
     }
     for (uint8_t i = 0; i < numTabs; i++) {
-      console << '\t'; // TAB size: 2
+      console << '  '; // TAB size: 2
     }
     console << entry.name();
     if (entry.isDirectory()) {

@@ -39,8 +39,7 @@ char *fgets_stdio_blocking(char *str, int n) {
 
 void xSemaphoreTakeT(xQueueHandle mutex) {
   if (!xSemaphoreTake(mutex, portMAX_DELAY)) {
-    console << "ERROR: mutex ************************************ " << mutex << " ****************"
-            << "\n";
+    console << "ERROR: mutex ************************************ " << mutex << " ****************\n";
     throw runtime_error("ERROR: mutex");
   }
 }

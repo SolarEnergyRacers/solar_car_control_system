@@ -104,8 +104,7 @@ void IOExt2::init() {
       console << s;
     }
     ioExt.IOExtDevs[devNr].clearInterrupts();
-    console << "[v] " << getName() << "[" << devNr << "] initialized."
-            << "\n";
+    console << "[v] " << getName() << "[" << devNr << "] initialized.\n";
   }
   ioInterruptRequest = false;
   pinMode(I2C_INTERRUPT, INPUT_PULLUP);
@@ -284,8 +283,7 @@ void hornHandler() {
 void lightHandler() {
   int value = carState.getPin(PinLight)->value;
   if (value == 0) {
-    console << "Light toggle"
-            << "\n";
+    console << "Light toggle\n";
     ;
     if (carState.Light == LIGHT::L1) {
       carState.Light = LIGHT::OFF;
@@ -301,8 +299,7 @@ void lightHandler() {
 void headLightHandler() {
   int value = carState.getPin(PinHeadLight)->value;
   if (value == 0) {
-    console << "Drive Light toggle"
-            << "\n";
+    console << "Drive Light toggle\n";
     if (carState.Light == LIGHT::L2) {
       carState.Light = LIGHT::L1;
       carState.getPin(PinLightOut)->value = 1;
@@ -320,13 +317,11 @@ void nextScreenHandler() {
     switch (carState.displayStatus) {
     case DISPLAY_STATUS::ENGINEER_RUNNING:
       carState.displayStatus = DISPLAY_STATUS::DRIVER_SETUP;
-      console << "Switch Next Screen toggle: switch from eng --> driver"
-              << "\n";
+      console << "Switch Next Screen toggle: switch from eng --> driver\n";
       break;
     case DISPLAY_STATUS::DRIVER_RUNNING:
       carState.displayStatus = DISPLAY_STATUS::ENGINEER_SETUP;
-      console << "Switch Next Screen toggle: switch from driver --> eng"
-              << "\n";
+      console << "Switch Next Screen toggle: switch from driver --> engineer\n";
       break;
     default:
       break;
@@ -337,12 +332,10 @@ void nextScreenHandler() {
 void constantModeOnOffHandler() {
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     if (carState.ConstantModeOn) {
-      console << "ConstantMode OFF"
-              << "\n";
+      console << "ConstantMode OFF\n";
       carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
     } else {
-      console << "ConstantMode ON"
-              << "\n";
+      console << "ConstantMode ON\n";
       carState.TargetSpeed = carState.Speed;                                       // unit: km/h
       carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
       carState.ConstantModeOn = true;                                              //#SAVETY#: deceleration unlock const mode
@@ -352,8 +345,7 @@ void constantModeOnOffHandler() {
 
 void constantModeHandler() {
   if (carState.getPin(PinConstantMode)->value == 0) {
-    console << "Constant mode toggle"
-            << "\n";
+    console << "Constant mode toggle\n";
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
       carState.TargetPower = 0;
       carState.ConstantMode = CONSTANT_MODE::SPEED;
@@ -368,8 +360,7 @@ void constantModeHandler() {
 
 void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
-    console << "Request Paddle Adjust"
-            << "\n";
+    console << "Request Paddle Adjust\n";
     carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
   }
 }
@@ -377,11 +368,9 @@ void paddleAdjustHandler() {
 void sdCardDetectHandler() {
   carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   if (carState.SdCardDetect) {
-    console << "SD card removed."
-            << "\n";
+    console << "SD card removed.\n";
   } else {
-    console << "SD card detected."
-            << "\n";
+    console << "SD card detected.\n";
   }
 }
 // end IO pin handler -----------------------------------------

@@ -21,16 +21,14 @@ using namespace std;
 void I2CBus::re_init() { init(); }
 
 void I2CBus::init(void) {
-  console << "[?] Init '" << getName() << "'"
-          << "\n";
+  console << "[?] Init '" << getName() << "'\n";
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
   Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
   xSemaphoreGive(mutex);
 
-  console << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << "."
-          << "\n";
+  console << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
   scan_i2c_devices();
 }
 
@@ -58,9 +56,7 @@ void I2CBus::scan_i2c_devices() {
       * Connect a 2.4k resistor between SDA and Vcc
       * Connect a 2.4k resistor between SCL and Vcc
   */
-  console << "    Scanning I2C addresses:"
-          << "\n"
-          << "    ";
+  console << "    Scanning I2C addresses:\n    ";
   uint8_t cnt = 0;
   string s;
 
@@ -86,6 +82,5 @@ void I2CBus::scan_i2c_devices() {
   }
   xSemaphoreGive(mutex);
 
-  console << "Scan completed: " << fmt::format("{}", cnt) << " I2C devices found."
-          << "\n";
+  console << "Scan completed: " << fmt::format("{}", cnt) << " I2C devices found.\n";
 }

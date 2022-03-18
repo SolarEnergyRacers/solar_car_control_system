@@ -39,8 +39,7 @@ void SDCard::init() {
   driverDisplay.print(s.c_str());
 
   if (!mount()) {
-    console << "initialization failed!"
-            << "\n";
+    console << "initialization failed!\n";
     return;
   }
   s = "[v] SDCard initialized.\n";
@@ -54,12 +53,10 @@ void SDCard::init() {
   if (open_log_file()) {
     logEnabled = true;
     write(carState.csv("Initial State", true));
-    console << "ok."
-            << "\n";
+    console << "ok.\n";
     driverDisplay.print("SD Card mounted.\n");
   } else {
-    console << "failed."
-            << "\n";
+    console << "failed.\n";
   }
 }
 
@@ -69,12 +66,10 @@ bool SDCard::mount() {
     mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
-      console << "SD card mounted."
-              << "\n";
+      console << "SD card mounted.\n";
       return true;
     }
-    console << "ERROR mounting SD card."
-            << "\n";
+    console << "ERROR mounting SD card.\n";
   } catch (exception &ex) {
     xSemaphoreGive(spiBus.mutex);
     console << "ERROR mounting SD card: " << ex.what() << "\n";
@@ -93,12 +88,10 @@ bool SDCard::open_log_file() {
       dataFile = SD.open(FILENAME, FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
       xSemaphoreGive(spiBus.mutex);
       if (dataFile != 0) {
-        console << "Log file opend for append."
-                << "\n";
+        console << "Log file opend for append.\n";
         return true;
       }
-      console << "ERROR opening '" << FILENAME << "'"
-              << "\n";
+      console << "ERROR opening '" << FILENAME << "'\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
       console << "ERROR opening '" << FILENAME << "': " << ex.what() << "\n";
@@ -115,8 +108,7 @@ void SDCard::unmount() {
       dataFile.close();
       SD.end();
       xSemaphoreGive(spiBus.mutex);
-      console << "Log file closed."
-              << "\n";
+      console << "Log file closed.\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
       console << "ERROR closing log file: " << ex.what() << "\n";
@@ -127,8 +119,7 @@ void SDCard::unmount() {
       xSemaphoreTakeT(spiBus.mutex);
       SD.end();
       xSemaphoreGive(spiBus.mutex);
-      console << "SD card unmounted."
-              << "\n";
+      console << "SD card unmounted.\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
       console << "ERROR unmounting SD card: " << ex.what() << "\n";
@@ -148,8 +139,7 @@ string SDCard::directory() {
     File root = SD.open("/");
     printDirectory(root, 1);
     root.close();
-    ss << "~~~~~~~~~~~~~~~~"
-       << "\n";
+    ss << "~~~~~~~~~~~~~~~~\n";
     return ss.str();
   }
   return "ERROR reading SD card.";

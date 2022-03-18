@@ -117,10 +117,10 @@ void CmdHandler::task() {
           break;
         case 's':
           console << carState.print("Recent State") << "\n";
-          printSystemValues();
           break;
         case 'S':
           console << carState.print("Recent State:") << "\n";
+          printSystemValues();
           break;
         case 'J':
           state = carState.serialize("Recent State");

@@ -263,8 +263,7 @@ void app_main(void) {
     driverDisplay.init();
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
     driverDisplay.create_task(16);
-    console << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "."
-            << "\n";
+    console << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "\n";
   }
 
   systemOk = true;
@@ -278,4 +277,5 @@ void app_main(void) {
   console << "-----------------------------------------------------------------\n";
   console << "\n";
   console << carState.print("Initial car state:") << "\n";
+  console << "-----------------------------------------------------------------\n";
 }

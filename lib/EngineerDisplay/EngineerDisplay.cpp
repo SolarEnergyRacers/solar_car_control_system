@@ -22,8 +22,7 @@ extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup() {
-  console << "[v] '" << getName() << "' inited: screen D ILI9341 with " << height << " x " << width << "."
-          << "\n";
+  console << "[v] '" << getName() << "' inited: screen D ILI9341 with " << height << " x " << width << "\n";
   return DISPLAY_STATUS::ENGINEER_BACKGROUND;
 }
 

@@ -35,8 +35,7 @@ void RTC::exit() {
 
 void RTC::init(void) {
   string s;
-  console << "[?] Init 'RTC'..."
-          << "\n";
+  console << "[?] Init 'RTC'...\n";
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
   s = fmt::format("    [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}", compiled.Month(), compiled.Day(),
@@ -54,8 +53,7 @@ void RTC::init(void) {
       // Common Causes:
       //    1) first time you ran and the device wasn't running yet
       //    2) the battery on the device is low or even missing
-      console << "    [WARN] rtc lost confidence. Set datetime to compile time of this binary."
-              << "\n";
+      console << "    [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n";
       Rtc.SetDateTime(compiled);
     }
   }
@@ -63,23 +61,19 @@ void RTC::init(void) {
 
   // start device
   if (!Rtc.GetIsRunning()) {
-    console << "    [INFO] rtc was not actively running, starting now"
-            << "\n";
+    console << "    [INFO] rtc was not actively running, starting now\n";
     Rtc.SetIsRunning(true);
   }
 
   // check time
   RtcDateTime now = Rtc.GetDateTime();
   if (now < compiled) {
-    console << "   [INFO] rtc time older than compile time! Updating DateTime."
-            << "\n";
+    console << "   [INFO] rtc time older than compile time! Updating DateTime.\n";
     Rtc.SetDateTime(compiled);
   } else if (now > compiled) {
-    console << "   [INFO] rtc time newer than compile time."
-            << "\n";
+    console << "   [INFO] rtc time newer than compile time.\n";
   } else if (now == compiled) {
-    console << "   [INFO] rtc time equal to compile time."
-            << "\n";
+    console << "   [INFO] rtc time equal to compile time.\n";
   }
 
   // set pin
@@ -105,8 +99,7 @@ RtcDateTime RTC::read_rtc_datetime(void) {
       // Common Causes:
       //   - the battery on the device is low or even missing and the power line
       //   was disconnected
-      console << "[RTC] lost confidence in the datetime"
-              << "\n";
+      console << "[RTC] lost confidence in the datetime\n";
     }
   }
   // get datetime

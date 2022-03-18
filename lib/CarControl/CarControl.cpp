@@ -109,8 +109,7 @@ bool CarControl::read_speed() {
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    console << "Break Pedal Pressed (paddle control)"
-            << "\n";
+    console << "Break Pedal Pressed (paddle control)\n";
     _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
     return true;
   }

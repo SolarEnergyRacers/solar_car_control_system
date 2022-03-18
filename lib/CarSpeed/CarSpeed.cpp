@@ -37,8 +37,7 @@ void CarSpeed::init() {
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
   sleep_polling_ms = 400;
-  console << "[v]" << getName() << " inited."
-          << "\n";
+  console << "[v]" << getName() << " inited.\n";
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }

@@ -27,8 +27,7 @@ void GPInputOutput::init() {
   digitalWrite(SPI_CS_SDCARD, HIGH);
   pinMode(SPI_CS_TFT, OUTPUT);
   digitalWrite(SPI_CS_TFT, HIGH);
-  console << "SPI_CS for TFT and SD card set."
-          << "\n";
+  console << "SPI_CS for TFT and SD card set.\n";
 }
 
 void GPInputOutput::exit() {
@@ -38,8 +37,7 @@ void GPInputOutput::exit() {
 void GPInputOutput::register_gpio_interrupt() {
 
   // report
-  console << "[HW Interrupt] Register GPInputOutput interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)"
-          << "\n";
+  console << "[HW Interrupt] Register GPInputOutput interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)\n";
 
   // set operating mode of interrupt pin to pull-up (i.e. interrupt is generated
   // if pin is getting grounded)

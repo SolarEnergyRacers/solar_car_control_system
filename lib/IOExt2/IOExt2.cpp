@@ -140,7 +140,6 @@ void IOExt2::handleIoInterrupt() {
 }
 
 void IOExt2::readAll(bool deltaOnly) {
-  // debug_printf("Read all INPUT* IOs at %ld\n", millis());
   list<void (*)()> pinHandlerList;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
@@ -163,7 +162,6 @@ void IOExt2::readAll(bool deltaOnly) {
   string outString = carState.printIOs("", true, deltaOnly);
   if (outString.length() > 0)
     console << fmt::format("{}\n", outString.c_str());
-  // debug_printf("%s\n", outString.c_str());
   // avoid multi registration:
   pinHandlerList.unique();
   // call all handlers for changed pins
@@ -200,7 +198,6 @@ int IOExt2::getPort(int port) {
   int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
   xSemaphoreGive(i2cBus.mutex);
   console << fmt::sprintf("Get BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
-
   console << fmt::sprintf("0x%02x [%d|%d]: %d\n", port, devNr, pin, value);
   return value;
 }

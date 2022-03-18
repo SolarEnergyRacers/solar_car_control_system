@@ -200,8 +200,8 @@ void app_main(void) {
   }
   if (RTC_ON) {
     RtcDateTime now = rtc.read_rtc_datetime();
-    // console << fmt::sprintf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(),
-    //                        now.Minute(), now.Second());
+    // console << fmt::sprintf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n"
+    //                , now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(), now.Second());
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
     engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
   }

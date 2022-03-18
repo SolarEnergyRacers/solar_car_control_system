@@ -150,19 +150,15 @@ void CmdHandler::task() {
           break;
         case 'u':
           if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
-            // console << fmt::sprintf("Speed arrow UP (%s):%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            // console << fmt::sprintf("Speed arrow DOWN (%s):%s-->on\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
           break;
         case 'd':
           if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
-            // console << fmt::sprintf("%s:%s-->off\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
-            // console << fmt::sprintf("%s:%s-->on\n", input.c_str(), &input[2]);
             carState.SpeedArrow = SPEED_ARROW::DECREASE;
           }
           break;
@@ -244,11 +240,10 @@ void CmdHandler::printSystemValues() {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->value == 0) {
-        console << fmt::format("{}: SET {:#04x}", pin->name, pin->port) << "\n";
+        console << fmt::format("{}: SET {:#04x}\n", pin->name, pin->port);
       }
     }
   }
-  console << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}", dac.get_pot(DAC::pot_chan::POT_CHAN0),
-                         dac.get_pot(DAC::pot_chan::POT_CHAN1))
-          << "\n";
+  console << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
+                         dac.get_pot(DAC::pot_chan::POT_CHAN1));
 }

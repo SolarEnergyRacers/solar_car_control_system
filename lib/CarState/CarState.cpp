@@ -49,7 +49,7 @@ void CarState::init_values() {
 
   TargetSpeed = 0;
   TargetPower = 0;
-  DriverInfo = "ok.";
+  DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
 }

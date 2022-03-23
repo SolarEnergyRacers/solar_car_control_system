@@ -3,6 +3,8 @@
 #include <Streaming.h>
 
 #include <iostream>
+#include <malloc.h>
+#include <stdio.h>
 #include <string>
 
 #include <Console.h>
@@ -32,11 +34,25 @@ Console &operator<<(Console &c, const volatile int &var) { return operator<<(c, 
 Console &operator<<(Console &c, const char *str) {
   cout << str;
   cout.flush();
+  // exclude most non printable chars
   // string s = string(str);
   // stripUnicode(s);
   // Serial2 << s.c_str();
+
   Serial2 << str;
   Serial2.flush();
+
+  // buffered transfer
+  //  size_t packageSize = 20;
+  //  char *buf = (char *)malloc(packageSize * sizeof(char) + 1); // package size + terminator
+  //  int len = strlen(str);
+  //  for (int i = 0; i * packageSize <= len; i++) {
+  //    strncpy(buf, str + (i * packageSize), packageSize);
+  //    *(buf + packageSize) = 0;
+  //    Serial2 << buf;
+  //  }
+  //  free(buf);
+  //  Serial2.flush();
   return c;
 }
 

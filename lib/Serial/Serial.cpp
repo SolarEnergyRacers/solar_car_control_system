@@ -72,6 +72,6 @@ void Uart::task() {
     //   // Serial2.print(char(Serial.read()));
     //   Serial2 << Serial.readString();
     // }
-    delay(100);
+    vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }

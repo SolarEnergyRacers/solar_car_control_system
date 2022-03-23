@@ -53,13 +53,8 @@ void loop() {
     payload = true;
   }
 
-  //  if(!payload){
-  //      Serial.println("Nothing to process");
-  //  } else {
-  //      Serial.println();
-  //  }
   String buffer = Serial.readString();
-  //Serial2.write(buffer.c_str());
+
   if ( buffer.length() > 0)
     Serial2 << buffer << " -- sent!" << endl;
   delay(100);

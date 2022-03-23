@@ -33,7 +33,7 @@ extern CarState carState;
 extern CarControl carControl;
 extern bool systemOk;
 
-#if layout == 2
+#if STEERINGWHEEL_BOARD_V1
 CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x00, INPUT_PULLUP, 1, 1, false, 0l, PinBatOnOff, batteryOnOffHandler},
     {0x01, INPUT_PULLUP, 1, 1, false, 0l, PinPvOnOff, pvOnOffHandler},
@@ -70,7 +70,8 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinSdCardDetect, sdCardDetectHandler},
     {0x1e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
     {0x1f, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY38, NULL}};
-#else
+#endif
+#if STEERINGWHEEL_BOARD_V2
 CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x00, INPUT_PULLUP, 1, 1, false, 0l, PinBatOnOff, batteryOnOffHandler},
     {0x01, INPUT_PULLUP, 1, 1, false, 0l, PinPvOnOff, pvOnOffHandler},

@@ -53,7 +53,9 @@
 #define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
- * SERIAL2
+ * SERIAL, SERIAL2
+ *
+ * RX and TX are defined in pins_arduino.h, all others here
  */
 #define SERIAL_BAUDRATE 115200
 #define SERIAL2_RX 16
@@ -119,4 +121,12 @@
  */
 #define LOG_INTERVALL 1000;
 
+/*
+ * Define wich version of printed board layouts are used
+ * (possibility to use older test boards too)
+ */
+#define STEERINGWHEEL_BOARD_V1 false
+#define STEERINGWHEEL_BOARD_V2 true
+
 #endif // DEFINITIONS_H
+

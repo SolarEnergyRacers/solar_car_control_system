@@ -11,8 +11,10 @@
 #include <freertos/semphr.h>
 #include <freertos/task.h>
 
+#include <Console.h>
 #include <Helper.h>
 
+extern Console console;
 using namespace std;
 
 char *fgets_stdio_blocking(char *str, int n) {
@@ -27,7 +29,7 @@ char *fgets_stdio_blocking(char *str, int n) {
     } else { // store char
       str[i++] = c;
     }
-    cout << "[" << i << ":" << c << "]";
+    console << "[" << i << ":" << c << "]";
   } while (i < (n - 1) && c != '\n' && c != '\r');
   str[i] = 0; // add zero-termination
 
@@ -37,7 +39,7 @@ char *fgets_stdio_blocking(char *str, int n) {
 
 void xSemaphoreTakeT(xQueueHandle mutex) {
   if (!xSemaphoreTake(mutex, portMAX_DELAY)) {
-    cout << "ERROR: mutex ************************************ " << mutex << " ****************" << endl;
+    console << "ERROR: mutex ************************************ " << mutex << " ****************\n";
     throw runtime_error("ERROR: mutex");
   }
 }

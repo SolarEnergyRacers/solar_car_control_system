@@ -19,24 +19,24 @@
 #include <CarStatePin.h>
 #include <Indicator.h>
 
+// IOExtDevX
 #define PinBatOnOff "BatOnOff"
 #define PinPvOnOff "PvOnOff"
 #define PinMcOnOff "McOnOff"
 #define PinEcoPower "EcoPower"
+#define PinDUMMY04 "DUMMY04"
 #define PinFwdBwd "FwdBwd"
 #define PinDUMMY06 "DUMMY06"
-#define PinDUMMY07 "DUMMY07"
 #define PinRelais11 "Relais11"
-// IOExt1
 #define PinIndicatorOutLeft "IndicatorOutLeft"
 #define PinIndicatorOutRight "IndicatorOutRight"
-#define PinFanOut "PinFanOut"
-#define PinHornOut "PinHornOut"
-#define PinLightOut "PinLightOut"
+#define PinFanOut "FanOut"
+#define PinHornOut "HornOut"
+#define PinLightOut "LightOut"
 #define PinBreakPedal "BreakPedal"
-#define PinHeadLightOut "PinHeadLightOut"
-#define PinDUMMY17 "DUMMY17"
-// IOExt2
+#define PinHeadLightOut "HeadLightOut"
+#define PinDUMMY14 "DUMMY14"
+#define PinDUMMY15 "DUMMY15"
 #define PinIndicatorBtnLeft "IndicatorBtnLeft"
 #define PinIndicatorBtnRight "IndicatorBtnRight"
 #define PinLight "Light"
@@ -45,13 +45,12 @@
 #define PinConstantModeOn "ConstantModeOn"
 #define PinHorn "Horn"
 #define PinNextScreen "NextScreen"
-// IOExt3
-#define PinDUMMY31 "DUMMY31"
-#define PinReserve1 "Reserve1"
+#define PinIncrease "Increase"
+#define PinConstantModeOff "ConstantModeOff"
 #define PinDUMMY33 "DUMMY33"
 #define PinPaddleAdjust "PaddleAdjust"
-#define PinDUMMY35 "DUMMY35"
-#define PinSdCardDetect "PinSdCardDetect"
+#define PinDecrease "Decrease"
+#define PinSdCardDetect "SdCardDetect"
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
@@ -69,7 +68,11 @@ void nextScreenHandler();
 void lightHandler();
 void headLightHandler();
 void constantModeHandler();
-void constantModeOnOffHandler();
+void constantModeOnHandler();
+void constantModeOffHandler();
+void decreaseHandler();
+void increaseHandler();
+
 void paddleAdjustHandler();
 void sdCardDetectHandler();
 // end pin handler

@@ -6,13 +6,22 @@
  *    ./extras/format.sh
  */
 
+#include <fmt/core.h>
+#include <fmt/printf.h>
+
+// local definitions
+#include <definitions.h>
+
 // standard libraries
+#include <Streaming.h>
 #include <iostream>
 #include <stdio.h>
+#include <stdlib.h>
 #include <string>
 
 // FreeRTOS / Arduino
 #include <Arduino.h>
+#include <SoftwareSerial.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/FreeRTOSConfig.h>
 #include <freertos/semphr.h>
@@ -21,14 +30,12 @@
 // project variables
 #include <sdkconfig.h>
 
-// local definitions
-#include <definitions.h>
-
 // local libs
 #include <ADC.h>
 #include <CANBus.h>
 #include <CarSpeed.h>
 #include <CmdHandler.h>
+#include <Console.h>
 #include <DAC.h>
 #include <Display.h>
 #include <DriverDisplay.h>
@@ -66,6 +73,7 @@ using namespace std;
 ADC adc;
 CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
 OneWireBus oneWireBus;
+Console console;
 SPIBus spiBus;
 I2CBus i2cBus;
 Temp ds; // temperature
@@ -92,34 +100,56 @@ bool systemOk = false;
 
 void app_main(void) {
 
+  if (SERIAL_RADIO_ON) {
+    // init console IO and radio console
+    uart.init();
+    delay(300);
+  }
+
+  // Testcode for buffered Serial2 tranfer
+  // console << "a:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9x1x\n";
+  // console << "b:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9x1\n";
+  // console << "c:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9x\n";
+  // console << "d:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9\n";
+  // console << "e:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f\n";
+  // console << "f:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8\n";
+  // console << "g:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7\n";
+  // console << "h:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f\n";
+  // console << "i:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6\n";
+  // console << "j:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f\n";
+  // console << "k:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5\n";
+  // console << "l:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f\n";
+  // console << "m:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4\n";
+  // console << "n:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f\n";
+  // console << "o:a1\n";
+  // console << "\n";
+  // console << "o:a1a2\n";
+
+  console << "\n--------------------\n";
+  console << "esp32dev + free RTOS\n";
+  console << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED;
+  console << "\n--------------------\n";
+
   // init arduino library
   initArduino();
 
-  // init serial output for  console
-
-  Serial.begin(SERIAL_BAUDRATE);
-  delay(300);
-  cout << endl;
-  cout << "--------------------" << endl;
-  cout << "esp32dev + free RTOS" << endl;
-  cout << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED << endl;
-  cout << "--------------------" << endl;
-
   // report chip info
-  cout << "-chip info -------------------" << endl;
+  console << "-chip info -------------------\n";
   chip_info();
-  cout << "-gpio pin settings ----------" << endl;
+  console << "-gpio pin settings ----------\n";
   gpio.init();
-  cout << "-init bus systems ------------" << endl;
+  console << "-init bus systems ------------\n";
   // init buses
   spiBus.init();
   oneWireBus.init();
   i2cBus.init();
-  cout << "------------------------------" << endl;
+  console << "------------------------------\n";
 
   engineerDisplay.init();
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
   engineerDisplay.print("[v] " + engineerDisplay.getName() + " initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
+
+  delay(1000);
 
   // ---- init modules ----
   if (INDICATOR_ON) {
@@ -153,9 +183,6 @@ void app_main(void) {
   if (DAC_ON) {
     dac.init();
   }
-  if (SERIAL_ON) {
-    uart.init();
-  }
   if (CAN_ON) {
     can.init();
   }
@@ -166,16 +193,16 @@ void app_main(void) {
     carSpeed.init();
   }
   if (!startOk) {
-    cout << "ERROR in init sequence(s). System halted!" << endl;
+    console << "ERROR in init sequence(s). System halted!\n";
     exit(0);
   }
 
   engineerDisplay.print("Startup sequence(s) successful.\n");
   engineerDisplay.print("System creating FreeRTOS tasks...\n");
-  cout << endl;
-  cout << "-----------------------------------------------------------------" << endl;
-  cout << "Startup sequence(s) successful. System creating FreeRTOS tasks..." << endl;
-  cout << "-----------------------------------------------------------------" << endl << endl;
+  console << "\n";
+  console << "-----------------------------------------------------------------\n";
+  console << "Startup sequence(s) successful. System creating FreeRTOS tasks...\n";
+  console << "-----------------------------------------------------------------\n\n";
 
   // ---- create tasks ----
   if (INDICATOR_ON) {
@@ -194,8 +221,8 @@ void app_main(void) {
   }
   if (RTC_ON) {
     RtcDateTime now = rtc.read_rtc_datetime();
-    debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
-                 now.Second());
+    // console << fmt::sprintf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n"
+    //                , now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(), now.Second());
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
     engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
   }
@@ -203,21 +230,19 @@ void app_main(void) {
     gpio.create_task();
     engineerDisplay.print("[v] " + gpio.getName() + " task initialized.\n");
   }
-
   if (DAC_ON) {
     dac.init();
-    cout << " - DAC DAC DAC" << endl;
   }
   if (COMMANDHANDLER_ON) {
     cmdHandler.create_task();
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
-  if (SERIAL_ON) {
-    cout << " - serial_demo_task" << endl;
-    xTaskCreate(&serial_demo_task, "serial_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
-  }
+  // if (SERIAL_RADIO_ON) {
+  //   console << " - serial_demo_task\n";
+  //   uart.create_task();
+  // }
   if (CAN_ON) {
-    cout << " - read_can_demo_task" << endl;
+    console << " - read_can_demo_task\n";
     can.create_task();
   }
   if (CARCONTROL_ON) {
@@ -259,7 +284,7 @@ void app_main(void) {
     driverDisplay.init();
     driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
     driverDisplay.create_task(16);
-    cout << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "." << endl;
+    console << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "\n";
   }
 
   systemOk = true;
@@ -268,9 +293,10 @@ void app_main(void) {
 #if IOEXT_ON || IOEXT2_ON
   ioExt.readAll();
 #endif
-  cout << "-----------------------------------------------------------------" << endl;
-  cout << "Creating FreeRTOS tasks successful. System running." << endl;
-  cout << "-----------------------------------------------------------------" << endl;
-  cout << endl;
-  cout << carState.print("Initial car state:") << endl;
+  console << "-----------------------------------------------------------------\n";
+  console << "Creating FreeRTOS tasks successful. System running.\n";
+  console << "-----------------------------------------------------------------\n";
+  console << "\n";
+  console << carState.print("Initial car state:") << "\n";
+  console << "-----------------------------------------------------------------\n";
 }

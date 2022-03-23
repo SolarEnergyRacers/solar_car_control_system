@@ -8,11 +8,13 @@
 
 #include <Wire.h>
 
+#include <Console.h>
 #include <I2CBus.h>
 #include <PWM.h>
 
 #include <Adafruit_PWMServoDriver.h>
 
+extern Console console;
 extern I2CBus i2cBus;
 
 void PWM::init(void) {
@@ -67,7 +69,7 @@ void PWM::task() {
         update_pwm(output, i);
       }
       // report current value
-      cout << "[PCA9685] set all outputs to: " << i;
+      console << "[PCA9685] set all outputs to: " << i;
 
       // sleep for 1s
       vTaskDelay(1000 / portTICK_PERIOD_MS);

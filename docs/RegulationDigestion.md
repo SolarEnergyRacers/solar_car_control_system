@@ -1,8 +1,0 @@
-# Regulation Digestion
-
-[TOC]
-
-## Findings
-
-- [ ] .
-

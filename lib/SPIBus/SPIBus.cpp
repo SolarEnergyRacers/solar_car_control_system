@@ -3,6 +3,7 @@
 //
 #include <definitions.h>
 
+#include <Console.h>
 #include <fmt/core.h>
 #include <inttypes.h>
 #include <iostream>
@@ -14,13 +15,13 @@
 
 #include <SPI.h>
 #include <SPIBus.h>
-
+extern Console console;
 using namespace std;
 
 void SPIBus::re_init() { init(); }
 
 void SPIBus::init(void) {
-  cout << "[?] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "." << endl;
+  console << "[?] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "\n";
 
   mutex = xSemaphoreCreateMutex();
   spi = SPIClass(VSPI);
@@ -36,5 +37,5 @@ void SPIBus::init(void) {
   xSemaphoreGive(mutex);
   // // CRITICAL SECTION SPI: end
 
-  cout << "[v] SPI inited." << endl;
+  console << "[v] SPI inited.\n";
 }

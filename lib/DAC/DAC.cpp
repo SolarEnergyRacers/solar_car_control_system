@@ -5,6 +5,7 @@
 #include <definitions.h>
 
 #include <fmt/core.h>
+#include <fmt/printf.h>
 #include <inttypes.h>
 #include <iostream>
 #include <stdio.h>
@@ -16,6 +17,7 @@
 #include <Arduino.h>
 
 #include <CarState.h>
+#include <Console.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
@@ -28,14 +30,15 @@
 extern CarState carState;
 extern DriverDisplay driverDisplay;
 extern I2CBus i2cBus;
+extern Console console;
 
 void DAC::re_init() { reset_and_lock_pot(); }
 
 void DAC::init() {
-  cout << "[?] Setup 'DAC'..." << endl;
+  console << "[?] Setup 'DAC'...\n";
   reset_and_lock_pot();
   string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:x}.\n", I2C_ADDRESS_DS1803);
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 }
 
@@ -74,8 +77,10 @@ void DAC::reset_and_lock_pot() {
   Wire.write(0); // second pot value
   Wire.endTransmission();
   xSemaphoreGive(i2cBus.mutex);
-  debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, POT_CHAN_ALL, command, 0,
-               get_pot(POT_CHAN_ALL));
+  // debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, POT_CHAN_ALL, command, 0,
+  //              get_pot(POT_CHAN_ALL));
+  console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, POT_CHAN_ALL, command,
+                          0, get_pot(POT_CHAN_ALL));
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
@@ -85,21 +90,21 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
       unlock();
       carState.AccelerationLocked = false;
       string s = fmt::format("DAC unlocked.\n");
-      cout << s;
+      console << s;
       if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
         driverDisplay.print(s.c_str());
       }
     } else {
       string s = fmt::format("Motor potentiometer locked!\n");
-      cout << s;
+      console << s;
       if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
         driverDisplay.print(s.c_str());
       }
       return;
     }
   }
-  if (val > DAC_MAX)
-    val = DAC_MAX;
+  // if (val > DAC_MAX)
+  //   val = DAC_MAX;
   // setup command
   uint8_t command = get_cmd(channel);
   uint8_t oldValue = get_pot(channel);
@@ -117,8 +122,10 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     }
     Wire.endTransmission();
     xSemaphoreGive(i2cBus.mutex);
-    debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command, val,
-                 get_pot(channel));
+    // debug_printf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command, val,
+    //              get_pot(channel));
+    console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command,
+                            val, get_pot(channel));
   }
 }
 

@@ -9,6 +9,7 @@
 #include <stdio.h>
 #include <string>
 
+#include <Console.h>
 #include <Display.h>
 #include <DriverDisplay.h>
 #include <IOExt2.h>
@@ -18,6 +19,7 @@
 extern CarState carState;
 extern DriverDisplay driverDisplay;
 extern Indicator indicator;
+extern Console console;
 
 // ------------------
 // FreeRTOS functions
@@ -28,7 +30,7 @@ void Indicator::re_init() { init(); }
 void Indicator::init(void) {
   set_SleepTime(200);
   string s = "[v] " + getName() + " initialized.\n";
-  cout << s;
+  console << s;
   driverDisplay.print(s.c_str());
 }
 
@@ -39,10 +41,12 @@ void Indicator::exit(void){
 
 void Indicator::setIndicator(INDICATOR state) {
   if (carState.Indicator == state) {
-    debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
+    // debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
+    console << fmt::format("Set indicator '{}' off\n", static_cast<int>(state));
     carState.Indicator = INDICATOR::OFF;
   } else {
-    debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
+    // debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
+    console << fmt::format("Set indicator '{}' on\n", static_cast<int>(state));
     carState.Indicator = state;
   }
 }

@@ -12,9 +12,11 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h> // semaphore
 
+#include <Console.h>
 #include <OneWire.h>
 #include <OneWireBus.h>
 
+extern Console console;
 using namespace std;
 
 void OneWireBus::init(void) {
@@ -28,5 +30,5 @@ void OneWireBus::init(void) {
   // release mutex
   xSemaphoreGive(mutex);
 
-  cout << "[v] OneWire inited: ONEWIRE_PIN=" << ONEWIRE_PIN << endl;
+  console << "[v] OneWire inited: ONEWIRE_PIN=" << ONEWIRE_PIN << "\n";
 }

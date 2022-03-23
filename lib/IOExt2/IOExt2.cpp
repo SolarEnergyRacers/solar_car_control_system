@@ -252,7 +252,7 @@ void IOExt2::task() {
     if (systemOk) {
       // handle INPUT pin interrupts
       if (ioInterruptRequest) {
-        //console << "ioInterruptRequest " << millis() << "\n";
+        // console << "ioInterruptRequest " << millis() << "\n";
         handleIoInterrupt();
         ioInterruptRequest = false;
       }

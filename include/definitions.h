@@ -129,4 +129,3 @@
 #define STEERINGWHEEL_BOARD_V2 true
 
 #endif // DEFINITIONS_H
-

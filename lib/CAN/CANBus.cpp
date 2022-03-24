@@ -19,96 +19,96 @@ void onReceiveForwarder(int packetSize) { can.onReceive(packetSize); }
 
 CANBus::CANBus() {
   // init max ages
-  this->max_ages[BMS_BASE_ADDR] = MAXAGE_BMU_HEARTBEAT;
-  this->max_ages[BMS_BASE_ADDR | 0x1] = MAXAGE_CMU_TEMP;     // CMU1
-  this->max_ages[BMS_BASE_ADDR | 0x4] = MAXAGE_CMU_TEMP;     // CMU2
-  this->max_ages[BMS_BASE_ADDR | 0x7] = MAXAGE_CMU_TEMP;     // CMU3
-  this->max_ages[BMS_BASE_ADDR | 0x2] = MAXAGE_CMU_VOLTAGES; // CMU1
-  this->max_ages[BMS_BASE_ADDR | 0x3] = MAXAGE_CMU_VOLTAGES; // CMU1
-  this->max_ages[BMS_BASE_ADDR | 0x5] = MAXAGE_CMU_VOLTAGES; // CMU2
-  this->max_ages[BMS_BASE_ADDR | 0x6] = MAXAGE_CMU_VOLTAGES; // CMU2
-  this->max_ages[BMS_BASE_ADDR | 0x8] = MAXAGE_CMU_VOLTAGES; // CMU3
-  this->max_ages[BMS_BASE_ADDR | 0x9] = MAXAGE_CMU_VOLTAGES; // CMU3
-  this->max_ages[BMS_BASE_ADDR | 0xF4] = MAXAGE_PACK_SOC;
-  this->max_ages[BMS_BASE_ADDR | 0xF5] = MAXAGE_BALANCE_SOC;
-  this->max_ages[BMS_BASE_ADDR | 0xF6] = MAXAGE_CHARGER_CONTROL;
-  this->max_ages[BMS_BASE_ADDR | 0xF7] = MAXAGE_PRECHARGE_STATUS;
-  this->max_ages[BMS_BASE_ADDR | 0xF8] = MAXAGE_MIN_MAX_U_CELL;
-  this->max_ages[BMS_BASE_ADDR | 0xF9] = MAXAGE_MIN_MAX_T_CELL;
-  this->max_ages[BMS_BASE_ADDR | 0xFA] = MAXAGE_PACK_VOLTAGE;
-  this->max_ages[BMS_BASE_ADDR | 0xFB] = MAXAGE_PACK_STATUS;
-  this->max_ages[BMS_BASE_ADDR | 0xFC] = MAXAGE_PACK_FAN_STATUS;
-  this->max_ages[BMS_BASE_ADDR | 0xFD] = MAXAGE_EXT_PACK_STATUS;
+  max_ages[BMS_BASE_ADDR] = MAXAGE_BMU_HEARTBEAT;
+  max_ages[BMS_BASE_ADDR | 0x1] = MAXAGE_CMU_TEMP;     // CMU1
+  max_ages[BMS_BASE_ADDR | 0x4] = MAXAGE_CMU_TEMP;     // CMU2
+  max_ages[BMS_BASE_ADDR | 0x7] = MAXAGE_CMU_TEMP;     // CMU3
+  max_ages[BMS_BASE_ADDR | 0x2] = MAXAGE_CMU_VOLTAGES; // CMU1
+  max_ages[BMS_BASE_ADDR | 0x3] = MAXAGE_CMU_VOLTAGES; // CMU1
+  max_ages[BMS_BASE_ADDR | 0x5] = MAXAGE_CMU_VOLTAGES; // CMU2
+  max_ages[BMS_BASE_ADDR | 0x6] = MAXAGE_CMU_VOLTAGES; // CMU2
+  max_ages[BMS_BASE_ADDR | 0x8] = MAXAGE_CMU_VOLTAGES; // CMU3
+  max_ages[BMS_BASE_ADDR | 0x9] = MAXAGE_CMU_VOLTAGES; // CMU3
+  max_ages[BMS_BASE_ADDR | 0xF4] = MAXAGE_PACK_SOC;
+  max_ages[BMS_BASE_ADDR | 0xF5] = MAXAGE_BALANCE_SOC;
+  max_ages[BMS_BASE_ADDR | 0xF6] = MAXAGE_CHARGER_CONTROL;
+  max_ages[BMS_BASE_ADDR | 0xF7] = MAXAGE_PRECHARGE_STATUS;
+  max_ages[BMS_BASE_ADDR | 0xF8] = MAXAGE_MIN_MAX_U_CELL;
+  max_ages[BMS_BASE_ADDR | 0xF9] = MAXAGE_MIN_MAX_T_CELL;
+  max_ages[BMS_BASE_ADDR | 0xFA] = MAXAGE_PACK_VOLTAGE;
+  max_ages[BMS_BASE_ADDR | 0xFB] = MAXAGE_PACK_STATUS;
+  max_ages[BMS_BASE_ADDR | 0xFC] = MAXAGE_PACK_FAN_STATUS;
+  max_ages[BMS_BASE_ADDR | 0xFD] = MAXAGE_EXT_PACK_STATUS;
 
-  this->max_ages[MPPT1_BASE_ADDR] = MAXAGE_MPPT_INPUT;
-  this->max_ages[MPPT1_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
-  this->max_ages[MPPT1_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
-  this->max_ages[MPPT1_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
-  this->max_ages[MPPT1_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
-  this->max_ages[MPPT1_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
-  this->max_ages[MPPT1_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
+  max_ages[MPPT1_BASE_ADDR] = MAXAGE_MPPT_INPUT;
+  max_ages[MPPT1_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
+  max_ages[MPPT1_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
+  max_ages[MPPT1_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
+  max_ages[MPPT1_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
+  max_ages[MPPT1_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
+  max_ages[MPPT1_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
 
-  this->max_ages[MPPT2_BASE_ADDR] = MAXAGE_MPPT_INPUT;
-  this->max_ages[MPPT2_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
-  this->max_ages[MPPT2_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
-  this->max_ages[MPPT2_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
-  this->max_ages[MPPT2_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
-  this->max_ages[MPPT2_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
-  this->max_ages[MPPT2_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
+  max_ages[MPPT2_BASE_ADDR] = MAXAGE_MPPT_INPUT;
+  max_ages[MPPT2_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
+  max_ages[MPPT2_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
+  max_ages[MPPT2_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
+  max_ages[MPPT2_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
+  max_ages[MPPT2_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
+  max_ages[MPPT2_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
 
-  this->max_ages[MPPT3_BASE_ADDR] = MAXAGE_MPPT_INPUT;
-  this->max_ages[MPPT3_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
-  this->max_ages[MPPT3_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
-  this->max_ages[MPPT3_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
-  this->max_ages[MPPT3_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
-  this->max_ages[MPPT3_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
-  this->max_ages[MPPT3_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
+  max_ages[MPPT3_BASE_ADDR] = MAXAGE_MPPT_INPUT;
+  max_ages[MPPT3_BASE_ADDR | 0x1] = MAXAGE_MPPT_OUTPUT;
+  max_ages[MPPT3_BASE_ADDR | 0x2] = MAXAGE_MPPT_TEMP;
+  max_ages[MPPT3_BASE_ADDR | 0x3] = MAXAGE_MPPT_AUX_POWER;
+  max_ages[MPPT3_BASE_ADDR | 0x4] = MAXAGE_MPPT_LIMITS;
+  max_ages[MPPT3_BASE_ADDR | 0x5] = MAXAGE_MPPT_STATUS;
+  max_ages[MPPT3_BASE_ADDR | 0x6] = MAXAGE_MPPT_POWER_CONN;
 
   // init ages
-  this->ages[BMS_BASE_ADDR] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0x1] = INT32_MAX; // CMU1
-  this->ages[BMS_BASE_ADDR | 0x4] = INT32_MAX; // CMU2
-  this->ages[BMS_BASE_ADDR | 0x7] = INT32_MAX; // CMU3
-  this->ages[BMS_BASE_ADDR | 0x2] = INT32_MAX; // CMU1
-  this->ages[BMS_BASE_ADDR | 0x3] = INT32_MAX; // CMU1
-  this->ages[BMS_BASE_ADDR | 0x5] = INT32_MAX; // CMU2
-  this->ages[BMS_BASE_ADDR | 0x6] = INT32_MAX; // CMU2
-  this->ages[BMS_BASE_ADDR | 0x8] = INT32_MAX; // CMU3
-  this->ages[BMS_BASE_ADDR | 0x9] = INT32_MAX; // CMU3
-  this->ages[BMS_BASE_ADDR | 0xF4] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xF5] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xF6] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xF7] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xF8] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xF9] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xFA] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xFB] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xFC] = INT32_MAX;
-  this->ages[BMS_BASE_ADDR | 0xFD] = INT32_MAX;
+  ages[BMS_BASE_ADDR] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0x1] = INT32_MAX; // CMU1
+  ages[BMS_BASE_ADDR | 0x4] = INT32_MAX; // CMU2
+  ages[BMS_BASE_ADDR | 0x7] = INT32_MAX; // CMU3
+  ages[BMS_BASE_ADDR | 0x2] = INT32_MAX; // CMU1
+  ages[BMS_BASE_ADDR | 0x3] = INT32_MAX; // CMU1
+  ages[BMS_BASE_ADDR | 0x5] = INT32_MAX; // CMU2
+  ages[BMS_BASE_ADDR | 0x6] = INT32_MAX; // CMU2
+  ages[BMS_BASE_ADDR | 0x8] = INT32_MAX; // CMU3
+  ages[BMS_BASE_ADDR | 0x9] = INT32_MAX; // CMU3
+  ages[BMS_BASE_ADDR | 0xF4] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xF5] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xF6] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xF7] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xF8] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xF9] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xFA] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xFB] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xFC] = INT32_MAX;
+  ages[BMS_BASE_ADDR | 0xFD] = INT32_MAX;
 
-  this->ages[MPPT1_BASE_ADDR] = INT32_MAX;
-  this->ages[MPPT1_BASE_ADDR | 0x1] = INT32_MAX;
-  this->ages[MPPT1_BASE_ADDR | 0x2] = INT32_MAX;
-  this->ages[MPPT1_BASE_ADDR | 0x3] = INT32_MAX;
-  this->ages[MPPT1_BASE_ADDR | 0x4] = INT32_MAX;
-  this->ages[MPPT1_BASE_ADDR | 0x5] = INT32_MAX;
-  this->ages[MPPT1_BASE_ADDR | 0x6] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR | 0x1] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR | 0x2] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR | 0x3] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR | 0x4] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR | 0x5] = INT32_MAX;
+  ages[MPPT1_BASE_ADDR | 0x6] = INT32_MAX;
 
-  this->ages[MPPT2_BASE_ADDR] = INT32_MAX;
-  this->ages[MPPT2_BASE_ADDR | 0x1] = INT32_MAX;
-  this->ages[MPPT2_BASE_ADDR | 0x2] = INT32_MAX;
-  this->ages[MPPT2_BASE_ADDR | 0x3] = INT32_MAX;
-  this->ages[MPPT2_BASE_ADDR | 0x4] = INT32_MAX;
-  this->ages[MPPT2_BASE_ADDR | 0x5] = INT32_MAX;
-  this->ages[MPPT2_BASE_ADDR | 0x6] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR | 0x1] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR | 0x2] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR | 0x3] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR | 0x4] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR | 0x5] = INT32_MAX;
+  ages[MPPT2_BASE_ADDR | 0x6] = INT32_MAX;
 
-  this->ages[MPPT3_BASE_ADDR] = INT32_MAX;
-  this->ages[MPPT3_BASE_ADDR | 0x1] = INT32_MAX;
-  this->ages[MPPT3_BASE_ADDR | 0x2] = INT32_MAX;
-  this->ages[MPPT3_BASE_ADDR | 0x3] = INT32_MAX;
-  this->ages[MPPT3_BASE_ADDR | 0x4] = INT32_MAX;
-  this->ages[MPPT3_BASE_ADDR | 0x5] = INT32_MAX;
-  this->ages[MPPT3_BASE_ADDR | 0x6] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR | 0x1] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR | 0x2] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR | 0x3] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR | 0x4] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR | 0x5] = INT32_MAX;
+  ages[MPPT3_BASE_ADDR | 0x6] = INT32_MAX;
 }
 
 string CANBus::getName() { return "CAN_Task"; }
@@ -259,7 +259,7 @@ void CANBus::task() {
         break;
       }
     }
-    this->sleep(CAN_TASK_WAIT);
+    sleep(CAN_TASK_WAIT);
   }
 }
 
@@ -270,10 +270,10 @@ void CANBus::onReceive(int packetSize) {
 
   packet.setID(CAN.packetId());
 
-  if (this->max_ages[packet.getID()] == 0 ||
-      (this->max_ages[packet.getID()] != -1 && millis() - this->ages[packet.getID()] > this->max_ages[packet.getID()])) {
+  if (max_ages[packet.getID()] == 0 ||
+      (max_ages[packet.getID()] != -1 && millis() - ages[packet.getID()] > max_ages[packet.getID()])) {
 
-    this->ages[packet.getID()] = millis();
+    ages[packet.getID()] = millis();
 
     for (int i = 0; i < packetSize; i++) {
       if (CAN.available()) {

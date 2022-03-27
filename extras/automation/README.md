@@ -21,8 +21,6 @@ Hints e.g here: [how-do-i-install-geckodriver](https://stackoverflow.com/questio
 - [ ] Possibly add `Terms of Use` check field
 - [ ] Possibly adjust the command for the enter command
 
-<<<<<<< HEAD
-
 ## Python Packages
 
 ```bash
@@ -35,11 +33,4 @@ pip install selenium
 
 ````bash
 C:\Users\SER\guestLogin>schtasks /create /tn "Guest relogin" /tr "python captive_portal.py" /sc hourly /mo 6 /st 00:05
-=======
-## Setup Scheduler
-
-```bash
-C:\Users\SER\guestLogin>schtasks /create /tn "Guest relogin" /tr "python captive
-_portal.py" /sc hourly /mo 6 /st 00:05
->>>>>>> f1fcfb7d07a56d72cb0af5df69dbc7070c25bbb8
 ````

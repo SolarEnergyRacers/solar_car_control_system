@@ -49,7 +49,7 @@ void CarState::init_values() {
 
   TargetSpeed = 0;
   TargetPower = 0;
-  DriverInfo = "ok.";
+  DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
 }
@@ -263,8 +263,8 @@ const string CarState::csv(string msg, bool withHeader) {
 
 const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
   string normalColor = "\033[0;39m";
-  string highLightColorOut = "\033[1;31m";
-  string highLightColorChg = "\033[1;36m";
+  string highLightColorOut = "\033[1;31m"; // red
+  string highLightColorChg = "\033[1;36m"; // blue
   stringstream ss(msg);
   if (msg.length() > 0)
     ss << msg << endl;

@@ -22,11 +22,13 @@ private:
   // if (output_setpoint < 0) {
   //   carState.Acceleration = output_setpoint; // acceleration
   //   carState.Deceleration = 0;               // deceleration
-  //   cout << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint << endl;
+  //   console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint <<
+  //   endl;
   // } else {
   //   carState.Acceleration = 0;                // acceleration
   //   carState.Deceleration = -output_setpoint; // deceleration
-  //   cout << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << endl;
+  //   console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint <<
+  //   endl;
   // }
 public:
   string getName(void) { return "CarSpeed"; };

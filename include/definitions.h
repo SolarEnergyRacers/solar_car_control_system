@@ -4,8 +4,8 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define VERSION "v0.1"
-#define VERSION_PUBLISHED "2022.01"
+#define VERSION "v0.2"
+#define VERSION_PUBLISHED "2022.02"
 
 #include <LocalFunctionsAndDevices.h>
 
@@ -53,11 +53,14 @@
 #define I2C_ADDRESS_DS1803 (DS1803_BASE_ADDR | (DS1803_ADDR2 << 2) | (DS1803_ADDR1 << 1) | DS1803_ADDR0)
 
 /*
- * SERIAL
+ * SERIAL, SERIAL2
+ *
+ * RX and TX are defined in pins_arduino.h, all others here
  */
-#define SERIAL_RX 16
-#define SERIAL_TX 17
-#define SERIAL_BAUDRATE 9600
+#define SERIAL_BAUDRATE 115200
+#define SERIAL2_RX 16
+#define SERIAL2_TX 17
+#define SERIAL2_BAUDRATE 9600
 
 /*
  * CAN Bus
@@ -151,25 +154,11 @@
  */
 #define LOG_INTERVALL 1000;
 
-#define DEBUG true
-#define debug_printf(fmt, ...)                                                                                                             \
-  do {                                                                                                                                     \
-    if (DEBUG)                                                                                                                             \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
-  } while (0)
-
-#define DEBUG2 false
-#define debug_printf_l2(fmt, ...)                                                                                                          \
-  do {                                                                                                                                     \
-    if (DEBUG2)                                                                                                                            \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
-  } while (0)
-
-#define DEBUG3 false
-#define debug_printf_l3(fmt, ...)                                                                                                          \
-  do {                                                                                                                                     \
-    if (DEBUG3)                                                                                                                            \
-      fprintf(stderr, "%-32s:%3d %-36s: " fmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                                 \
-  } while (0)
+/*
+ * Define wich version of printed board layouts are used
+ * (possibility to use older test boards too)
+ */
+#define STEERINGWHEEL_BOARD_V1 false
+#define STEERINGWHEEL_BOARD_V2 true
 
 #endif // DEFINITIONS_H

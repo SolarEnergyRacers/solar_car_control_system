@@ -7,26 +7,29 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include <../lib/Console/Console.h>
 #include <abstract_task.h>
 
 using namespace std;
 
+extern Console console;
+
 void abstract_task::init() {
   // do initialization in implementation here
-  cout << "[?] Init '" << getInfo() << "'... ";
+  console << "[?] Init '" << getInfo() << "'... ";
 };
 
 void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
 void abstract_task::sleep(int polling_ms) { vTaskDelay(polling_ms / portTICK_PERIOD_MS); };
 
 void abstract_task::create_task(int priority) {
-  cout << " - create task '" << getInfo() << "'...";
+  console << " - create task '" << getInfo() << "'...";
 #if WithTaskSuspend == true
   xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, 1, &xHandle);
 #else
   xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, priority, NULL);
 #endif
-  cout << " done." << endl;
+  console << " done.\n";
 };
 
 void abstract_task::re_init() {

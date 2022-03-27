@@ -10,7 +10,7 @@
 class CmdHandler : public abstract_task {
 private:
   uint32_t sleep_polling_ms = 250;
-  string commands = "RECDsPSJVMUH-:!ud<>wlLciIr";
+  string commands = "RECDsPSJVMUH-:!ud<>wlLciI";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
@@ -39,9 +39,8 @@ private:
                     "\tl [off]  - position lights on/off      [|off]\n"
                     "\tL [off]  - beam light on/off           [|off]\n"
                     "\tc [c|s|p]- constant speed|power mode   [|c|s|p]\n"
-                    "\ti        - update all IOs (INPUT) \n"
                     "\tI        - scan I2C devices \n"
-                    "\tr        - ioExt.readAll() \n"
+                    "\ti        - ioExt.readAll() \n"
                     "\t\n";
 
   void printSystemValues(void);

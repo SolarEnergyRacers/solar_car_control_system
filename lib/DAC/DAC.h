@@ -25,6 +25,7 @@ private:
 public:
   void init();
   void re_init();
+  string getName(void) { return "DAC"; };
   void reset_and_lock_pot();
   void lock();
   void set_pot(uint8_t val, pot_chan channel);

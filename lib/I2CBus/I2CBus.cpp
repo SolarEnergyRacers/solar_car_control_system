@@ -11,21 +11,24 @@
 
 #include <Wire.h> // Arduino I2C library
 
+#include <Console.h>
 #include <I2CBus.h>
+
+extern Console console;
 
 using namespace std;
 
 void I2CBus::re_init() { init(); }
 
 void I2CBus::init(void) {
-  cout << "[?] Init '" << getName() << "'" << endl;
+  console << "[?] Init '" << getName() << "'\n";
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
   Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
   xSemaphoreGive(mutex);
 
-  cout << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << "." << endl;
+  console << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
   scan_i2c_devices();
 }
 
@@ -53,7 +56,7 @@ void I2CBus::scan_i2c_devices() {
       * Connect a 2.4k resistor between SDA and Vcc
       * Connect a 2.4k resistor between SCL and Vcc
   */
-  cout << "    Scanning I2C addresses:" << endl << "    ";
+  console << "    Scanning I2C addresses:\n    ";
   uint8_t cnt = 0;
   string s;
 
@@ -75,9 +78,9 @@ void I2CBus::scan_i2c_devices() {
     if ((addr & 0x0f) == 0x0f) {
       s.append("\n    ");
     }
-    cout << s;
+    console << s;
   }
   xSemaphoreGive(mutex);
 
-  cout << "Scan completed: " << fmt::format("{}", cnt) << " I2C devices found." << endl;
+  console << "Scan completed: " << fmt::format("{}", cnt) << " I2C devices found.\n";
 }

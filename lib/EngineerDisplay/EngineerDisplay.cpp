@@ -14,13 +14,15 @@
 #include <Adafruit_GFX.h>     // graphics library
 #include <Adafruit_ILI9341.h> // display
 #include <CarState.h>
+#include <Console.h>
 
+extern Console console;
 extern SPIBus spiBus;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
 
 DISPLAY_STATUS EngineerDisplay::display_setup() {
-  cout << "[v] '" << getName() << "' inited: screen D ILI9341 with " << height << " x " << width << "." << endl;
+  console << "[v] '" << getName() << "' inited: screen D ILI9341 with " << height << " x " << width << "\n";
   return DISPLAY_STATUS::ENGINEER_BACKGROUND;
 }
 

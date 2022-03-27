@@ -70,14 +70,25 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Acceleration locked ... " << BOOL_str[(int)(AccelerationLocked)] << endl;
   ss << "Acceleration .......... " << Acceleration << endl;
   ss << "Deceleration .......... " << Deceleration << endl;
+  ss << "Acceleration Display... " << AccelerationDisplay << endl;
+  ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
+  ss << "Battery On............. " << BatteryOn << endl;
+  ss << "Battery Voltage........ " << BatteryVoltage << endl;
+  ss << "Battery Current........ " << BatteryCurrent << endl;
+  ss << "Battery Errors ........." << batteryErrorsAsString(true) << endl;
+  ss << "Battery Precharge State " << PRECHARGE_STATE_str[(int)(PrechargeState)] << endl;
+  ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
+  ss << "MPPT1 Current ......... " << Mppt1Current << endl;
+  ss << "MPPT2 Current ......... " << Mppt2Current << endl;
+  ss << "MPPT3 Current ......... " << Mppt3Current << endl;
+  ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent << endl;
+  ss << "Photo Reference Cell .. " << ReferenceSolarCell << endl;
   ss << "Acceleration Display .. " << AccelerationDisplay << endl;
   ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
   ss << "Battery On ............ " << BatteryOn << endl;
   ss << "Battery Voltage ....... " << BatteryVoltage << endl;
   ss << "Battery Current ....... " << BatteryCurrent << endl;
   ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
-  ss << "Photo Voltaic Current . " << PhotoVoltaicCurrent << endl;
-  ss << "Photo Reference Cell .. " << ReferenceSolarCell << endl;
   ss << "Motor On .............. " << MotorOn << endl;
   ss << "Motor Current ......... " << MotorCurrent << endl;
   ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection)] << endl;
@@ -171,6 +182,8 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "batteryOn, ";
     ss << "batteryVoltage, ";
     ss << "batteryCurrent, ";
+    ss << "batteryErrors, ";
+    ss << "batteryPrechargeState, ";
     ss << "pvOn, ";
     ss << "pvCurrent, ";
     ss << "motorOn, ";
@@ -213,6 +226,8 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << BatteryOn << ", ";
   ss << floor(BatteryVoltage * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(BatteryCurrent * 1000.0 + .5) / 1000.0 << ", ";
+  ss << batteryErrorsAsString() << ", ";
+  ss << PRECHARGE_STATE_str[(int)(PrechargeState)] << ", ";
   ss << PhotoVoltaicOn << ", ";
   ss << floor(PhotoVoltaicCurrent * 1000.0 + .5) / 1000.0 << ", ";
   ss << MotorOn << ", ";
@@ -289,4 +304,24 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
     return ss.str();
   else
     return "";
+}
+
+const string CarState::batteryErrorsAsString(bool verbose /*= false*/) {
+  stringstream ss;
+
+  ss << "[";
+
+  if (verbose) {
+    for (auto const &battErr : BatteryErrors) {
+      ss << BATTERY_ERROR_str[(int)(battErr)] << "-";
+    }
+  } else {
+    for (auto const &battErr : BatteryErrors) {
+      ss << (int)(battErr) << "-";
+    }
+  }
+
+  ss << "]";
+
+  return ss.str();
 }

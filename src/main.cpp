@@ -242,8 +242,8 @@ void app_main(void) {
   //   uart.create_task();
   // }
   if (CAN_ON) {
-    console << " - read_can_demo_task\n";
     can.create_task();
+    engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");
   }
   if (CARCONTROL_ON) {
     carControl.init();

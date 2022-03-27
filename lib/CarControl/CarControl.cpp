@@ -250,7 +250,6 @@ void CarControl::task() {
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();
     someThingChanged |= read_battery_data();
-    someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
     someThingChanged |= read_reference_cell_data();
 

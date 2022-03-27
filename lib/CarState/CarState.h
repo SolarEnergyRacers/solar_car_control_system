@@ -6,6 +6,7 @@
 #define CARSTATE_H
 
 #include <cJSON.h>
+#include <list>
 #include <map>
 #include <sstream>
 #include <string>
@@ -35,6 +36,7 @@ enum class DISPLAY_STATUS {
   ENGINEER_BACKGROUND,
   ENGINEER_RUNNING
 };
+
 static const char *DISPLAY_STATUS_str[] = {
     "DRIVER_HALTED",       // no action on this display
     "DRIVER_SETUP",        // driver screen setup
@@ -47,6 +49,32 @@ static const char *DISPLAY_STATUS_str[] = {
     "ENGINEER_BACKGROUND", // create background for engineer screen
     "ENGINEER_RUNNING"     // enineer mode active
 };
+
+enum class PRECHARGE_STATE { ERROR, IDLE, MEASURE, PRECHARGE, RUN, ENABLE_PACK };
+
+static const char *PRECHARGE_STATE_str[] = {"ERROR", "IDLE", "MEASURE", "PRECHARGE", "RUN", "ENABLE_PACK"};
+
+enum class BATTERY_ERROR {
+  CELL_OVER_VOLTAGE,
+  CELL_UNDER_VOLTAGE,
+  CELL_OVER_TEMP,
+  MEASUREMENT_UNTRUSTED,
+  CMU_COMM_TIMEOUT,
+  VEHICLE_COMM_TIMEOUT,
+  BMU_IN_SETUP_MODE,
+  CMU_CAN_POWER,
+  PACK_ISOLATION_TEST_FAIL,
+  SOC_MEASUREMENT_INVALID,
+  CAN_12V_LOW,
+  CONTACTOR_STUCK,
+  EXTRA_CELL_DETECTED
+};
+
+static const char *BATTERY_ERROR_str[] = {
+    "CELL_OVER_VOLTAGE",    "CELL_UNDER_VOLTAGE", "CELL_OVER_TEMP",     "MEASUREMENT_UNTRUSTED",    "CMU_COMM_TIMEOUT",
+    "VEHICLE_COMM_TIMEOUT", "BMU_IN_SETUP_MODE",  "CMU_CAN_POWER",      "PACK_ISOLATION_TEST_FAIL", "SOC_MEASUREMENT_INVALID",
+    "CAN_12V_LOW",          "CONTACTOR_STUCK",    "EXTRA_CELL_DETECTED"};
+
 class CarState {
 
 public:
@@ -93,9 +121,12 @@ public:
   bool MotorOn;        // IO-In
   bool EcoOn;          // IO-In
 
+  PRECHARGE_STATE PrechargeState;    // CAN
+  list<BATTERY_ERROR> BatteryErrors; // CAN
+
   float BatteryVoltage;      // CAN
   float BatteryCurrent;      // CAN
-  float PhotoVoltaicCurrent; // CAN
+  float PhotoVoltaicCurrent; // ADC
   float MotorVoltage;        // ADC
   float MotorCurrent;        // ADC
 
@@ -149,6 +180,7 @@ public:
   const string printIOs(string msg, bool withColors = true, bool deltaOnly = false);
   const string serialize(string msg = "");
   const string csv(string msg = "", bool withHeader = false);
+  const string batteryErrorsAsString(bool verbose = false);
 };
 
 #endif // CARSTATE_H

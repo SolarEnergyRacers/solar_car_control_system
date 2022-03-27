@@ -270,8 +270,7 @@ void CANBus::onReceive(int packetSize) {
 
   packet.setID(CAN.packetId());
 
-  if (max_ages[packet.getID()] == 0 ||
-      (max_ages[packet.getID()] != -1 && millis() - ages[packet.getID()] > max_ages[packet.getID()])) {
+  if (max_ages[packet.getID()] == 0 || (max_ages[packet.getID()] != -1 && millis() - ages[packet.getID()] > max_ages[packet.getID()])) {
 
     ages[packet.getID()] = millis();
 

@@ -20,15 +20,6 @@ private:
   double speed_increment = 1.0;
   PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
 
-  double input_value;
-  double output_setpoint;
-  double target_speed;
-  double Kp = 2;
-  double Ki = 1;
-  double Kd = 0.1;
-  double speed_increment = 1.0;
-  PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
-
 public:
   string getName(void) { return "CarSpeed"; };
   void init(void);

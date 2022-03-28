@@ -19,17 +19,16 @@ private:
   double Kd = 0.1;
   double speed_increment = 1.0;
   PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
-  // if (output_setpoint < 0) {
-  //   carState.Acceleration = output_setpoint; // acceleration
-  //   carState.Deceleration = 0;               // deceleration
-  //   console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint <<
-  //   endl;
-  // } else {
-  //   carState.Acceleration = 0;                // acceleration
-  //   carState.Deceleration = -output_setpoint; // deceleration
-  //   console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint <<
-  //   endl;
-  // }
+
+  double input_value;
+  double output_setpoint;
+  double target_speed;
+  double Kp = 2;
+  double Ki = 1;
+  double Kd = 0.1;
+  double speed_increment = 1.0;
+  PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
+
 public:
   string getName(void) { return "CarSpeed"; };
   void init(void);

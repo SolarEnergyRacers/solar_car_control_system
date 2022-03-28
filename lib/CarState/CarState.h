@@ -106,15 +106,15 @@ public:
   }
   ~CarState(){};
 
-  // pyhsical car data (measurment values)
+  // physical car data (measurement values)
   int Speed;        // ADC
   int Acceleration; // ADC Steering Wheel
   int Deceleration; // ADC Steering Wheel
-  //#SAVETY#: acceleration lock
+  //#SAFETY#: acceleration lock
   bool AccelerationLocked;  // DSC lock
   bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
   int AccelerationDisplay;  // Display Value (-99...+99)
-  //#SAVETY-END#
+  //#SAFETY-END#
 
   bool BatteryOn;      // IO-In
   bool PhotoVoltaicOn; // IO-in
@@ -151,12 +151,13 @@ public:
   DISPLAY_STATUS displayStatus;
   DRIVE_DIRECTION DriveDirection;
   CONSTANT_MODE ConstantMode;
-  bool ConstantModeOn; //#SAVETY#: deceleration unlock const mode
+  bool ConstantModeOn; //#SAFETY#: deceleration unlock const mode
   INDICATOR Indicator;
   bool IndicatorBlink;
   bool SdCardDetect;
 
   float TargetSpeed;
+  float TargetRecuperation;
   float TargetPower;
   string DriverInfo;
   SPEED_ARROW SpeedArrow;

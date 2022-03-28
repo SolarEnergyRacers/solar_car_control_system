@@ -71,6 +71,14 @@ void CarSpeed::update_pid(double Kp, double Ki, double Kd) { pid.SetTunings(Kp, 
 
 void CarSpeed::task() {
 
+  /*
+   * How is accelration / decelartion handled in hardware?
+   * - acceleration: Digital to analog converter value representing the target speed -> 0V: max rev, 2.5V: stop, 5V: max fwd
+   * - deceleration: DIgital to analog converter value representing the recuperation: -> 0V: no rec, 5V: max recup
+   * -> in case of recup > 0, we should have acceleration on 2.5V
+   *
+   */
+
   // polling loop
   while (1) {
     if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
@@ -87,15 +95,17 @@ void CarSpeed::task() {
       if (output_setpoint > DAC_MAX)
         output_setpoint = DAC_MAX;
 
-      // set acceleration & deceleration
-      if (output_setpoint > 0) {
-        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
-        console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> acceleration=" << output_setpoint
-                << "\n";
-      } else {
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
-        dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+      if (carState.TargetRecuperation > 0) { // we recuperate
+        dac.set_pot(carState.TargetRecuperation, DAC::pot_chan::POT_CHAN1);
+
+      } else { // we accelerate  fwd/backwrd
+        // set acceleration & deceleration
+        if (output_setpoint > 0) {
+          // TODO: set MC switch to forward
+        } else {
+          // TODO: set MC switch to reverse
+        }
+        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration forward or backward
         console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
                 << "\n";
       }

@@ -1,11 +1,9 @@
-/***
- *
+/*
  * Driver's Display
  *
  * The driver's display is passive with the exception of the indicator function.
  * This means that all sensors send their values to the display.
- *
- ***/
+ */
 
 #include <LocalFunctionsAndDevices.h>
 
@@ -71,8 +69,6 @@ void Display::re_init(void) {
   _setup();
 }
 
-// Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_RST);
-// Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(SPI_CS_TFT, SPI_DC, SPI_MOSI, SPI_CLK, SPI_RST, SPI_MISO);
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(&spiBus.spi, SPI_DC, SPI_CS_TFT, SPI_RST);
 
 void Display::_setup() {
@@ -390,17 +386,7 @@ void Display::lifeSign() {
 }
 #endif
 
-void Display::drawCentreString(const string &buf, int x, int y) {
-  // xSemaphoreTakeT(spiBus.mutex);
-
-  // int16_t x1, y1;
-  // uint16_t w, h;
-  // tft.getTextBounds(buf, &x, &y, &x1, &y1, &w, &h); // calc width of new string
-  // tft.setCursor(x - w / 2, y);
-  // tft.print(buf.c_str());
-
-  // xSemaphoreGive(spiBus.mutex);}
-}
+void Display::drawCentreString(const string &buf, int x, int y) { return; }
 
 // -------------
 // FreeRTOS TASK

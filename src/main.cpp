@@ -237,10 +237,6 @@ void app_main(void) {
     cmdHandler.create_task();
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
-  // if (SERIAL_RADIO_ON) {
-  //   console << " - serial_demo_task\n";
-  //   uart.create_task();
-  // }
   if (CAN_ON) {
     can.create_task();
     engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");

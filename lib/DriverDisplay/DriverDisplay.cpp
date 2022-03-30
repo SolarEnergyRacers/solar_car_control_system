@@ -188,7 +188,6 @@ void DriverDisplay::constant_drive_mode_show() {
   } else {
     tft.print(SPEED_STRING);
   }
-  // tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }
 
@@ -421,7 +420,7 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (BatteryOn.is_changed() || justInited) {
       BatteryOn.showValue(tft);
     }
-    PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent;
+    PhotoVoltaicCurrent.Value = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
     if (PhotoVoltaicCurrent.is_changed() || justInited) {
       PhotoVoltaicCurrent.showValue(tft);
     }

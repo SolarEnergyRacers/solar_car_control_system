@@ -3,18 +3,18 @@
 #include "CANRxBuffer.h"
 
 CANRxBuffer::CANRxBuffer() {
-  this->head = 0;
-  this->tail = 0;
-  this->items = 0;
+  head = 0;
+  tail = 0;
+  items = 0;
 }
 
 void CANRxBuffer::push(CANPacket packet) {
   rxBuffer[this->head] = packet;
-  this->head++;
-  this->items++;
+  head++;
+  items++;
 
-  if (this->head >= CAN_RX_BUFFER_SIZE) {
-    this->head = 0;
+  if (head >= CAN_RX_BUFFER_SIZE) {
+    head = 0;
   }
 }
 
@@ -22,13 +22,13 @@ CANPacket CANRxBuffer::pop() {
   CANPacket packet;
 
   if (items > 0) {
-    packet = rxBuffer[this->tail];
+    packet = rxBuffer[tail];
 
-    this->tail++;
-    this->items--;
+    tail++;
+    items--;
 
-    if (this->tail >= CAN_RX_BUFFER_SIZE) {
-      this->tail = 0;
+    if (tail >= CAN_RX_BUFFER_SIZE) {
+      tail = 0;
     }
   } else {
     packet.setID(0);
@@ -38,6 +38,6 @@ CANPacket CANRxBuffer::pop() {
   return packet;
 }
 
-bool CANRxBuffer::isAvailable() { return (this->items > 0); }
+bool CANRxBuffer::isAvailable() { return (items > 0); }
 
-uint16_t CANRxBuffer::getSize() { return this->items; }
+uint16_t CANRxBuffer::getSize() { return items; }

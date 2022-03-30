@@ -37,7 +37,7 @@ void CarSpeed::init() {
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
   sleep_polling_ms = 400;
-  console << "[v]" << getName() << " inited.\n";
+  console << "[v]" << getName() << " initialized.\n";
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }
@@ -75,38 +75,29 @@ void CarSpeed::task() {
   while (1) {
     if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
       // read target speed
-      // input_value = get_current_speed();
       input_value = carState.Speed;
-      target_speed = carState.TargetSpeed;
+      target_speed = carState.TargetSpeed; // can be negative for deceleration
 
       // update pid controller
       pid.Compute();
 
+      // check range
       if (output_setpoint < -DAC_MAX)
         output_setpoint = -DAC_MAX;
       if (output_setpoint > DAC_MAX)
         output_setpoint = DAC_MAX;
 
-      // set acceleration & deceleration // TOOD: check that the value is in range
-      // if (output_setpoint < 0) {
-      //   carState.Acceleration = output_setpoint; // acceleration
-      //   carState.Deceleration = 0;               // deceleration
-      //   console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint <<
-      //   endl;
-      // } else {
-      //   carState.Acceleration = 0;                // acceleration
-      //   carState.Deceleration = -output_setpoint; // deceleration
-      //   console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint <<
-      //   endl;
-      // }
-
-      // set acceleration & deceleration // TOOD: check that the value is in range
+      // set acceleration & deceleration
       if (output_setpoint > 0) {
+        //   carState.Acceleration = output_setpoint; // acceleration
+        //   carState.Deceleration = 0;               // deceleration
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
         dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
-        console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> Acceleration=" << output_setpoint
+        console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> acceleration=" << output_setpoint
                 << "\n";
       } else {
+        //   carState.Acceleration = 0;                // acceleration
+        //   carState.Deceleration = -output_setpoint; // deceleration
         dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
         dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
         console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint

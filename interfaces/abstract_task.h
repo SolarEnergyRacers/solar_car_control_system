@@ -1,5 +1,5 @@
 //
-// This is an example class
+// This is the abstract task class, which has to be implemented by all other tasks
 //
 
 #ifndef ABSTRACT_TASK_H
@@ -11,7 +11,6 @@
 
 #if WithTaskSuspend == true
 #include <task.h>
-// typedef void *TaskHandle_t;
 #endif
 
 using namespace std;
@@ -22,9 +21,8 @@ private:
 #if WithTaskSuspend == true
   TaskHandle_t xHandle;
 #endif
-
 protected:
-  uint32_t sleep_polling_ms = 300;
+  uint32_t sleep_polling_ms;
 
 public:
   virtual string getName(void);
@@ -43,7 +41,7 @@ public:
   void sleep(void);
   void sleep(int polling_ms);
 
-  void create_task(int priority = 1);
+  void create_task(int priority = 1, uint32_t sleep_polling = 300, int stack_size = 4096);
   static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };
 };
 

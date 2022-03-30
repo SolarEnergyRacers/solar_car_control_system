@@ -98,6 +98,10 @@ CarState carState;
 bool startOk = true;
 bool systemOk = false;
 
+bool debug = true;
+bool debugl2 = false;
+bool debugl3 = false;
+
 void app_main(void) {
 
   if (SERIAL_RADIO_ON) {
@@ -106,7 +110,7 @@ void app_main(void) {
     delay(300);
   }
 
-  // Testcode for buffered Serial2 tranfer
+  // Testcode for buffered Serial2 transfer
   // console << "a:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9x1x\n";
   // console << "b:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9x1\n";
   // console << "c:a1a2a3a4a5a6a7a8a9b1b2b3b4b5b6b7b8b9c1c2c3c4c5vc6c7c8c9d1d2d3d4d5d6d7d8d9e1e2e3e4e5e6e7e8e9f1f2f3f4f5f6f7f8f9x\n";
@@ -127,7 +131,7 @@ void app_main(void) {
 
   console << "\n--------------------\n";
   console << "esp32dev + free RTOS\n";
-  console << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED;
+  console << "Solar Energy Car Races SER4" << VERSION;
   console << "\n--------------------\n";
 
   // init arduino library
@@ -239,13 +243,9 @@ void app_main(void) {
     cmdHandler.create_task();
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
-  // if (SERIAL_RADIO_ON) {
-  //   console << " - serial_demo_task\n";
-  //   uart.create_task();
-  // }
   if (CAN_ON) {
-    console << " - read_can_demo_task\n";
     can.create_task();
+    engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");
   }
   if (CARCONTROL_ON) {
     carControl.init();
@@ -254,7 +254,7 @@ void app_main(void) {
   }
   if (IOEXT2_ON) {
     carState.Indicator = INDICATOR::OFF;
-    carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+    carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
     carState.SdCardDetect = false;
     carState.ConstantMode = CONSTANT_MODE::SPEED;
     carState.Light = LIGHT::OFF;

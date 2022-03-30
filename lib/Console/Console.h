@@ -22,6 +22,7 @@ using namespace std;
 class Console {
 public:
   string buffer = "";
+
   //------- OUT ---------
   friend Console &operator<<(Console &c, const bool &var) { return operator<<(c, to_string(var)); }
   friend Console &operator<<(Console &c, const char &var) { return operator<<(c, to_string(var)); }

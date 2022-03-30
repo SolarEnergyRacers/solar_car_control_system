@@ -157,7 +157,6 @@ bool CarControl::read_paddles() {
 void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
   // debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
   //              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
-
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
 
@@ -250,7 +249,6 @@ void CarControl::task() {
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();
     someThingChanged |= read_battery_data();
-    someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
     someThingChanged |= read_reference_cell_data();
 

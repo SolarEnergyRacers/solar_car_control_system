@@ -133,8 +133,6 @@ protected:
 private:
   void _arrow_increase(int color);
   void _arrow_decrease(int color);
-  // void _light1(bool lightOn);
-  // void _light2(bool lightOn);
   void _hide_light();
   void _turn_Left(int color);
   void _turn_Right(int color);

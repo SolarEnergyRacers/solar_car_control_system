@@ -34,6 +34,7 @@ Console &operator<<(Console &c, const char *str) {
   //    strncpy(buf, str + (i * packageSize), packageSize);
   //    *(buf + packageSize) = 0;
   //    Serial2 << strip_extended_chars(string(buf));
+  //    Serial2 << buf;
   //  }
   //  free(buf);
   //  Serial2.flush();

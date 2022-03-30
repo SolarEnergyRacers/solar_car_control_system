@@ -1,7 +1,8 @@
 //
-// This is an example class
+// This is the abstract task class, which has to be implemented by all other tasks
 //
 #include <iostream>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include <freertos/FreeRTOS.h>
@@ -20,14 +21,14 @@ void abstract_task::init() {
 };
 
 void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
-void abstract_task::sleep(int polling_ms) { vTaskDelay(polling_ms / portTICK_PERIOD_MS); };
 
-void abstract_task::create_task(int priority) {
+void abstract_task::create_task(int priority, uint32_t sleep_polling, int stack_size) {
+  sleep_polling_ms = sleep_polling;
   console << " - create task '" << getInfo() << "'...";
 #if WithTaskSuspend == true
-  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, 1, &xHandle);
+  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), stack_size, (void *)this, 1, &xHandle);
 #else
-  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), 4096, (void *)this, priority, NULL);
+  xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), stack_size, (void *)this, priority, NULL);
 #endif
   console << " done.\n";
 };

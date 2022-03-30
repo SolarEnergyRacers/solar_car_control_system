@@ -21,7 +21,8 @@
 #define SD_ON true               // SD card
 #define SERIAL_RADIO_ON true     // additionally write/read to/from the Serial2, the radio console
 
-/* the break relais only works with 12V. If you want without
+/*
+ * The break relais only works with 12V. If you want without
  * external power supply that means with only 5V the logic must be inverted.
  */
 #define VCC_12V true

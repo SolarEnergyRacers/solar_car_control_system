@@ -11,7 +11,7 @@ typedef struct {
   float x, y, z;
 } Float3D;
 
-//void read_gyro_acc_demo_task(void *pvParameter); // TODO: can eventually be removed
+// void read_gyro_acc_demo_task(void *pvParameter); // TODO: can eventually be removed
 
 class GyroAcc : public abstract_task {
 private:

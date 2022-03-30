@@ -98,6 +98,10 @@ CarState carState;
 bool startOk = true;
 bool systemOk = false;
 
+bool debug = true;
+bool debugl2 = false;
+bool debugl3 = false;
+
 void app_main(void) {
 
   if (SERIAL_RADIO_ON) {

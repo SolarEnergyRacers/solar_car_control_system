@@ -22,9 +22,8 @@ private:
 #if WithTaskSuspend == true
   TaskHandle_t xHandle;
 #endif
-
 protected:
-  uint32_t sleep_polling_ms = 300;
+  uint32_t sleep_polling_ms;
 
 public:
   virtual string getName(void);
@@ -43,7 +42,7 @@ public:
   void sleep(void);
   void sleep(int polling_ms);
 
-  void create_task(int priority = 1);
+  void create_task(int priority = 1, uint32_t sleep_polling = 300, int stack_size = 4096);
   static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };
 };
 

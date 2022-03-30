@@ -4,24 +4,25 @@
 #ifndef DEBUGPRINT_H
 #define DEBUGPRINT_H
 
-#define DEBUG true
+extern bool debug;
+extern bool debugl2;
+extern bool debugl3;
+
 #define debug_printf(frmt, ...)                                                                                                            \
   do {                                                                                                                                     \
-    if (DEBUG)                                                                                                                             \
+    if (debug)                                                                                                                             \
       console << fmt::sprintf("%-32s:%3d %-36s: " frmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                        \
   } while (0)
 
-#define DEBUG2 false
 #define debug_printf_l2(frmt, ...)                                                                                                         \
   do {                                                                                                                                     \
-    if (DEBUG2)                                                                                                                            \
+    if (debugl2)                                                                                                                           \
       console << fmt::sprintf("%-32s:%3d %-36s: " frmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                        \
   } while (0)
 
-#define DEBUG3 false
 #define debug_printf_l3(frmt, ...)                                                                                                         \
   do {                                                                                                                                     \
-    if (DEBUG3)                                                                                                                            \
+    if (debugl3)                                                                                                                           \
       console << fmt::sprintf("%-32s:%3d %-36s: " frmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                        \
   } while (0)
 

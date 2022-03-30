@@ -44,7 +44,7 @@ void CarState::init_values() {
   Indicator = INDICATOR::OFF;
   DriveDirection = DRIVE_DIRECTION::FORWARD;
   ConstantMode = CONSTANT_MODE::SPEED;
-  ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+  ConstantModeOn = false; //#SAFETY#: deceleration unlock const mode
   SdCardDetect = false;
 
   TargetSpeed = 0;
@@ -60,7 +60,7 @@ const string CarState::print(string msg, bool withColors) {
   struct tm t = *localtime(&theTime);
 
   stringstream ss(msg);
-  ss << "====SER4 Car Status====" << VERSION << "==" << VERSION_PUBLISHED << "====";
+  ss << "====SER4 Car Status====" << VERSION;
   ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
   ss << "====uptime: " << getTimeStamp(millis() / 1000) << "s====" << asctime(&t);
   if (msg.length() > 0)

@@ -79,7 +79,8 @@ void CarSpeed::task() {
    * - deceleration/recuperation: Digital to analog converter value representing the recuperation amount: -> 0V: no rec, 5V: max recup
    * -> Note: n case of recup > 0, we should have acceleration 0
    *
-   * TODO: ini file: recuperate on constant speed mode , or just let it roll (i.e. let it roll if the speed is too high is less convenient for the driver, however, it conserves energy since we do not over-regulate) For the moment, we recuperate
+   * TODO: ini file: recuperate on constant speed mode , or just let it roll (i.e. let it roll if the speed is too high is less convenient
+   * for the driver, however, it conserves energy since we do not over-regulate) For the moment, we recuperate
    */
 
   // polling loop
@@ -101,15 +102,14 @@ void CarSpeed::task() {
       // set acceleration & recuperation
       if (output_setpoint >= 0) {
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN1); // recuperation
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // recuperation
       } else {
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN0); // acceleration
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN0);               // acceleration
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
       }
       // TODO: replace dac.set_pot with carControl functions
 
       console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << "\n";
-
     }
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

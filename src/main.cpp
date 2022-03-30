@@ -131,7 +131,7 @@ void app_main(void) {
 
   console << "\n--------------------\n";
   console << "esp32dev + free RTOS\n";
-  console << "Solar Energy Car Races SER4" << VERSION << " -- " << VERSION_PUBLISHED;
+  console << "Solar Energy Car Races SER4" << VERSION;
   console << "\n--------------------\n";
 
   // init arduino library

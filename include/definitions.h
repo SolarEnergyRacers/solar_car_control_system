@@ -4,8 +4,7 @@
 #ifndef DEFINITIONS_H
 #define DEFINITIONS_H
 
-#define VERSION "v0.2"
-#define VERSION_PUBLISHED "2022.02"
+#define VERSION "$GIT_BRANCH_$GIT_COMMIT_HASH"
 
 #include <LocalFunctionsAndDevices.h>
 

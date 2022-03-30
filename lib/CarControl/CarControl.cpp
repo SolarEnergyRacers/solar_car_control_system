@@ -143,6 +143,10 @@ bool CarControl::read_paddles() {
   }
 
   if (valueDisplayLast != valueDisplay) {
+    // debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | ACCEL-DISPLAY: %3d"
+    //              " ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+    //              valueDec, valueDecNorm, valueAcc, valueAccNorm, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot,
+    //              ads_min_acc, ads_max_acc);
     hasChanged = true;
     _set_dec_acc_values(valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
   }
@@ -151,6 +155,8 @@ bool CarControl::read_paddles() {
 }
 
 void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
+  // debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+  //              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
 

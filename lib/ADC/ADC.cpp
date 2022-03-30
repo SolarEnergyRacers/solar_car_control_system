@@ -82,6 +82,7 @@ int16_t ADC::read(ADC::Pin port) {
   value = ADC::adss[idx].readADC(pin);
   xSemaphoreGive(i2cBus.mutex);
 
+  // console << fmt::sprintf("index: 0x%x, pin: 0x%x => value=%d\n", idx, pin, value);
   return value;
 }
 

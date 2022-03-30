@@ -252,7 +252,7 @@ void app_main(void) {
   }
   if (IOEXT2_ON) {
     carState.Indicator = INDICATOR::OFF;
-    carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+    carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
     carState.SdCardDetect = false;
     carState.ConstantMode = CONSTANT_MODE::SPEED;
     carState.Light = LIGHT::OFF;

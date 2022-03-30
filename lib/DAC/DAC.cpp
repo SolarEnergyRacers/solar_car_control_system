@@ -43,7 +43,7 @@ void DAC::init() {
 }
 
 void DAC::lock() {
-  //#SAVETY#: acceleration lock
+  // #SAFETY#: acceleration lock
   isLocked = true;
   carState.AccelerationLocked = true;
 };
@@ -82,7 +82,7 @@ void DAC::reset_and_lock_pot() {
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
-  //#SAVETY#: acceleration lock
+  // #SAFETY#: acceleration lock
   if (isLocked) {
     if (carState.PaddlesJustAdjusted && carState.AccelerationDisplay == 0) {
       unlock();
@@ -105,7 +105,7 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
   uint8_t command = get_cmd(channel);
   uint8_t oldValue = get_pot(channel);
   if (oldValue != val) {
-    // SAFETY: Reset constant mode on deceleration paddle touched
+    // #SAFETY#: Reset constant mode on deceleration paddel touched
     if (channel == POT_CHAN1 || channel == POT_CHAN_ALL) {
       carState.ConstantModeOn = false;
     }

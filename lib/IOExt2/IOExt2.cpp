@@ -60,12 +60,12 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x14, INPUT_PULLUP, 1, 1, false, 0l, PinNextScreen, nextScreenHandler},
     {0x15, INPUT_PULLUP, 1, 1, false, 0l, PinConstantMode, constantModeHandler},
     {0x16, INPUT_PULLUP, 1, 1, false, 0l, PinIndicatorBtnRight, indicatorHandler},
-    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler}, //#SAVETY#: deceleration unlock const mode
+    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnOffHandler}, // #SAFETY#: deceleration unlock const mode
     // IOExtDev1-PortB
     {0x18, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY31, NULL},
     {0x19, INPUT_PULLUP, 1, 1, false, 0l, PinReserve1, NULL},
     {0x1a, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY33, NULL},
-    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler}, //#SAVETY#: lock acceleration
+    {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler}, // #SAFETY#: lock acceleration
     {0x1c, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY35, NULL},
     {0x1d, INPUT_PULLUP, 1, 1, false, 0l, PinSdCardDetect, sdCardDetectHandler},
     {0x1e, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY37, NULL},
@@ -98,9 +98,9 @@ CarStatePin CarState::pins[] = { // IOExtDev0-PortA
     {0x14, INPUT_PULLUP, 1, 1, false, 0l, PinNextScreen, nextScreenHandler},
     {0x15, INPUT_PULLUP, 1, 1, false, 0l, PinConstantMode, constantModeHandler},
     {0x16, INPUT_PULLUP, 1, 1, false, 0l, PinIndicatorBtnRight, indicatorHandler},
-    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnHandler}, //#SAVETY#: deceleration unlock const mode
+    {0x17, INPUT_PULLUP, 1, 1, false, 0l, PinConstantModeOn, constantModeOnHandler}, // #SAFETY#: deceleration unlock const mode
     // IOExtDev1-PortB
-    {0x18, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler}, //#SAVETY#: lock acceleration
+    {0x18, INPUT_PULLUP, 1, 1, false, 0l, PinPaddleAdjust, paddleAdjustHandler}, // #SAFETY#: lock acceleration
     {0x19, INPUT_PULLUP, 1, 1, false, 0l, PinLight, lightHandler},
     {0x1a, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY33, NULL},
     {0x1b, INPUT_PULLUP, 1, 1, false, 0l, PinIncrease, increaseHandler},
@@ -377,7 +377,7 @@ void constantModeOnHandler() {
     console << "ConstantMode ON\n";
     carState.TargetSpeed = carState.Speed;                                       // unit: km/h
     carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
-    carState.ConstantModeOn = true;                                              //#SAVETY#: deceleration unlock const mode
+    carState.ConstantModeOn = true;                                              // #SAFETY#: deceleration unlock const mode
   }
 }
 
@@ -385,7 +385,7 @@ void constantModeOffHandler() {
   if (carState.getPin(PinConstantModeOff)->value == 0) {
     if (carState.ConstantModeOn) {
       console << "ConstantMode OFF\n";
-      carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+      carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
     }
   }
 }

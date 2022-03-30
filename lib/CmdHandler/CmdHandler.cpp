@@ -197,15 +197,15 @@ void CmdHandler::task() {
         case 'c':
           if (input[2] == 's') {
             carState.ConstantMode = CONSTANT_MODE::SPEED;
-            carState.ConstantModeOn = true; //#SAVETY#: deceleration unlock const mode
+            carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
           } else if (input[2] == 'p') {
             carState.ConstantMode = CONSTANT_MODE::POWER;
-            carState.ConstantModeOn = true; //#SAVETY#: deceleration unlock const mode
+            carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
           } else {
             if (carState.ConstantModeOn) {
-              carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+              carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
             } else {
-              carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+              carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
             }
           }
           break;

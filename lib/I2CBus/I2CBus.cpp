@@ -49,13 +49,13 @@ bool I2CBus::i2c_available(uint8_t adr) {
 
 void I2CBus::scan_i2c_devices() {
   /* I2C slave Address Scanner
-  for 5V bus
-      * Connect a 4.7k resistor between SDA and Vcc
-      * Connect a 4.7k resistor between SCL and Vcc
-  for 3.3V bus
-      * Connect a 2.4k resistor between SDA and Vcc
-      * Connect a 2.4k resistor between SCL and Vcc
-  */
+   * for 5V bus
+   * Connect a 4.7k resistor between SDA and Vcc
+   * Connect a 4.7k resistor between SCL and Vcc
+   * for 3.3V bus
+   * Connect a 2.4k resistor between SDA and Vcc
+   * Connect a 2.4k resistor between SCL and Vcc
+   */
   console << "    Scanning I2C addresses:\n    ";
   uint8_t cnt = 0;
   string s;

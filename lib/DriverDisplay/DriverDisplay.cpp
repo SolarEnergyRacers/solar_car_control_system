@@ -188,7 +188,6 @@ void DriverDisplay::constant_drive_mode_show() {
   } else {
     tft.print(SPEED_STRING);
   }
-  // tft.setTextSize(1);
   xSemaphoreGive(spiBus.mutex);
 }
 

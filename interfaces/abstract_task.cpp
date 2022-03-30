@@ -1,7 +1,8 @@
 //
-// This is an example class
+// This is the abstract task class, which has to be implemented by all other tasks
 //
 #include <iostream>
+#include <stdint.h>
 #include <stdlib.h>
 
 #include <freertos/FreeRTOS.h>

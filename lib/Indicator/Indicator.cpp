@@ -41,11 +41,9 @@ void Indicator::exit(void){
 
 void Indicator::setIndicator(INDICATOR state) {
   if (carState.Indicator == state) {
-    // debug_printf("Set indicator '%d' off\n", static_cast<int>(state));
     console << fmt::format("Set indicator '{}' off\n", static_cast<int>(state));
     carState.Indicator = INDICATOR::OFF;
   } else {
-    // debug_printf("Set indicator '%d' on\n", static_cast<int>(state));
     console << fmt::format("Set indicator '{}' on\n", static_cast<int>(state));
     carState.Indicator = state;
   }

@@ -1,5 +1,5 @@
 //
-// This is an example class
+// This is the abstract task class, which has to be implemented by all other tasks
 //
 
 #ifndef ABSTRACT_TASK_H
@@ -11,7 +11,6 @@
 
 #if WithTaskSuspend == true
 #include <task.h>
-// typedef void *TaskHandle_t;
 #endif
 
 using namespace std;

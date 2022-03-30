@@ -5,10 +5,6 @@
 #ifndef CARSTATEPIN_H
 #define CARSTATEPIN_H
 
-#include <stdio.h>  /* printf */
-#include <stdlib.h> /* abs */
-#include <string>
-
 #include <definitions.h>
 
 using namespace std;

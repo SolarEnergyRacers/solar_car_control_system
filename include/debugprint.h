@@ -3,11 +3,6 @@
  */
 #ifndef DEBUGPRINT_H
 #define DEBUGPRINT_H
-#include <../.pio/libdeps/esp32dev/fmt/include/fmt/core.h>
-#include <../.pio/libdeps/esp32dev/fmt/include/fmt/printf.h>
-#include <../lib/Console/Console.h>
-
-extern Console console;
 
 extern bool debug;
 extern bool debugl2;

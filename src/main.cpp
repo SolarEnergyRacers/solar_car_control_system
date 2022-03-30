@@ -241,10 +241,6 @@ void app_main(void) {
     cmdHandler.create_task();
     engineerDisplay.print("[v] " + cmdHandler.getName() + " task initialized.\n");
   }
-  // if (SERIAL_RADIO_ON) {
-  //   console << " - serial_demo_task\n";
-  //   uart.create_task();
-  // }
   if (CAN_ON) {
     can.create_task();
     engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");
@@ -256,7 +252,7 @@ void app_main(void) {
   }
   if (IOEXT2_ON) {
     carState.Indicator = INDICATOR::OFF;
-    carState.ConstantModeOn = false; //#SAVETY#: deceleration unlock const mode
+    carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
     carState.SdCardDetect = false;
     carState.ConstantMode = CONSTANT_MODE::SPEED;
     carState.Light = LIGHT::OFF;

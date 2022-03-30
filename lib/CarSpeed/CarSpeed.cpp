@@ -73,10 +73,13 @@ void CarSpeed::task() {
 
   /*
    * How is accelration / decelartion handled in hardware?
-   * - acceleration: Digital to analog converter value representing the target speed -> 0V: max rev, 2.5V: stop, 5V: max fwd
-   * - deceleration: DIgital to analog converter value representing the recuperation: -> 0V: no rec, 5V: max recup
-   * -> in case of recup > 0, we should have acceleration on 2.5V
    *
+   * - acceleration: Digital to analog converter value representing the target speed -> 0V: stop, 5V -> max speed
+   * - a separate I/O is used for forward/reverse switching
+   * - deceleration/recuperation: Digital to analog converter value representing the recuperation amount: -> 0V: no rec, 5V: max recup
+   * -> Note: n case of recup > 0, we should have acceleration 0
+   *
+   * TODO: ini file: recuperate on constant speed mode , or just let it roll (i.e. let it roll if the speed is too high is less convenient for the driver, however, it conserves energy since we do not over-regulate) For the moment, we recuperate
    */
 
   // polling loop
@@ -84,7 +87,7 @@ void CarSpeed::task() {
     if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
       // read target speed
       input_value = carState.Speed;
-      target_speed = carState.TargetSpeed; // can be negative for deceleration
+      target_speed = carState.TargetSpeed;
 
       // update pid controller
       pid.Compute();
@@ -95,20 +98,18 @@ void CarSpeed::task() {
       if (output_setpoint > DAC_MAX)
         output_setpoint = DAC_MAX;
 
-      if (carState.TargetRecuperation > 0) { // we recuperate
-        dac.set_pot(carState.TargetRecuperation, DAC::pot_chan::POT_CHAN1);
-
-      } else { // we accelerate  fwd/backwrd
-        // set acceleration & deceleration
-        if (output_setpoint > 0) {
-          // TODO: set MC switch to forward
-        } else {
-          // TODO: set MC switch to reverse
-        }
-        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration forward or backward
-        console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
-                << "\n";
+      // set acceleration & recuperation
+      if (output_setpoint >= 0) {
+        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN1); // recuperation
+      } else {
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN0); // acceleration
+        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
       }
+      // TODO: replace dac.set_pot with carControl functions
+
+      console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << "\n";
+
     }
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

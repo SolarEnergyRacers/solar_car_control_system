@@ -259,7 +259,7 @@ void CANBus::task() {
         break;
       }
     }
-    //sleep(CAN_TASK_WAIT);
+    // sleep(CAN_TASK_WAIT);
     vTaskDelay(CAN_TASK_WAIT / portTICK_RATE_MS);
   }
 }

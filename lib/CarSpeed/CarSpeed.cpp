@@ -106,8 +106,8 @@ void CarSpeed::task() {
       } else {
         //   carState.Acceleration = 0;                // acceleration
         //   carState.Deceleration = -output_setpoint; // deceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
-        //TODO: (+/- output_setpoint)
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN0); // acceleration
+        // TODO: (+/- output_setpoint)
         // dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
         dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
         console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint

@@ -11,8 +11,6 @@
 #include <iostream>
 #include <stdio.h>
 
-//#include <Arduino.h>
-
 #include <CarSpeed.h>
 #include <CarState.h>
 #include <Console.h>
@@ -71,12 +69,24 @@ void CarSpeed::update_pid(double Kp, double Ki, double Kd) { pid.SetTunings(Kp, 
 
 void CarSpeed::task() {
 
+  /*
+   * How is accelration / decelartion handled in hardware?
+   *
+   * - acceleration: Digital to analog converter value representing the target speed -> 0V: stop, 5V -> max speed
+   * - a separate I/O is used for forward/reverse switching
+   * - deceleration/recuperation: Digital to analog converter value representing the recuperation amount: -> 0V: no rec, 5V: max recup
+   * -> Note: n case of recup > 0, we should have acceleration 0
+   *
+   * TODO: ini file: recuperate on constant speed mode , or just let it roll (i.e. let it roll if the speed is too high is less convenient
+   * for the driver, however, it conserves energy since we do not over-regulate) For the moment, we recuperate
+   */
+
   // polling loop
   while (1) {
     if (carState.ConstantModeOn && carState.ConstantMode == CONSTANT_MODE::SPEED) {
       // read target speed
       input_value = carState.Speed;
-      target_speed = carState.TargetSpeed; // can be negative for deceleration
+      target_speed = carState.TargetSpeed;
 
       // update pid controller
       pid.Compute();
@@ -88,21 +98,24 @@ void CarSpeed::task() {
         output_setpoint = DAC_MAX;
 
       // set acceleration & deceleration
-      if (output_setpoint > 0) {
+      if (output_setpoint >= 0) {
         //   carState.Acceleration = output_setpoint; // acceleration
         //   carState.Deceleration = 0;               // deceleration
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // deceleration
-        console << "#+++ input_value=" << input_value << ", target_speed=" << target_speed << " ==> acceleration=" << output_setpoint
-                << "\n";
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // recuperation
       } else {
         //   carState.Acceleration = 0;                // acceleration
         //   carState.Deceleration = -output_setpoint; // deceleration
         dac.set_pot(0, DAC::pot_chan::POT_CHAN0);                // acceleration
+        //TODO: (+/- output_setpoint)
+        // dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
         dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
         console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
                 << "\n";
       }
+      // TODO: replace dac.set_pot with carControl functions
+
+      console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << "\n";
     }
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

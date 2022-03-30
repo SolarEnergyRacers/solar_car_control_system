@@ -11,7 +11,8 @@
 
 using namespace std;
 
-bool static extended_charset(char c) { return !(c >= 19 && c < 128 && c != 9 && c != 10 && c != 13); }
+bool static extended_charset(char c) { return c < ' ' && c != '\t' && c != '\n' && c != '\r'; }
+
 const char *strip_extended_chars(string str) {
   str.erase(remove_if(str.begin(), str.end(), extended_charset), str.end());
   return str.c_str();

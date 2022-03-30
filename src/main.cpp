@@ -213,7 +213,9 @@ void app_main(void) {
     xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
   }
   if (GYRO_ACC_ON) {
-    xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    // xTaskCreate(&read_gyro_acc_demo_task, "read_gyro_acc_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+    gyroAcc.create_task();
+    engineerDisplay.print("[v] " + gyroAcc.getName() + " task initialized.\n");
   }
   if (PWM_ON) {
     pwm.create_task();

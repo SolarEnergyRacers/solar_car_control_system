@@ -11,8 +11,6 @@
 #include <iostream>
 #include <stdio.h>
 
-//#include <Arduino.h>
-
 #include <CarSpeed.h>
 #include <CarState.h>
 #include <Console.h>
@@ -99,13 +97,21 @@ void CarSpeed::task() {
       if (output_setpoint > DAC_MAX)
         output_setpoint = DAC_MAX;
 
-      // set acceleration & recuperation
+      // set acceleration & deceleration
       if (output_setpoint >= 0) {
+        //   carState.Acceleration = output_setpoint; // acceleration
+        //   carState.Deceleration = 0;               // deceleration
         dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
         dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // recuperation
       } else {
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN0);               // acceleration
-        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
+        //   carState.Acceleration = 0;                // acceleration
+        //   carState.Deceleration = -output_setpoint; // deceleration
+        dac.set_pot(0, DAC::pot_chan::POT_CHAN0); // acceleration
+        // TODO: (+/- output_setpoint)
+        // dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
+        dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
+        console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
+                << "\n";
       }
       // TODO: replace dac.set_pot with carControl functions
 

@@ -55,8 +55,23 @@ void Uart::init() {
   console << fmt::format("[v] {} inited.\n", getName());
 }
 
+// bool payload1;
+// bool payload2;
 void Uart::task() {
   while (1) {
+    // // payload1 = payload2 = false;
+    // while (Serial2.available()) {
+    //   // Serial.print(char(Serial2.read()));
+    //   Serial << char(Serial2.read());
+    //   // payload2 = true;
+    // }
+    // // if (payload2) {
+    // //   Serial << "---read\n";
+    // // }
+    // while (Serial.available()) {
+    //   // Serial2.print(char(Serial.read()));
+    //   Serial2 << Serial.readString();
+    // }
     vTaskDelay(1000 / portTICK_PERIOD_MS);
   }
 }

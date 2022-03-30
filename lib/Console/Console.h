@@ -23,19 +23,19 @@ class Console {
 public:
   string buffer = "";
 
-public:
   //------- OUT ---------
-  friend Console &operator<<(Console &c, const string &str);
-  friend Console &operator<<(Console &c, const char &chr);
+  friend Console &operator<<(Console &c, const bool &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const char &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const double &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const float &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const int &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const long &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const size_t &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const string &var) { return operator<<(c, var.c_str()); }
+  friend Console &operator<<(Console &c, const unsigned long &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const volatile int &var) { return operator<<(c, to_string(var)); }
+
   friend Console &operator<<(Console &c, const char *str);
-  friend Console &operator<<(Console &c, const int &i);
-  friend Console &operator<<(Console &c, const volatile int &i);
-  friend Console &operator<<(Console &c, const long &l);
-  friend Console &operator<<(Console &c, const unsigned long &l);
-  friend Console &operator<<(Console &c, const float &f);
-  friend Console &operator<<(Console &c, const double &d);
-  friend Console &operator<<(Console &c, const size_t &st);
-  friend Console &operator<<(Console &c, const bool &b);
 
   //-------- IN ---------
   friend string &operator>>(string &s, Console &c);

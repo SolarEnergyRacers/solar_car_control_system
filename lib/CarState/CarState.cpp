@@ -48,7 +48,6 @@ void CarState::init_values() {
   SdCardDetect = false;
 
   TargetSpeed = 0;
-  TargetRecuperation = 0;
   TargetPower = 0;
   DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;

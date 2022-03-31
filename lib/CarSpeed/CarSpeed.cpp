@@ -7,9 +7,14 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include <inttypes.h>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
+#include <string>
 
 #include <CarSpeed.h>
 #include <CarState.h>
@@ -92,10 +97,14 @@ void CarSpeed::task() {
       pid.Compute();
 
       // check range
-      if (output_setpoint < -DAC_MAX)
+      if (output_setpoint < -DAC_MAX) {
+        console << fmt::format("WARN::PID dejustified {} < -{}!\n", output_setpoint, DAC_MAX);
         output_setpoint = -DAC_MAX;
-      if (output_setpoint > DAC_MAX)
+      }
+      if (output_setpoint > DAC_MAX) {
+        console << fmt::format("WARN::PID dejustified {} > {}!\n", output_setpoint, DAC_MAX);
         output_setpoint = DAC_MAX;
+      }
 
       // set acceleration & deceleration
       if (output_setpoint >= 0) {

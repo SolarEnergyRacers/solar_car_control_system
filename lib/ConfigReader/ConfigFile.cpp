@@ -43,6 +43,8 @@ ConfigFile::ConfigFile(std::string const &configFile) {
     name = trim(line.substr(0, posEqual));
     value = trim(line.substr(posEqual + 1));
 
+    //TODO: trim line comments
+
     content_[inSection + '/' + name] = Chameleon(value);
   }
 }

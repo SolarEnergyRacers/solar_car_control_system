@@ -103,3 +103,43 @@
 
 ## ASC2016_Protection-System-Test-Procedure.pdf (Damian, Jonas)
 - [ ] Sämtliche Schutzfunktionen des BMS werden getestet, man muss Messpunkte für Fehler-Signal-Injektion bereitstellen.
+
+## iESC 2022
+
+This regulatory document contains concrete dates and times (chapter scrutineering)
+
+### 2.4 Solar Collector (Jonas)
+
+### 2.5 Energy storage
+
+### 2.6 Signage
+
+### 2.8 Timing Transponder
+
+### 2.15 Emergency recovery
+
+### 2.24 Lighting
+
+### 2.25 Audible warning device
+
+### 2.26 Instrumentation (Karl)
+
+### 2.27 Automatic functions (Karl)
+
+### 2.28 Electrical safety
+
+### 2.29 Electrical safe state 
+
+###  2.30 Auxiliary Battery
+
+###  3.8 Safety equipment
+
+- [ ] battery datasheet
+- [ ] suitable container for damaged electrochemial cells
+- [ ] Sand
+
+### 3.9 Communication
+
+### 3.15 Charging with an External Power Supply
+
+### 3.16 Solar Charging

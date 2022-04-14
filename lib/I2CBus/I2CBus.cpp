@@ -66,7 +66,7 @@ void I2CBus::scan_i2c_devices() {
     try {
       Wire.beginTransmission(addr);
       ec = Wire.endTransmission(true);
-    } catch (__exception ex) {
+    } catch (exception &ex) {
       // do nothing
     }
     if (ec == 0) {

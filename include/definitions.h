@@ -8,6 +8,9 @@
 
 #include <LocalFunctionsAndDevices.h>
 
+#define FILENAME_SER4CONFIG "/ser4config.ini"
+//#define FILENAME_SER4DATA "/ser4data.csv"
+
 /*
  *  GPIO
  */
@@ -59,7 +62,7 @@
 #define SERIAL_BAUDRATE 115200
 #define SERIAL2_RX 16
 #define SERIAL2_TX 17
-#define SERIAL2_BAUDRATE 9600
+#define SERIAL2_BAUDRATE 115200 //9600
 
 /*
  * CAN Bus

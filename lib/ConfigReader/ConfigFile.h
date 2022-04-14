@@ -9,16 +9,26 @@
 
 #include "Chameleon.h"
 
+using namespace std;
+
 class ConfigFile {
-  std::map<std::string, Chameleon> content_;
+  std::map<string, Chameleon> content_;
 
 public:
-  ConfigFile(std::string const &configFile);
+  ConfigFile(string const &configFile);
 
-  Chameleon const &Value(std::string const &section, std::string const &entry) const;
+  Chameleon const &Value(string const &section, string const &entry) const;
+  //Chameleon const &Value(string const &section, string const &entry, string const &default_value) const;
+  string Value(string const &section, string const &entry, string const &default_value) const;
 
-  Chameleon const &Value(std::string const &section, std::string const &entry, double value);
-  Chameleon const &Value(std::string const &section, std::string const &entry, std::string const &value);
+  Chameleon const &Value(string const &section, string const &entry, int value);
+  Chameleon const &Value(string const &section, string const &entry, int value, int default_value);
+
+  Chameleon const &Value(string const &section, string const &entry, float value);
+  Chameleon const &Value(string const &section, string const &entry, float value, float default_value);
+
+  Chameleon const &Value(string const &section, string const &entry, double value);
+  Chameleon const &Value(string const &section, string const &entry, double value, double default_value);
 };
 
 #endif

@@ -7,8 +7,6 @@
 
 #include <SD.h>
 
-#define FILENAME "/ser4data.csv"
-
 class SDCard {
 private:
   bool mounted;

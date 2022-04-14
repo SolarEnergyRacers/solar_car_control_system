@@ -106,8 +106,8 @@ void Display::_setup() {
     printf("    ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
     printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
     printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
-  } catch (__exception ex) {
-    console << "[x] Display: Unable to initialize screen 'ILI9341'.\n";
+  } catch (exception &ex) {
+    console << fmt::format("[x] Display: Unable to initialize screen 'ILI9341': {}\n", ex.what());
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }

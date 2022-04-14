@@ -1,8 +1,6 @@
 # Boot Screens
 
-## 2021.08.03
-
-## Boot Display Log
+## Boot Display Log - 2021.08.03
 
 ```
 rst:0x1 (POWERON_RESET),boot:0x13 (SPI_FAST_FLASH_BOOT)
@@ -175,4 +173,7 @@ lib/ADC/ADC.cpp                 :186 read_adc_acc_dec                    : Dec (
 - [x] witch screen button
 - [x] left paddle 0 ... -74
 - [x] right paddle 0 .. 52
+- [x] Gyroscope
+
+## Boot Display Log - 2022.04 13
 

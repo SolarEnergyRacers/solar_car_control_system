@@ -9,14 +9,19 @@
 #include <string>
 
 #include <CarState.h>
+#include <ConfigFile.h>
+#include <Console.h>
 #include <Helper.h>
 #include <IOExt2.h>
 #include <Indicator.h>
+#include <SDCard.h>
 #include <definitions.h>
 
 using namespace std;
 
 extern CarState carState;
+extern Console console;
+extern SDCard sdCard;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
@@ -52,6 +57,31 @@ void CarState::init_values() {
   DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
+
+  // read from ser4config.ini file
+  console << "START 1 READING FROM CONFIG.INI___________________\n";
+  read_config_ini();
+  console << "FINISH READING FROM CONFIG.INI__________________\n";
+}
+
+bool CarState::read_config_ini() {
+  try {
+    ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
+    console << "START 2 READING FROM CONFIG.INI___________________\n";
+
+    LogFilename = (string)cf.Value("Main", "LogFilename", "/ser4data.csv");
+    console << fmt::format("START 2a READING FROM CONFIG.INI: LogFileName:{}___________________\n",LogFilename);
+    LogFilePeriod = cf.Value("Main", "LogFilePeriod");
+    console << "START 2b READING FROM CONFIG.INI___________________\n";
+    LogInterval = cf.Value("Main", "LogInterval");
+    console << "START 2c READING FROM CONFIG.INI___________________\n";
+  } catch (exception &ex) {
+    console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";
+    console << "START 2d READING FROM CONFIG.INI___________________\n";
+    return false;
+  }
+  console << "START 2e READING FROM CONFIG.INI___________________\n";
+  return true;
 }
 
 const string CarState::print(string msg, bool withColors) {

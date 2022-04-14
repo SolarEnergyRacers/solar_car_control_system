@@ -193,6 +193,7 @@ void app_main(void) {
   if (SD_ON) {
     sdCard.init();
   }
+  carState.init_values();
   if (CARSPEED_ON) {
     carSpeed.init();
   }
@@ -291,7 +292,6 @@ void app_main(void) {
 
   systemOk = true;
   sleep(1);
-  carState.init_values();
 #if IOEXT_ON || IOEXT2_ON
   ioExt.readAll();
 #endif

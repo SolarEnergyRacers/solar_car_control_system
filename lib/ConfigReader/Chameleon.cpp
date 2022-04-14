@@ -24,19 +24,32 @@
    René Nyffenegger rene.nyffenegger@adp-gmbh.ch
 */
 
+#include <iostream>
 #include <sstream>
 #include <string>
-#include <iostream>
 
 #include "Chameleon.h"
 
-Chameleon::Chameleon(std::string const &value) { value_ = value; }
+using namespace std;
 
+Chameleon::Chameleon(string const &value) { value_ = value; }
 
 Chameleon::Chameleon(const char *c) { value_ = c; }
 
+Chameleon::Chameleon(int d) {
+  stringstream s;
+  s << d;
+  value_ = s.str();
+}
+
+Chameleon::Chameleon(float d) {
+  stringstream s;
+  s << d;
+  value_ = s.str();
+}
+
 Chameleon::Chameleon(double d) {
-  std::stringstream s;
+  stringstream s;
   s << d;
   value_ = s.str();
 }
@@ -48,18 +61,33 @@ Chameleon &Chameleon::operator=(Chameleon const &other) {
   return *this;
 }
 
-Chameleon &Chameleon::operator=(double i) {
-  std::stringstream s;
+Chameleon &Chameleon::operator=(int i) {
+  stringstream s;
   s << i;
   value_ = s.str();
   return *this;
 }
 
-Chameleon &Chameleon::operator=(std::string const &s) {
-  value_ = s;
+Chameleon &Chameleon::operator=(float i) {
+  stringstream s;
+  s << i;
+  value_ = s.str();
   return *this;
 }
 
-Chameleon::operator std::string() const { return value_; }
+Chameleon &Chameleon::operator=(double i) {
+  stringstream s;
+  s << i;
+  value_ = s.str();
+  return *this;
+}
 
+// Chameleon &Chameleon::operator=(string const &s) {
+//   value_ = s;
+//   return *this;
+// }
+
+Chameleon::operator string() const { return value_; }
+Chameleon::operator int() const { return atoi(value_.c_str()); }
+Chameleon::operator float() const { return atof(value_.c_str()); }
 Chameleon::operator double() const { return atof(value_.c_str()); }

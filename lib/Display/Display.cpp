@@ -366,7 +366,7 @@ int Display::write_nat_999(int x, int y, int valueLast, int value, int textSize,
 }
 
 #if LIFESIGN_ON == true
-unsigned long secLast = 0;
+unsigned long secondLast = 0;
 void Display::lifeSign() {
   int color = ILI9341_GREEN;
   if (!sdCard.isReadyForLog()) {
@@ -379,8 +379,8 @@ void Display::lifeSign() {
   lifeSignState = !lifeSignState;
 
   unsigned long allSeconds = millis() / 1000;
-  if (secLast < allSeconds) {
-    secLast = allSeconds;
+  if (secondLast < allSeconds) {
+    secondLast = allSeconds;
     // TODO: switch by debug level: console << getTimeStamp(allSeconds).c_str() << "\n";
   }
 }

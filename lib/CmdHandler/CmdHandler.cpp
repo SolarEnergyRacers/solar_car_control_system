@@ -139,7 +139,7 @@ void CmdHandler::task() {
           sdCard.unmount();
           break;
         case 'M':
-          sdCard.logEnabled = sdCard.mount();
+          sdCard.mount();
           break;
         case 'H':
           memory_info();

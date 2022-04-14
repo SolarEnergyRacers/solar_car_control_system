@@ -201,15 +201,15 @@ public:
   // [Dynamic]
   int PaddleDamping = 10;         // 0...99
   int PaddleOffset = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
-  int PaddleAdjustCounter = 10;   // about seconds§
+  int PaddleAdjustCounter = 3;   // about seconds§
   float ConstSpeedIncrease = 1.0; // [km/h] per click
   float ConstPowerIncrease = 1.0; // [W] per click
 
   // [Communication]
-  int I2CFrequence = 200;        // [kHz]
-  int CarDataLogPeriod = 1000;   // [ms]
-  int Serail1Baudrates = 115200; // baud
-  int Serial2Baudrate = 9600;    // baud
+  int I2CFrequence = 200;       // [kHz]
+  int CarDataLogPeriod = 1000;  // [ms]
+  int Serial1Baudrate = 115200; // baud
+  int Serial2Baudrate = 115200; // baud
 
   // [Telemetry]
   int SendInterval = 1000;    // [ms]

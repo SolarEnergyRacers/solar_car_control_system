@@ -70,26 +70,26 @@ bool CarState::initalize_config() {
     console << "START 2 READING FROM CONFIG.INI___________________\n";
 
     // [Main]
-    LogFilename = cf.Value("Main", "LogFilename", "/ser4data.csv");
-    LogFilePeriod = cf.Value("Main", "LogFilePeriod", 1);
-    LogInterval = cf.Value("Main", "LogInterval", 1);
+    LogFilename = cf.get("Main", "LogFilename", "/ser4data.csv");
+    LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
+    LogInterval = cf.get("Main", "LogInterval", 1);
     // [TaskTimings]
-    SleepTimeIOExt = cf.Value("TaskTimings", "SleepTimeIOExt", 400);
+    SleepTimeIOExt = cf.get("TaskTimings", "SleepTimeIOExt", 400);
     // [Dynamic]
-    PaddleDamping = cf.Value("Dynamic", "PaddleDamping", 10);
-    PaddleOffset = cf.Value("Dynamic", "PaddleOffset", 3000);
-    PaddleAdjustCounter = cf.Value("Dynamic", "PaddleAdjustCounter", 10);
-    ConstSpeedIncrease = cf.Value("Dynamic", "ConstSpeedIncrease", 1.0);
-    ConstPowerIncrease = cf.Value("Dynamic", "ConstPowerIncrease", 0.5);
+    PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
+    PaddleOffset = cf.get("Dynamic", "PaddleOffset", 3000);
+    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 10);
+    ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
+    ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
     // [Communication]
-    I2CFrequence = cf.Value("Communication", "I2CFrequence", 400);
-    CarDataLogPeriod = cf.Value("Communication", "CarDataLogPeriod", 1000);
-    Serail1Baudrates = cf.Value("Communication", "Serail1Baudrates", 115200);
-    Serial2Baudrate = cf.Value("Communication", "Serial2Baudrate", 9800);
+    I2CFrequence = cf.get("Communication", "I2CFrequence", 400);
+    CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
+    Serial1Baudrate = cf.get("Communication", "Serail1Baudrates", 115200);
+    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9800);
 
     // [Telemetry]
-    SendInterval = cf.Value("Telemetry", "", 1000);
-    MaxCachedRecords = cf.Value("Telemetry", "MaxCachedRecords", 100);
+    SendInterval = cf.get("Telemetry", "", 1000);
+    MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);
 
   } catch (exception &ex) {
     console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";

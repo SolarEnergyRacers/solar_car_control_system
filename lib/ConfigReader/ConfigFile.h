@@ -15,11 +15,11 @@ class ConfigFile {
 public:
   ConfigFile(string const &configFile);
 
-  string const &Value(string const &section, string const &entry, string default_value) const;
-  bool Value(string const &section, string const &entry, bool default_value);
-  int Value(string const &section, string const &entry, int default_value);
-  float Value(string const &section, string const &entry, float default_value);
-  double Value(string const &section, string const &entry, double default_value);
+  string const &get(string const &section, string const &entry, string default_value) const;
+  bool get(string const &section, string const &entry, bool default_value);
+  int get(string const &section, string const &entry, int default_value);
+  float get(string const &section, string const &entry, float default_value);
+  double get(string const &section, string const &entry, double default_value);
 };
 
 #endif

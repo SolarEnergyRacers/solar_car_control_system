@@ -33,7 +33,6 @@ extern DriverDisplay driverDisplay;
 void SDCard::re_init() { init(); }
 
 void SDCard::init() {
-  logEnabled = false;
   string s = "[?] Init 'SDCard'...\n";
   console << s;
   driverDisplay.print(s.c_str());
@@ -51,7 +50,6 @@ void SDCard::init() {
   driverDisplay.print(s.c_str());
 
   if (open_log_file()) {
-    logEnabled = true;
     write(carState.csv("Initial State", true));
     console << "ok.\n";
     driverDisplay.print("SD Card mounted.\n");
@@ -62,7 +60,7 @@ void SDCard::init() {
 
 bool SDCard::mount() {
   if (!carState.SdCardDetect) {
-    console << "ERROR: No SD card detected..\n";
+    console << "M..\n";
     return false;
   }
   try {
@@ -105,6 +103,10 @@ bool SDCard::open_log_file() {
 }
 
 void SDCard::unmount() {
+  if (!carState.SdCardDetect) {
+    mounted = false;
+    return;
+  }
   if (isReadyForLog()) {
     try {
       xSemaphoreTakeT(spiBus.mutex);
@@ -130,7 +132,6 @@ void SDCard::unmount() {
     }
     mounted = false;
   }
-  logEnabled = false;
 }
 
 string SDCard::directory() {
@@ -172,7 +173,7 @@ void SDCard::printDirectory(File dir, int numTabs) {
 }
 
 void SDCard::write(string msg) {
-  if (logEnabled) {
+  if (!isReadyForLog()) {
     if (!isReadyForLog()) {
       // give it a shot
       open_log_file();

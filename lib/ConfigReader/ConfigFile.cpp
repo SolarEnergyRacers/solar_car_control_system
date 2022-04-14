@@ -78,7 +78,7 @@ ConfigFile::ConfigFile(string const &configFile) {
   }
 }
 
-string const &ConfigFile::Value(string const &section, string const &entry, string default_value) const {
+string const &ConfigFile::get(string const &section, string const &entry, string const default_value) const {
 
   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 
@@ -88,7 +88,7 @@ string const &ConfigFile::Value(string const &section, string const &entry, stri
   return ci->second;
 }
 
-bool ConfigFile::Value(string const &section, string const &entry, bool default_value) {
+bool ConfigFile::get(string const &section, string const &entry, bool default_value) {
 
   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 
@@ -100,7 +100,7 @@ bool ConfigFile::Value(string const &section, string const &entry, bool default_
   return value;
 }
 
-int ConfigFile::Value(string const &section, string const &entry, int default_value) {
+int ConfigFile::get(string const &section, string const &entry, int default_value) {
 
   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 
@@ -110,7 +110,7 @@ int ConfigFile::Value(string const &section, string const &entry, int default_va
   return stoi(ci->second);
 }
 
-float ConfigFile::Value(string const &section, string const &entry, float default_value) {
+float ConfigFile::get(string const &section, string const &entry, float default_value) {
 
   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 
@@ -120,7 +120,7 @@ float ConfigFile::Value(string const &section, string const &entry, float defaul
   return stof(ci->second);
 }
 
-double ConfigFile::Value(string const &section, string const &entry, double default_value) {
+double ConfigFile::get(string const &section, string const &entry, double default_value) {
 
   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 

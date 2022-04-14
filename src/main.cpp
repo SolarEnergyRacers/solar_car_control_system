@@ -156,12 +156,25 @@ void app_main(void) {
   delay(1000);
 
   // ---- init modules ----
+  if (COMMANDHANDLER_ON) {
+    cmdHandler.init();
+  }
+  if (INT_ON) {
+    gpio.register_gpio_interrupt();
+  }
+  if (IOEXT2_ON) {
+    ioExt.init();
+  }
+  if (SD_ON) {
+    sdCard.init();
+  }
+
+  carState.init_values();
+  //------from now config ini values can be used------
+  
   if (INDICATOR_ON) {
     indicator.init();
     indicator.setIndicator(INDICATOR::OFF);
-  }
-  if (COMMANDHANDLER_ON) {
-    cmdHandler.init();
   }
   if (ADC_ON) {
     adc.init();
@@ -178,22 +191,12 @@ void app_main(void) {
   if (RTC_ON) {
     rtc.init();
   }
-  if (INT_ON) {
-    gpio.register_gpio_interrupt();
-  }
-  if (IOEXT2_ON) {
-    ioExt.init();
-  }
   if (DAC_ON) {
     dac.init();
   }
   if (CAN_ON) {
     can.init();
   }
-  if (SD_ON) {
-    sdCard.init();
-  }
-  carState.init_values();
   if (CARSPEED_ON) {
     carSpeed.init();
   }

@@ -183,7 +183,7 @@ void CarControl::adjust_paddles(int seconds) {
   ads_max_acc = 0;
   ads_max_dec = 0;
 
-  int cycles = (seconds * 10);
+  int cycles = (seconds);
   if (cycles < 1)
     cycles = 1;
   string s("    adjust...");
@@ -260,7 +260,7 @@ void CarControl::task() {
     _handle_indicator();
 
     // one data row per second
-    if (sdCard.logEnabled && (millis() > millisNextStamp)) {
+    if (sdCard.isReadyForLog() && (millis() > millisNextStamp)) {
       millisNextStamp = millis() + carState.CarDataLogPeriod;
       sdCard.write(carState.csv("Recent State"));
     }

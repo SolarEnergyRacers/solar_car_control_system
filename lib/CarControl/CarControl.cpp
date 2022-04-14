@@ -261,7 +261,7 @@ void CarControl::task() {
 
     // one data row per second
     if (sdCard.logEnabled && (millis() > millisNextStamp)) {
-      millisNextStamp = millis() + LOG_INTERVALL;
+      millisNextStamp = millis() + carState.CarDataLogPeriod;
       sdCard.write(carState.csv("Recent State"));
     }
 

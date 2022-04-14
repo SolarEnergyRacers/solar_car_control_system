@@ -11,10 +11,12 @@
 
 #include <Wire.h> // Arduino I2C library
 
+#include <CarState.h>
 #include <Console.h>
 #include <I2CBus.h>
 
 extern Console console;
+extern CarState carState;
 
 using namespace std;
 
@@ -25,7 +27,7 @@ void I2CBus::init(void) {
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
-  Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ);
+  Wire.begin(I2C_SDA, I2C_SCL, carState.I2CFrequence * 1000); // frequency in Hz
   xSemaphoreGive(mutex);
 
   console << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";

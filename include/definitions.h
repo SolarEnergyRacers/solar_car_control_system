@@ -152,11 +152,6 @@
  */
 
 /*
- * carState and carControl
- */
-#define LOG_INTERVALL 1000;
-
-/*
  * Define wich version of printed board layouts are used
  * (possibility to use older test boards too)
  */

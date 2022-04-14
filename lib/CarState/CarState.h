@@ -105,7 +105,7 @@ public:
     AccelerationLocked = true;
   }
   ~CarState(){};
-  bool read_config_ini();
+  bool initalize_config();
 
   // physical car data (measurement values)
   int Speed;        // ADC
@@ -206,8 +206,8 @@ public:
   float ConstPowerIncrease = 1.0; // [W] per click
 
   // [Communication]
-  int I2CFrequence = 400;        // [ms]
-  int CarDataLogPeriod = 1;      // [s]
+  int I2CFrequence = 200;        // [kHz]
+  int CarDataLogPeriod = 1000;   // [ms]
   int Serail1Baudrates = 115200; // baud
   int Serial2Baudrate = 9600;    // baud
 

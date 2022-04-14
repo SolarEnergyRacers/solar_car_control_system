@@ -60,11 +60,11 @@ void CarState::init_values() {
 
   // read from ser4config.ini file
   console << "START 1 READING FROM CONFIG.INI___________________\n";
-  read_config_ini();
+  initalize_config();
   console << "FINISH READING FROM CONFIG.INI__________________\n";
 }
 
-bool CarState::read_config_ini() {
+bool CarState::initalize_config() {
   try {
     ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
     console << "START 2 READING FROM CONFIG.INI___________________\n";
@@ -83,7 +83,7 @@ bool CarState::read_config_ini() {
     ConstPowerIncrease = cf.Value("Dynamic", "ConstPowerIncrease", 0.5);
     // [Communication]
     I2CFrequence = cf.Value("Communication", "I2CFrequence", 400);
-    CarDataLogPeriod = cf.Value("Communication", "CarDataLogPeriod", 1);
+    CarDataLogPeriod = cf.Value("Communication", "CarDataLogPeriod", 1000);
     Serail1Baudrates = cf.Value("Communication", "Serail1Baudrates", 115200);
     Serial2Baudrate = cf.Value("Communication", "Serial2Baudrate", 9800);
 

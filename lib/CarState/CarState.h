@@ -184,7 +184,7 @@ public:
   const string csv(string msg = "", bool withHeader = false);
   const string batteryErrorsAsString(bool verbose = false);
 
-  // auxiliary variables - possibly read from ser4config.ini
+  // auxiliary variables - read from ser4config.ini
   // [Main]
   string LogFilename; // telemetry data: %stamp% get replaced by datetime stamp if period != 0
   int LogFilePeriod;  // [h], after that a new log file is created, 0 - never
@@ -200,6 +200,7 @@ public:
 
   // [Dynamic]
   int PaddleDamping = 10;         // 0...99
+  int PaddleOffset = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
   int PaddleAdjustCounter = 10;   // about seconds§
   float ConstSpeedIncrease = 1.0; // [km/h] per click
   float ConstPowerIncrease = 1.0; // [W] per click

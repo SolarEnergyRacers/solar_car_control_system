@@ -146,7 +146,7 @@ void CmdHandler::task() {
           break;
         // -------------- chase car commands
         case '-':
-          carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
+          carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
           break;
         case 'u':
           if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {

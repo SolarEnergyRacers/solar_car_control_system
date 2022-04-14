@@ -407,7 +407,7 @@ void constantModeHandler() {
 void paddleAdjustHandler() {
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
     console << "Request Paddle Adjust\n";
-    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
+    carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
   }
 }
 

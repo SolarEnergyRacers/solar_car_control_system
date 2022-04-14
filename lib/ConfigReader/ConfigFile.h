@@ -7,28 +7,19 @@
 #include <map>
 #include <string>
 
-#include "Chameleon.h"
-
 using namespace std;
 
 class ConfigFile {
-  std::map<string, Chameleon> content_;
+  std::map<string, string> content_;
 
 public:
   ConfigFile(string const &configFile);
 
-  Chameleon const &Value(string const &section, string const &entry) const;
-  //Chameleon const &Value(string const &section, string const &entry, string const &default_value) const;
-  string Value(string const &section, string const &entry, string const &default_value) const;
-
-  Chameleon const &Value(string const &section, string const &entry, int value);
-  Chameleon const &Value(string const &section, string const &entry, int value, int default_value);
-
-  Chameleon const &Value(string const &section, string const &entry, float value);
-  Chameleon const &Value(string const &section, string const &entry, float value, float default_value);
-
-  Chameleon const &Value(string const &section, string const &entry, double value);
-  Chameleon const &Value(string const &section, string const &entry, double value, double default_value);
+  string const &Value(string const &section, string const &entry, string default_value) const;
+  bool Value(string const &section, string const &entry, bool default_value);
+  int Value(string const &section, string const &entry, int default_value);
+  float Value(string const &section, string const &entry, float default_value);
+  double Value(string const &section, string const &entry, double default_value);
 };
 
 #endif

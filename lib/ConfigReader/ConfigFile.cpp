@@ -3,6 +3,9 @@
 #include <fmt/core.h>
 #include <fmt/printf.h>
 #include <fstream>
+#include <iostream>
+#include <sstream>
+#include <string>
 
 #include <Console.h>
 #include <SDCard.h>
@@ -60,68 +63,69 @@ ConfigFile::ConfigFile(string const &configFile) {
         name = trim(line.substr(0, posEqual));
         value = trim(line.substr(posEqual + 1));
 
-        console << "START 3c READING FROM CONFIG.INI___________________\n";
         // remove line end comment
         posEqual = value.find('#');
         value = trim(value.substr(0, posEqual));
-        content_[inSection + '/' + name] = Chameleon(value);
-        console << "START 3d READING FROM CONFIG.INI___________________\n";
+        content_[inSection + '/' + name] = value;
       }
+      console << fmt::format("INFO: 3d:: READING FROM CONFIG.INI___________________\n", configFile);
     } catch (exception &ex) {
       console << "WARN: No readable configfile: '" << configFile << "' found: " << ex.what() << "\n";
     }
   } else {
-    content_["no_config_info/not_found"] = Chameleon("no value");
+    content_["no_config_info/not_found"] = "no value";
     console << "WARN: No readable configfile: '" << configFile << "' found. Using coded settings.\n";
   }
 }
 
-Chameleon const &ConfigFile::Value(string const &section, string const &entry) const {
+string const &ConfigFile::Value(string const &section, string const &entry, string default_value) const {
 
-  std::map<string, Chameleon>::const_iterator ci = content_.find(section + '/' + entry);
-  console << "START 4a READING FROM CONFIG.INI___________________\n";
+  std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 
   if (ci == content_.end())
-    throw "does not exist";
+    return default_value;
 
   return ci->second;
 }
 
-// Chameleon const &ConfigFile::Value(string const &section, string const &entry, string const &default_value) const {
+bool ConfigFile::Value(string const &section, string const &entry, bool default_value) {
 
-//   std::map<string, Chameleon>::const_iterator ci = content_.find(section + '/' + entry);
-//   console << "START 4b READING FROM CONFIG.INI___________________\n";
-
-//   if (ci == content_.end()) {
-//     console << fmt::format("START 4c READING FROM CONFIG.INI, value={}___________________\n", default_value);
-//     Chameleon const v = (Chameleon const)default_value;
-//     console << fmt::format("START 4d READING FROM CONFIG.INI, value={}___________________\n", v);
-//     return (Chameleon const)default_value;
-//   }
-//   console << "START 4e READING FROM CONFIG.INI___________________\n";
-//   return ci->second;
-// }
-
-string ConfigFile::Value(string const &section, string const &entry, string const &default_value) const {
-
-  std::map<string, Chameleon>::const_iterator ci = content_.find(section + '/' + entry);
-  console << "START 4b READING FROM CONFIG.INI___________________\n";
+  std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 
   if (ci == content_.end()) {
-    console << fmt::format("START 4c READING FROM CONFIG.INI, value={}___________________\n", default_value);
-    string v = default_value;
-    console << fmt::format("START 4d READING FROM CONFIG.INI, value={}___________________\n", v);
     return default_value;
   }
-  console << "START 4e READING FROM CONFIG.INI___________________\n";
-  return (string)ci->second;
+  bool value = default_value;
+  istringstream(ci->second) >> value;
+  return value;
 }
 
+int ConfigFile::Value(string const &section, string const &entry, int default_value) {
 
-Chameleon const &ConfigFile::Value(string const &section, string const &entry, double default_value) {
-  try {
-    return Value(section, entry);
-  } catch (const char *) {
-    return content_.insert(make_pair(section + '/' + entry, Chameleon(default_value))).first->second;
+  std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
+
+  if (ci == content_.end()) {
+    return default_value;
   }
+  return stoi(ci->second);
+}
+
+float ConfigFile::Value(string const &section, string const &entry, float default_value) {
+
+  std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
+
+  if (ci == content_.end()) {
+    return default_value;
+  }
+  return stof(ci->second);
+}
+
+double ConfigFile::Value(string const &section, string const &entry, double default_value) {
+
+  std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
+
+  if (ci == content_.end()) {
+    return default_value;
+  }
+  return stod(ci->second);
 }

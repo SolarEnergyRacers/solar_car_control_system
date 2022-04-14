@@ -422,17 +422,18 @@ void sdCardDetectHandler() {
 
 void decreaseHandler() {
   console << "Decrease constant mode target.\n";
-  if (carState.TargetSpeed > 2)
-    carState.TargetSpeed -= 2;
-  if (carState.TargetPower > 1)
-    carState.TargetPower -= 1;
+  if (carState.TargetSpeed >= carState.ConstSpeedIncrease)
+    carState.TargetSpeed -= carState.ConstSpeedIncrease;
+  if (carState.TargetPower >= carState.ConstPowerIncrease1)
+    carState.TargetPower -= carState.ConstPowerIncrease;
 }
 
 void increaseHandler() {
   console << "Increase constant mode target.\n";
-  if (carState.TargetSpeed < 111)
-    carState.TargetSpeed += 2;
-  carState.TargetPower += 1;
+  if (carState.TargetSpeed < 111) // only until 111km/h
+    carState.TargetSpeed += carState.ConstSpeedIncrease;
+  if (carState.TargetSPower < 5000) // only until 5kW
+    carState.TargetPower += carState.ConstPowerIncrease;
 }
 // end IO pin handler -----------------------------------------
 #endif

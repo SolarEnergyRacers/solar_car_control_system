@@ -116,6 +116,11 @@ bool CarControl::read_paddles() {
   int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
 
+  // check if change is in damping
+  if (valueAcc != 0 && valueDec != 0)
+    if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
+      return hasChanged;
+
   int16_t valueDecNorm = 0;
   int16_t valueAccNorm = 0;
   int valueDisplay = 0;
@@ -215,8 +220,8 @@ void CarControl::adjust_paddles(int seconds) {
     delay(100);
   }
   // make sure null level to avoid automatic acceleration/deceleration
-  ads_min_dec += 5000;
-  ads_min_acc += 5000;
+  ads_min_dec += carState.PaddleOffset;
+  ads_min_acc += carState.PaddleOffset;
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   console << s;

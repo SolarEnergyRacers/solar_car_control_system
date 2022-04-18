@@ -78,7 +78,7 @@ bool CarState::initalize_config() {
     // [Dynamic]
     PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
     PaddleOffset = cf.get("Dynamic", "PaddleOffset", 3000);
-    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 10);
+    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 25);
     ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
     ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
     // [Communication]
@@ -147,7 +147,37 @@ const string CarState::print(string msg, bool withColors) {
      << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
   ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << "]" << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
-  ss << "IO ....................." << printIOs("", false) << endl;
+  ss << "IO .................... " << printIOs("", false) << endl;
+
+  ss << "Log file name ......... " << LogFilename << endl;
+  ss << "Log file persiod ...... " << LogFilePeriod << endl;
+  ss << "Log file interval ..... " << LogInterval << endl;
+
+  // [TaskTimings]
+  ss << "Sleep time EIOExt ..... " << SleepTimeIOExt << endl;
+
+  // [PID]
+  ss << "Kp .................... " << Kp << endl;
+  ss << "Ki .................... " << Ki << endl;
+  ss << "Kd .................... " << Kd << endl;
+
+  // [Dynamic]
+  ss << "Paddle damping ........ " << PaddleDamping << endl;
+  ss << "Paddle offset ......... " << PaddleOffset << endl;
+  ss << "Paddle adjustment ..... " << PaddleAdjustCounter << endl;
+  ss << "Const speed increase .. " << ConstSpeedIncrease << endl;
+  ss << "Const power invrease .. " << ConstPowerIncrease << endl;
+
+  // [Communication]
+  ss << "I2C frequency ......... " << I2CFrequence << endl;
+  ss << "Car data log period ... " << CarDataLogPeriod << endl;
+  ss << "Serial 1 baud rate .... " << Serial1Baudrate << endl;
+  ss << "Serial 2 baud rate .... " << Serial2Baudrate << endl;
+
+  // [Telemetry]
+  ss << "Telemetry send intervall" << SendInterval << endl;
+  ss << "Telemetry cahce records " << MaxCachedRecords << endl;
+
   ss << "===========================================================================================" << endl;
   return ss.str();
 }

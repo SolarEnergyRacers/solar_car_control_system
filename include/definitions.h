@@ -59,10 +59,8 @@
  *
  * RX and TX are defined in pins_arduino.h, all others here
  */
-//#define SERIAL_BAUDRATE 115200
 #define SERIAL2_RX 16
 #define SERIAL2_TX 17
-//#define SERIAL2_BAUDRATE 115200 // 9600
 
 /*
  * CAN Bus

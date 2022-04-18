@@ -104,6 +104,10 @@ bool debugl3 = false;
 
 void app_main(void) {
 
+  //--- no SD card available --> set only defualt values
+  carState.init_values();
+  //------from now config ini values can be used------
+
   if (SERIAL_RADIO_ON) {
     // init console IO and radio console
     uart.init();
@@ -156,9 +160,6 @@ void app_main(void) {
   delay(1000);
 
   // ---- init modules ----
-  if (COMMANDHANDLER_ON) {
-    cmdHandler.init();
-  }
   if (INT_ON) {
     gpio.register_gpio_interrupt();
   }
@@ -169,9 +170,13 @@ void app_main(void) {
     sdCard.init();
   }
 
+  //--- SD card available ----------------------------
   carState.init_values();
   //------from now config ini values can be used------
-  
+
+  if (COMMANDHANDLER_ON) {
+    cmdHandler.init();
+  }
   if (INDICATOR_ON) {
     indicator.init();
     indicator.setIndicator(INDICATOR::OFF);
@@ -252,6 +257,21 @@ void app_main(void) {
     engineerDisplay.print("[v] " + can.getName() + " task initialized.\n");
   }
   if (CARCONTROL_ON) {
+    if (CARCONTROL_ON) {
+      carControl.init();
+      carControl.create_task();
+      engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");
+    }
+    if (IOEXT2_ON) {
+      carState.Indicator = INDICATOR::OFF;
+      carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
+      carState.SdCardDetect = false;
+      carState.ConstantMode = CONSTANT_MODE::SPEED;
+      carState.Light = LIGHT::OFF;
+      ioExt.create_task();
+      engineerDisplay.print("[v] " + ioExt.getName() + " task initialized.\n");
+      ioExt.readAll();
+    }
     carControl.init();
     carControl.create_task();
     engineerDisplay.print("[v] " + carControl.getName() + " task initialized.\n");

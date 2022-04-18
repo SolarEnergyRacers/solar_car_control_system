@@ -412,7 +412,7 @@ void paddleAdjustHandler() {
 }
 
 void sdCardDetectHandler() {
-  carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
+  carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 0;
   if (carState.SdCardDetect) {
     console << "SD card removed.\n";
   } else {

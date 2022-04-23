@@ -60,8 +60,14 @@ void SDCard::init() {
 
 bool SDCard::mount() {
   if (!carState.SdCardDetect) {
-    console << "M..\n";
+    console << "No SD card detected!\n";
+    mounted = false;
+    SD.end();
     return false;
+  }
+  if (sdCard.isMounted()) {
+    console << "SD card already mounted.\n";
+    return true;
   }
   try {
     xSemaphoreTakeT(spiBus.mutex);
@@ -74,17 +80,13 @@ bool SDCard::mount() {
     console << "ERROR: Unable to mount SD card.\n";
   } catch (exception &ex) {
     xSemaphoreGive(spiBus.mutex);
-    console << "ERROR:Unable to mount SD card: " << ex.what() << "\n";
+    console << "ERROR: Unable to mount SD card: " << ex.what() << "\n";
   }
   return false;
 }
 
 bool SDCard::open_log_file() {
-  if (!mounted) {
-    // give it a shot
-    mount();
-  }
-  if (mounted) {
+  if (mount()) {
     try {
       xSemaphoreTakeT(spiBus.mutex);
       dataFile = SD.open(carState.LogFilename.c_str(), FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE

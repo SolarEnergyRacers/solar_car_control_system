@@ -199,20 +199,20 @@ public:
   double Kd; // = 0.1; // differential
 
   // [Dynamic]
-  int PaddleDamping; // = 10;         // 0...99
-  int PaddleOffset; // = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
-  int PaddleAdjustCounter; // = 20;   // about seconds§
+  int PaddleDamping;        // = 10;         // 0...99
+  int PaddleOffset;         // = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
+  int PaddleAdjustCounter;  // = 20;   // about seconds§
   float ConstSpeedIncrease; // = 1.0; // [km/h] per click
   float ConstPowerIncrease; // = 1.0; // [W] per click
 
   // [Communication]
-  int I2CFrequence; // = 200;       // [kHz]
-  int CarDataLogPeriod; // = 1000;  // [ms]
+  int I2CFrequence;             // = 200;       // [kHz]
+  int CarDataLogPeriod;         // = 1000;  // [ms]
   int Serial1Baudrate = 115200; // baud
-  int Serial2Baudrate = 9600; // baud
+  int Serial2Baudrate = 9600;   // baud
 
   // [Telemetry]
-  int SendInterval; // = 1000;    // [ms]
+  int SendInterval;     // = 1000;    // [ms]
   int MaxCachedRecords; // = 100; // number of telemetry records hold in cache in case of trasmit errors
 };
 

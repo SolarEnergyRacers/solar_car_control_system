@@ -22,6 +22,7 @@ using namespace std;
 extern CarState carState;
 extern Console console;
 extern SDCard sdCard;
+extern IOExt2 ioExt;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
@@ -58,16 +59,19 @@ void CarState::init_values() {
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
 
+  console << "Reread all IOs in foreced mode...\n";
+  ioExt.readAll(false, true);
+  console << print("Initial State") << "\n";
+
   // read from ser4config.ini file
-  console << "START 1 READING FROM CONFIG.INI___________________\n";
   initalize_config();
+  console << print("State after SER4CONF.INI") << "\n";
   console << "FINISH READING FROM CONFIG.INI__________________\n";
 }
 
 bool CarState::initalize_config() {
   try {
     ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
-    console << "START 2 READING FROM CONFIG.INI___________________\n";
 
     // [Main]
     LogFilename = cf.get("Main", "LogFilename", "/ser4data.csv");
@@ -75,6 +79,10 @@ bool CarState::initalize_config() {
     LogInterval = cf.get("Main", "LogInterval", 1);
     // [TaskTimings]
     SleepTimeIOExt = cf.get("TaskTimings", "SleepTimeIOExt", 400);
+    // [PID]
+    Kp = cf.get("PID", "Kp", 2);
+    Ki = cf.get("PID", "Ki", 1);
+    Kd = cf.get("PID", "Kd", 0.1);
     // [Dynamic]
     PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
     PaddleOffset = cf.get("Dynamic", "PaddleOffset", 3000);
@@ -82,10 +90,10 @@ bool CarState::initalize_config() {
     ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
     ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
     // [Communication]
-    I2CFrequence = cf.get("Communication", "I2CFrequence", 400);
+    I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
     CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
-    Serial1Baudrate = cf.get("Communication", "Serail1Baudrates", 115200);
-    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9800);
+    Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
+    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
 
     // [Telemetry]
     SendInterval = cf.get("Telemetry", "", 1000);
@@ -142,7 +150,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Constant Mode ......... " << CONSTANT_MODE_str[(int)(ConstantMode)] << endl;
   ss << "Target Speed .......... " << TargetSpeed << endl;
   ss << "Target Power .......... " << TargetPower << endl;
-  ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << endl;
+  ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;
   ss << "Info Last ............. "
      << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
   ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << "]" << endl;

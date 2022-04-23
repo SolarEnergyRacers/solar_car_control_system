@@ -8,6 +8,7 @@
 #include <fmt/format.h>
 #include <fmt/printf.h>
 #include <iostream>
+#include <iterator>
 #include <sstream>
 #include <stdio.h>
 #include <string>
@@ -21,6 +22,7 @@
 
 #include <ADC.h>
 #include <CarControl.h>
+#include <CarSpeed.h>
 #include <CarState.h>
 #include <CarStatePin.h>
 #include <CmdHandler.h>
@@ -42,6 +44,7 @@ extern IOExt2 ioExt;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
+extern CarSpeed carSpeed;
 extern CarControl carControl;
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
@@ -66,6 +69,12 @@ void CmdHandler::exit() {
   // TODO
 }
 // ------------------
+template <size_t N> void splitString(string (&arr)[N], string str) {
+  int n = 0;
+  istringstream iss(str);
+  for (auto it = istream_iterator<string>(iss); it != istream_iterator<string>() && n < N; ++it, ++n)
+    arr[n] = *it;
+}
 
 void CmdHandler::task() {
   string state;
@@ -132,9 +141,18 @@ void CmdHandler::task() {
           sdCard.write(state);
           console << state;
           break;
-        case 'P': {
-          sdCard.directory();
+        case 'k': {
+          string arr[4];
+          splitString(arr, &input[1]);
+          float Kp = atof(arr[0].c_str());
+          float Ki = atof(arr[1].c_str());
+          float Kd = atof(arr[2].c_str());
+          carSpeed.update_pid(Kp, Ki, Kd);
+          console << "PID set to Kp=" << Kp << ", Ki=" << Ki << ", Kd=" << Kd << "\n";
         } break;
+        case 'P':
+          sdCard.directory();
+          break;
         case 'U':
           sdCard.unmount();
           break;

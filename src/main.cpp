@@ -105,7 +105,7 @@ bool debugl3 = false;
 void app_main(void) {
 
   //--- no SD card available --> set only defualt values
-  carState.init_values();
+  // carState.init_values();
   //------from now config ini values can be used------
 
   if (SERIAL_RADIO_ON) {
@@ -171,7 +171,7 @@ void app_main(void) {
   }
 
   //--- SD card available ----------------------------
-  carState.init_values();
+  // carState.init_values();
   //------from now config ini values can be used------
 
   if (COMMANDHANDLER_ON) {
@@ -324,4 +324,8 @@ void app_main(void) {
   console << "\n";
   console << carState.print("Initial car state:") << "\n";
   console << "-----------------------------------------------------------------\n";
+
+  //--- SD card available ----------------------------
+  carState.init_values();
+  //------from now config ini values can be used------
 }

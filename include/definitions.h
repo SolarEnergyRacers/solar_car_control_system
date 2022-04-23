@@ -8,7 +8,7 @@
 
 #include <LocalFunctionsAndDevices.h>
 
-#define FILENAME_SER4CONFIG "/ser4config.ini"
+#define FILENAME_SER4CONFIG "SER4CONF.INI"
 //#define FILENAME_SER4DATA "/ser4data.csv"
 
 /*

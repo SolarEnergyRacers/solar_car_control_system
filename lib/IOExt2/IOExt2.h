@@ -89,7 +89,7 @@ public:
   void setPort(int port, bool value);
   int getPort(int port);
 
-  void readAll(bool deltaOnly = false);
+  void readAll(bool deltaOnly = false, bool forced = false);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };

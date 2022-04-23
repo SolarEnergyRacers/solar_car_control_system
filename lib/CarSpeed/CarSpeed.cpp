@@ -70,7 +70,12 @@ double CarSpeed::get_current_speed() {
   return (double)370 * wheel_circumference / 60.0;
 }
 
-void CarSpeed::update_pid(double Kp, double Ki, double Kd) { pid.SetTunings(Kp, Ki, Kd); }
+void CarSpeed::update_pid(double Kp, double Ki, double Kd) {
+  carState.Kp = Kp;
+  carState.Ki = Ki;
+  carState.Kd = Kd;
+  pid.SetTunings(carState.Kp, carState.Ki, carState.Kd);
+}
 
 void CarSpeed::task() {
 

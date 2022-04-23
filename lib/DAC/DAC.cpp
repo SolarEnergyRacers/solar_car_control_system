@@ -77,7 +77,8 @@ void DAC::reset_and_lock_pot() {
   Wire.write(0); // second pot value
   Wire.endTransmission();
   xSemaphoreGive(i2cBus.mutex);
-  // console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, POT_CHAN_ALL, command,
+  // console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, POT_CHAN_ALL,
+  // command,
   //                         0, get_pot(POT_CHAN_ALL));
 }
 

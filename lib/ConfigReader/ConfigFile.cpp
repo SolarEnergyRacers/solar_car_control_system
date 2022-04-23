@@ -30,24 +30,60 @@ string trim(string const &source, char const *delims = " \t\r\n") {
 }
 
 // read the whole config file and store the Section/Entry pairs in a map
+// ConfigFile::ConfigFile() {
+//   console << "START 2a READING FROM CONFIG.INI:" << FILENAME_SER4CONFIG << "\n";
+//   sdCard.mount();
+//   if (sdCard.isMounted()) {
+//     try {
+//       ifstream file(FILENAME_SER4CONFIG, ios_base::in);
+//       string inSection = "UNKNOWN";
+//       string line;
+//       for (int lineNr = 0; getline(file, line); lineNr++) {
+//         if (!line.length())
+//           continue;
+
+//         console << lineNr << ": " << line << "\n";
+
+//         if (line[0] == '#')
+//           continue;
+//         if (line[0] == ';')
+//           continue;
+
+//         if (line[0] == '[') {
+//           inSection = trim(line.substr(1, line.find(']') - 1));
+//           continue;
+//         }
+
+//         int posEqual = line.find('=');
+//         string name = trim(line.substr(0, posEqual));
+//         string value = trim(line.substr(posEqual + 1));
+
+//         // remove line end comment
+//         posEqual = value.find('#');
+//         value = trim(value.substr(0, posEqual));
+//         content_[inSection + '/' + name] = value;
+//       }
+//     } catch (exception &ex) {
+//       console << "WARN: No readable configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";
+//     }
+//   } else {
+//     content_["no_config_info/not_found"] = "no value";
+//     console << "WARN: No readable configfile: '" << FILENAME_SER4CONFIG << "' found. Using coded settings.\n";
+//   }
+// }
+
 ConfigFile::ConfigFile(string const &configFile) {
-  sdCard.mount();
-  if (sdCard.isMounted()) {
+  console << "START READING FROM CONFIG.INI:" << configFile << "\n";
+  if (sdCard.mount()) {
     try {
-
-      ifstream file(configFile.c_str());
-      console << fmt::format("START 3a READING FROM {}___________________\n", configFile);
-
+      ifstream file(FILENAME_SER4CONFIG, ios_base::in);
+      string inSection = "UNKNOWN";
       string line;
-      string name;
-      string value;
-      string inSection;
-      int posEqual;
-      while (getline(file, line)) {
-        console << fmt::format("START 3b READING FROM CONFIG.INI, line:{}___________________\n", line);
-
+      for (int lineNr = 0; getline(file, line); lineNr++) {
         if (!line.length())
           continue;
+
+        console << lineNr << ": " << line << "\n";
 
         if (line[0] == '#')
           continue;
@@ -59,26 +95,35 @@ ConfigFile::ConfigFile(string const &configFile) {
           continue;
         }
 
-        posEqual = line.find('=');
-        name = trim(line.substr(0, posEqual));
-        value = trim(line.substr(posEqual + 1));
+        int posEqual = line.find('=');
+        string name = trim(line.substr(0, posEqual));
+        string value = trim(line.substr(posEqual + 1));
 
         // remove line end comment
         posEqual = value.find('#');
         value = trim(value.substr(0, posEqual));
         content_[inSection + '/' + name] = value;
       }
-      console << fmt::format("INFO: 3d:: READING FROM CONFIG.INI___________________\n", configFile);
     } catch (exception &ex) {
-      console << "WARN: No readable configfile: '" << configFile << "' found: " << ex.what() << "\n";
+      console << "WARN: No readable configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";
     }
   } else {
     content_["no_config_info/not_found"] = "no value";
-    console << "WARN: No readable configfile: '" << configFile << "' found. Using coded settings.\n";
+    console << "WARN: No readable configfile: '" << FILENAME_SER4CONFIG << "' found. Using coded settings.\n";
   }
 }
 
-string const &ConfigFile::get(string const &section, string const &entry, string const default_value) const {
+// string const ConfigFile::get(string const &section, string const &entry, string const default_value) const {
+
+//   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
+
+//   if (ci == content_.end())
+//     return default_value;
+
+//   return ci->second;
+// }
+
+string const ConfigFile::get(string const &section, string const &entry, char const *default_value) {
 
   std::map<string, string>::const_iterator ci = content_.find(section + '/' + entry);
 

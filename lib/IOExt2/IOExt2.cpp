@@ -177,7 +177,7 @@ void IOExt2::handleIoInterrupt() {
   isInInterruptHandler = false;
 }
 
-void IOExt2::readAll(bool deltaOnly) {
+void IOExt2::readAll(bool deltaOnly, bool forced) {
   // string normalColor = "\033[0;39m";
   // string highLightColorChg = "\033[1;36m"; // blue
   list<void (*)()> pinHandlerList;
@@ -194,7 +194,7 @@ void IOExt2::readAll(bool deltaOnly) {
         //          normalColor.c_str());
         // else
         //   printf(" %02d: dev: %d, pin:%x -- value:%d\n", pin->port, devNr, pinNr, pin->value);
-        if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited)) {
+        if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited || forced)) {
           pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
           pin->oldValue = pin->value;
@@ -412,11 +412,11 @@ void paddleAdjustHandler() {
 }
 
 void sdCardDetectHandler() {
-  carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 0;
+  carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   if (carState.SdCardDetect) {
-    console << "SD card removed.\n";
+    console << "SD card detected.-------------------------------------------------------------------------\n";
   } else {
-    console << "SD card detected.\n";
+    console << "SD card removed.----------------------------------------------------------------------------\n";
   }
 }
 

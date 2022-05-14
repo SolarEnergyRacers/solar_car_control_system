@@ -356,7 +356,8 @@ void headLightHandler() {
 }
 
 void nextScreenHandler() {
-    if( !systemOk) return;
+  if (!systemOk)
+    return;
 
   if (carState.getPin(PinNextScreen)->value == 0) {
     switch (carState.displayStatus) {

@@ -76,7 +76,7 @@ bool CarState::initalize_config() {
     LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
     LogInterval = cf.get("Main", "LogInterval", 1);
     // [TaskTimings]
-    //SleepTimeIOExt = cf.get("TaskTimings", "SleepTimeIOExt", 400);
+    // SleepTimeIOExt = cf.get("TaskTimings", "SleepTimeIOExt", 400);
     // [PID]
     Kp = cf.get("PID", "Kp", 2);
     Ki = cf.get("PID", "Ki", 1);
@@ -88,7 +88,7 @@ bool CarState::initalize_config() {
     ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
     ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
     // [Communication]
-    //I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
+    // I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
     CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
     Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
     Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
@@ -341,7 +341,7 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << Ki << ", ";
   ss << Kd << ", ";
   ss << TargetPower << ", ";
-  string field = DriverInfo.replace(DriverInfo.begin(), DriverInfo.end(), '\n',' ');
+  string field = DriverInfo.replace(DriverInfo.begin(), DriverInfo.end(), '\n', ' ');
   ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], field) << ", ";
   ss << SPEED_ARROW_str[(int)SpeedArrow] << ", ";
   ss << LIGHT_str[(int)(Light)] << ", ";

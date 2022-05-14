@@ -160,7 +160,7 @@ void app_main(void) {
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
   engineerDisplay.print("[v] " + engineerDisplay.getName() + " initialized, " + engineerDisplay.get_DisplayStatus_text() + ".\n");
 
-  //delay(1000);
+  // delay(1000);
 
   // ---- init modules ----
   if (INT_ON) {

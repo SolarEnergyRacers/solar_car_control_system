@@ -129,15 +129,20 @@ void CmdHandler::task() {
           break;
         case 'S':
           console << carState.print("Recent State:") << "\n";
-          printSystemValues();
+          console << printSystemValues();
           break;
         case 'J':
           state = carState.serialize("Recent State");
           sdCard.write(state + "\n");
           console << state << "\n";
           break;
-        case 'V':
+        case 'v':
           state = carState.csv("Recent State");
+          sdCard.write(state);
+          console << state;
+          break;
+        case 'V':
+          state = carState.csv("Recent State", true); // with header
           sdCard.write(state);
           console << state;
           break;
@@ -248,20 +253,21 @@ void CmdHandler::task() {
   }
 }
 
-void CmdHandler::printSystemValues() {
-
+string CmdHandler::printSystemValues() {
+  stringstream ss("");
   int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-  console << fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
+  ss << fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
 
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->value == 0) {
-        console << fmt::format("{}: SET {:#04x}\n", pin->name, pin->port);
+        ss << fmt::format("{}: SET {:#04x}\n", pin->name, pin->port);
       }
     }
   }
-  console << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
-                         dac.get_pot(DAC::pot_chan::POT_CHAN1));
+  ss << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
+                    dac.get_pot(DAC::pot_chan::POT_CHAN1));
+  return ss.str();
 }

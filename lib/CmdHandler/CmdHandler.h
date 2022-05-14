@@ -10,7 +10,7 @@
 class CmdHandler : public abstract_task {
 private:
   uint32_t sleep_polling_ms = 250;
-  string commands = "RECDsPSJVMUHk-:!ud<>wlLciI";
+  string commands = "!-:<>CcDdEHiIJklLMPRsSUuVvw";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
@@ -19,11 +19,11 @@ private:
                     "\tE          - switch to engineer screen\n"
                     "\tD          - switch to driver display\n"
                     "\t-          - adjust paddels\n"
-                    "\ts          - print status of all values\n"
                     "\tP          - print directory of sdcard\n"
+                    "\ts          - print status of all values\n"
                     "\tS          - print status\n"
                     "\tJ          - write JSON status to sdcard\n"
-                    "\tV          - write CSV status to sdcard\n"
+                    "\t[V|v]      - write CSV status header (v - w/o header) to sdcard with\n"
                     "\tM          - mount sdcard and eneable logging\n"
                     "\tU          - unmount sdcard and disable logging\n"
                     "\tH          - memory_info\n"
@@ -44,7 +44,7 @@ private:
                     "\ti          - ioExt.readAll() \n"
                     "\t\n";
 
-  void printSystemValues(void);
+  string printSystemValues(void);
 
 public:
   void init();

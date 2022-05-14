@@ -95,7 +95,7 @@ public:
 
     TargetSpeed = 0;
     TargetPower = 0;
-    DriverInfo = "ok.";
+    DriverInfo = "starting...";
     DriverInfoType = INFO_TYPE::STATUS;
     Light = LIGHT::OFF;
 

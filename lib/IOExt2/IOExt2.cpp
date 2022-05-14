@@ -356,6 +356,8 @@ void headLightHandler() {
 }
 
 void nextScreenHandler() {
+    if( !systemOk) return;
+
   if (carState.getPin(PinNextScreen)->value == 0) {
     switch (carState.displayStatus) {
     case DISPLAY_STATUS::ENGINEER_RUNNING:
@@ -373,6 +375,8 @@ void nextScreenHandler() {
 }
 
 void constantModeOnHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     console << "ConstantMode ON\n";
     carState.TargetSpeed = carState.Speed;                                       // unit: km/h
@@ -382,6 +386,8 @@ void constantModeOnHandler() {
 }
 
 void constantModeOffHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinConstantModeOff)->value == 0) {
     if (carState.ConstantModeOn) {
       console << "ConstantMode OFF\n";
@@ -390,6 +396,8 @@ void constantModeOffHandler() {
   }
 }
 void constantModeHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinConstantMode)->value == 0) {
     console << "Constant mode toggle\n";
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
@@ -405,6 +413,8 @@ void constantModeHandler() {
 }
 
 void paddleAdjustHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
     console << "Request Paddle Adjust\n";
     carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
@@ -414,13 +424,15 @@ void paddleAdjustHandler() {
 void sdCardDetectHandler() {
   carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   if (carState.SdCardDetect) {
-    console << "SD card detected.-------------------------------------------------------------------------\n";
+    console << "SD card detected.\n";
   } else {
-    console << "SD card removed.----------------------------------------------------------------------------\n";
+    console << "SD card removed.\n";
   }
 }
 
 void decreaseHandler() {
+  if (!systemOk)
+    return;
   console << "Decrease constant mode target.\n";
   carState.TargetSpeed -= carState.ConstSpeedIncrease;
   if (carState.TargetSpeed < 0)
@@ -432,6 +444,8 @@ void decreaseHandler() {
 }
 
 void increaseHandler() {
+  if (!systemOk)
+    return;
   console << "Increase constant mode target.\n";
   carState.TargetSpeed += carState.ConstSpeedIncrease;
   if (carState.TargetSpeed > 111) // only until 111km/h

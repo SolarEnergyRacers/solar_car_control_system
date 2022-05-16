@@ -172,7 +172,7 @@ void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t v
   valueDisplayLast = valueDisplay;
 }
 
-void CarControl::adjust_paddles(int seconds) {
+void CarControl::adjust_paddles(int cycles) {
   int x, y;
   int16_t value;
 
@@ -183,7 +183,6 @@ void CarControl::adjust_paddles(int seconds) {
   ads_max_acc = 0;
   ads_max_dec = 0;
 
-  int cycles = (seconds);
   if (cycles < 1)
     cycles = 1;
   string s("    adjust...");

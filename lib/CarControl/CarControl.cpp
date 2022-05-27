@@ -13,6 +13,8 @@
 
 #include <ADC.h>
 #include <CarControl.h>
+#include <CarSpeed.h>
+#include <ConfigFile.h>
 #include <Console.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
@@ -24,16 +26,17 @@
 #include <MCP23017.h>
 #include <SDCard.h>
 
+extern ADC adc;
+extern CarControl carControl;
+extern CarSpeed carSpeed;
+extern CarState carState;
 extern Console console;
+extern DAC dac;
+extern DriverDisplay driverDisplay;
+extern EngineerDisplay engineerDisplay;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern IOExt2 ioExt;
-extern ADC adc;
-extern DAC dac;
-extern CarState carState;
-extern CarControl carControl;
-extern DriverDisplay driverDisplay;
-extern EngineerDisplay engineerDisplay;
 extern SDCard sdCard;
 
 using namespace std;
@@ -51,7 +54,7 @@ void CarControl::init() {
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
   carState.AccelerationDisplay = -99;
-  // adjust_paddles(5); // manually adjust paddles (5s handling time)
+  // adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
   string s = fmt::format("[v] {} inited.\n", getName());
   console << s;
@@ -65,7 +68,6 @@ void CarControl::exit(void) {
 void CarControl::_handleValueChanged() {
   // TODO
 }
-// ------------------
 
 bool CarControl::read_battery_data() {
   carState.BatteryVoltage = adc.read(ADC::Pin::BAT_VOLTAGE) / 100.;  // TODO
@@ -91,9 +93,7 @@ bool CarControl::read_reference_cell_data() {
 
 bool CarControl::read_speed() {
   // native input
-  // xSemaphoreTakeT(carControl.mutex);
   int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
-  // xSemaphoreGive(carControl.mutex);
   // voltage
   float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED);
   // round per minute
@@ -115,6 +115,11 @@ bool CarControl::read_paddles() {
   }
   int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
+
+  // check if change is in damping
+  if (valueAcc != 0 && valueDec != 0)
+    if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
+      return hasChanged;
 
   int16_t valueDecNorm = 0;
   int16_t valueAccNorm = 0;
@@ -167,7 +172,7 @@ void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t v
   valueDisplayLast = valueDisplay;
 }
 
-void CarControl::adjust_paddles(int seconds) {
+void CarControl::adjust_paddles(int cycles) {
   int x, y;
   int16_t value;
 
@@ -178,7 +183,6 @@ void CarControl::adjust_paddles(int seconds) {
   ads_max_acc = 0;
   ads_max_dec = 0;
 
-  int cycles = (seconds * 10);
   if (cycles < 1)
     cycles = 1;
   string s("    adjust...");
@@ -215,8 +219,8 @@ void CarControl::adjust_paddles(int seconds) {
     delay(100);
   }
   // make sure null level to avoid automatic acceleration/deceleration
-  ads_min_dec += 5000;
-  ads_min_acc += 5000;
+  ads_min_dec += carState.PaddleOffset;
+  ads_min_acc += carState.PaddleOffset;
 
   s = fmt::format("\n    ==>dec {:5}-{:5} == acc {:5}-{:5}\n", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc);
   console << s;
@@ -255,8 +259,8 @@ void CarControl::task() {
     _handle_indicator();
 
     // one data row per second
-    if (sdCard.logEnabled && (millis() > millisNextStamp)) {
-      millisNextStamp = millis() + LOG_INTERVALL;
+    if (sdCard.isReadyForLog() && (millis() > millisNextStamp)) {
+      millisNextStamp = millis() + carState.CarDataLogPeriod;
       sdCard.write(carState.csv("Recent State"));
     }
 

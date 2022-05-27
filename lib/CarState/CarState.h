@@ -95,7 +95,7 @@ public:
 
     TargetSpeed = 0;
     TargetPower = 0;
-    DriverInfo = "ok.";
+    DriverInfo = "starting...";
     DriverInfoType = INFO_TYPE::STATUS;
     Light = LIGHT::OFF;
 
@@ -105,6 +105,7 @@ public:
     AccelerationLocked = true;
   }
   ~CarState(){};
+  bool initalize_config();
 
   // physical car data (measurement values)
   int Speed;        // ADC
@@ -182,6 +183,37 @@ public:
   const string serialize(string msg = "");
   const string csv(string msg = "", bool withHeader = false);
   const string batteryErrorsAsString(bool verbose = false);
+
+  // auxiliary variables - read from ser4config.ini
+  // [Main]
+  string LogFilename; // telemetry data: %stamp% get replaced by datetime stamp if period != 0
+  int LogFilePeriod;  // [h], after that a new log file is created, 0 - never
+  int LogInterval;    // [s]
+
+  // [TaskTimings]
+  int SleepTimeIOExt = 400; // [ms]
+
+  // [PID]
+  double Kp; // = 2;   // proportional
+  double Ki; // = 1;   // integral
+  double Kd; // = 0.1; // differential
+
+  // [Dynamic]
+  int PaddleDamping;        // = 10;         // 0...99
+  int PaddleOffset;         // = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
+  int PaddleAdjustCounter;  // = 20;   // about seconds§
+  float ConstSpeedIncrease; // = 1.0; // [km/h] per click
+  float ConstPowerIncrease; // = 1.0; // [W] per click
+
+  // [Communication]
+  int I2CFrequence;             // = 200;       // [kHz]
+  int CarDataLogPeriod;         // = 1000;  // [ms]
+  int Serial1Baudrate = 115200; // baud
+  int Serial2Baudrate = 9600;   // baud
+
+  // [Telemetry]
+  int SendInterval;     // = 1000;    // [ms]
+  int MaxCachedRecords; // = 100; // number of telemetry records hold in cache in case of trasmit errors
 };
 
 #endif // CARSTATE_H

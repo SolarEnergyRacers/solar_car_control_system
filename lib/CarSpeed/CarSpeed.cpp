@@ -7,9 +7,14 @@
 #include <freertos/FreeRTOS.h>
 #include <freertos/task.h>
 
+#include <fmt/core.h>
+#include <fmt/format.h>
+#include <fmt/printf.h>
 #include <inttypes.h>
 #include <iostream>
+#include <sstream>
 #include <stdio.h>
+#include <string>
 
 #include <CarSpeed.h>
 #include <CarState.h>
@@ -65,7 +70,12 @@ double CarSpeed::get_current_speed() {
   return (double)370 * wheel_circumference / 60.0;
 }
 
-void CarSpeed::update_pid(double Kp, double Ki, double Kd) { pid.SetTunings(Kp, Ki, Kd); }
+void CarSpeed::update_pid(double Kp, double Ki, double Kd) {
+  carState.Kp = Kp;
+  carState.Ki = Ki;
+  carState.Kd = Kd;
+  pid.SetTunings(carState.Kp, carState.Ki, carState.Kd);
+}
 
 void CarSpeed::task() {
 
@@ -92,10 +102,14 @@ void CarSpeed::task() {
       pid.Compute();
 
       // check range
-      if (output_setpoint < -DAC_MAX)
+      if (output_setpoint < -DAC_MAX) {
+        console << fmt::format("WARN::PID dejustified {} < -{}!\n", output_setpoint, DAC_MAX);
         output_setpoint = -DAC_MAX;
-      if (output_setpoint > DAC_MAX)
+      }
+      if (output_setpoint > DAC_MAX) {
+        console << fmt::format("WARN::PID dejustified {} > {}!\n", output_setpoint, DAC_MAX);
         output_setpoint = DAC_MAX;
+      }
 
       // set acceleration & deceleration
       if (output_setpoint >= 0) {

@@ -62,7 +62,7 @@ void GyroAcc::task() {
       gyro_last.x = gyro.x;
       gyro_last.y = gyro.y;
       gyro_last.z = gyro.z;
-      console << fmt::sprintf("[BMI088] gx=%f, gy=%f, gz=%f\n", gyro.x, gyro.y, gyro.z);
+      // console << fmt::sprintf("[BMI088] gx=%f, gy=%f, gz=%f\n", gyro.x, gyro.y, gyro.z);
     }
 
     // read the gyro
@@ -71,7 +71,7 @@ void GyroAcc::task() {
       acc_last.x = acc.x;
       acc_last.y = acc.y;
       acc_last.z = acc.z;
-      console << fmt::sprintf("[BMI088] ax=%f, ay=%f, az=%f\n", acc.x, acc.y, acc.z);
+      // console << fmt::sprintf("[BMI088] ax=%f, ay=%f, az=%f\n", acc.x, acc.y, acc.z);
     }
 
     // sleep for 1s

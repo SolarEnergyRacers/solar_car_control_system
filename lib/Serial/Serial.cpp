@@ -35,22 +35,22 @@ void Uart::exit() {}
 void Uart::init() {
   console = Console();
   // init serial for console IO
-  Serial.begin(SERIAL_BAUDRATE);
+  Serial.begin(carState.Serial1Baudrate);
   delay(1000);
   console << "[?] Setup '" << getName() << "'...\n";
   console << "    ---Serial------------\n";
   console << "    Serial TX0 is on pin: " << to_string(TX) << "\n";
   console << "    Serial RX0 is on pin: " << to_string(RX) << "\n";
-  console << "    Serial Baud Rate:     " << SERIAL_BAUDRATE << "\n";
+  console << "    Serial Baud Rate:     " << carState.Serial1Baudrate << "\n";
   // init serial for radio console IO
-  Serial2.begin(SERIAL2_BAUDRATE, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
+  Serial2.begin(carState.Serial2Baudrate, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
   // Serial2.enableIntTx(false);
   delay(1000);
   // both Serial and Serial2 inited -> from now the Console class is usable
   console << "    ---Serial2 HC-12------\n";
   console << "    Serial2 TX2 is on pin: " << to_string(SERIAL2_TX) << "\n";
   console << "    Serial2 RX2 is on pin: " << to_string(SERIAL2_RX) << "\n";
-  console << "    Serial2 Baud Rate:     " << SERIAL2_BAUDRATE << "\n";
+  console << "    Serial2 Baud Rate:     " << carState.Serial2Baudrate << "\n";
 
   console << fmt::format("[v] {} inited.\n", getName());
 }

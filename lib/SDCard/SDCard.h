@@ -5,22 +5,23 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H
 #define SOLAR_CAR_CONTROL_SYSTEM_SDCARD_H
 
+#include <CarState.h>
 #include <SD.h>
 
-#define FILENAME "/ser4data.csv"
+extern CarState carState;
 
 class SDCard {
 private:
-  bool mounted;
-  void printDirectory(File dir, int numTabs);
+  bool mounted = false;
   File dataFile;
 
+  void printDirectory(File dir, int numTabs);
+
 public:
-  bool logEnabled;
   void init();
   void re_init();
-  bool isMounted() { return mounted; }
-  bool isReadyForLog() { return mounted && dataFile != 0; }
+  bool isMounted() { return carState.SdCardDetect && mounted; }
+  bool isReadyForLog() { return isMounted() && dataFile != 0; }
   // write a string into the dataFile
   void write(string msg);
   // prints the directory tree of the card

@@ -177,7 +177,7 @@ void IOExt2::handleIoInterrupt() {
   isInInterruptHandler = false;
 }
 
-void IOExt2::readAll(bool deltaOnly) {
+void IOExt2::readAll(bool deltaOnly, bool forced) {
   // string normalColor = "\033[0;39m";
   // string highLightColorChg = "\033[1;36m"; // blue
   list<void (*)()> pinHandlerList;
@@ -194,7 +194,7 @@ void IOExt2::readAll(bool deltaOnly) {
         //          normalColor.c_str());
         // else
         //   printf(" %02d: dev: %d, pin:%x -- value:%d\n", pin->port, devNr, pinNr, pin->value);
-        if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited)) {
+        if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited || forced)) {
           pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
           pin->oldValue = pin->value;
@@ -356,6 +356,9 @@ void headLightHandler() {
 }
 
 void nextScreenHandler() {
+  if (!systemOk)
+    return;
+
   if (carState.getPin(PinNextScreen)->value == 0) {
     switch (carState.displayStatus) {
     case DISPLAY_STATUS::ENGINEER_RUNNING:
@@ -373,6 +376,8 @@ void nextScreenHandler() {
 }
 
 void constantModeOnHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinConstantModeOn)->value == 0) {
     console << "ConstantMode ON\n";
     carState.TargetSpeed = carState.Speed;                                       // unit: km/h
@@ -382,6 +387,8 @@ void constantModeOnHandler() {
 }
 
 void constantModeOffHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinConstantModeOff)->value == 0) {
     if (carState.ConstantModeOn) {
       console << "ConstantMode OFF\n";
@@ -390,6 +397,8 @@ void constantModeOffHandler() {
   }
 }
 void constantModeHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinConstantMode)->value == 0) {
     console << "Constant mode toggle\n";
     if (carState.ConstantMode == CONSTANT_MODE::POWER) {
@@ -405,34 +414,47 @@ void constantModeHandler() {
 }
 
 void paddleAdjustHandler() {
+  if (!systemOk)
+    return;
   if (carState.getPin(PinPaddleAdjust)->value == 0) {
     console << "Request Paddle Adjust\n";
-    carControl.adjust_paddles(3); // manually adjust paddles (3s handling time)
+    carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
   }
 }
 
 void sdCardDetectHandler() {
   carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   if (carState.SdCardDetect) {
-    console << "SD card removed.\n";
-  } else {
     console << "SD card detected.\n";
+  } else {
+    console << "SD card removed.\n";
   }
 }
 
 void decreaseHandler() {
+  if (!systemOk)
+    return;
   console << "Decrease constant mode target.\n";
-  if (carState.TargetSpeed > 2)
-    carState.TargetSpeed -= 2;
-  if (carState.TargetPower > 1)
-    carState.TargetPower -= 1;
+  carState.TargetSpeed -= carState.ConstSpeedIncrease;
+  if (carState.TargetSpeed < 0)
+    carState.TargetSpeed = 0;
+
+  carState.TargetPower -= carState.ConstPowerIncrease;
+  if (carState.TargetPower < 0)
+    carState.TargetPower = 0;
 }
 
 void increaseHandler() {
+  if (!systemOk)
+    return;
   console << "Increase constant mode target.\n";
-  if (carState.TargetSpeed < 111)
-    carState.TargetSpeed += 2;
-  carState.TargetPower += 1;
+  carState.TargetSpeed += carState.ConstSpeedIncrease;
+  if (carState.TargetSpeed > 111) // only until 111km/h
+    carState.TargetSpeed = 111;
+
+  carState.TargetPower += carState.ConstPowerIncrease;
+  if (carState.TargetPower > 4500) // only until 5kW
+    carState.TargetPower = 4500;
 }
 // end IO pin handler -----------------------------------------
 #endif

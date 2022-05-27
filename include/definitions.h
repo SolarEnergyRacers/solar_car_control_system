@@ -8,6 +8,9 @@
 
 #include <LocalFunctionsAndDevices.h>
 
+#define FILENAME_SER4CONFIG "SER4CONF.INI"
+//#define FILENAME_SER4DATA "/ser4data.csv"
+
 /*
  *  GPIO
  */
@@ -56,10 +59,8 @@
  *
  * RX and TX are defined in pins_arduino.h, all others here
  */
-#define SERIAL_BAUDRATE 115200
 #define SERIAL2_RX 16
 #define SERIAL2_TX 17
-#define SERIAL2_BAUDRATE 9600
 
 /*
  * CAN Bus
@@ -147,11 +148,6 @@
  *  General ESP32 Pinout:
  * https://randomnerdtutorials.com/esp32-pinout-reference-gpios/
  */
-
-/*
- * carState and carControl
- */
-#define LOG_INTERVALL 1000;
 
 /*
  * Define wich version of printed board layouts are used

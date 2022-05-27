@@ -9,14 +9,20 @@
 #include <string>
 
 #include <CarState.h>
+#include <ConfigFile.h>
+#include <Console.h>
 #include <Helper.h>
 #include <IOExt2.h>
 #include <Indicator.h>
+#include <SDCard.h>
 #include <definitions.h>
 
 using namespace std;
 
 extern CarState carState;
+extern Console console;
+extern SDCard sdCard;
+extern IOExt2 ioExt;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
@@ -52,6 +58,49 @@ void CarState::init_values() {
   DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
+
+  console << "Reread all IOs in foreced mode...\n";
+  ioExt.readAll(false, true);
+  console << print("Initial State") << "\n";
+
+  // read from ser4config.ini file
+  initalize_config();
+  console << print("State after SER4CONF.INI") << "\n";
+}
+
+bool CarState::initalize_config() {
+  try {
+    ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
+    // [Main]
+    LogFilename = cf.get("Main", "LogFilename", "/ser4data.csv");
+    LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
+    LogInterval = cf.get("Main", "LogInterval", 1);
+    // [TaskTimings]
+    // SleepTimeIOExt = cf.get("TaskTimings", "SleepTimeIOExt", 400);
+    // [PID]
+    Kp = cf.get("PID", "Kp", 2);
+    Ki = cf.get("PID", "Ki", 1);
+    Kd = cf.get("PID", "Kd", 0.1);
+    // [Dynamic]
+    PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
+    PaddleOffset = cf.get("Dynamic", "PaddleOffset", 3000);
+    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 25);
+    ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
+    ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
+    // [Communication]
+    // I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
+    CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
+    Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
+    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
+    // [Telemetry]
+    SendInterval = cf.get("Telemetry", "", 1000);
+    MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);
+
+  } catch (exception &ex) {
+    console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";
+    return false;
+  }
+  return true;
 }
 
 const string CarState::print(string msg, bool withColors) {
@@ -98,12 +147,42 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Constant Mode ......... " << CONSTANT_MODE_str[(int)(ConstantMode)] << endl;
   ss << "Target Speed .......... " << TargetSpeed << endl;
   ss << "Target Power .......... " << TargetPower << endl;
-  ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << endl;
+  ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;
   ss << "Info Last ............. "
      << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
   ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << "]" << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
-  ss << "IO ....................." << printIOs("", false) << endl;
+  ss << "IO .................... " << printIOs("", false) << endl;
+
+  ss << "Log file name ......... " << LogFilename << endl;
+  ss << "Log file persiod ...... " << LogFilePeriod << endl;
+  ss << "Log file interval ..... " << LogInterval << endl;
+
+  // [TaskTimings]
+  ss << "Sleep time EIOExt ..... " << SleepTimeIOExt << endl;
+
+  // [PID]
+  ss << "Kp .................... " << Kp << endl;
+  ss << "Ki .................... " << Ki << endl;
+  ss << "Kd .................... " << Kd << endl;
+
+  // [Dynamic]
+  ss << "Paddle damping ........ " << PaddleDamping << endl;
+  ss << "Paddle offset ......... " << PaddleOffset << endl;
+  ss << "Paddle adjustment ..... " << PaddleAdjustCounter << endl;
+  ss << "Const speed increase .. " << ConstSpeedIncrease << endl;
+  ss << "Const power invrease .. " << ConstPowerIncrease << endl;
+
+  // [Communication]
+  ss << "I2C frequency ......... " << I2CFrequence << endl;
+  ss << "Car data log period ... " << CarDataLogPeriod << endl;
+  ss << "Serial 1 baud rate .... " << Serial1Baudrate << endl;
+  ss << "Serial 2 baud rate .... " << Serial2Baudrate << endl;
+
+  // [Telemetry]
+  ss << "Telemetry send intervall" << SendInterval << endl;
+  ss << "Telemetry cahce records " << MaxCachedRecords << endl;
+
   ss << "===========================================================================================" << endl;
   return ss.str();
 }
@@ -179,6 +258,7 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "acceleration, ";
     ss << "deceleration, ";
     ss << "accelerationDisplay, ";
+
     ss << "batteryOn, ";
     ss << "batteryVoltage, ";
     ss << "batteryCurrent, ";
@@ -195,10 +275,10 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "voltageMin, ";
     ss << "voltageAvg, ";
     ss << "voltageMax, ";
-    ss << "t1, ";
-    ss << "t2, ";
-    ss << "t3, ";
-    ss << "t4, ";
+    ss << "T1, ";
+    ss << "T2, ";
+    ss << "T3, ";
+    ss << "T4, ";
 
     ss << "indicator, ";
     ss << "driveDirection, ";
@@ -206,8 +286,12 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "sdCardDetected, ";
 
     ss << "displayStatus, ";
+
     ss << "constantMode, ";
     ss << "targetSpeed, ";
+    ss << "Kp, ";
+    ss << "Ki, ";
+    ss << "Kd, ";
     ss << "targetPower, ";
     ss << "driverInfo, ";
     ss << "speedArrow, ";
@@ -223,6 +307,7 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << Acceleration << ", ";
   ss << Deceleration << ", ";
   ss << AccelerationDisplay << ", ";
+
   ss << BatteryOn << ", ";
   ss << floor(BatteryVoltage * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(BatteryCurrent * 1000.0 + .5) / 1000.0 << ", ";
@@ -252,8 +337,12 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << DISPLAY_STATUS_str[(int)displayStatus] << ", ";
   ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
   ss << TargetSpeed << ", ";
+  ss << Kp << ", ";
+  ss << Ki << ", ";
+  ss << Kd << ", ";
   ss << TargetPower << ", ";
-  ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str()).c_str() << ", ";
+  string field = DriverInfo.replace(DriverInfo.begin(), DriverInfo.end(), '\n', ' ');
+  ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], field) << ", ";
   ss << SPEED_ARROW_str[(int)SpeedArrow] << ", ";
   ss << LIGHT_str[(int)(Light)] << ", ";
   ss << printIOs("", false).c_str() << ", ";

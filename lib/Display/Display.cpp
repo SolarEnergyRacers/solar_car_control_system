@@ -1,7 +1,7 @@
 /*
  * Driver's Display
  *
- * The driver's display is passive with the exception of the indicator function.
+ * The driver's display is passive.
  * This means that all sensors send their values to the display.
  */
 
@@ -13,7 +13,7 @@
 #include <fmt/core.h>
 #include <iostream>
 
-#include <ADC.h>
+// #include <ADC.h>
 #include <CarState.h>
 #include <Console.h>
 #include <Display.h>
@@ -35,7 +35,6 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 extern SPIBus spiBus;
-extern ADC adc;
 extern CarState carState;
 extern SDCard sdCard;
 extern Console console;
@@ -60,6 +59,7 @@ void Display::init() {
   abstract_task::init();
   console << "\n";
   re_init();
+  console << "-01---------\n";
 }
 
 void Display::re_init(void) {
@@ -68,6 +68,10 @@ void Display::re_init(void) {
 #endif
   _setup();
 }
+void Display::exit() {
+  // todo
+}
+// ------------
 
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(&spiBus.spi, SPI_DC, SPI_CS_TFT, SPI_RST);
 
@@ -93,6 +97,7 @@ void Display::_setup() {
     rdpixfmt = tft.readcommand8(ILI9341_RDPIXFMT);
     rdimgfmt = tft.readcommand8(ILI9341_RDIMGFMT);
     rdselfdiag = tft.readcommand8(ILI9341_RDSELFDIAG);
+
     tft.setCursor(0, 0);
     tft.setTextSize(1);
     tft.fillScreen(bgColor);
@@ -122,8 +127,6 @@ void Display::clear_screen(int bgColor) {
   tft.fillScreen(bgColor);
   xSemaphoreGive(spiBus.mutex);
 }
-
-void Display::exit() {}
 
 int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
   int l1 = t1.length() * textSize * 6;

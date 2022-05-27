@@ -26,6 +26,16 @@ template <typename Enumeration> auto as_integer(Enumeration const value) -> type
 }
 
 class Display : public abstract_task {
+private:
+  uint32_t sleep_polling_ms = 400;
+
+public:
+  // RTOS task
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; };
+  void init(void);
+  void re_init(void);
+  void exit(void);
 
 private:
   //==== Display definitions ==== START
@@ -48,10 +58,6 @@ public:
   virtual ~Display(){};
   Display() { carState.displayStatus = DISPLAY_STATUS::ENGINEER_CONSOLE; };
 
-  // RTOS task
-  void init(void);
-  void re_init(void);
-  void exit(void);
   void set_DisplayStatus(DISPLAY_STATUS theNewStatus) { carState.displayStatus = theNewStatus; };
 
   DISPLAY_STATUS get_DisplayStatus() { return carState.displayStatus; };

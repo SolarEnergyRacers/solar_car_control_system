@@ -11,7 +11,20 @@
 void read_can_demo_task(void *pvParameter);
 
 class CANBus : public abstract_task {
+private:
+  uint32_t sleep_polling_ms = 400;
 
+public:
+  // RTOS task
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; };
+  string getName(void) { return "CANBus"; };
+  void init(void);
+  void re_init(void);
+  void exit(void);
+  void task(void);
+
+  // Class functions and members
 private:
   CANRxBuffer rxBuffer;
   std::map<uint16_t, int32_t> max_ages;
@@ -19,14 +32,6 @@ private:
 
 public:
   CANBus();
-  string getName(void);
-  void re_init(void);
-  void init(void);
-  void exit(void);
-  void task(void);
-  void startBattery(void);
-
-  // void create_task(void);
 
   void onReceive(int packetSize);
 

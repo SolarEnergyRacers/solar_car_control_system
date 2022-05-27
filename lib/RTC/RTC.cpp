@@ -68,12 +68,12 @@ void RTC::init(void) {
   // check time
   RtcDateTime now = Rtc.GetDateTime();
   if (now < compiled) {
-    console << "   [INFO] rtc time older than compile time! Updating DateTime.\n";
+    console << "    [INFO] rtc time older than compile time! Updating DateTime.\n";
     Rtc.SetDateTime(compiled);
   } else if (now > compiled) {
-    console << "   [INFO] rtc time newer than compile time.\n";
+    console << "    [INFO] rtc time newer than compile time.\n";
   } else if (now == compiled) {
-    console << "   [INFO] rtc time equal to compile time.\n";
+    console << "    [INFO] rtc time equal to compile time.\n";
   }
 
   // set pin

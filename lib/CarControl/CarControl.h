@@ -15,16 +15,22 @@
 #include <definitions.h>
 
 class CarControl : public abstract_task {
+private:
+  uint32_t sleep_polling_ms = 400;
+
 public:
-  SemaphoreHandle_t mutex = NULL;
-  static void valueChangedHandler() { valueChangeRequest++; };
-
+  // RTOS task
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; };
   string getName(void) { return "CarControl"; };
-
   void init(void);
   void re_init(void);
   void exit(void);
   void task(void);
+
+  // Class member and functions
+  SemaphoreHandle_t mutex = NULL;
+  static void valueChangedHandler() { valueChangeRequest++; };
 
   bool read_battery_data();
   bool read_motor_data();

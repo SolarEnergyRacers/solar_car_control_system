@@ -23,8 +23,10 @@ Console &operator<<(Console &c, const char *str) {
   cout << str;
   cout.flush();
 
-  Serial2 << strip_extended_chars(string(str));
-  Serial2.flush();
+  if (SERIAL_RADIO_ON) {
+    Serial2 << strip_extended_chars(string(str));
+    Serial2.flush();
+  }
 
   // // buffered transfer
   //  size_t packageSize = 20;

@@ -2,7 +2,7 @@
 // MCP23017 I/O Extension over I2C
 //
 #include <definitions.h>
-#if IOEXT2_ON
+#if IOEXT_ON
 
 #include <stdio.h>
 
@@ -120,7 +120,7 @@ void IOExt2::re_init() { init(); }
 void IOExt2::init() {
   string s;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-    console << "[?] Init IOExt2 " << devNr << "\n";
+    console << "[?] Init IOExt2 device [" << devNr << "]\n";
     xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].init();
     ioExt.IOExtDevs[devNr].interruptMode(MCP23017InterruptMode::Or);
@@ -138,11 +138,13 @@ void IOExt2::init() {
       xSemaphoreGive(i2cBus.mutex);
       int dev = pin->port >> 4;
       int devPin = pin->port & 0xf;
-      s = fmt::format("  {:#04x} [{:02d}] dev:{:02d}, devpin:{:02d}, mode:{}, value={} ({})\n", pin->port, carState.getIdx(pin->name), dev,
-                      devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value, pin->name.c_str());
-      console << s;
+      console << fmt::format("  {:#04x} [{:02d}] dev:{:02d}, devpin:{:02d}, mode:{}, value={} ({})\n", pin->port,
+                             carState.getIdx(pin->name), dev, devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value,
+                             pin->name.c_str());
     }
+    xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].clearInterrupts();
+    xSemaphoreGive(i2cBus.mutex);
     console << "[v] " << getName() << "[" << devNr << "] initialized.\n";
   }
   ioInterruptRequest = false;
@@ -158,13 +160,13 @@ void IOExt2::exit(void) {
 
 void IOExt2::handleIoInterrupt() {
   if (isInInterruptHandler) {
-    console << "Jump out of interrupt handler at " << millis() << "\n";
+    console << fmt::format("Jump out of interrupt handler at {}\n", millis());
     return;
   }
   isInInterruptHandler = true;
-  // debug_printf("Do interrupt handler at %ld\n", millis());
+  console << fmt::format("Do interrupt handler at {}}\n", millis());
   readAll(true);
-  // debug_printf("clear interrupts   %ld\n", millis());
+  console << fmt::format("Clear interrupts   {}\n", millis());
   xSemaphoreTakeT(i2cBus.mutex);
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     // uint8_t portA, portB;
@@ -183,6 +185,7 @@ void IOExt2::readAll(bool deltaOnly, bool forced) {
   list<void (*)()> pinHandlerList;
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+      // console << "readAll dev:" << devNr << ", pinNr:" << pinNr << "\n";
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->mode != OUTPUT) {
 
@@ -190,10 +193,10 @@ void IOExt2::readAll(bool deltaOnly, bool forced) {
         pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
         xSemaphoreGive(i2cBus.mutex);
         // if (pin->value == 0)
-        //   printf("%s %02d: dev: %d, pin:%x -- value:%d%s\n", highLightColorChg.c_str(), pin->port, devNr, pinNr, pin->value,
-        //          normalColor.c_str());
+        //   console << fmt::printf("%s %02d: dev: %d, pin:%x -- value:%d%s\n", highLightColorChg.c_str(), pin->port, devNr, pinNr,
+        //   pin->value, normalColor.c_str());
         // else
-        //   printf(" %02d: dev: %d, pin:%x -- value:%d\n", pin->port, devNr, pinNr, pin->value);
+        // console << fmt::printf(" %02d: dev: %d, pin:%x -- value:%d\n", pin->port, devNr, pinNr, pin->value);
         if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited || forced)) {
           pin->inited = true;
           pinHandlerList.push_back(pin->handlerFunction);
@@ -215,7 +218,6 @@ void IOExt2::readAll(bool deltaOnly, bool forced) {
 }
 
 void IOExt2::setPortMode(int port, uint8_t mode) {
-  // get device & port
   int devNr = port >> 4;
   int pin = port & 0xf;
   xSemaphoreTakeT(i2cBus.mutex);
@@ -224,7 +226,6 @@ void IOExt2::setPortMode(int port, uint8_t mode) {
 }
 
 void IOExt2::setPort(int port, bool value) {
-  // get device & port
   int devNr = port >> 4;
   int pin = port & 0xf;
   // debug_printf("Set BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
@@ -234,7 +235,6 @@ void IOExt2::setPort(int port, bool value) {
 }
 
 int IOExt2::getPort(int port) {
-  // get device & port
   int devNr = port >> 4;
   int pin = port & 0xf;
   xSemaphoreTakeT(i2cBus.mutex);
@@ -252,9 +252,10 @@ void IOExt2::task() {
     if (systemOk) {
       // handle INPUT pin interrupts
       if (ioInterruptRequest) {
-        // console << "ioInterruptRequest " << millis() << "\n";
+        // console << "jump ioInterruptRequest " << millis() << "\n";
         handleIoInterrupt();
         ioInterruptRequest = false;
+        // carControl.valueChangedHandler();
       }
       // update OUTPUT pins
       for (auto &pin : carState.pins) {

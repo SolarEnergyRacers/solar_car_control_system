@@ -107,6 +107,19 @@ public:
   ~CarState(){};
   bool initalize_config();
 
+  // ADC native values
+  int16_t MOTOR_SPEED;
+  int16_t BAT_CURRENT;
+  int16_t MOTOR_CURRENT;
+  int16_t PV_CURRENT;
+  // ADC1
+  int16_t BAT_VOLTAGE;
+  int16_t MOTOR_VOLTAGE;
+  int16_t REFERENCE_CELL;
+  // ADC2 (steering wheel)
+  int16_t STW_ACC;
+  int16_t STW_DEC;
+
   // physical car data (measurement values)
   int Speed;        // ADC
   int Acceleration; // ADC Steering Wheel
@@ -209,7 +222,7 @@ public:
   int I2CFrequence;             // = 200;       // [kHz]
   int CarDataLogPeriod;         // = 1000;  // [ms]
   int Serial1Baudrate = 115200; // baud
-  int Serial2Baudrate = 9600;   // baud
+  int Serial2Baudrate = 115200; // baud
 
   // [Telemetry]
   int SendInterval;     // = 1000;    // [ms]

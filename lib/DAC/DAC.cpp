@@ -37,7 +37,7 @@ void DAC::re_init() { reset_and_lock_pot(); }
 void DAC::init() {
   console << "[?] Setup 'DAC'...\n";
   reset_and_lock_pot();
-  string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:x}.\n", I2C_ADDRESS_DS1803);
+  string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:02x}.\n", I2C_ADDRESS_DS1803);
   console << s;
   driverDisplay.print(s.c_str());
 }
@@ -70,6 +70,7 @@ uint8_t DAC::get_cmd(pot_chan channel) {
 void DAC::reset_and_lock_pot() {
   lock();
   uint8_t command = get_cmd(POT_CHAN_ALL);
+  //#SAFTY#
   xSemaphoreTakeT(i2cBus.mutex);
   Wire.beginTransmission(I2C_ADDRESS_DS1803);
   Wire.write(command);
@@ -77,9 +78,6 @@ void DAC::reset_and_lock_pot() {
   Wire.write(0); // second pot value
   Wire.endTransmission();
   xSemaphoreGive(i2cBus.mutex);
-  // console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, POT_CHAN_ALL,
-  // command,
-  //                         0, get_pot(POT_CHAN_ALL));
 }
 
 void DAC::set_pot(uint8_t val, pot_chan channel) {
@@ -88,13 +86,13 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     if (carState.PaddlesJustAdjusted && carState.AccelerationDisplay == 0) {
       unlock();
       carState.AccelerationLocked = false;
-      string s = fmt::format("DAC unlocked.\n");
+      string s = "DAC unlocked.\n";
       console << s;
       if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
         driverDisplay.print(s.c_str());
       }
     } else {
-      string s = fmt::format("Motor potentiometer locked!\n");
+      string s = "Motor potentiometer locked!\n";
       console << s;
       if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
         driverDisplay.print(s.c_str());

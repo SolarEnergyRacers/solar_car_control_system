@@ -21,6 +21,7 @@ extern Console console;
 void GyroAcc::re_init() { init(); }
 
 void GyroAcc::init(void) {
+  set_SleepTime(1000);
   // check connection & report
   if (bmi088.isConnection()) {
     console << "[BMI088] is connected\n";
@@ -33,6 +34,10 @@ void GyroAcc::init(void) {
     console << "[BMI088] is not connected\n";
   }
 }
+void GyroAcc::exit(void) {
+  // TODO
+}
+// -----------------
 
 Float3D GyroAcc::read_gyroscope(void) {
   // allocate struct
@@ -74,7 +79,7 @@ void GyroAcc::task() {
       // console << fmt::sprintf("[BMI088] ax=%f, ay=%f, az=%f\n", acc.x, acc.y, acc.z);
     }
 
-    // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // sleep
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

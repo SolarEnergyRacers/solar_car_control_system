@@ -26,4 +26,11 @@ extern bool debugl3;
       console << fmt::sprintf("%-32s:%3d %-36s: " frmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                        \
   } while (0)
 
+/* extern int debug_level;
+#define debug_printf(level, frmt, ...)                                                                                                     \
+  do {                                                                                                                                     \
+    if (debug_level >= level)                                                                                                              \
+      console << fmt::sprintf("%-32s:%3d %-36s: " frmt, __FILE__, __LINE__, __func__, __VA_ARGS__);                                        \
+  } while (0)
+*/
 #endif // DEBUGPRINT_H

@@ -62,7 +62,9 @@ bool SDCard::mount() {
   if (!carState.SdCardDetect) {
     console << "No SD card detected!\n";
     mounted = false;
+    xSemaphoreTakeT(spiBus.mutex);
     SD.end();
+    xSemaphoreGive(spiBus.mutex);
     return false;
   }
   if (sdCard.isMounted()) {
@@ -70,6 +72,7 @@ bool SDCard::mount() {
     return true;
   }
   try {
+    console << "Mounting SD card ...\n";
     xSemaphoreTakeT(spiBus.mutex);
     mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);

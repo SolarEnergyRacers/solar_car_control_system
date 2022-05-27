@@ -21,8 +21,6 @@ private:
 #if WithTaskSuspend == true
   TaskHandle_t xHandle;
 #endif
-protected:
-  uint32_t sleep_polling_ms;
 
 public:
   virtual string getName(void);
@@ -32,12 +30,13 @@ public:
   virtual void task(void); // this is the actual task
 
   string getInfo(void);
-  void set_SleepTime(int milliseconds);
 
 #if WithTaskSuspend == true
   TaskHandle_t getHandle() { return xHandle; };
 #endif
 
+  virtual void set_SleepTime(uint32_t milliseconds) = 0;
+  virtual uint32_t get_SleepTime() = 0;
   void sleep(void);
   void sleep(int polling_ms);
 

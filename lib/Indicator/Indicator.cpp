@@ -23,12 +23,10 @@ extern Console console;
 
 // ------------------
 // FreeRTOS functions
-string Indicator::getName(void) { return "Indicator"; };
-
 void Indicator::re_init() { init(); }
 
 void Indicator::init(void) {
-  set_SleepTime(200);
+  // set_SleepTime(200);
   string s = "[v] " + getName() + " initialized.\n";
   console << s;
   driverDisplay.print(s.c_str());
@@ -59,36 +57,10 @@ void Indicator::setIndicator(int left, int right) {
     setIndicator(INDICATOR::RIGHT);
 }
 
-bool Indicator::getIndicatorLeft() {
-  return (carState.Indicator == INDICATOR::LEFT || carState.Indicator == INDICATOR::WARN) && carState.IndicatorBlink;
-}
-
-bool Indicator::getIndicatorRight() {
-  return (carState.Indicator == INDICATOR::RIGHT || carState.Indicator == INDICATOR::WARN) && carState.IndicatorBlink;
-}
-
-unsigned long lastFlip = 0;
-bool justSwitchedOff = true;
 void Indicator::task() {
   // do not add code here -- only controlling the blink frequency
   // polling loop
   while (1) {
-    if (carState.Indicator != INDICATOR::OFF) {
-      justSwitchedOff = true;
-      if (carState.IndicatorBlink && (millis() - lastFlip) > intervall_on) {
-        lastFlip = millis();
-        carState.IndicatorBlink = false;
-      } else if (!carState.IndicatorBlink && (millis() - lastFlip) > intervall_off) {
-        lastFlip = millis();
-        carState.IndicatorBlink = true;
-      }
-      carState.getPin(PinIndicatorOutLeft)->value = indicator.getIndicatorLeft();
-      carState.getPin(PinIndicatorOutRight)->value = indicator.getIndicatorRight();
-    } else if (justSwitchedOff) {
-      carState.getPin(PinIndicatorOutLeft)->value = 0;
-      carState.getPin(PinIndicatorOutRight)->value = 0;
-      justSwitchedOff = false;
-    }
 
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

@@ -9,6 +9,7 @@
 #include <Wire.h>
 
 #include <Console.h>
+#include <Helper.h>
 #include <I2CBus.h>
 #include <PWM.h>
 
@@ -20,7 +21,7 @@ extern I2CBus i2cBus;
 void PWM::init(void) {
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(i2cBus.mutex);
 
   // init device
   pwm.begin();
@@ -51,7 +52,7 @@ void PWM::update_pwm(int channel, int value) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(i2cBus.mutex);
 
   pwm.setPWM(channel, 0, value);
 

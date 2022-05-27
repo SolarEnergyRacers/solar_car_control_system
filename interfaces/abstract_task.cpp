@@ -20,10 +20,11 @@ void abstract_task::init() {
   console << "[?] Init '" << getInfo() << "'... ";
 };
 
-void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
+void abstract_task::sleep() { vTaskDelay(get_SleepTime() / portTICK_PERIOD_MS); };
 
 void abstract_task::create_task(int priority, uint32_t sleep_polling, int stack_size) {
-  sleep_polling_ms = sleep_polling;
+  // sleep_polling_ms = sleep_polling;
+  set_SleepTime(sleep_polling);
   console << " - create task '" << getInfo() << "'...";
 #if WithTaskSuspend == true
   xTaskCreate((void (*)(void *)) & init_task, getInfo().c_str(), stack_size, (void *)this, 1, &xHandle);
@@ -46,5 +47,3 @@ void abstract_task::exit() {
 };
 
 string abstract_task::getInfo() { return getName(); }
-
-void abstract_task::set_SleepTime(int milliseconds) { sleep_polling_ms = milliseconds; }

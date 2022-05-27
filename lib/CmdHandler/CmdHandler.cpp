@@ -37,9 +37,13 @@
 #include <SDCard.h>
 #include <system.h>
 
-extern I2CBus i2cBus;
-extern DAC dac;
+#if ADC_ON
 extern ADC adc;
+#endif
+extern I2CBus i2cBus;
+#if DAC_ON
+extern DAC dac;
+#endif
 extern IOExt2 ioExt;
 extern I2CBus i2cBus;
 extern Indicator indicator;
@@ -69,6 +73,7 @@ void CmdHandler::exit() {
   // TODO
 }
 // ------------------
+
 template <size_t N> void splitString(string (&arr)[N], string str) {
   int n = 0;
   istringstream iss(str);
@@ -152,7 +157,9 @@ void CmdHandler::task() {
           float Kp = atof(arr[0].c_str());
           float Ki = atof(arr[1].c_str());
           float Kd = atof(arr[2].c_str());
+#if CARSPEED_ON
           carSpeed.update_pid(Kp, Ki, Kd);
+#endif
           console << "PID set to Kp=" << Kp << ", Ki=" << Ki << ", Kd=" << Kd << "\n";
         } break;
         case 'P':
@@ -255,9 +262,11 @@ void CmdHandler::task() {
 
 string CmdHandler::printSystemValues() {
   stringstream ss("");
-  int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
+#if ADC_ON
+  int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-  ss << fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
+  ss << fmt::format("dec={:5d}  acc={:5d}\n", valueDec, valueAcc);
+#endif
 
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
@@ -267,7 +276,9 @@ string CmdHandler::printSystemValues() {
       }
     }
   }
+#if DAC_ON
   ss << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
                     dac.get_pot(DAC::pot_chan::POT_CHAN1));
+#endif
   return ss.str();
 }

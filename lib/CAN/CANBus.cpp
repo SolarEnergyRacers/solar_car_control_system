@@ -111,8 +111,6 @@ CANBus::CANBus() {
   ages[MPPT3_BASE_ADDR | 0x6] = INT32_MAX;
 }
 
-string CANBus::getName() { return "CAN_Task"; }
-
 void CANBus::re_init() {
   CAN.end();
   CANBus::init();

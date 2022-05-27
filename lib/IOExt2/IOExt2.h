@@ -6,7 +6,7 @@
 #define SER_IOEXT2_H
 
 #include <definitions.h>
-#if IOEXT2_ON
+#if IOEXT_ON
 
 #include <MCP23017.h>
 #include <list>
@@ -78,14 +78,20 @@ void sdCardDetectHandler();
 // end pin handler
 
 class IOExt2 : public abstract_task {
-public:
-  string getName(void) { return "IOExt2"; };
+private:
+  uint32_t sleep_polling_ms = 400;
 
+public:
+  // RTOS task
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; };
+  string getName(void) { return "IOExt2"; };
   void init(void);
   void re_init(void);
   void exit(void);
   void task(void);
 
+  // Class member and functions
   void setPort(int port, bool value);
   int getPort(int port);
 

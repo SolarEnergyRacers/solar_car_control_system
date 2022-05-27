@@ -26,8 +26,9 @@
 extern Console console;
 extern PID pid;
 extern CarSpeed carSpeed;
-// extern ADC adc;
+#if DAC_ON
 extern DAC dac;
+#endif
 extern CarState carState;
 
 // ------------------
@@ -39,8 +40,7 @@ void CarSpeed::init() {
   target_speed = 0;
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
-  sleep_polling_ms = 400;
-  console << "[v]" << getName() << " initialized.\n";
+  console << "[v] " << getName() << " initialized.\n";
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }
@@ -110,7 +110,7 @@ void CarSpeed::task() {
         console << fmt::format("WARN::PID dejustified {} > {}!\n", output_setpoint, DAC_MAX);
         output_setpoint = DAC_MAX;
       }
-
+#if DAC_ON
       // set acceleration & deceleration
       if (output_setpoint >= 0) {
         //   carState.Acceleration = output_setpoint; // acceleration
@@ -127,6 +127,7 @@ void CarSpeed::task() {
         console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
                 << "\n";
       }
+#endif
       // TODO: replace dac.set_pot with carControl functions
 
       console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << "\n";

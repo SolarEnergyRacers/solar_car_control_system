@@ -291,10 +291,12 @@ void app_main(void) {
   carState.SdCardDetect = false;
   carState.ConstantMode = CONSTANT_MODE::SPEED;
   carState.Light = LIGHT::OFF;
-  ioExt.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", ioExt.getName(), ioExt.get_SleepTime()));
+  ioExt.create_task(1, 250, 8192);
+  msg = fmt::format("[v] {} task initialized ({}ms).\n", ioExt.getName(), ioExt.get_SleepTime());
+  console << msg << "\n";
+  engineerDisplay.print(msg);
   ioExt.readAll();
-  // engineerDisplay.print("[v] " + ioExt.getName() + " readAll done..\n");
+  engineerDisplay.print("[v] " + ioExt.getName() + " readAll done..\n");
 #endif
 #if CARSPEED_ON
   carSpeed.create_task();
@@ -326,10 +328,10 @@ void app_main(void) {
 #endif
 
   systemOk = true;
-  sleep(1);
-#if IOEXT_ON
-  ioExt.readAll();
-#endif
+
+// #if IOEXT_ON
+//   ioExt.readAll();
+// #endif
   console << "-----------------------------------------------------------------\n";
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";

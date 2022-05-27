@@ -180,7 +180,7 @@ void app_main(void) {
   string msg = fmt::format("[v] {} task initialized ({}ms) {}.\n", engineerDisplay.getName(), engineerDisplay.get_SleepTime(),
                            engineerDisplay.get_DisplayStatus_text());
   console << msg << "\n";
-  //engineerDisplay.print(msg);
+  // engineerDisplay.print(msg);
 // ---- init modules ----
 #if INT_ON
   TODO !!!GPInputOutput gpio; // I2C Interrupts, GPIO pin settings
@@ -329,9 +329,9 @@ void app_main(void) {
 
   systemOk = true;
 
-// #if IOEXT_ON
-//   ioExt.readAll();
-// #endif
+  // #if IOEXT_ON
+  //   ioExt.readAll();
+  // #endif
   console << "-----------------------------------------------------------------\n";
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";

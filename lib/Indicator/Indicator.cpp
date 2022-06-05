@@ -12,7 +12,7 @@
 #include <Console.h>
 #include <Display.h>
 #include <DriverDisplay.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <MCP23017.h>
 
@@ -23,13 +23,13 @@ extern Console console;
 
 // ------------------
 // FreeRTOS functions
-void Indicator::re_init() { init(); }
+string Indicator::re_init() { return init(); }
 
-void Indicator::init(void) {
-  // set_SleepTime(200);
-  string s = "[v] " + getName() + " initialized.\n";
-  console << s;
-  driverDisplay.print(s.c_str());
+string Indicator::init(void) {
+  bool hasError = false;
+  console << "[??] Init " + getName() + "...";
+  console << "done.\n";
+  return fmt::format("[{}] Indicator initialized.", hasError ? "--" : "ok");
 }
 
 void Indicator::exit(void){

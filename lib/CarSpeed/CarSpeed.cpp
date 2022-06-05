@@ -34,13 +34,14 @@ extern CarState carState;
 // ------------------
 // FreeRTOS functions
 
-void CarSpeed::re_init() { init(); }
+string CarSpeed::re_init() { return init(); }
 
-void CarSpeed::init() {
+string CarSpeed::init() {
+  bool hasError = false;
   target_speed = 0;
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
-  console << "[v] " << getName() << " initialized.\n";
+  return fmt::format("[{}] CarSpeed initialized.", hasError ? "--" : "ok");
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }

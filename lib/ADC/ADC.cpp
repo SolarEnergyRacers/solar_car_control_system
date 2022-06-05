@@ -31,23 +31,24 @@ extern DriverDisplay driverDisplay;
 
 using namespace std;
 
-void ADC::re_init() { init(); }
+string ADC::re_init() { return init(); }
 
-void ADC::init() {
+string ADC::init() {
+  bool hasError = false;
   // instantiate the devices with their corresponding address
   ads_addrs[0] = I2C_ADDRESS_ADS1x15_0;
   ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
-  string s;
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-    console << fmt::format("[?] Init 'ADC[{}]' with address {:#04x} ...", idx, ads_addrs[idx]);
+    console << fmt::format("    [?] Init 'ADC[{}]' with address {:#04x} ...\n", idx, ads_addrs[idx]);
     xSemaphoreTakeT(i2cBus.mutex);
     adss[idx] = ADS1115(ads_addrs[idx]);
 
     bool result = adss[idx].begin();
     if (!result) {
-      console << fmt::format(" ERROR: Wrong ADS1x15 address {:#04x}.\n", ads_addrs[idx]);
       xSemaphoreGive(i2cBus.mutex);
+      console << fmt::format("        ERROR: Wrong ADS1x15 at address: {:#04x}.\n", ads_addrs[idx]);
+      hasError = true;
       continue;
     }
     console << "\n";
@@ -63,19 +64,17 @@ void ADC::init() {
     // 1 bit = 3mV (ADS1015) 0.1875mV (ADS1115)
     float multiplier = adss[idx].toVoltage(1); // voltage factor
     xSemaphoreGive(i2cBus.mutex);
-    console << "    Max voltage=" << adss[idx].getMaxVoltage() << " with multiplier=" << multiplier << "\n";
+    console << "        Max voltage=" << adss[idx].getMaxVoltage() << " with multiplier=" << multiplier << "\n";
     // read all inputs & report
     for (int i = 0; i < 4; i++) {
       xSemaphoreTakeT(i2cBus.mutex);
       int16_t value = adss[idx].readADC(i);
       xSemaphoreGive(i2cBus.mutex);
-      console << "      [ADS1x15] AIN" << i << " --> " << value << ": " << multiplier * value << "mV\n";
+      console << "          [ADS1x15] AIN" << i << " --> " << value << ": " << multiplier * value << "mV\n";
     }
-
-    string s = fmt::format("[v] ADC[{}] at 0x{:x} initialized.\n", idx, ads_addrs[idx]);
-    console << s;
-    driverDisplay.print(s.c_str());
+    console << fmt::format("    [ok] ADC[{}] at 0x{:x} inited.\n", idx, ads_addrs[idx]);
   }
+  return fmt::format("[{}] ADC initialized.", hasError ? "--" : "ok");
 }
 
 void ADC::exit(void) {

@@ -32,14 +32,17 @@ extern DriverDisplay driverDisplay;
 extern I2CBus i2cBus;
 extern Console console;
 
-void DAC::re_init() { reset_and_lock_pot(); }
-
-void DAC::init() {
-  console << "[?] Setup 'DAC'...\n";
+string DAC::re_init() {
   reset_and_lock_pot();
-  string s = fmt::format("[v] DAC initialized with I2C_ADDRESS_DS1803={:02x}.\n", I2C_ADDRESS_DS1803);
-  console << s;
-  driverDisplay.print(s.c_str());
+  return "";
+}
+
+string DAC::init() {
+  bool hasError = false;
+  console << "[??] Init 'DAC'...\n";
+  reset_and_lock_pot();
+  console << fmt::format("    DAC initialized with I2C_ADDRESS_DS1803={:02x}.\n", I2C_ADDRESS_DS1803);
+  return fmt::format("[{}] DAC initialized.", hasError ? "--" : "ok");
 }
 
 void DAC::lock() {

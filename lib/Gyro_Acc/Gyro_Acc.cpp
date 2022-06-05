@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string>
 
-#include <BMI088.h> // gyro & acc lib
+#include <BMI088.h>
 #include <Console.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
@@ -18,10 +18,10 @@
 extern I2CBus i2cBus;
 extern Console console;
 
-void GyroAcc::re_init() { init(); }
+string GyroAcc::re_init() { return init(); }
 
-void GyroAcc::init(void) {
-  set_SleepTime(1000);
+string GyroAcc::init(void) {
+  bool hasError = false;
   // check connection & report
   if (bmi088.isConnection()) {
     console << "[BMI088] is connected\n";
@@ -32,8 +32,11 @@ void GyroAcc::init(void) {
 
   } else {
     console << "[BMI088] is not connected\n";
+    hasError = true;
   }
+  return fmt::format("[{}] GyroAcc initialized.", hasError ? "--" : "ok");
 }
+
 void GyroAcc::exit(void) {
   // TODO
 }

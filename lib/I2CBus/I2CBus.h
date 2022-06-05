@@ -16,11 +16,11 @@ class I2CBus {
 private:
 public:
   SemaphoreHandle_t mutex = NULL;
-  void init();
-  void re_init();
+  string getName() { return "I2C Bus"; }
+  string init();
+  string re_init();
   bool i2c_available(uint8_t adr);
   void scan_i2c_devices();
-  string getName() { return "I2C Bus"; }
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_I2CBUS_H

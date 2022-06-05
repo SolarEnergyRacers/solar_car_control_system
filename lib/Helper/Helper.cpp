@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 
+#include <RTC.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
 #include <freertos/task.h>
@@ -44,7 +45,12 @@ void xSemaphoreTakeT(xQueueHandle mutex) {
   }
 }
 
-std::string getTimeStamp(unsigned long seconds) {
+string getTime(RtcDateTime now) {
+  return fmt::format("{:02d}/{:02d}/{:04d} {:02d}:{:02d}:{:02d}", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
+                     now.Second());
+}
+
+string getTimeStamp(unsigned long seconds) {
   int secsRemaining = seconds % 3600;
   int runHours = seconds / 3600;
   int runMinutes = secsRemaining / 60;

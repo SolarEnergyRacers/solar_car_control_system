@@ -29,12 +29,13 @@ extern Console console;
 extern DriverDisplay driverDisplay;
 extern Console console;
 
-void Uart::re_init() { init(); }
-void Uart::exit() {}
+string Uart::re_init() { return init(); }
 
-void Uart::init() {
+string Uart::init() {
+  bool hasError = false;
   console = Console();
-  // init serial for console IO
+  // abstract_task::init();
+  //  init serial for console IO
   Serial.begin(carState.Serial1Baudrate);
   delay(1000);
   console << "[?] Setup '" << getName() << "'...\n";
@@ -51,9 +52,11 @@ void Uart::init() {
   console << "    Serial2 TX2 is on pin: " << to_string(SERIAL2_TX) << "\n";
   console << "    Serial2 RX2 is on pin: " << to_string(SERIAL2_RX) << "\n";
   console << "    Serial2 Baud Rate:     " << carState.Serial2Baudrate << "\n";
-
-  console << fmt::format("[v] {} inited.\n", getName());
+  console << "    done.";
+  return fmt::format("[{}] Serial and Serial2 initialized.", hasError ? "--" : "ok");
 }
+
+void Uart::exit() {}
 
 // bool payload1;
 // bool payload2;

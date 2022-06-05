@@ -27,15 +27,15 @@ template <typename Enumeration> auto as_integer(Enumeration const value) -> type
 
 class Display : public abstract_task {
 private:
-  uint32_t sleep_polling_ms = 400;
+  // uint32_t sleep_polling_ms = 400;
 
 public:
   // RTOS task
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; };
-  void init(void);
-  void re_init(void);
+  virtual string getName(void);
+  string init(void);
+  string re_init(void);
   void exit(void);
+  void task(void);
 
 private:
   //==== Display definitions ==== START
@@ -69,11 +69,6 @@ public:
   void getCursor(int &x, int &y);
   void clear_screen(int bgColor);
   int getPixelWidthOfTexts(int textSize, string t1, string t2);
-
-  // internal functions for inner task communication
-  void task(void);
-
-  virtual string getName(void);
 
 protected:
   int height;

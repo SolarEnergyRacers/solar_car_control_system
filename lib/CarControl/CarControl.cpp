@@ -21,7 +21,7 @@
 #include <EngineerDisplay.h>
 #include <Helper.h>
 #include <I2CBus.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <MCP23017.h>
 #include <SDCard.h>
@@ -40,7 +40,7 @@ extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 extern I2CBus i2cBus;
 extern Indicator indicator;
-extern IOExt2 ioExt;
+extern IOExt ioExt;
 extern SDCard sdCard;
 
 using namespace std;
@@ -50,19 +50,19 @@ unsigned long millisNextStamp = millis();
 // ------------------
 // FreeRTOS functions
 
-void CarControl::re_init() { init(); }
+string CarControl::re_init() { return init(); }
 
-void CarControl::init() {
-  console << "[?] Setup '" << getName() << "'...\n";
+string CarControl::init() {
+  bool hasError = false;
+  console << "[?] Setup '" << getName() << "'... ";
   justInited = true;
   mutex = xSemaphoreCreateMutex();
   xSemaphoreGive(mutex);
   carState.AccelerationDisplay = -99;
   // adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (5s handling time)
   sleep_polling_ms = 250;
-  string s = fmt::format("[v] {} inited.\n", getName());
-  console << s;
-  driverDisplay.print(s.c_str());
+  console << "done.";
+  return fmt::format("[{}] CarControl initialized.", hasError ? "--" : "ok");
 }
 
 void CarControl::exit(void) {
@@ -285,6 +285,7 @@ volatile int CarControl::valueChangeRequest = 0;
 void CarControl::task() {
   // polling loop
   while (1) {
+    ioExt.setPort(0x04, !ioExt.getPort(0x04)); // PinDacLifeSign
     bool someThingChanged = false;
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();

@@ -4,7 +4,11 @@
 
 #include <definitions.h>
 
+// standard libraries
+#include <fmt/core.h>
 #include <iostream>
+#include <stdio.h>
+#include <string>
 
 #include <Wire.h>
 
@@ -18,23 +22,20 @@
 extern Console console;
 extern I2CBus i2cBus;
 
-void PWM::init(void) {
-
-  // CRITICAL SECTION I2C: start
+string PWM::init(void) {
+  bool hasError = false;
   xSemaphoreTakeT(i2cBus.mutex);
 
-  // init device
   pwm.begin();
-
-  // set up parameters
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(1600); // max pwm freq
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
+
+  return fmt::format("[{}] PWM initialized.", hasError ? "--" : "ok");
 }
 
-void PWM::re_init() { init(); }
+string PWM::re_init() { return init(); }
 
 void PWM::exit() {
   // TODO

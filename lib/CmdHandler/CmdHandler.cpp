@@ -32,7 +32,7 @@
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <SDCard.h>
 #include <system.h>
@@ -44,7 +44,7 @@ extern I2CBus i2cBus;
 #if DAC_ON
 extern DAC dac;
 #endif
-extern IOExt2 ioExt;
+extern IOExt ioExt;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
@@ -60,13 +60,12 @@ using namespace std;
 // ------------------
 // FreeRTOS functions
 
-void CmdHandler::re_init() { init(); }
+string CmdHandler::re_init() { return init(); }
 
-void CmdHandler::init() {
+string CmdHandler::init() {
+  bool hasError = false;
   // nothing to do, i2c bus is getting initialized externally
-  string s = "[v] " + getName() + " initialized.\n";
-  console << s;
-  driverDisplay.print(s.c_str());
+  return fmt::format("[{}] CmdHandler initialized.", hasError ? "--" : "ok");
 }
 
 void CmdHandler::exit() {

@@ -24,10 +24,10 @@ private:
 
 public:
   virtual string getName(void);
-  virtual void init(void);
-  virtual void re_init(void);
+  virtual string init(void) = 0;
+  virtual string re_init(void) = 0;
   virtual void exit(void);
-  virtual void task(void); // this is the actual task
+  virtual void task(void) = 0;
 
   string getInfo(void);
 
@@ -35,12 +35,15 @@ public:
   TaskHandle_t getHandle() { return xHandle; };
 #endif
 
-  virtual void set_SleepTime(uint32_t milliseconds) = 0;
-  virtual uint32_t get_SleepTime() = 0;
+  uint32_t sleep_polling_ms;
+
+  void set_SleepTime(uint32_t milliseconds);
+  uint32_t get_SleepTime();
   void sleep(void);
   void sleep(int polling_ms);
-
-  void create_task(int priority = 1, uint32_t sleep_polling = 300, int stack_size = 4096);
+  string report_task_init();
+  string report_task_init(abstract_task *task);
+  string create_task(int priority = 10, uint32_t sleep_polling = 330, int stack_size = 4096);
   static void init_task(void *pvParams) { ((abstract_task *)pvParams)->task(); };
 };
 

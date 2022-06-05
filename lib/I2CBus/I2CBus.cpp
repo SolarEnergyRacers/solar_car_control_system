@@ -20,19 +20,20 @@ extern CarState carState;
 
 using namespace std;
 
-void I2CBus::re_init() { init(); }
+string I2CBus::re_init() { return init(); }
 
-void I2CBus::init(void) {
-  console << "[?] Init '" << getName() << "'\n";
+string I2CBus::init(void) {
+  bool hasError = false;
+  console << "[??] Init '" << getName() << "'...\n";
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
   // Wire.begin(I2C_SDA, I2C_SCL, carState.I2CFrequence * 1000); // frequency in Hz
   Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ); // frequency in mHz
   xSemaphoreGive(mutex);
-
   console << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
   scan_i2c_devices();
+  return fmt::format("[{}] I2CBus initialized.", hasError ? "--" : "ok");
 }
 
 // test if the i2c bus is available and ready for transaction at address adr

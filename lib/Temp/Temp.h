@@ -14,8 +14,8 @@ private:
   DallasTemperature ds;
 
 public:
-  void init();
-  void re_init();
+  string init();
+  string re_init();
   void request_temperatures(void);
   int get_num_temp_dev(void);
   float read_tempC_index(int index);

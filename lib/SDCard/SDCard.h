@@ -18,8 +18,8 @@ private:
   void printDirectory(File dir, int numTabs);
 
 public:
-  void init();
-  void re_init();
+  string init();
+  string re_init();
   bool isMounted() { return carState.SdCardDetect && mounted; }
   bool isReadyForLog() { return isMounted() && dataFile != 0; }
   // write a string into the dataFile

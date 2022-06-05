@@ -12,7 +12,7 @@
 #include <ConfigFile.h>
 #include <Console.h>
 #include <Helper.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <SDCard.h>
 #include <definitions.h>
@@ -22,11 +22,11 @@ using namespace std;
 extern CarState carState;
 extern Console console;
 extern SDCard sdCard;
-extern IOExt2 ioExt;
+extern IOExt ioExt;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
-CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
-CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt2::getIdx(port)]); }
+CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
+CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(port)]); }
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
 static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASHR"};
@@ -359,7 +359,7 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     ss << devNr << ": ";
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
-      int idx = IOExt2::getIdx(devNr, pinNr);
+      int idx = IOExt::getIdx(devNr, pinNr);
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->mode == OUTPUT && withColors) {
         if (pin->value != pin->oldValue) {

@@ -19,11 +19,10 @@
  *
  * RTC
  * const uint8_t DS1307_ADDRESS = 0x68;
- *
  */
 
 /*
- *  GPIO
+ *  GPIputOutput
  */
 #define GPIO_INTERRUPT_PIN 33
 
@@ -44,7 +43,7 @@
 // analog digital coder
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
-#define I2C_ADDRESS_ADS1x15_1 0x49
+#define I2C_ADDRESS_ADS1x15_1 0x4b
 #define I2C_ADDRESS_ADS1x15_2 0x4a
 #define ADC_MAX 65535
 

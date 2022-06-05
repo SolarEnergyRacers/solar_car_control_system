@@ -55,19 +55,20 @@ bool lifeSignState = false;
 
 string Display::getName() { return "Display"; };
 
-void Display::init() {
-  abstract_task::init();
-  console << "\n";
-  re_init();
-  console << "-01---------\n";
+string Display::init() {
+  console << "[??] Init '" << getInfo() << "'...\n";
+  return re_init();
 }
 
-void Display::re_init(void) {
+string Display::re_init(void) {
+  bool hasError = false;
 #if WithTaskSuspend == true
   vTaskResume(getHandle());
 #endif
   _setup();
+  return fmt::format("[{}] Display {} initialized.", hasError ? "--" : "ok", getName());
 }
+
 void Display::exit() {
   // todo
 }

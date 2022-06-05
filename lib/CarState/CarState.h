@@ -71,9 +71,20 @@ enum class BATTERY_ERROR {
 };
 
 static const char *BATTERY_ERROR_str[] = {
-    "CELL_OVER_VOLTAGE",    "CELL_UNDER_VOLTAGE", "CELL_OVER_TEMP",     "MEASUREMENT_UNTRUSTED",    "CMU_COMM_TIMEOUT",
-    "VEHICLE_COMM_TIMEOUT", "BMU_IN_SETUP_MODE",  "CMU_CAN_POWER",      "PACK_ISOLATION_TEST_FAIL", "SOC_MEASUREMENT_INVALID",
-    "CAN_12V_LOW",          "CONTACTOR_STUCK",    "EXTRA_CELL_DETECTED"};
+    "CELL_OVER_VOLTAGE",        //
+    "CELL_UNDER_VOLTAGE",       //
+    "CELL_OVER_TEMP",           //
+    "MEASUREMENT_UNTRUSTED",    //
+    "CMU_COMM_TIMEOUT",         //
+    "VEHICLE_COMM_TIMEOUT",     //
+    "BMU_IN_SETUP_MODE",        //
+    "CMU_CAN_POWER",            //
+    "PACK_ISOLATION_TEST_FAIL", //
+    "SOC_MEASUREMENT_INVALID",  //
+    "CAN_12V_LOW",              //
+    "CONTACTOR_STUCK",          //
+    "EXTRA_CELL_DETECTED"       //
+};
 
 class CarState {
 
@@ -106,6 +117,9 @@ public:
   }
   ~CarState(){};
   bool initalize_config();
+  string dummy1 = PRECHARGE_STATE_str[0];
+  string dummy2 = BATTERY_ERROR_str[0];
+  string dummy3 = DISPLAY_STATUS_str[0];
 
   // ADC native values
   int16_t MOTOR_SPEED;

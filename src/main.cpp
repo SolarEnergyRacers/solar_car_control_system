@@ -43,7 +43,7 @@
 #include <GPIO.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <MCP23017.h>
 #include <OneWireBus.h>
@@ -76,7 +76,7 @@ CmdHandler cmdHandler;
 Console console;
 DriverDisplay driverDisplay;
 EngineerDisplay engineerDisplay;
-GPInputOutput gpio; // I2C Interrupts, GPIO pin settings
+GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
 I2CBus i2cBus;
 Indicator indicator;
 OneWireBus oneWireBus;
@@ -84,10 +84,10 @@ SDCard sdCard;
 SPIBus spiBus;
 // Global objects (possibly to deactivated)
 #if INT_ON
-TODO !!!GPInputOutput gpio; // I2C Interrupts, GPIO pin settings
+// TODO !!!GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
 #endif
 #if IOEXT_ON
-IOExt2 ioExt;
+IOExt ioExt;
 #endif
 #if ADC_ON
 ADC adc;
@@ -125,13 +125,15 @@ bool debugl2 = false;
 bool debugl3 = false;
 // int debug_level = 3;
 
+string msg;
+
 void app_main(void) {
 
 #if SERIAL_RADIO_ON
   // init console IO and radio console
   Uart uart; // SERIAL
-  uart.init();
-  delay(300);
+  msg = uart.init();
+  console << msg << "\n";
 #endif
 
 #if TEST_SERIAL2
@@ -177,20 +179,24 @@ void app_main(void) {
 
   engineerDisplay.init();
   // engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
-  string msg = fmt::format("[v] {} task initialized ({}ms) {}.\n", engineerDisplay.getName(), engineerDisplay.get_SleepTime(),
-                           engineerDisplay.get_DisplayStatus_text());
+  msg = fmt::format("[v] {} task initialized ({}ms) {}.\n", engineerDisplay.getName(), engineerDisplay.get_SleepTime(),
+                    engineerDisplay.get_DisplayStatus_text());
   console << msg << "\n";
-  // engineerDisplay.print(msg);
+  // engineerDisplay.print(msg + "\n");
 // ---- init modules ----
 #if INT_ON
-  TODO !!!GPInputOutput gpio; // I2C Interrupts, GPIO pin settings
+  // TODO !!!GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
   gpio.register_gpio_interrupt();
 #endif
 #if IOEXT_ON
-  ioExt.init();
+  msg = ioExt.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if SD_ON
-  sdCard.init();
+  msg = sdCard.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 
   //--- SD card available ----------------------------
@@ -199,34 +205,54 @@ void app_main(void) {
   //------from now config ini values can be used------
 
 #if COMMANDHANDLER_ON
-  cmdHandler.init();
+  msg = cmdHandler.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if RTC_ON
-  rtc.init();
+  msg = rtc.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if INDICATOR_ON
-  indicator.init();
+  msg = indicator.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if DAC_ON
-  dac.init();
+  msg = dac.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if ADC_ON
-  adc.init();
+  msg = adc.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if DS_ON
-  ds.init();
+  msg = ds.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if GYRO_ACC_ON
-  gyroAcc.init();
+  msg = gyroAcc.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if PWM_ON
-  pwm.init();
+  msg = pwm.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if CAN_ON
-  can.init();
+  msg = can.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if CARSPEED_ON
-  carSpeed.init();
+  msg = carSpeed.init();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 
   if (!startOk) {
@@ -243,47 +269,56 @@ void app_main(void) {
 
 // ---- create tasks ----
 #if INDICATOR_ON
-  indicator.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", indicator.getName(), indicator.get_SleepTime()));
+  msg = indicator.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if DS_ON
-  xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  //xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
 #endif
 #if ADC_ON
-  adc.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", adc.getName(), adc.get_SleepTime()));
+  msg = adc.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if GYRO_ACC_ON
-  gyroAcc.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", gyroAcc.getName(), gyroAcc.get_SleepTime()));
+  msg = gyroAcc.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if PWM_ON
-  pwm.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", pwm.getName(), pwm.get_SleepTime()));
+  msg = pwm.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if RTC_ON
   RtcDateTime now = rtc.read_rtc_datetime();
-  // console << fmt::sprintf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n"
-  //                , now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(), now.Second());
   esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
-  // engineerDisplay.print("[v] " + rtc.getName() + " initialized, time in esp32 updated.\n");
+  // string actTime = getTime(now);
+  // msg = rtc.create_task();
+  // console << msg << actTime << "\n";
+  // engineerDisplay.print(fmt::format("{} {}\n", msg, actTime));
 #endif
 #if INT_ON
-  gpio.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", gpio.getName(), gpio.get_SleepTime()));
+  msg = gpio.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if COMMANDHANDLER_ON
-  cmdHandler.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", cmdHandler.getName(), cmdHandler.get_SleepTime()));
+  msg = cmdHandler.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if CAN_ON
-  can.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", can.getName(), can.get_SleepTime()));
+  msg = can.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if CARCONTROL_ON
   carControl.init();
-  carControl.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", carControl.getName(), carControl.get_SleepTime()));
+  msg = carControl.create_task();
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if IOEXT_ON
   carState.Indicator = INDICATOR::OFF;
@@ -291,24 +326,24 @@ void app_main(void) {
   carState.SdCardDetect = false;
   carState.ConstantMode = CONSTANT_MODE::SPEED;
   carState.Light = LIGHT::OFF;
-  ioExt.create_task(1, 250, 8192);
-  msg = fmt::format("[v] {} task initialized ({}ms).\n", ioExt.getName(), ioExt.get_SleepTime());
+  msg = ioExt.create_task(1, 250, 8192);
+  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
-  engineerDisplay.print(msg);
   ioExt.readAll();
   engineerDisplay.print("[v] " + ioExt.getName() + " readAll done..\n");
 #endif
 #if CARSPEED_ON
-  carSpeed.create_task();
-  engineerDisplay.print(fmt::format("[v] {} task initialized ({}ms).\n", carSpeed.getName(), carSpeed.get_SleepTime()));
+  msg = carSpeed.create_task(10, 250, 2048);
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
-  //--let the bootscreen visible for a moment ------------------
-  int waitAtConsoleView = 5;
   engineerDisplay.print("\nready");
 #if RTC_ON == true
   engineerDisplay.print(fmt::format(" at {}", esp32time.getDateTime().c_str()));
 #endif
+  //--let the bootscreen visible for a moment ------------------
   engineerDisplay.print(".\nWaiting for start of life display: ");
+  int waitAtConsoleView = 5;
   while (waitAtConsoleView-- > 0) {
     engineerDisplay.print(to_string(waitAtConsoleView));
     sleep(1);
@@ -318,27 +353,30 @@ void app_main(void) {
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
 //------------------------------------------------------------
 #if ENGINEER_DISPLAY_ON
-  engineerDisplay.create_task(10);
+  msg = engineerDisplay.create_task(10);
+  engineerDisplay.print(msg + "\n");
+  console << msg << "\n";
 #endif
 #if DRIVER_DISPLAY_ON
   driverDisplay.init();
   driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
-  driverDisplay.create_task(16);
-  console << "[v] " << driverDisplay.getName() << " task initialized, " << driverDisplay.get_DisplayStatus_text() << "\n";
+  msg = driverDisplay.create_task(16);
+  engineerDisplay.print(msg + "\n");
+  console << msg << driverDisplay.get_DisplayStatus_text() << "\n";
 #endif
 
   systemOk = true;
 
-  // #if IOEXT_ON
-  //   ioExt.readAll();
-  // #endif
   console << "-----------------------------------------------------------------\n";
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";
 
-  // //--- SD card available ----------------------------
-  // console << "carState.init_values():3\n";
-  // carState.init_values();
-  // //------from now config ini values can be used------
+#if IOEXT_ON
+  ioExt.readAll();
+#endif
+  //--- SD card available ----------------------------
+  console << "carState.init_values():3\n";
+  carState.init_values();
+  //------from now config ini values can be used------
   console << "-----------------------------------------------------------------\n";
 }

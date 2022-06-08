@@ -54,14 +54,13 @@ string CarControl::re_init() { return init(); }
 
 string CarControl::init() {
   bool hasError = false;
-  console << "[?] Setup '" << getName() << "'... ";
+  console << "[  ] Init 'CarControl'... ";
   justInited = true;
-  mutex = xSemaphoreCreateMutex();
-  xSemaphoreGive(mutex);
+  // mutex = xSemaphoreCreateMutex();
+  // xSemaphoreGive(mutex);
   carState.AccelerationDisplay = -99;
   // adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (5s handling time)
-  sleep_polling_ms = 250;
-  console << "done.";
+  console << "done.\n";
   return fmt::format("[{}] CarControl initialized.", hasError ? "--" : "ok");
 }
 
@@ -124,7 +123,8 @@ bool CarControl::read_speed() {
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    console << "Break Pedal Pressed (paddle control)\n";
+    // XXXXXX
+    // console << "Break Pedal Pressed (paddle control)\n";
     _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
     return true;
   }
@@ -189,7 +189,6 @@ void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t v
 
 void CarControl::adjust_paddles(int seconds) {
   int x, y;
-  int16_t value;
 
 #if DAC_ON
   dac.reset_and_lock_pot();
@@ -220,6 +219,7 @@ void CarControl::adjust_paddles(int seconds) {
     }
 
 #if ADC_ON
+    int16_t value;
     value = adc.read(ADC::Pin::STW_DEC);
     if (value > 0) {
       if (ads_min_dec > value)
@@ -285,7 +285,7 @@ volatile int CarControl::valueChangeRequest = 0;
 void CarControl::task() {
   // polling loop
   while (1) {
-    ioExt.setPort(0x04, !ioExt.getPort(0x04)); // PinDacLifeSign
+    carState.getPin(PinDacLifeSign)->value = !carState.getPin(PinDacLifeSign)->value;
     bool someThingChanged = false;
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();

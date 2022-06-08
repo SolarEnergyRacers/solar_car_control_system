@@ -22,7 +22,7 @@ string Temp::re_init() { return init(); }
 
 string Temp::init(void) {
   bool hasError = false;
-  console << "[??] Init 'Temp (OneWire)'...\n";
+  console << "[  ] Init 'Temp (OneWire)'...\n";
   xSemaphoreTake(oneWireBus.mutex, portMAX_DELAY);
 
   // init devices
@@ -30,7 +30,7 @@ string Temp::init(void) {
   ds.begin();
 
   // report devices found
-  console << fmt::format("    OneWire devices on bus: {}\n", ds.getDeviceCount());
+  console << fmt::format("     OneWire devices on bus: {}\n", ds.getDeviceCount());
 
   // clear old search
   oneWireBus.oneWire.reset_search();
@@ -39,14 +39,14 @@ string Temp::init(void) {
   DeviceAddress device_addr;
   while (oneWireBus.oneWire.search(device_addr)) {
 
-    console << "    [DS18B20] Address:";
+    console << "     [DS18B20] Address:";
     for (uint8_t i = 0; i < 8; i++) {
 
       console << fmt::format(" {}", device_addr[i]);
     }
     console << " ";
 
-    console << fmt::format("    Resolution: {}", ds.getResolution(device_addr));
+    console << fmt::format("     Resolution: {}", ds.getResolution(device_addr));
     console << " ";
 
     console << "    Power Mode: ";
@@ -112,6 +112,6 @@ void read_ds_demo_task(void *pvParameter) {
       console << fmt::format("    [DS18B20] Temperature: {:4.2f}C / {:4.2f}F\n", ds.read_tempC_index(i), ds.read_tempF_index(i));
     }
 
-    vTaskDelay(5000 / portTICK_PERIOD_MS);
+    vTaskDelay(ds.get_SleepTime() / portTICK_PERIOD_MS);
   }
 }

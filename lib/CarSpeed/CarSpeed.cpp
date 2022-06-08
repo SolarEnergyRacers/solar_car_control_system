@@ -38,6 +38,7 @@ string CarSpeed::re_init() { return init(); }
 
 string CarSpeed::init() {
   bool hasError = false;
+  console << "[  ] Init 'CarSpeed'...\n";
   target_speed = 0;
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
@@ -67,7 +68,7 @@ double CarSpeed::get_current_speed() {
   float voltage = value * 5.0 / 65536; // TODO: check if we really use 16bit ADS1115
 
   // convert value from voltage to revolutions per minute: 370rpm / V
-  float wheel_circumference = 1.0; // TODO: set circumference = diameter*pi, in meters
+  float wheel_circumference = 1.76; // TODO: set circumference = diameter*pi, in meters
   return (double)370 * wheel_circumference / 60.0;
 }
 

@@ -22,16 +22,15 @@ string GyroAcc::re_init() { return init(); }
 
 string GyroAcc::init(void) {
   bool hasError = false;
+  console << "[  ] Init GyroAcc...\n";
   // check connection & report
   if (bmi088.isConnection()) {
-    console << "[BMI088] is connected\n";
-
+    console << "     BMI088 is connected\n";
     // init sensor
     bmi088.initialize();
-    console << "[BMI088] is initialized\n";
-
+    console << "     BMI088 is initialized\n";
   } else {
-    console << "[BMI088] is not connected\n";
+    console << "     BMI088 is not connected\n";
     hasError = true;
   }
   return fmt::format("[{}] GyroAcc initialized.", hasError ? "--" : "ok");

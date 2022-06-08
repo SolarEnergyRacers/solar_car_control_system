@@ -31,11 +31,11 @@ string RTC::re_init() { return init(); }
 
 string RTC::init(void) {
   bool hasError = false;
-  console << "[??] Init 'RTC'...\n";
-  console << fmt::format("    DS1307_ADDRESS {:02x}\n", DS1307_ADDRESS);
+  console << "[  ] Init 'RTC'...\n";
+  console << fmt::format("     DS1307_ADDRESS {:02x}\n", DS1307_ADDRESS);
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  console << fmt::format("    [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}\n", compiled.Month(), compiled.Day(),
+  console << fmt::format("     [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}\n", compiled.Month(), compiled.Day(),
                          compiled.Year(), compiled.Hour(), compiled.Minute(), compiled.Second());
   xSemaphoreTakeT(i2cBus.mutex);
   Rtc.Begin();
@@ -48,12 +48,12 @@ string RTC::init(void) {
     uint8_t lastError = Rtc.LastError();
     xSemaphoreGive(i2cBus.mutex);
     if (lastError != 0) {
-      console << "    [INFO] rtc Communication error " << Rtc.LastError() << "\n";
+      console << "     [INFO] rtc Communication error " << Rtc.LastError() << "\n";
     } else {
       // Common Causes:
       //    1) first time you ran and the device wasn't running yet
       //    2) the battery on the device is low or even missing
-      console << "    [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n";
+      console << "     [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n";
       xSemaphoreTakeT(i2cBus.mutex);
       Rtc.SetDateTime(compiled);
       xSemaphoreGive(i2cBus.mutex);
@@ -66,7 +66,7 @@ string RTC::init(void) {
   bool isRunning = Rtc.GetIsRunning();
   xSemaphoreGive(i2cBus.mutex);
   if (!isRunning) {
-    console << "    [INFO] rtc was not actively running, starting now\n";
+    console << "     [INFO] rtc was not actively running, starting now\n";
     xSemaphoreTakeT(i2cBus.mutex);
     Rtc.SetIsRunning(true);
     xSemaphoreGive(i2cBus.mutex);
@@ -77,14 +77,15 @@ string RTC::init(void) {
   RtcDateTime now = Rtc.GetDateTime();
   xSemaphoreGive(i2cBus.mutex);
   if (now < compiled) {
-    console << "    [INFO] rtc time older than compile time! Updating DateTime.\n";
+    console << "     [INFO] rtc time older than compile time! Updating DateTime.\n";
     xSemaphoreTakeT(i2cBus.mutex);
     Rtc.SetDateTime(compiled);
     xSemaphoreGive(i2cBus.mutex);
   } else if (now > compiled) {
-    console << "    [INFO] rtc time newer than compile time.\n";
+    console << "     [INFO] rtc time newer than compile time. Updating esp32time DateTime.\n";
+    esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
   } else if (now == compiled) {
-    console << "    [INFO] rtc time equal to compile time.\n";
+    console << "     [INFO] rtc time equal to compile time.\n";
   }
 
   // set pin
@@ -95,14 +96,12 @@ string RTC::init(void) {
   return fmt::format("[{}] RTC initialized.", hasError ? "--" : "ok");
 }
 
-
 void RTC::exit() {
   // TODO
 }
 
 RtcDateTime RTC::read_rtc_datetime(void) {
   RtcDateTime now;
-  console << "----01----";
   // check connection & confidence
   xSemaphoreTakeT(i2cBus.mutex);
   bool isValid = Rtc.IsDateTimeValid();
@@ -110,23 +109,20 @@ RtcDateTime RTC::read_rtc_datetime(void) {
   if (!isValid) {
     uint8_t lastError = Rtc.LastError();
     xSemaphoreGive(i2cBus.mutex);
-    console << "----02----";
     if (lastError != 0) {
       // report
-      console << "[RTC] i2c communications error: " << Rtc.LastError() << "\n";
+      console << "     ERROR: RTC i2c communications error: " << Rtc.LastError() << "\n";
     } else {
       // Common Causes:
       //   - the battery on the device is low or even missing and the power line
       //   was disconnected
-      console << "[RTC] lost confidence in the datetime\n";
+      console << "     ERROR: RTC lost confidence in the datetime\n";
     }
   }
-  console << "----03----";
   // get datetime
   xSemaphoreTakeT(i2cBus.mutex);
   now = Rtc.GetDateTime();
   xSemaphoreGive(i2cBus.mutex);
-  console << "----04----";
   return now;
 }
 

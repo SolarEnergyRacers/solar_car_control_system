@@ -59,10 +59,6 @@ void CarState::init_values() {
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
 
-  console << "Reread all IOs in foreced mode...\n";
-  ioExt.readAll(false, true);
-  // console << print("Initial State") << "\n";
-
   // read from ser4config.ini file
   initalize_config();
   // console << print("State after SER4CONF.INI") << "\n";
@@ -72,7 +68,7 @@ bool CarState::initalize_config() {
   try {
     ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
     // [Main]
-    LogFilename = cf.get("Main", "LogFilename", "/ser4data.csv");
+    LogFilename = cf.get("Main", "LogFilename", "/SER4DATA.CSV");
     LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
     LogInterval = cf.get("Main", "LogInterval", 1);
     // [PID]

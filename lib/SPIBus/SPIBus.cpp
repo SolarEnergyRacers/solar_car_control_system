@@ -22,7 +22,7 @@ string SPIBus::re_init() { return init(); }
 
 string SPIBus::init(void) {
   bool hasError = false;
-  console << "[??] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "\n";
+  console << "[  ] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "...\n";
 
   mutex = xSemaphoreCreateMutex();
   spi = SPIClass(VSPI);

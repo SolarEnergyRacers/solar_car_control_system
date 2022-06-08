@@ -40,15 +40,16 @@ string ADC::init() {
   ads_addrs[1] = I2C_ADDRESS_ADS1x15_1;
   ads_addrs[2] = I2C_ADDRESS_ADS1x15_2;
   for (int idx = 0; idx < NUM_ADC_DEVICES; idx++) {
-    console << fmt::format("    [?] Init 'ADC[{}]' with address {:#04x} ...\n", idx, ads_addrs[idx]);
+    console << fmt::format("     Init 'ADC[{}]' with address {:#04x} ...", idx, ads_addrs[idx]);
     xSemaphoreTakeT(i2cBus.mutex);
     adss[idx] = ADS1115(ads_addrs[idx]);
 
     bool result = adss[idx].begin();
     if (!result) {
       xSemaphoreGive(i2cBus.mutex);
-      console << fmt::format("        ERROR: Wrong ADS1x15 at address: {:#04x}.\n", ads_addrs[idx]);
+      console << fmt::format("\n        ERROR: Wrong ADS1x15 at address: {:#04x}.\n", ads_addrs[idx]);
       hasError = true;
+      ads_addrs[idx] = 0;
       continue;
     }
     console << "\n";
@@ -72,7 +73,7 @@ string ADC::init() {
       xSemaphoreGive(i2cBus.mutex);
       console << "          [ADS1x15] AIN" << i << " --> " << value << ": " << multiplier * value << "mV\n";
     }
-    console << fmt::format("    [ok] ADC[{}] at 0x{:x} inited.\n", idx, ads_addrs[idx]);
+    console << fmt::format("     ok ADC[{}] at 0x{:x} inited.\n", idx, ads_addrs[idx]);
   }
   return fmt::format("[{}] ADC initialized.", hasError ? "--" : "ok");
 }
@@ -86,9 +87,11 @@ int16_t ADC::read(ADC::Pin port) {
   int pin = port & 0xf;
   int16_t value = 0;
 
-  xSemaphoreTakeT(i2cBus.mutex);
-  value = ADC::adss[idx].readADC(pin);
-  xSemaphoreGive(i2cBus.mutex);
+  if (ads_addrs[idx] != 0) {
+    xSemaphoreTakeT(i2cBus.mutex);
+    value = ADC::adss[idx].readADC(pin);
+    xSemaphoreGive(i2cBus.mutex);
+  }
 
   // if (port == STW_ACC || port == STW_DEC || port == MOTOR_SPEED) {
   //    console << fmt::sprintf("port 0x%02x: index: 0x%x, pin: 0x%x => value=%d\n", port, idx, pin, value);
@@ -98,7 +101,11 @@ int16_t ADC::read(ADC::Pin port) {
 
 float ADC::get_multiplier(Pin port) {
   int devNr = port >> 4;
-  return adss[devNr].toVoltage(1);
+  if (ads_addrs[devNr] != 0) {
+    return adss[devNr].toVoltage(1);
+  } else {
+    return 0;
+  }
 }
 
 void ADC::task() {

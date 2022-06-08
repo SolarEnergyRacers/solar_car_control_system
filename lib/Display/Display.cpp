@@ -56,7 +56,7 @@ bool lifeSignState = false;
 string Display::getName() { return "Display"; };
 
 string Display::init() {
-  console << "[??] Init '" << getInfo() << "'...\n";
+  console << "[  ] Init '" << getInfo() << "'...\n";
   return re_init();
 }
 
@@ -65,8 +65,7 @@ string Display::re_init(void) {
 #if WithTaskSuspend == true
   vTaskResume(getHandle());
 #endif
-  _setup();
-  return fmt::format("[{}] Display {} initialized.", hasError ? "--" : "ok", getName());
+  return _setup();
 }
 
 void Display::exit() {
@@ -76,8 +75,9 @@ void Display::exit() {
 
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(&spiBus.spi, SPI_DC, SPI_CS_TFT, SPI_RST);
 
-void Display::_setup() {
-  console << "    Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
+string Display::_setup() {
+  bool hasError = false;
+  console << "     Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
           << ", SPI_MISO=" << SPI_MISO << ", SPI_CS_TFT=" << SPI_CS_TFT << "\n";
   height = 0;
   width = 0;
@@ -104,23 +104,22 @@ void Display::_setup() {
     tft.fillScreen(bgColor);
     tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(0, height);
-    tft.printf("%s inited (%dx%d)-->%s\n", getName().c_str(), height, width, DISPLAY_STATUS_str[(int)carState.displayStatus]);
     xSemaphoreGive(spiBus.mutex);
 
-    printf("    ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
-    printf("    ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
-    printf("    ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
-    printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
-    printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
+    printf("     ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
+    printf("     ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
+    printf("     ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
+    printf("     ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
+    printf("     ILI9341_RDMODE:     0x%x\n", rdmode);
   } catch (exception &ex) {
-    console << fmt::format("[x] Display: Unable to initialize screen 'ILI9341': {}\n", ex.what());
+    console << fmt::format("[--] Display: Unable to initialize screen 'ILI9341': {}\n", ex.what());
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  console << "[v] '" << getName() << "' Display inited: screen 'ILI9341' with " << height << " x " << width
-          << ". Status: " << DISPLAY_STATUS_str[(int)carState.displayStatus] << "\n";
+  return fmt::format("[{}] Display initialized.  Screen 'ILI9341' {}x{}.     Status: {}", hasError ? "--" : "ok", height, width,
+                     DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }
 
 void Display::clear_screen(int bgColor) {

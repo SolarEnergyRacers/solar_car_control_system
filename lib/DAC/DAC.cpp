@@ -39,9 +39,9 @@ string DAC::re_init() {
 
 string DAC::init() {
   bool hasError = false;
-  console << "[??] Init 'DAC'...\n";
+  console << "[  ] Init 'DAC'...\n";
   reset_and_lock_pot();
-  console << fmt::format("    DAC initialized with I2C_ADDRESS_DS1803={:02x}.\n", I2C_ADDRESS_DS1803);
+  console << fmt::format("     DAC initialized with I2C_ADDRESS_DS1803={:02x}.\n", I2C_ADDRESS_DS1803);
   return fmt::format("[{}] DAC initialized.", hasError ? "--" : "ok");
 }
 
@@ -95,11 +95,12 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
         driverDisplay.print(s.c_str());
       }
     } else {
-      string s = "Motor potentiometer locked!\n";
-      console << s;
-      if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
-        driverDisplay.print(s.c_str());
-      }
+      // XXXXX
+      // string s = "Motor potentiometer locked!\n";
+      // console << s;
+      // if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
+      //   driverDisplay.print(s.c_str());
+      // }
       return;
     }
   }

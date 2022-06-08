@@ -74,7 +74,7 @@ void PWM::task() {
       console << "[PCA9685] set all outputs to: " << i;
 
       // sleep for 1s
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
     }
   }
 }

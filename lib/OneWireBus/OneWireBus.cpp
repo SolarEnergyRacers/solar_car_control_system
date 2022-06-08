@@ -21,12 +21,11 @@ using namespace std;
 
 string OneWireBus::init(void) {
   bool hasError = false;
+  console << "[  ] Init 'OneWireBus'...\n";
+
   mutex = xSemaphoreCreateMutex();
-
   oneWire = OneWire(ONEWIRE_PIN);
-
   xSemaphoreGive(mutex);
 
-  console << fmt::format("[v] OneWire inited: ONEWIRE_PIN={}", ONEWIRE_PIN);
-  return fmt::format("[{}] OneWireBus initialized.", hasError ? "--" : "ok");
+  return fmt::format("[{}] OneWireBus initialized.  ONEWIRE_PIN={}", hasError ? "--" : "ok", ONEWIRE_PIN);
 }

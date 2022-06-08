@@ -23,11 +23,14 @@ string GPIputOutput::re_init() { return init(); }
 
 string GPIputOutput::init() {
   bool hasError = false;
+  console << "[  ] Init 'GPIputOutput' ...";
+  vPortCPUInitializeMutex(&mutex);
   // Init GPIO pins for CS of SD-card and TFT
   pinMode(SPI_CS_SDCARD, OUTPUT);
   digitalWrite(SPI_CS_SDCARD, HIGH);
   pinMode(SPI_CS_TFT, OUTPUT);
   digitalWrite(SPI_CS_TFT, HIGH);
+  console << "done.\n";
   return fmt::format("[{}] SPI_CS for TFT and SD card set, GPIO initialized.", hasError ? "--" : "ok");
 }
 
@@ -48,7 +51,7 @@ void GPIputOutput::register_gpio_interrupt() {
 }
 
 volatile int GPIputOutput::interrupt_counter = 0;
-portMUX_TYPE GPIputOutput::mux = portMUX_INITIALIZER_UNLOCKED;
+portMUX_TYPE GPIputOutput::mutex = portMUX_INITIALIZER_UNLOCKED;
 
 void GPIputOutput::task() {
 
@@ -63,6 +66,6 @@ void GPIputOutput::task() {
     }
 
     // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

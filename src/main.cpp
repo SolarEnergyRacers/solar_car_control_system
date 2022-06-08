@@ -86,9 +86,7 @@ SPIBus spiBus;
 #if INT_ON
 // TODO !!!GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
 #endif
-#if IOEXT_ON
 IOExt ioExt;
-#endif
 #if ADC_ON
 ADC adc;
 #endif
@@ -169,30 +167,35 @@ void app_main(void) {
   console << "-chip info -------------------\n";
   chip_info();
   console << "-gpio pin settings ----------\n";
-  gpio.init();
+  msg = gpio.init();
+  console << msg << "\n";
   console << "-init bus systems ------------\n";
   // init buses
-  spiBus.init();
-  oneWireBus.init();
-  i2cBus.init();
+  msg = spiBus.init();
+  console << msg << "\n";
+  msg = oneWireBus.init();
+  console << msg << "\n";
+  msg = i2cBus.init();
+  console << msg << "\n";
   console << "------------------------------\n";
 
-  engineerDisplay.init();
-  // engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_CONSOLE);
-  msg = fmt::format("[v] {} task initialized ({}ms) {}.\n", engineerDisplay.getName(), engineerDisplay.get_SleepTime(),
-                    engineerDisplay.get_DisplayStatus_text());
+  msg = engineerDisplay.init();
   console << msg << "\n";
-  // engineerDisplay.print(msg + "\n");
+  engineerDisplay.print(msg + "\n");
 // ---- init modules ----
 #if INT_ON
   // TODO !!!GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
   gpio.register_gpio_interrupt();
 #endif
-#if IOEXT_ON
+
+  // IOEXT
   msg = ioExt.init();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
-#endif
+  console << "Reread all IOs in foreced mode:\n";
+  ioExt.readAll(false, true);
+  console << "------------------------------\n";
+
 #if SD_ON
   msg = sdCard.init();
   console << msg << "\n";
@@ -200,8 +203,8 @@ void app_main(void) {
 #endif
 
   //--- SD card available ----------------------------
-  console << "carState.init_values():2\n";
-  carState.init_values();
+  // console << "carState.init_values():2\n";
+  // carState.init_values();
   //------from now config ini values can be used------
 
 #if COMMANDHANDLER_ON
@@ -260,85 +263,86 @@ void app_main(void) {
     exit(0);
   }
 
-  engineerDisplay.print("Startup sequence(s) successful.\n");
-  engineerDisplay.print("System creating FreeRTOS tasks...\n");
+  engineerDisplay.print("Startup sequence successful, creating FreeRTOS tasks.\n");
   console << "\n";
   console << "-----------------------------------------------------------------\n";
   console << "Startup sequence(s) successful. System creating FreeRTOS tasks...\n";
   console << "-----------------------------------------------------------------\n\n";
+  // ---- create tasks ----
 
-// ---- create tasks ----
+  // IOEXT
+  carState.Indicator = INDICATOR::OFF;
+  carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
+  carState.SdCardDetect = false;
+  carState.ConstantMode = CONSTANT_MODE::SPEED;
+  carState.Light = LIGHT::OFF;
+  msg = ioExt.create_task(5, 500, 4000);
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
+  ioExt.readAll(false, true, "     ", true);
+  msg = fmt::format("     {} readAll done.", ioExt.getName());
+  console << msg << "\n";
+
 #if INDICATOR_ON
   msg = indicator.create_task();
   engineerDisplay.print(msg + "\n");
   console << msg << "\n";
 #endif
 #if DS_ON
-  //xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  // xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
 #endif
 #if ADC_ON
   msg = adc.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if GYRO_ACC_ON
   msg = gyroAcc.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if PWM_ON
   msg = pwm.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if RTC_ON
   RtcDateTime now = rtc.read_rtc_datetime();
   esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
-  // string actTime = getTime(now);
-  // msg = rtc.create_task();
-  // console << msg << actTime << "\n";
-  // engineerDisplay.print(fmt::format("{} {}\n", msg, actTime));
+  string actTime = formatDateTime(now);
+  msg = rtc.create_task();
+  console << msg << " RTC Time: " << actTime << "\n";
+  engineerDisplay.print(fmt::format("{} {}\n", msg, actTime));
 #endif
 #if INT_ON
   msg = gpio.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if COMMANDHANDLER_ON
   msg = cmdHandler.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if CAN_ON
   msg = can.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if CARCONTROL_ON
   carControl.init();
   msg = carControl.create_task();
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
-#endif
-#if IOEXT_ON
-  carState.Indicator = INDICATOR::OFF;
-  carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
-  carState.SdCardDetect = false;
-  carState.ConstantMode = CONSTANT_MODE::SPEED;
-  carState.Light = LIGHT::OFF;
-  msg = ioExt.create_task(1, 250, 8192);
   engineerDisplay.print(msg + "\n");
-  console << msg << "\n";
-  ioExt.readAll();
-  engineerDisplay.print("[v] " + ioExt.getName() + " readAll done..\n");
 #endif
 #if CARSPEED_ON
   msg = carSpeed.create_task(10, 250, 2048);
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
+
   engineerDisplay.print("\nready");
-#if RTC_ON == true
+#if RTC_ON
   engineerDisplay.print(fmt::format(" at {}", esp32time.getDateTime().c_str()));
 #endif
   //--let the bootscreen visible for a moment ------------------
@@ -346,24 +350,20 @@ void app_main(void) {
   int waitAtConsoleView = 5;
   while (waitAtConsoleView-- > 0) {
     engineerDisplay.print(to_string(waitAtConsoleView));
-    sleep(1);
+    delay(1000);
     engineerDisplay.print("-");
   }
   engineerDisplay.print("start");
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
 //------------------------------------------------------------
-#if ENGINEER_DISPLAY_ON
   msg = engineerDisplay.create_task(10);
-  engineerDisplay.print(msg + "\n");
   console << msg << "\n";
-#endif
-#if DRIVER_DISPLAY_ON
+  engineerDisplay.print(msg + "\n");
   driverDisplay.init();
   driverDisplay.set_DisplayStatus(DISPLAY_STATUS::DRIVER_SETUP);
   msg = driverDisplay.create_task(16);
-  engineerDisplay.print(msg + "\n");
   console << msg << driverDisplay.get_DisplayStatus_text() << "\n";
-#endif
+  engineerDisplay.print(msg + "\n");
 
   systemOk = true;
 
@@ -371,9 +371,8 @@ void app_main(void) {
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";
 
-#if IOEXT_ON
   ioExt.readAll();
-#endif
+
   //--- SD card available ----------------------------
   console << "carState.init_values():3\n";
   carState.init_values();

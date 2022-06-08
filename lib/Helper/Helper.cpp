@@ -45,7 +45,7 @@ void xSemaphoreTakeT(xQueueHandle mutex) {
   }
 }
 
-string getTime(RtcDateTime now) {
+string formatDateTime(RtcDateTime now) {
   return fmt::format("{:02d}/{:02d}/{:04d} {:02d}:{:02d}:{:02d}", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
                      now.Second());
 }

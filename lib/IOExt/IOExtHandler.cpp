@@ -32,7 +32,6 @@ extern CarState carState;
 extern CarControl carControl;
 extern bool systemOk;
 
-
 void batteryOnOffHandler() {
   carState.BatteryOn = carState.getPin(PinBatOnOff)->value == 1;
   console << "Battery " << (carState.BatteryOn ? "On" : "Off") << "\n";
@@ -216,4 +215,3 @@ void increaseHandler() {
   if (carState.TargetPower > 4500) // only until 5kW
     carState.TargetPower = 4500;
 }
-

@@ -35,53 +35,53 @@
 | ESP32:25 DAC        | CAN:TX                 |
 | ESP32:26 DAC        | CAN:RX                 |
 
-| **_ADS1x15_**                    |    Analog to digital converter    |
-| :--------------------------------------- | :--------------------------------: |
-| ADC0, I2C Addr 0x48                      |                                    |
-| ADC0:0                                   | motor controller, speed indication |
-| ADC0:1                                   |    Ibat: battery current sensor    |
-| ADC0:2                                   |     Imot: motor current sensor     |
-| ADC0:3                                   |       Ipv: pv current sensor       |
-| ADC1, I2C Addr 0x49 (TODO: can be set??) |                                    |
-| ADC1:0                                   |   Ubat: battery voltage (analog)   |
-| ADC1:1                                   |   Umot: motorcontroller voltage   |
-| ADC1:2                                   |                                    |
-| ADC1:3                                   |                                    |
-| ADC2, I2C Addr 0x50 (TODO: can be set??) |                                    |
-| ADC2:0                                   | steering wheel acceleration piezo |
-| ADC2:1                                   | steering wheel deceleration piezo |
-| ADC2:2                                   |                                    |
-| ADC2:3                                   |                                    |
+| **_ADS1115_** |    Analog to digital converter    |
+| :-------------------- | :--------------------------------: |
+| ADC0, I2C Addr 0x48   |                                    |
+| ADC0:0                | motor controller, speed indication |
+| ADC0:1                |    Ibat: battery current sensor    |
+| ADC0:2                |     Imot: motor current sensor     |
+| ADC0:3                |       Ipv: pv current sensor       |
+| ADC1, I2C Addr 0x49   |                                    |
+| ADC1:0                |   Ubat: battery voltage (analog)   |
+| ADC1:1                |   Umot: motorcontroller voltage   |
+| ADC1:2                |                                    |
+| ADC1:3                |                                    |
+| ADC2, I2C Addr 0x4a   |                                    |
+| ADC2:0                | steering wheel acceleration piezo |
+| ADC2:1                | steering wheel deceleration piezo |
+| ADC2:2                |                                    |
+| ADC2:3                |                                    |
 
-| **_MCP23014_**  |      Input/Output extender      |
-| :---------------------- | :-----------------------------: |
-| IOExt0, I2C Addr (TODO) |                                |
-| IOExt0:0 in             | switch (status): battery on/off |
-| IOExt0:1 in             |   switch (status): PV on/off   |
-| IOExt0:2 in             |  switch (status): motor on/off  |
-| IOExt0:3                |       ~~mc: eco/power~~       |
-| IOExt0:4                |         ~~mc: on/off~~         |
-| IOExt0:5 in             |    switch (status): fwd/rwd    |
-| IOExt0:6                |         ~~pv: on/off~~         |
-| IOExt0:7                |   output: battery fan on/off   |
-| IOExt1, I2C Addr (TODO) |                                |
-| IOExt1:0                |     output: left indicator     |
-| IOExt1:1                |     output: right indicator     |
-| IOExt1:2                |          output: horn          |
-| IOExt1:3                |       output: head light       |
-| IOExt1:4                |          output: light          |
-| IOExt1:5                |                                |
-| IOExt1:6                |                                |
-| IOExt1:7                |                                |
-| IOExt2, I2C Addr (TODO) |     steering wheel buttons     |
-| IOExt2:0                |     button: left indicator     |
-| IOExt2:1                |     button: right indicator     |
-| IOExt2:2                |       button: head light       |
-| IOExt2:3                |          button: light          |
-| IOExt2:4                |          button: horn          |
-| IOExt2:5                |          button: next          |
-| IOExt2:6                |       button: power/speed       |
-| IOExt2:7                |        button: set/reset        |
+| **_MCP23014_** |      Input/Output extender      |
+| :--------------------- | :-----------------------------: |
+| **IOExt0**       |                                |
+| IOExt0:0 in            | switch (status): battery on/off |
+| IOExt0:1 in            |   switch (status): PV on/off   |
+| IOExt0:2 in            |  switch (status): motor on/off  |
+| IOExt0:3               |       ~~mc: eco/power~~       |
+| IOExt0:4               |         ~~mc: on/off~~         |
+| IOExt0:5 in            |    switch (status): fwd/rwd    |
+| IOExt0:6               |         ~~pv: on/off~~         |
+| IOExt0:7               |   output: battery fan on/off   |
+|                        |                                |
+| IOExt1:0               |     output: left indicator     |
+| IOExt1:1               |     output: right indicator     |
+| IOExt1:2               |          output: horn          |
+| IOExt1:3               |       output: head light       |
+| IOExt1:4               |          output: light          |
+| IOExt1:5               |                                |
+| IOExt1:6               |                                |
+| IOExt1:7               |                                |
+| **IOExt2**       |     steering wheel buttons     |
+| IOExt2:0               |     button: left indicator     |
+| IOExt2:1               |     button: right indicator     |
+| IOExt2:2               |       button: head light       |
+| IOExt2:3               |          button: light          |
+| IOExt2:4               |          button: horn          |
+| IOExt2:5               |          button: next          |
+| IOExt2:6               |       button: power/speed       |
+| IOExt2:7               |        button: set/reset        |
 
 | **_ILI9341_** |             3.2" 320x240 display             |
 | :-------------------- | :------------------------------------------: |
@@ -106,12 +106,12 @@
 | A1:5                 |       GND for address 0x28       |
 | A0:4                 |       GND for address 0x28       |
 
-| **_RTC_** |  real time clock  |
-| :---------------- | :---------------: |
-| SCL               | see ESP32:I2C:SCL |
-| SDA               | see ESP32:I2C:SDA |
+| **_DS1307_** | RTC, real time clock |
+| :------------------- | :------------------: |
+| SCL                  |  see ESP32:I2C:SCL  |
+| SDA                  |  see ESP32:I2C:SDA  |
 
-| **_Gyro&Acc_** | gyroscope & accelerator |
+| **_Gyro+Acc_** | gyroscope & accelerator |
 | :--------------------- | :---------------------: |
 | SCL                    |    see ESP32:I2C:SCL    |
 | SDA                    |    see ESP32:I2C:SDA    |
@@ -168,10 +168,8 @@
 | A1:5                 |       GND for address 0x28       |
 | A0:4                 |       GND for address 0x28       |
 
-| **_RTC_** |  real time clock  |
-| :---------------- | :---------------: |
-| SCL               | see ESP32:I2C:SCL |
-| SDA               | see ESP32:I2C:SDA |
+|  |  |
+| :- | :-: |
 
 | **_Gyro&Acc_** | gyroscope & accelerator |
 | :--------------------- | :---------------------: |
@@ -214,18 +212,18 @@
 
 Scanning I2C addresses:
 
-| Address | Device                       | Location       |
-| ------- | ---------------------------- | -------------- |
-| 0x00    | ESP32 I2C master             | main noard     |
-| 0x19    | 6-axis inertial sensor, gyro | main board     |
-| 0x20    | Extended digital IOs         | main board     |
-| 0x21    | Extended digital IOs         | steering wheel |
-| 0x28    | digital analog coder         | main board     |
-| 0x48    | analog digital coder         | main board     |
-| 0x49    | analog digital coder         | main board     |
-| 0x4a    | analog digital coder         | steering wheel |
-| 0x68    | real time clock              | main board     |
-| 0x69    | 6-axis inertial sensor, gyro | main board     |
+| Address | Device                         | Location       |
+| ------- | ------------------------------ | -------------- |
+| 0x00    | ESP32 I2C master               | main noard     |
+| 0x19    | 6-axis inertial sensor, gyro   | main board     |
+| 0x20    | MCP23014, Extended digital IOs | main board     |
+| 0x21    | MCP23014, Extended digital IOs | steering wheel |
+| 0x28    | DS1803, digital analog coder   | main board     |
+| 0x48    | ADS1115, analog digital coder  | main board     |
+| 0x49    | ADS1115, analog digital coder  | main board     |
+| 0x4a    | ADS1115, analog digital coder  | steering wheel |
+| 0x68    | DS1307, real time clock        | main board     |
+| 0x69    | 6-axis inertial sensor, gyro   | main board     |
 
 ### Further Documentation and Findings
 

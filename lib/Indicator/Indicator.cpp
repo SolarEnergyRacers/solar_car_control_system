@@ -27,7 +27,7 @@ string Indicator::re_init() { return init(); }
 
 string Indicator::init(void) {
   bool hasError = false;
-  console << "[??] Init " + getName() + "...";
+  console << "[  ] Init " + getName() + "...";
   console << "done.\n";
   return fmt::format("[{}] Indicator initialized.", hasError ? "--" : "ok");
 }

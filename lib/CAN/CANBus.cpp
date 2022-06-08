@@ -122,7 +122,7 @@ string CANBus::re_init() {
 
 string CANBus::init() {
   bool hasError = false;
-
+  console << "[  ] Init CANBus...\n";
   mutex = xSemaphoreCreateBinary();
   CAN.setPins(CAN_RX, CAN_TX);
   CAN.onReceive(onReceiveForwarder); // couldn't get it to work with method of object
@@ -130,11 +130,11 @@ string CANBus::init() {
   if (!CAN.begin(CAN_SPEED)) {
     xSemaphoreGive(mutex);
     // opening CAN failed :,(
-    console << fmt::format("    ERROR: CANBus with rx={:02x}m tx={:02x} NOT inited.\n", CAN_RX, CAN_TX);
+    console << fmt::format("     ERROR: CANBus with rx={:02x}m tx={:02x} NOT inited.\n", CAN_RX, CAN_TX);
     hasError = true;
   } else {
     xSemaphoreGive(mutex);
-    console << fmt::format("    CANBus with rx={:02x}m tx={:02x} inited.\n", CAN_RX, CAN_TX);
+    console << fmt::format("     CANBus with rx={:02x}m tx={:02x} inited.\n", CAN_RX, CAN_TX);
   }
 
   return fmt::format("[{}] CANBus initialized.", hasError ? "--" : "ok");
@@ -269,7 +269,7 @@ void CANBus::task() {
       }
     }
     // sleep(CAN_TASK_WAIT);
-    vTaskDelay(CAN_TASK_WAIT / portTICK_RATE_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_RATE_MS);
   }
 }
 

@@ -6,7 +6,6 @@
 #define SER_IOEXT_H
 
 #include <definitions.h>
-#if IOEXT_ON
 
 #include <MCP23017.h>
 #include <list>
@@ -56,9 +55,11 @@
 
 class IOExt : public abstract_task {
 private:
-  // uint32_t sleep_polling_ms = 400;
+  uint32_t sleep_polling_ms;
 
 public:
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
   // RTOS task
   string getName(void) { return "IOExt"; };
   string init(void);
@@ -70,7 +71,7 @@ public:
   void setPort(int port, bool value);
   int getPort(int port);
 
-  void readAll(bool deltaOnly = false, bool forced = false);
+  void readAll(bool deltaOnly = false, bool forced = false, string indent = "", bool verbose = false);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
@@ -88,5 +89,4 @@ private:
       MCP23017(I2C_ADDRESS_MCP23017_IOExt1)  // Pins 16-31: Steering wheel
   };
 };
-#endif
 #endif // SER_IOEXT_H

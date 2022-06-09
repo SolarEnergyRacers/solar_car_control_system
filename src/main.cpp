@@ -157,7 +157,7 @@ void app_main(void) {
 
   console << "\n--------------------\n";
   console << "esp32dev + free RTOS\n";
-  console << "Solar Energy Car Races SER4" << VERSION;
+  console << "Solar Energy Car Racers SER4 Controller: " << VERSION;
   console << "\n--------------------\n";
 
   // init arduino library
@@ -276,12 +276,11 @@ void app_main(void) {
   carState.SdCardDetect = false;
   carState.ConstantMode = CONSTANT_MODE::SPEED;
   carState.Light = LIGHT::OFF;
-  msg = ioExt.create_task(5, 500, 4000);
+  msg = ioExt.create_task(5, 200, 4000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
-  ioExt.readAll(false, true, "     ", true);
-  msg = fmt::format("     {} readAll done.", ioExt.getName());
-  console << msg << "\n";
+  // ioExt.readAll(false, true, "     ", true);
+  // console << "     ReadAll done.\n";
 
 #if INDICATOR_ON
   msg = indicator.create_task();
@@ -355,7 +354,7 @@ void app_main(void) {
   }
   engineerDisplay.print("start");
   engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
-//------------------------------------------------------------
+  //------------------------------------------------------------
   msg = engineerDisplay.create_task(10);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
@@ -364,7 +363,8 @@ void app_main(void) {
   msg = driverDisplay.create_task(16);
   console << msg << driverDisplay.get_DisplayStatus_text() << "\n";
   engineerDisplay.print(msg + "\n");
-
+  delay(1000);
+  
   systemOk = true;
 
   console << "-----------------------------------------------------------------\n";

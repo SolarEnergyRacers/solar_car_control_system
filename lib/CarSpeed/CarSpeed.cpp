@@ -130,9 +130,6 @@ void CarSpeed::task() {
                 << "\n";
       }
 #endif
-      // TODO: replace dac.set_pot with carControl functions
-
-      console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << "\n";
     }
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

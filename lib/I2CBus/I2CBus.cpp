@@ -93,8 +93,8 @@ void I2CBus::scan_i2c_devices() {
   s += "     ------- | ------------------------------------ | --------------\n";
   s += "      0x00   | ESP32 I2C master                     | main noard    \n";
   s += "      0x19   | BMI088, 6-axis inertial sensor, acc  | main board    \n";
-  s += "      0x20   | MCP23014, Extended digital IOs       | main board    \n";
-  s += "      0x21   | MCP23014, Extended digital IOs       | steering wheel\n";
+  s += "      0x20   | MCP23017, Extended digital IOs       | main board    \n";
+  s += "      0x21   | MCP23017, Extended digital IOs       | steering wheel\n";
   s += "      0x28   | DS1803, digital analog coder         | main board    \n";
   s += "      0x48   | ADS1115, analog digital coder        | main board    \n";
   s += "      0x49   | ADS1115, analog digital coder        | main board    \n";

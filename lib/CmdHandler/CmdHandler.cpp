@@ -240,7 +240,7 @@ void CmdHandler::task() {
           }
           break;
         case 'i':
-          ioExt.readAll(false, true, "", true);
+          ioExt.readAll(false, false, "", true);
           break;
         case 'I':
           i2cBus.scan_i2c_devices();

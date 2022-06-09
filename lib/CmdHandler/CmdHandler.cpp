@@ -179,14 +179,14 @@ void CmdHandler::task() {
           carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
           break;
         case 'u':
-          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
+          if (input[1] == '-' || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
           break;
         case 'd':
-          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
+          if (input[1] == '-' || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
             carState.SpeedArrow = SPEED_ARROW::DECREASE;
@@ -240,7 +240,11 @@ void CmdHandler::task() {
           }
           break;
         case 'i':
-          ioExt.readAll(false, false, "", true);
+          if (input[1] == 'o') {
+            ioExt.verboseMode = !ioExt.verboseMode;
+          } else {
+            ioExt.readAll(false, false, "", true);
+          }
           break;
         case 'I':
           i2cBus.scan_i2c_devices();

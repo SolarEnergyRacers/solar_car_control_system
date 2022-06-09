@@ -276,7 +276,7 @@ void app_main(void) {
   carState.SdCardDetect = false;
   carState.ConstantMode = CONSTANT_MODE::SPEED;
   carState.Light = LIGHT::OFF;
-  msg = ioExt.create_task(5, 200, 4000);
+  msg = ioExt.create_task(6, 200, 4000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
   // ioExt.readAll(false, true, "     ", true);

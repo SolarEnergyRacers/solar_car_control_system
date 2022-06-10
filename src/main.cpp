@@ -203,8 +203,7 @@ void app_main(void) {
 #endif
 
   //--- SD card available ----------------------------
-  // console << "carState.init_values():2\n";
-  // carState.init_values();
+  carState.init_values();
   //------from now config ini values can be used------
 
 #if COMMANDHANDLER_ON
@@ -364,7 +363,7 @@ void app_main(void) {
   console << msg << driverDisplay.get_DisplayStatus_text() << "\n";
   engineerDisplay.print(msg + "\n");
   delay(1000);
-  
+
   systemOk = true;
 
   console << "-----------------------------------------------------------------\n";
@@ -374,8 +373,7 @@ void app_main(void) {
   ioExt.readAll();
 
   //--- SD card available ----------------------------
-  console << "carState.init_values():3\n";
-  carState.init_values();
+  carState.initalize_config();
   //------from now config ini values can be used------
   console << "-----------------------------------------------------------------\n";
 }

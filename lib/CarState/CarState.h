@@ -53,6 +53,13 @@ static const char *DISPLAY_STATUS_str[] = {
 enum class PRECHARGE_STATE { ERROR, IDLE, MEASURE, PRECHARGE, RUN, ENABLE_PACK };
 
 static const char *PRECHARGE_STATE_str[] = {"ERROR", "IDLE", "MEASURE", "PRECHARGE", "RUN", "ENABLE_PACK"};
+static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASH"};
+static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
+static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
+static const char *BOOL_str[] = {"false", "true"};
+static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
+static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
+static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
 
 enum class BATTERY_ERROR {
   CELL_OVER_VOLTAGE,

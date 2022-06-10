@@ -82,7 +82,7 @@ template <size_t N> void splitString(string (&arr)[N], string str) {
 }
 
 void CmdHandler::task() {
-  string state;
+  string state, msg;
   while (1) {
     try {
       while (Serial.available() || Serial2.available()) {
@@ -104,14 +104,15 @@ void CmdHandler::task() {
           input = input.substring(0, input.length() - 1);
         }
 
-        console << "Received: " << input.c_str() << "\n";
-
         if (input.length() < 1 || commands.find(input[0], 0) == -1) {
           input = "h"; // help
         }
 
         switch (input[0]) {
         // ---------------- controller commands
+        case '\n':
+          console << "\n";
+          break;
         case 'R':
           engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
           driverDisplay.re_init();
@@ -151,17 +152,6 @@ void CmdHandler::task() {
           sdCard.write(state);
           console << state;
           break;
-        case 'k': {
-          string arr[4];
-          splitString(arr, &input[1]);
-          float Kp = atof(arr[0].c_str());
-          float Ki = atof(arr[1].c_str());
-          float Kd = atof(arr[2].c_str());
-#if CARSPEED_ON
-          carSpeed.update_pid(Kp, Ki, Kd);
-#endif
-          console << "PID set to Kp=" << Kp << ", Ki=" << Ki << ", Kd=" << Kd << "\n";
-        } break;
         case 'P':
           sdCard.directory();
           break;
@@ -174,8 +164,39 @@ void CmdHandler::task() {
         case 'H':
           memory_info();
           break;
+        case 'i':
+          if (input[1] == 'o') {
+            console << "Received: " << input << " -->  ioExt.verboseMode: " << ioExt.verboseMode << "\n";
+            ioExt.verboseMode = !ioExt.verboseMode;
+          } else if (input[1] == 'R') {
+            console << "Received: " << input << " -->  ioExt.re_init()\n";
+            msg = ioExt.re_init();
+            console << msg << "\n";
+          } else {
+            console << "Received: " << input
+                    << ": ioExt.readAll(false, false, "
+                       ", true)\n";
+            ioExt.readAll(false, false, "", true);
+          }
+          break;
+        case 'I':
+          console << "Received: " << input << " -->  i2cBus.scan_i2c_devices()\n";
+          i2cBus.scan_i2c_devices();
+          break;
         // -------------- chase car commands
+        case 'k': {
+          string arr[4];
+          splitString(arr, &input[1]);
+          float Kp = atof(arr[0].c_str());
+          float Ki = atof(arr[1].c_str());
+          float Kd = atof(arr[2].c_str());
+#if CARSPEED_ON
+          carSpeed.update_pid(Kp, Ki, Kd);
+#endif
+          console << "PID set to Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+        } break;
         case '-':
+          console << "Received: " << input << " -->  carControl.adjust_paddles(" << carState.PaddleAdjustCounter << ")\n";
           carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
           break;
         case 'u':
@@ -184,6 +205,7 @@ void CmdHandler::task() {
           } else {
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
+          console << "Received: " << input << " -->  carState.SpeedArrow=" << SPEED_ARROW_str[(int)(carState.SpeedArrow)] << "\n";
           break;
         case 'd':
           if (input[1] == '-' || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
@@ -191,24 +213,32 @@ void CmdHandler::task() {
           } else {
             carState.SpeedArrow = SPEED_ARROW::DECREASE;
           }
+          console << "Received: " << input << " -->  carState.SpeedArrow=" << SPEED_ARROW_str[(int)(carState.SpeedArrow)] << "\n";
           break;
         case ':':
           carState.DriverInfoType = INFO_TYPE::INFO;
           carState.DriverInfo = &input[1];
+          console << "Received: " << input << " -->  carState.DriverInfo [" << INFO_TYPE_str[(int)carState.DriverInfoType]
+                  << "]=" << carState.DriverInfo << "\n";
           break;
         case '!':
           carState.DriverInfoType = INFO_TYPE::WARN;
           carState.DriverInfo = &input[1];
+          console << "Received: " << input << " -->  carState.DriverInfo [" << INFO_TYPE_str[(int)carState.DriverInfoType]
+                  << "]=" << carState.DriverInfo << "\n";
           break;
         // -------------- steering wheel input element emulators
         case '<':
           indicator.setIndicator(INDICATOR::LEFT);
+          console << "Received: " << input << " -->  carState.Light=" << INDICATOR_str[(int)(carState.Indicator)] << "\n";
           break;
         case '>':
           indicator.setIndicator(INDICATOR::RIGHT);
+          console << "Received: " << input << " -->  carState.Light=" << INDICATOR_str[(int)(carState.Indicator)] << "\n";
           break;
         case 'w':
           indicator.setIndicator(INDICATOR::WARN);
+          console << "Received: " << input << " -->  carState.Light=" << INDICATOR_str[(int)(carState.Indicator)] << "\n";
           break;
         case 'l':
           if (input[1] == '-') {
@@ -216,6 +246,7 @@ void CmdHandler::task() {
           } else {
             carState.Light = LIGHT::L1;
           }
+          console << "Received: " << input << " -->  carState.Light=" << LIGHT_str[(int)(carState.Light)] << "\n";
           break;
         case 'L':
           if (input[1] == '-') {
@@ -223,6 +254,7 @@ void CmdHandler::task() {
           } else {
             carState.Light = LIGHT::L2;
           }
+          console << "Received: " << input << " -->  carState.Light=" << LIGHT_str[(int)(carState.Light)] << "\n";
           break;
         case 'c':
           if (input[2] == 's') {
@@ -232,24 +264,13 @@ void CmdHandler::task() {
             carState.ConstantMode = CONSTANT_MODE::POWER;
             carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
           } else {
-            if (carState.ConstantModeOn) {
-              carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
-            } else {
-              carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
-            }
+            carState.ConstantModeOn = !carState.ConstantModeOn; // #SAFETY#: deceleration unlock const mode
           }
-          break;
-        case 'i':
-          if (input[1] == 'o') {
-            ioExt.verboseMode = !ioExt.verboseMode;
-          } else {
-            ioExt.readAll(false, false, "", true);
-          }
-          break;
-        case 'I':
-          i2cBus.scan_i2c_devices();
+          console << "Received: " << input << " -->  carState.ConstantMode - " << CONSTANT_MODE_str[(int)(carState.ConstantMode)]
+                  << " On: " << carState.ConstantModeOn << "\n";
           break;
         default:
+          console << "Received: " << input << "\n";
           console << "ERROR:: Unknown command '" << input << "' \n" << helpText << "\n";
           break;
         case 'h':

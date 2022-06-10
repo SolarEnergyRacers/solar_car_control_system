@@ -53,8 +53,7 @@ public:
                     "\tL [-]      - beam light on/off\n"
                     "\tc [c|s|p]  - constant speed|power mode\n"
                     "\tI          - scan I2C devices\n"
-                    "\ti          - ioExt.readAll()\n"
-                    "\tio         - ioExt show in console continously\n"
+                    "\ti [|o|R]   - ioExt.readAll (o - ioExt show in console continously, R -ioExt.re_init)\n"
                     "\t\n";
 
   string printSystemValues(void);

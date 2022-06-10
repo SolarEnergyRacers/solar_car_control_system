@@ -29,14 +29,6 @@ CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOE
 CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(port)]); }
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
-static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASHR"};
-static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
-static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
-static const char *BOOL_str[] = {"false", "true"};
-static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
-static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
-static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
-
 void CarState::init_values() {
   Speed = 0;
   Acceleration = 0;

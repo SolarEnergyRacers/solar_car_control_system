@@ -17,13 +17,27 @@
 
 using namespace std;
 
-// public structures
+// public structures and structure texts
+static const char *BOOL_str[] = {"false", "true"};
+
 enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
+static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASH"};
+
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
+
 enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
+static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
+
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
+static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
+
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
+static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
+
 enum class LIGHT { OFF, L1, L2 };
+static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
+
 enum class DISPLAY_STATUS {
   DRIVER_HALTED,
   DRIVER_SETUP,
@@ -36,7 +50,6 @@ enum class DISPLAY_STATUS {
   ENGINEER_BACKGROUND,
   ENGINEER_RUNNING
 };
-
 static const char *DISPLAY_STATUS_str[] = {
     "DRIVER_HALTED",       // no action on this display
     "DRIVER_SETUP",        // driver screen setup
@@ -51,15 +64,7 @@ static const char *DISPLAY_STATUS_str[] = {
 };
 
 enum class PRECHARGE_STATE { ERROR, IDLE, MEASURE, PRECHARGE, RUN, ENABLE_PACK };
-
 static const char *PRECHARGE_STATE_str[] = {"ERROR", "IDLE", "MEASURE", "PRECHARGE", "RUN", "ENABLE_PACK"};
-static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASH"};
-static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
-static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
-static const char *BOOL_str[] = {"false", "true"};
-static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
-static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
-static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
 
 enum class BATTERY_ERROR {
   CELL_OVER_VOLTAGE,
@@ -76,7 +81,6 @@ enum class BATTERY_ERROR {
   CONTACTOR_STUCK,
   EXTRA_CELL_DETECTED
 };
-
 static const char *BATTERY_ERROR_str[] = {
     "CELL_OVER_VOLTAGE",        //
     "CELL_UNDER_VOLTAGE",       //
@@ -121,12 +125,21 @@ public:
     // #SAFETY#: acceleration lock
     PaddlesJustAdjusted = false;
     AccelerationLocked = true;
+    // BEGIN prevent stupid compiler warnings "defined but not used"
+    (void)BOOL_str;
+    (void)INDICATOR_str;
+    (void)INFO_TYPE_str;
+    (void)SPEED_ARROW_str;
+    (void)CONSTANT_MODE_str;
+    (void)DRIVE_DIRECTION_str;
+    (void)LIGHT_str;
+    (void)DISPLAY_STATUS_str;
+    (void)PRECHARGE_STATE_str;
+    (void)BATTERY_ERROR_str;
+    // BEGIN prevent stupid compiler warnings "defined but not used"
   }
   ~CarState(){};
   bool initalize_config();
-  string dummy1 = PRECHARGE_STATE_str[0];
-  string dummy2 = BATTERY_ERROR_str[0];
-  string dummy3 = DISPLAY_STATUS_str[0];
 
   // ADC native values
   int16_t MOTOR_SPEED;

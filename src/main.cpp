@@ -193,7 +193,9 @@ void app_main(void) {
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
   console << "Reread all IOs in foreced mode:\n";
-  ioExt.readAll(false, true);
+  // ioExt.readAll(false, true);
+  // ioExt.readPins(PinReadMode::ALL);
+  ioExt.readAndHandlePins(PinHandleMode::FORCED);
   console << "------------------------------\n";
 
 #if SD_ON
@@ -370,10 +372,11 @@ void app_main(void) {
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";
 
-  ioExt.readAll();
-
+  // ioExt.readAll();
+  carState.init_values();
+  ioExt.readAndHandlePins(PinHandleMode::FORCED);
   //--- SD card available ----------------------------
-  carState.initalize_config();
+  //carState.initalize_config();
   //------from now config ini values can be used------
   console << "-----------------------------------------------------------------\n";
 }

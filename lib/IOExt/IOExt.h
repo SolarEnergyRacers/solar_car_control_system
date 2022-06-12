@@ -53,6 +53,9 @@
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
+enum class PinReadMode { ALL, CHANGED };
+enum class PinHandleMode { NORMAL, FORCED };
+
 class IOExt : public abstract_task {
 private:
   uint32_t sleep_polling_ms;
@@ -71,7 +74,9 @@ public:
   void setPort(int port, bool value);
   int getPort(int port);
 
-  void readAll(bool deltaOnly = false, bool forced = false, string indent = "", bool verbose = false);
+  // void readAll(bool deltaOnly = false, bool forced = false, string indent = "", bool verbose = false);
+  bool readPins(PinReadMode type = PinReadMode::CHANGED);
+  bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
@@ -79,7 +84,8 @@ public:
   bool verboseMode = false;
 
 private:
-  bool isInInterruptHandler = false;
+  // bool isInInterruptHandler = false;
+  bool isInInputHandler = false;
 
   void setPortMode(int port, uint8_t mode);
   void handleIoInterrupt();

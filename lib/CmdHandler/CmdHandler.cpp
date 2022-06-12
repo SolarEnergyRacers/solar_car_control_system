@@ -176,7 +176,8 @@ void CmdHandler::task() {
             console << "Received: " << input
                     << ": ioExt.readAll(false, false, "
                        ", true)\n";
-            ioExt.readAll(false, false, "", true);
+            // ioExt.readAll(false, false, "", true);
+            ioExt.readPins(PinReadMode::ALL);
           }
           break;
         case 'I':

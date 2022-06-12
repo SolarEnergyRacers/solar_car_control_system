@@ -60,13 +60,7 @@ string Display::init() {
   return re_init();
 }
 
-string Display::re_init(void) {
-  bool hasError = false;
-#if WithTaskSuspend == true
-  vTaskResume(getHandle());
-#endif
-  return _setup();
-}
+string Display::re_init(void) { return _setup(); }
 
 void Display::exit() {
   // todo

@@ -14,7 +14,10 @@ extern CarState carState;
 extern CarControl carControl;
 extern bool systemOk;
 
-CarStatePin CarState::pins[] = { // IOExtDev0-PortA
+CarStatePin CarState::pins[] = {
+    // port (device|pin), mode, value, oldValue, inited, timestamp, name, handler
+    //
+    // IOExtDev0-PortA
     {0x00, INPUT_PULLUP, 1, 1, false, 0l, PinBatOnOff, batteryOnOffHandler},
     {0x01, INPUT_PULLUP, 1, 1, false, 0l, PinPvOnOff, pvOnOffHandler},
     {0x02, INPUT, 1, 1, false, 0l, PinMcOnOff, mcOnOffHandler}, // dont pull because of z-diode

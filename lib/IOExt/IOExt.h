@@ -72,16 +72,15 @@ public:
 
   // Class member and functions
   void setPort(int port, bool value);
-  int getPort(int port);
-
-  // void readAll(bool deltaOnly = false, bool forced = false, string indent = "", bool verbose = false);
-  bool readPins(PinReadMode type = PinReadMode::CHANGED);
+  bool readPins(PinReadMode type);
+  void readPins();
   bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
-  bool verboseMode = false;
+  bool verboseModeIn = false;
+  bool verboseModeOut = false;
 
 private:
   // bool isInInterruptHandler = false;

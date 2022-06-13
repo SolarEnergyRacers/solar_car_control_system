@@ -60,7 +60,7 @@ void fwdBwdHandler() {
 void breakPedalHandler() {
   if (VCC_12V) { // break pedal relais works only with 12V
     carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 0;
-  } else { // UCC_5V
+  } else { // VCC_5V
     carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
   }
   console << "Break pedal pressed " << (carState.BreakPedal ? "pressed" : "released") << "\n";

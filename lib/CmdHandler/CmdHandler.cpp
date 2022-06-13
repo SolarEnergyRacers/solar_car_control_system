@@ -165,9 +165,12 @@ void CmdHandler::task() {
           memory_info();
           break;
         case 'i':
-          if (input[1] == 'o') {
-            console << "Received: " << input << " -->  ioExt.verboseMode: " << ioExt.verboseMode << "\n";
-            ioExt.verboseMode = !ioExt.verboseMode;
+          if (input[1] == 'i') {
+            ioExt.verboseModeIn = !ioExt.verboseModeIn;
+            console << "Received: " << input << " -->  set ioExt.verboseModeIn: " << ioExt.verboseModeIn << "\n";
+          } else if (input[1] == 'o') {
+            ioExt.verboseModeOut = !ioExt.verboseModeOut;
+            console << "Received: " << input << " -->  set ioExt.verboseModeOut: " << ioExt.verboseModeOut << "\n";
           } else if (input[1] == 'R') {
             console << "Received: " << input << " -->  ioExt.re_init()\n";
             msg = ioExt.re_init();

@@ -12,6 +12,7 @@ using namespace std;
 class CarStatePin {
 public:
   int port; // high nibble: device number, low nibble: portNr (pin)
+  int mask;
   int mode;
   int value;
   int oldValue;

@@ -60,7 +60,7 @@ void I2CBus::scan_i2c_devices() {
    * Connect a 2.4k resistor between SDA and Vcc
    * Connect a 2.4k resistor between SCL and Vcc
    */
-  console << "     Scanning I2C addresses:\n    ";
+  console << "     Scanning I2C addresses:\n     ";
   uint8_t cnt = 0;
   string s;
 

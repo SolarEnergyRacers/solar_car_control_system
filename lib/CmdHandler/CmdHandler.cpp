@@ -134,7 +134,6 @@ void CmdHandler::task() {
           console << carState.print("Recent State") << "\n";
           break;
         case 'S':
-          console << carState.print("Recent State:") << "\n";
           console << printSystemValues();
           break;
         case 'J':
@@ -294,19 +293,22 @@ string CmdHandler::printSystemValues() {
 #if ADC_ON
   int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-  ss << fmt::format("dec={:5d}  acc={:5d}\n", valueDec, valueAcc);
+  ss << fmt::format("ADC: dec={:5d}  acc={:5d}\n", valueDec, valueAcc);
 #endif
 
-  for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-    for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
-      CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->value == 0) {
-        ss << fmt::format("{}: SET {:#04x}\n", pin->name, pin->port);
-      }
-    }
-  }
+  // for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
+  //   for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
+  //     CarStatePin *pin = carState.getPin(devNr, pinNr);
+  //     ss << fmt::format("{:20s} {:#04x}: {%10s} Pin ", pin->name, pin->port, pin->mode);
+  //     if (pin->value == 0) {
+  //       ss << "SET\n";
+  //     } else {
+  //       ss << "UNSET\n";
+  //     }
+  //   }
+  // }
 #if DAC_ON
-  ss << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
+  ss << fmt::format("DAC: POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
                     dac.get_pot(DAC::pot_chan::POT_CHAN1));
 #endif
   return ss.str();

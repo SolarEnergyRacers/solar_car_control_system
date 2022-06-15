@@ -114,7 +114,7 @@ void IOExt::setPort(int port, bool value) {
   xSemaphoreGive(i2cBus.mutex);
   if (verboseModeOut) {
     CarStatePin *pin = carState.getPin(devNr, pinNr);
-    console << fmt::format("Set BOOL -- 0x{:02x}: {} --> {}, inited: {}  <-- {:15s} \t({}ms)\n", pin->port, pin->oldValue, pin->value,
+    console << fmt::format("Set BOOL -- 0x{:02x}: {} --> {}, inited: {:5}  <-- {:15s} \t({}ms)\n", pin->port, pin->oldValue, pin->value,
                            pin->inited, pin->name, millis());
   }
 }
@@ -127,7 +127,7 @@ bool IOExt::readPins(PinReadMode type) {
     for (auto &pin : carState.pins) {
       if (pin.mode != OUTPUT) {
         if (pin.oldValue != pin.value || type == PinReadMode::ALL) {
-          console << fmt::format("Get BOOL -- 0x{:02x}: {} --> {}, inited: {}  <-- {:15s} \t({}ms)\n", pin.port, pin.oldValue, pin.value,
+          console << fmt::format("Get BOOL -- 0x{:02x}: {} --> {}, inited: {:5}  <-- {:15s} \t({}ms)\n", pin.port, pin.oldValue, pin.value,
                                  pin.inited, pin.name, millis());
           if (pin.oldValue != pin.value)
             hasChanges = true;

@@ -9,7 +9,6 @@
 | MainBoard DB12     | ESP32:14              |
 | SteeringWheel DB12 | ILI9341:SPI_CS_SDCARD |
 
-
 ### GPIO Pin 36 is not usable
 
 |                    | Old      | New      |
@@ -27,12 +26,24 @@
 
 ### Main Board
 
-| Old     | New                      |                                             |
-| ------- | ------------------------ | ------------------------------------------- |
+| Old               | New                      |                                             |
+| ----------------- | ------------------------ | ------------------------------------------- |
 | Serial Tranceiver | GND, VCC, TX, RX on Plug | GND,VCC,Tx, RX, SET on Plug                 |
-| LTC4311 | Integrate into mainboard | remark: near ESP32 SDA,SCL or near MCP23017 |
+| LTC4311           | Integrate into mainboard | remark: near ESP32 SDA,SCL or near MCP23017 |
 
 |                    | Old      | New      |
 | ------------------ | -------- | -------- |
-| SD Card detect | % | IOExt2:5 |
-| ILI C/D Low active	| R to GND	| R to VCC |  
+| SD Card detect     | %        | IOExt2:5 |
+| ILI C/D Low active | R to GND | R to VCC |
+
+
+
+
+
+## 2022.06.14 -  Test im Auto
+
+- [ ] CAN auf 12V
+- [ ] Mainboard 12V und GND am Inputstecker brücken
+- [ ] PullDown nach Z-Diode
+- [ ] Neues Konzept DAC-Abschaltung
+- [ ] Sicherheit gehen Verpolung des 12V Abschalters

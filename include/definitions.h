@@ -43,8 +43,8 @@
 // analog digital coder
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
+#define I2C_ADDRESS_ADS1x15_1 0x49
 #define I2C_ADDRESS_ADS1x15_2 0x4a
-#define I2C_ADDRESS_ADS1x15_1 0x4b
 #define ADC_MAX 65535
 
 // Puls width modifier

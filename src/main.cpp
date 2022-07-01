@@ -205,6 +205,9 @@ void app_main(void) {
 #endif
 
   //--- SD card available ----------------------------
+  ioExt.readAndHandlePins(PinHandleMode::FORCED);
+  console << "##SD V1################################"
+          << "\n";
   carState.init_values();
   //------from now config ini values can be used------
 
@@ -373,10 +376,13 @@ void app_main(void) {
   console << "-----------------------------------------------------------------\n";
 
   // ioExt.readAll();
-  carState.init_values();
   ioExt.readAndHandlePins(PinHandleMode::FORCED);
+  console << "##SD V2################################"
+          << "\n";
+
+  carState.init_values();
   //--- SD card available ----------------------------
-  //carState.initalize_config();
+  // carState.initalize_config();
   //------from now config ini values can be used------
   console << "-----------------------------------------------------------------\n";
 }

@@ -21,15 +21,15 @@
 
 ### Boot Screen
 
-The bootscrren with blue font on yellow background shows the initialisation of all devices controlled by the car control system.
+The bootscreen with blue font on yellow background shows the initialization of all devices controlled by the car control system.
 
 The first part shows the device init, the second part shows the control task creation.
 
-The last display is a 4 Seconds countdown to allow an additional view to the values.
+The last display is a 4 seconds countdown to allow an additional view to the values.
 
 ### Adjust Paddles
 
-After each start the Paddles must be adjusted. Until that the acceleration is locked. It is shown by the number `-99` in the `acceleration/deceleration` display and the drivers information Acceleration still locked.
+After each start the paddles must be adjusted. Until that the acceleration is locked. It is shown by the number `-99` in the `acceleration/deceleration` display and the drivers information Acceleration still locked.
 
 Procedure:
 
@@ -38,6 +38,8 @@ Procedure:
   You have about 5s time for that.
 - If successful the `acceleration/deceleration` display show `+ 0`
   Otherwise repeat the complete procedure
+
+If the `acceleration/deceleration` display during the tour doesn't display `+ 0` the adjust procedure must be repeated.
 
 
 ## Car Operate

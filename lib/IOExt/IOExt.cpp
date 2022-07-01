@@ -59,11 +59,12 @@ string IOExt::init() {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       carState.idxOfPin.insert(pair<string, int>{pin->name, getIdx(devNr, pinNr)});
+      setPortMode(pin->port, pin->mode);
     }
     console << "     ok " << getName() << "[" << devNr << "]\n";
   }
   // inital read the io pins
-  readPins();
+  readAllPins();
   // setup inerrupt handling
   ioInterruptRequest = false;
   pinMode(I2C_INTERRUPT, INPUT_PULLUP);
@@ -83,7 +84,7 @@ void IOExt::exit(void) {
 //   }
 //   isInInterruptHandler = true;
 //   // console << fmt::format("Do interrupt handler at {}}\n", millis());
-//   readPins();
+//   readAllPins();
 //   //readAll(true, false, "", false);
 //   // console << fmt::format("Clear interrupts   {}\n", millis());
 //   xSemaphoreTakeT(i2cBus.mutex);
@@ -114,15 +115,15 @@ void IOExt::setPort(int port, bool value) {
   xSemaphoreGive(i2cBus.mutex);
   if (verboseModeOut) {
     CarStatePin *pin = carState.getPin(devNr, pinNr);
-    console << fmt::format("Set BOOL -- 0x{:02x}: {} --> {}, inited: {:5}  <-- {:15s} \t({}ms)\n", pin->port, pin->oldValue, pin->value,
-                           pin->inited, pin->name, millis());
+    console << fmt::format("Set BOOL -- 0x{:02x}, [{:x}|{:x}]: {} --> {}, inited: {:5}  <-- {:15s} \t({}ms)\n", pin->port, devNr, pinNr,
+                           pin->oldValue, pin->value, pin->inited, pin->name, millis());
   }
 }
 
 bool IOExt::readPins(PinReadMode type) {
   if (!isInInputHandler) {
     isInInputHandler = true;
-    readPins();
+    readAllPins();
     bool hasChanges = false;
     for (auto &pin : carState.pins) {
       if (pin.mode != OUTPUT) {
@@ -140,7 +141,17 @@ bool IOExt::readPins(PinReadMode type) {
   return false;
 }
 
-void IOExt::readPins() {
+// void IOExt::writeAllPins() {
+
+//   for (auto &pin : carState.pins) {
+//     if (pin.mode == OUTPUT) {
+//       console << fmt::format(">> {:02x} {:02x} | {:02x} {:02x} -- ({}ms)\t", io0A, io0B, io1A, io1B, millis());
+//       ioExt.setPort(pin.port, pin.value);
+//     }
+//   }
+// }
+
+void IOExt::readAllPins() {
 
   xSemaphoreTakeT(i2cBus.mutex);
   int16_t io0A = IOExtDevs[0].readPort(MCP23017Port::A);
@@ -168,7 +179,7 @@ void IOExt::readPins() {
 bool IOExt::readAndHandlePins(PinHandleMode mode) {
   if (!isInInputHandler) {
     isInInputHandler = true;
-    readPins();
+    readAllPins();
 
     if (verboseModeIn) {
       console << fmt::format("IOExt ({}ms)\t", millis()) << carState.printIOs("", true, false) << "\n";

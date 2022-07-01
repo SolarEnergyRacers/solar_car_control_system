@@ -36,14 +36,15 @@
 | SD Card detect     | %        | IOExt2:5 |
 | ILI C/D Low active | R to GND | R to VCC |
 
-
-
-
-
 ## 2022.06.14 -  Test im Auto
+
+### Main Board
 
 - [ ] CAN auf 12V
 - [ ] Mainboard 12V und GND am Inputstecker brücken
 - [ ] PullDown nach Z-Diode
 - [ ] Neues Konzept DAC-Abschaltung
+
+### Switch Board
+
 - [ ] Sicherheit gehen Verpolung des 12V Abschalters

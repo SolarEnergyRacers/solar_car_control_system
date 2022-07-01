@@ -23,17 +23,17 @@
 #define PinPvOnOff "PvOnOff"
 #define PinMcOnOff "McOnOff"
 #define PinEcoPower "EcoPower"
-#define PinDacLifeSign "PinDacLifeSign"
+#define PinDacLifeSign "PinDacLifeSign-p25"
 #define PinFwdBwd "FwdBwd"
 #define PinDUMMY06 "DUMMY06"
 #define PinRelais11 "Relais11"
-#define PinIndicatorOutLeft "IndicatorOutLeft"
-#define PinIndicatorOutRight "IndicatorOutRight"
-#define PinFanOut "FanOut"
-#define PinHornOut "HornOut"
-#define PinLightOut "LightOut"
+#define PinIndicatorOutLeft "IndicatorOutLeft-p1"
+#define PinIndicatorOutRight "IndicatorOutRight-p2"
+#define PinFanOut "FanOut-p28"
+#define PinHornOut "HornOut-p3"
+#define PinLightOut "LightOut-p5"
 #define PinBreakPedal "BreakPedal"
-#define PinHeadLightOut "HeadLightOut"
+#define PinHeadLightOut "HeadLightOut-p4"
 #define PinDUMMY14 "DUMMY14"
 #define PinDUMMY15 "DUMMY15"
 #define PinIndicatorBtnLeft "IndicatorBtnLeft"
@@ -53,6 +53,7 @@
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
+enum class PinWriteMode { ALL, CHANGED };
 enum class PinReadMode { ALL, CHANGED };
 enum class PinHandleMode { NORMAL, FORCED };
 
@@ -72,8 +73,10 @@ public:
 
   // Class member and functions
   void setPort(int port, bool value);
+  //void writePins(PinWriteMode type);
+  //void writeAllPins();
   bool readPins(PinReadMode type);
-  void readPins();
+  void readAllPins();
   bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };

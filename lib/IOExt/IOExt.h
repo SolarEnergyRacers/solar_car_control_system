@@ -73,8 +73,8 @@ public:
 
   // Class member and functions
   void setPort(int port, bool value);
-  //void writePins(PinWriteMode type);
-  //void writeAllPins();
+  // void writePins(PinWriteMode type);
+  // void writeAllPins();
   bool readPins(PinReadMode type);
   void readAllPins();
   bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);

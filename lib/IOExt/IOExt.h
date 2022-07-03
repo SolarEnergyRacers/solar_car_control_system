@@ -25,7 +25,7 @@
 #define PinEcoPower "EcoPower"
 #define PinDacLifeSign "PinDacLifeSign-p25"
 #define PinFwdBwd "FwdBwd"
-#define PinDUMMY06 "DUMMY06"
+#define PinGreenLightOut "PinGreenLightOut-p27"
 #define PinRelais11 "Relais11"
 #define PinIndicatorOutLeft "IndicatorOutLeft-p1"
 #define PinIndicatorOutRight "IndicatorOutRight-p2"
@@ -53,8 +53,6 @@
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
-enum class PinWriteMode { ALL, CHANGED };
-enum class PinReadMode { ALL, CHANGED };
 enum class PinHandleMode { NORMAL, FORCED };
 
 class IOExt : public abstract_task {
@@ -73,9 +71,7 @@ public:
 
   // Class member and functions
   void setPort(int port, bool value);
-  // void writePins(PinWriteMode type);
-  // void writeAllPins();
-  bool readPins(PinReadMode type);
+  void writeAllPins(PinHandleMode mode = PinHandleMode::NORMAL);
   void readAllPins();
   bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);
 

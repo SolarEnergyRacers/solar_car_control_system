@@ -22,7 +22,7 @@ public:
   void task(void);
 
   // Class functions and members
-  string commands = "!-:<>CcDdEHiIJklLMPRsSUuVvw";
+  string commands = "!-:<>CcDdEFGHiIJklLMPRsSUuVvw";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -----------\n"
@@ -42,6 +42,8 @@ public:
                     "\tk kp ki kd - update PID constants\n"
                     "\tI          - scan I2C devices\n"
                     "\ti [|i|o|R] - read IOs (i|o-show in|out continously, R-reinit)\n"
+                    "\tG [-]      - Green light on/off\n"
+                    "\tF [-]      - Fan on/off\n"
                     "\t-------- DRIVER_RUNNING INFO COMMANDS -----------\n"
                     "\t:<text>    - display driver info text\n"
                     "\t!<text>    - display driver warn text\n"

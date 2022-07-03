@@ -50,6 +50,8 @@ void CarState::init_values() {
   DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
+  GreenLight = false;
+  Fan = false;
 
   // read from ser4config.ini file
   initalize_config();
@@ -94,6 +96,8 @@ const string CarState::print(string msg, bool withColors) {
   struct tm t = *localtime(&theTime);
 
   stringstream ss(msg);
+  string tempStr = DriverInfo;
+  replace(tempStr.begin(), tempStr.end(), '\n', ' ');
   ss << "====SER4 Car Status====" << VERSION << "==";
   ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
   ss << "====uptime:" << getTimeStamp(millis() / 1000) << "s====" << asctime(&t) << "==";
@@ -107,7 +111,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Acceleration Display... " << AccelerationDisplay << endl;
   ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
   ss << "Battery On............. " << BatteryOn << endl;
-  ss << "Battery Voltage........ " << BatteryVoltage << endl;
+  ss << "Battery Voltage ....... " << BatteryVoltage << endl;
   ss << "Battery Current........ " << BatteryCurrent << endl;
   ss << "Battery Errors ........." << batteryErrorsAsString(true) << endl;
   ss << "Battery Precharge State " << PRECHARGE_STATE_str[(int)(PrechargeState)] << endl;
@@ -119,13 +123,12 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Photo Reference Cell .. " << ReferenceSolarCell << endl;
   ss << "Acceleration Display .. " << AccelerationDisplay << endl;
   ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
-  ss << "Battery On ............ " << BatteryOn << endl;
-  ss << "Battery Voltage ....... " << BatteryVoltage << endl;
-  ss << "Battery Current ....... " << BatteryCurrent << endl;
   ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
   ss << "Motor On .............. " << MotorOn << endl;
   ss << "Motor Current ......... " << MotorCurrent << endl;
   ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection)] << endl;
+  ss << "Green Light ........... " << GreenLight << endl;
+  ss << "Fan ................... " << Fan << endl;
   ss << "------------------------" << endl;
   ss << "Indicator ............. " << INDICATOR_str[(int)(Indicator)] << endl;
   ss << "Constant Mode On ...... " << BOOL_str[(int)(ConstantModeOn)] << endl;
@@ -134,7 +137,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Target Power .......... " << TargetPower << endl;
   ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;
   ss << "Info Last ............. "
-     << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
+     << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << tempStr << endl;
   ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
   ss << "IO .................... " << printIOs("", false) << endl;
@@ -223,6 +226,8 @@ const string CarState::serialize(string msg) {
   cJSON_AddStringToObject(ctrData, "driverInfo", fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str()).c_str());
   cJSON_AddStringToObject(ctrData, "speedArrow", SPEED_ARROW_str[(int)SpeedArrow]);
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
+  cJSON_AddBoolToObject(dynData, "greenLight", GreenLight);
+  cJSON_AddBoolToObject(dynData, "fan", Fan);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
   return fmt::format("{}\n", cJSON_PrintUnformatted(carData));
 }
@@ -281,6 +286,8 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "driverInfo, ";
     ss << "speedArrow, ";
     ss << "light, ";
+    ss << "greenLight";
+    ss << "fan";
     ss << "io ";
     ss << endl;
   }
@@ -330,15 +337,22 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], field) << ", ";
   ss << SPEED_ARROW_str[(int)SpeedArrow] << ", ";
   ss << LIGHT_str[(int)(Light)] << ", ";
+  ss << GreenLight << ", ";
+  ss << Fan << ", ";
   ss << printIOs("", false).c_str() << ", ";
   ss << endl;
   return ss.str();
 }
 
 const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
-  string normalColor = "\033[0;39m";
-  string highLightColorOut = "\033[1;31m"; // red
-  string highLightColorChg = "\033[1;36m"; // blue
+  string normalColor = "";
+  string highLightColorOut = "";
+  string highLightColorChg = "";
+  if (withColors) {
+    normalColor = "\033[0;39m";
+    highLightColorOut = "\033[1;31m"; // red
+    highLightColorChg = "\033[1;36m"; // blue
+  }
   stringstream ss(msg);
   if (msg.length() > 0)
     ss << msg << endl;
@@ -349,7 +363,7 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       int idx = IOExt::getIdx(devNr, pinNr);
       CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->mode == OUTPUT && withColors) {
+      if (pin->mode == OUTPUT) {
         if (pin->value != pin->oldValue) {
           hasDelta = true;
           ss << highLightColorChg << pin->value << normalColor;

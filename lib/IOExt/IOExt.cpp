@@ -115,41 +115,20 @@ void IOExt::setPort(int port, bool value) {
   xSemaphoreGive(i2cBus.mutex);
   if (verboseModeOut) {
     CarStatePin *pin = carState.getPin(devNr, pinNr);
-    console << fmt::format("Set BOOL -- 0x{:02x}, [{:x}|{:x}]: {} --> {}, inited: {:5}  <-- {:15s} \t({}ms)\n", pin->port, devNr, pinNr,
+    console << fmt::format("Set BOOL -- 0x{:02x}, [{:x}|{:x}]: {} --> {}, inited: {:5}  <-- {:18s} \t({}ms)\n", pin->port, devNr, pinNr,
                            pin->oldValue, pin->value, pin->inited, pin->name, millis());
   }
 }
 
-bool IOExt::readPins(PinReadMode type) {
-  if (!isInInputHandler) {
-    isInInputHandler = true;
-    readAllPins();
-    bool hasChanges = false;
-    for (auto &pin : carState.pins) {
-      if (pin.mode != OUTPUT) {
-        if (pin.oldValue != pin.value || type == PinReadMode::ALL) {
-          console << fmt::format("Get BOOL -- 0x{:02x}: {} --> {}, inited: {:5}  <-- {:15s} \t({}ms)\n", pin.port, pin.oldValue, pin.value,
-                                 pin.inited, pin.name, millis());
-          if (pin.oldValue != pin.value)
-            hasChanges = true;
-        }
-      }
+void IOExt::writeAllPins(PinHandleMode mode) {
+  for (auto &pin : carState.pins) {
+    if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited || mode == PinHandleMode::FORCED)) {
+      setPort(pin.port, pin.value);
+      pin.oldValue = pin.value;
+      pin.inited = true;
     }
-    isInInputHandler = false;
-    return hasChanges;
   }
-  return false;
 }
-
-// void IOExt::writeAllPins() {
-
-//   for (auto &pin : carState.pins) {
-//     if (pin.mode == OUTPUT) {
-//       console << fmt::format(">> {:02x} {:02x} | {:02x} {:02x} -- ({}ms)\t", io0A, io0B, io1A, io1B, millis());
-//       ioExt.setPort(pin.port, pin.value);
-//     }
-//   }
-// }
 
 void IOExt::readAllPins() {
 
@@ -159,8 +138,7 @@ void IOExt::readAllPins() {
   int16_t io1A = IOExtDevs[1].readPort(MCP23017Port::A);
   int16_t io1B = IOExtDevs[1].readPort(MCP23017Port::B);
   xSemaphoreGive(i2cBus.mutex);
-  // console << fmt::format(">> {:02x} {:02x} | {:02x} {:02x} -- ({}ms)\t", io0A, io0B, io1A, io1B, millis());
-
+  
   for (CarStatePin &pin : carState.pins) {
     if (pin.mode != OUTPUT) {
       if (pin.port < 0x08) {
@@ -174,17 +152,18 @@ void IOExt::readAllPins() {
       }
     }
   }
+  if (verboseModeIn) {
+    console << fmt::format("IOExt ({}ms)\t", millis()) << carState.printIOs("", true, false) << "\n";
+  }
 }
 
 bool IOExt::readAndHandlePins(PinHandleMode mode) {
   if (!isInInputHandler) {
     isInInputHandler = true;
-    readAllPins();
-
-    if (verboseModeIn) {
-      console << fmt::format("IOExt ({}ms)\t", millis()) << carState.printIOs("", true, false) << "\n";
-    }
+    
     bool hasChanges = false;
+
+    readAllPins();
     list<void (*)()> pinHandlerList;
     for (CarStatePin &pin : carState.pins) {
       if (pin.mode != OUTPUT) {
@@ -227,8 +206,7 @@ void IOExt::task() {
       if (changedInputs) {
         carControl.valueChangedHandler();
       }
-      // readAll(true, false, "", false);
-      //   handle INPUT pin interrupts
+      // handle INPUT pin interrupts
       //   if (ioInterruptRequest) {
       //     console << "jump ioInterruptRequest " << millis() << "\n";
       //     handleIoInterrupt();
@@ -236,15 +214,8 @@ void IOExt::task() {
       //     // carControl.valueChangedHandler();
       //   }
 
-      //  update OUTPUT pins
-      for (auto &pin : carState.pins) {
-        if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited)) {
-          // console << pin.name << ": " << pin.oldValue << " -- " << pin.value << ", inited:" << pin.inited << "\n";
-          pin.oldValue = pin.value;
-          pin.inited = true;
-          setPort(pin.port, pin.value);
-        }
-      }
+      // update OUTPUT pins
+      // writeAllPins(PinHandleMode::NORMAL);
     }
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

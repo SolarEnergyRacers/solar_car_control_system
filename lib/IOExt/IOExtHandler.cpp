@@ -23,6 +23,7 @@
 #include <I2CBus.h>
 #include <IOExt.h>
 #include <IOExtHandler.h>
+#include <SDCard.h>
 
 extern Console console;
 extern I2CBus i2cBus;
@@ -30,6 +31,7 @@ extern Indicator indicator;
 extern IOExt ioExt;
 extern CarState carState;
 extern CarControl carControl;
+extern SDCard sdCard;
 extern bool systemOk;
 
 void batteryOnOffHandler() {
@@ -54,7 +56,7 @@ void ecoPowerHandler() {
 
 void fwdBwdHandler() {
   carState.DriveDirection = carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::BACKWARD : DRIVE_DIRECTION::FORWARD;
-  console << "Direction " << (carState.DriveDirection == DRIVE_DIRECTION::FORWARD ? "Backward" : "Forward") << "\n";
+  console << "Direction " << (carState.DriveDirection == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward") << "\n";
 }
 
 void breakPedalHandler() {
@@ -184,7 +186,12 @@ void paddleAdjustHandler() {
 void sdCardDetectHandler() {
   carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   if (carState.SdCardDetect) {
-    console << "SD card detected.\n";
+    console << "SD card detected, try to start logging...\n";
+    string msg = sdCard.init();
+    console << msg << "\n";
+    string state = carState.csv("Recent State", true); // with header
+    sdCard.write(state);
+    sdCard.open_log_file();
   } else {
     console << "SD card removed.\n";
   }

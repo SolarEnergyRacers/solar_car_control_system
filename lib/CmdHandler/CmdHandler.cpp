@@ -178,8 +178,7 @@ void CmdHandler::task() {
             console << "Received: " << input
                     << ": ioExt.readAll(false, false, "
                        ", true)\n";
-            // ioExt.readAll(false, false, "", true);
-            ioExt.readPins(PinReadMode::ALL);
+            ioExt.readAllPins();
           }
           break;
         case 'I':
@@ -201,6 +200,27 @@ void CmdHandler::task() {
         case '-':
           console << "Received: " << input << " -->  carControl.adjust_paddles(" << carState.PaddleAdjustCounter << ")\n";
           carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
+          break;
+        case 'F':
+          if (input[1] == '-') {
+            carState.Fan = false;
+            carState.getPin(PinFanOut)->value = 0;
+          } else {
+            carState.Fan = true;
+            carState.getPin(PinFanOut)->value = 1;
+          }
+          console << "Received: " << input << " -->  carState.Fan=" << carState.Fan << "\n";
+          break;
+          break;
+        case 'G':
+          if (input[1] == '-') {
+            carState.GreenLight = false;
+            carState.getPin(PinGreenLightOut)->value = 0;
+          } else {
+            carState.GreenLight = true;
+            carState.getPin(PinGreenLightOut)->value = 1;
+          }
+          console << "Received: " << input << " -->  carState.GreenLight=" << carState.GreenLight << "\n";
           break;
         case 'u':
           if (input[1] == '-' || carState.SpeedArrow == SPEED_ARROW::INCREASE) {

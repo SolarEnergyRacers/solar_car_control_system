@@ -285,7 +285,12 @@ volatile int CarControl::valueChangeRequest = 0;
 void CarControl::task() {
   // polling loop
   while (1) {
+    // update OUTPUT pins
+    ioExt.writeAllPins(PinHandleMode::FORCED);
+
     carState.getPin(PinDacLifeSign)->value = !carState.getPin(PinDacLifeSign)->value;
+    
+    // handle changed INPUT pins
     bool someThingChanged = false;
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();

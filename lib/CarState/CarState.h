@@ -120,11 +120,13 @@ public:
     DriverInfo = "starting...";
     DriverInfoType = INFO_TYPE::STATUS;
     Light = LIGHT::OFF;
+    Fan = false;
 
     // init state flags
     // #SAFETY#: acceleration lock
     PaddlesJustAdjusted = false;
     AccelerationLocked = true;
+    GreenLight = false;
     // BEGIN prevent stupid compiler warnings "defined but not used"
     (void)BOOL_str;
     (void)INDICATOR_str;
@@ -211,6 +213,8 @@ public:
   SPEED_ARROW SpeedArrow;
   INFO_TYPE DriverInfoType;
   LIGHT Light;
+  bool GreenLight;
+  bool Fan;
 
   // All IO pins
   static CarStatePin pins[IOExtPINCOUNT];

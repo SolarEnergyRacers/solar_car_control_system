@@ -25,7 +25,7 @@ CarStatePin CarState::pins[] = {
     //
     {0x04, 0x10, OUTPUT, 1, 1, false, 0l, PinDacLifeSign, NULL},
     {0x05, 0x20, INPUT, 1, 1, false, 0l, PinFwdBwd, fwdBwdHandler}, // dont pull because of z-diode
-    {0x06, 0x40, INPUT_PULLUP, 1, 1, false, 0l, PinDUMMY06, NULL},
+    {0x06, 0x40, OUTPUT, 0, 0, false, 0l, PinGreenLightOut, NULL},
     {0x07, 0x80, OUTPUT, 0, 0, false, 0l, PinFanOut, NULL},
     // IOExtDev0-PortB
     {0x08, 0x01, OUTPUT, 0, 0, false, 0l, PinIndicatorOutLeft, NULL},

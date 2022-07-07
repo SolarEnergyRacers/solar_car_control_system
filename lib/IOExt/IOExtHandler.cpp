@@ -140,10 +140,14 @@ void constantModeOnHandler() {
   if (!systemOk)
     return;
   if (carState.getPin(PinConstantModeOn)->value == 0) {
-    console << "ConstantMode ON\n";
-    carState.TargetSpeed = carState.Speed;                                       // unit: km/h
-    carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
-    carState.ConstantModeOn = true;                                              // #SAFETY#: deceleration unlock const mode
+    console << "ConstantMode ON";
+    if (carState.ConstantModeOn) {
+      carState.TargetSpeed = carState.Speed;                                       // unit: km/h
+      carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
+      console << " - overtake speed " << carState.TargetSpeed << " / power " << carState.TargetPower;
+    }
+    console << "\n";
+    carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
   }
 }
 

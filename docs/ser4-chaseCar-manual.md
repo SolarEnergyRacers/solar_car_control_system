@@ -26,42 +26,41 @@ Available commands (!-:<>CcDdEHiIJklLMPRsSUuVvw):
 | C          | switch to console screen           |
 | E          | switch to engineer screen          |
 | D          | switch to driver display           |
-|            | adjust paddels                     |
+| -          | adjust paddels                     |
 | P          | print directory of sdcard          |
 | s          | print status of all values         |
 | S          | print status                       |
 | J          | write JSON status to sdcard        |
-| V          | v                                  |
+| V or v     | Log state as csv, V: with header   |
 | M          | mount sdcard and eneable logging   |
 | U          | unmount sdcard and disable logging |
-| H          | memory_info                        |
+| ~H~        | ~memory_info~                      |
 | k kp ki kd | update PID constants               |
 | I          | scan I2C devices                   |
 | i          | IO ReadAll                         |
-| ii         | verbose IO input view |
-| io         | verbose IO output view |
-| iR         | re-init IO
+| ii         | verbose IO input view              |
+| io         | verbose IO output view             |
+| iR         | re-init IO                         |
 
 #### DRIVER_RUNNING INFO COMMANDS
 
 | command     | Function                 |
 | ----------- | ------------------------ |
-| :`<text>` | display driver info text |
-| !`<text>` | display driver warn text |
+| :`<text>`   | display driver info text |
+| !`<text>`   | display driver warn text |
 | u [-]       | speed up arrow (green)   |
 | d [-]       | speed down arrow (red)   |
 
 #### Driver SUPPORT COMMANDS
 
-| command | Function              |
-| ------- | --------------------- |
-| <       | left indicator on/off |
-
-> | right indicator on/off
-> w          | hazard warning lights on/off
-> l [-]      | position lights on/off
-> L [-]      | beam light on/off
-> c [c|s|p]  | constant speed|power mode
+| command    | Function              |
+| ---------- | --------------------- |
+| <          | left indicator on/off |
+| >          | right indicator on/off|
+| w          | hazard warning lights on/off|
+| l [-]      | position lights on/off|
+| L [-]      | beam light on/off|
+| c [c/s/p]  | constant speed/power mode|
 
 ### Console Procedures
 

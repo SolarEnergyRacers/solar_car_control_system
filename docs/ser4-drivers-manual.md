@@ -10,12 +10,11 @@
 
 ### Emergency Controls
 
-
 ### Switch Board
 
 ### Steering Wheel
 
-![steeringwheel](./assets.ser4-drivers-manual/SteeringWheel-22022.03.20.jpg)
+![steeringwheel](./assets.ser4-drivers-manual/SteeringWheel.drawio.png)
 
 ## Car Start
 
@@ -41,12 +40,21 @@ Procedure:
 
 If the `acceleration/deceleration` display during the tour doesn't display `+ 0` the adjust procedure must be repeated.
 
-
 ## Car Operate
 
 ## Steering Wheel
 
 ### Buttons
+
+#### Constant Mode
+
+
+| Button                 | function                                         |
+| ------------------------ | -------------------------------------------------- |
+| SET (first time press) | set constant mode                                |
+| SET (next time press)  | overtake current speed / power                   |
+| RES                    | reset constant mode                              |
+| PWR/SPD                | switch between constant power and constant speed |
 
 ### Paddles
 

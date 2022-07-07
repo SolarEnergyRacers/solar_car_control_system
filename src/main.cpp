@@ -44,6 +44,7 @@
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
 #include <IOExt.h>
+#include <IOExtHandler.h>
 #include <Indicator.h>
 #include <MCP23017.h>
 #include <OneWireBus.h>
@@ -193,8 +194,6 @@ void app_main(void) {
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
   console << "Reread all IOs in foreced mode:\n";
-  // ioExt.readAll(false, true);
-  // ioExt.readPins(PinReadMode::ALL);
   ioExt.readAndHandlePins(PinHandleMode::FORCED);
   console << "------------------------------\n";
 
@@ -205,9 +204,7 @@ void app_main(void) {
 #endif
 
   //--- SD card available ----------------------------
-  ioExt.readAndHandlePins(PinHandleMode::FORCED);
-  console << "##SD V1################################"
-          << "\n";
+  sdCardDetectHandler();
   carState.init_values();
   //------from now config ini values can be used------
 
@@ -283,8 +280,6 @@ void app_main(void) {
   msg = ioExt.create_task(4, 100, 4000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
-  // ioExt.readAll(false, true, "     ", true);
-  // console << "     ReadAll done.\n";
 
 #if INDICATOR_ON
   msg = indicator.create_task();
@@ -375,14 +370,11 @@ void app_main(void) {
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";
 
-  // ioExt.readAll();
+  console << "1-----------------------------------------------------------------\n";
   ioExt.readAndHandlePins(PinHandleMode::FORCED);
-  console << "##SD V2################################"
-          << "\n";
-
-  carState.init_values();
   //--- SD card available ----------------------------
-  // carState.initalize_config();
+  console << "2-----------------------------------------------------------------\n";
+  carState.init_values();
   //------from now config ini values can be used------
-  console << "-----------------------------------------------------------------\n";
+  console << "3-----------------------------------------------------------------\n";
 }

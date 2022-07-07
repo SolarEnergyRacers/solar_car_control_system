@@ -192,6 +192,26 @@ void DriverDisplay::constant_drive_mode_show() {
   xSemaphoreGive(spiBus.mutex);
 }
 
+#define ECO_MODE_STRING " eco"
+#define PWR_MODE_STRING " Power"
+void DriverDisplay::eco_power_mode_show() {
+  bool isEco = EcoModeOn.get_recent_overtake_last();
+  int width = getPixelWidthOfTexts(ecoPwrModeTextSize, ECO_MODE_STRING, PWR_MODE_STRING) + 4;
+  
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.fillRoundRect(ecoPwrModeX - 2, ecoPwrModeY - 2, width, 18, 3, ILI9341_BLACK);
+  tft.setCursor(ecoPwrModeX, ecoPwrModeY);
+  tft.setTextSize(ecoPwrModeTextSize);
+  if (isEco) {
+    tft.setTextColor(ILI9341_GREEN);
+    tft.print(ECO_MODE_STRING);
+  } else {
+    tft.setTextColor(ILI9341_BLUE);
+    tft.print(PWR_MODE_STRING);
+  }
+  xSemaphoreGive(spiBus.mutex);
+}
+
 #define LIGHT1_STRING "Light"
 #define LIGHT2_STRING "LIGHT"
 void DriverDisplay::_hide_light() {
@@ -406,6 +426,10 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     ConstantModeOn.Value = carState.ConstantModeOn;
     if (ConstantMode.Value != ConstantMode.ValueLast || ConstantModeOn.Value != ConstantModeOn.ValueLast || justInited) {
       constant_drive_mode_show();
+    }
+    EcoModeOn.Value = carState.EcoOn;
+    if (EcoModeOn.Value != EcoModeOn.ValueLast || justInited) {
+      eco_power_mode_show();
     }
 
     Indicator.Value = carState.Indicator;

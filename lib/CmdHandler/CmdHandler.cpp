@@ -175,10 +175,8 @@ void CmdHandler::task() {
             msg = ioExt.re_init();
             console << msg << "\n";
           } else {
-            console << "Received: " << input
-                    << ": ioExt.readAll(false, false, "
-                       ", true)\n";
             ioExt.readAllPins();
+            console << "Received: " << input << carState.printIOs("", true, false) << "\n";
           }
           break;
         case 'I':

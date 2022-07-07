@@ -110,8 +110,8 @@ string Display::_setup() {
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
-  lifeSignX = width - lifeSignRadius - 6;
-  lifeSignY = height - lifeSignRadius - 6;
+  lifeSignX = width - lifeSignRadius - 4;
+  lifeSignY = height - lifeSignRadius - 4;
   return fmt::format("[{}] Display initialized.  Screen 'ILI9341' {}x{}.     Status: {}", hasError ? "--" : "ok", height, width,
                      DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }

@@ -22,6 +22,7 @@
 #include <Display.h>
 #include <DriverDisplay.h>
 #include <Helper.h>
+#include <IOExt.h>
 #include <SDCard.h>
 #include <SPIBus.h>
 
@@ -29,6 +30,7 @@ extern Console console;
 extern SPIBus spiBus;
 extern SDCard sdCard;
 extern DriverDisplay driverDisplay;
+extern IOExt ioExt;
 
 string SDCard::re_init() { return init(); }
 
@@ -55,6 +57,13 @@ string SDCard::init() {
 }
 
 bool SDCard::mount() {
+  if (sdCard.isMounted()) {
+    console << "     SD card already mounted.\n";
+    return true;
+  }
+  if (!carState.SdCardDetect) {
+    ioExt.readAllPins();
+  }
   if (!carState.SdCardDetect) {
     console << "     No SD card detected!\n";
     mounted = false;
@@ -62,10 +71,6 @@ bool SDCard::mount() {
     SD.end();
     xSemaphoreGive(spiBus.mutex);
     return false;
-  }
-  if (sdCard.isMounted()) {
-    console << "     SD card already mounted.\n";
-    return true;
   }
   try {
     console << "     Mounting SD card ...\n";

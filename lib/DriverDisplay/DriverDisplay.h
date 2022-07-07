@@ -29,6 +29,7 @@ private:
   DisplayValue<LIGHT> Light = DisplayValue<LIGHT>(0, 0, "", "%s", "");
   DisplayValue<CONSTANT_MODE> ConstantMode = DisplayValue<CONSTANT_MODE>(0, 0, "", "%s", "");
   DisplayValue<bool> ConstantModeOn = DisplayValue<bool>(0, 0, "", "%s", "");
+  DisplayValue<bool> EcoModeOn = DisplayValue<bool>(0, 0, "", "%s", "");
   DisplayValue<INDICATOR> Indicator = DisplayValue<INDICATOR>(0, 0, ",", "", "");
 
   DisplayValue<int> Speed = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
@@ -105,7 +106,7 @@ private:
   // ---- voltage and current displays ---- END
 
   // constant mode speed or power display
-  int constantModeX = 242; // 250;
+  int constantModeX = 242;
   int constantModeY = 158;
   int constantModeTextSize = 2;
 
@@ -121,8 +122,14 @@ private:
   int indicatorWidth = 30;
   int indicatorHeight = 20;
 
-  int lightX = 250;
-  int lightY = 198; // 138;
+  int lightX = 252;
+  int lightY = 198;
+ 
+  // eco/pwr mode display
+  int ecoPwrModeX = 242;
+  int ecoPwrModeY = 218;
+  int ecoPwrModeTextSize = 2;
+
   //==== Driver Display definition ==== END
 
 protected:
@@ -144,6 +151,7 @@ private:
   void draw_display_background();
 
   void constant_drive_mode_show();
+  void eco_power_mode_show();
 
   void write_drive_direction();
   void write_driver_info();

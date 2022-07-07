@@ -124,7 +124,7 @@ private:
 
   int lightX = 252;
   int lightY = 198;
- 
+
   // eco/pwr mode display
   int ecoPwrModeX = 242;
   int ecoPwrModeY = 218;

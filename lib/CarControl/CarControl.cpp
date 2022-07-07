@@ -289,7 +289,7 @@ void CarControl::task() {
     ioExt.writeAllPins(PinHandleMode::FORCED);
 
     carState.getPin(PinDacLifeSign)->value = !carState.getPin(PinDacLifeSign)->value;
-    
+
     // handle changed INPUT pins
     bool someThingChanged = false;
     someThingChanged |= read_paddles();

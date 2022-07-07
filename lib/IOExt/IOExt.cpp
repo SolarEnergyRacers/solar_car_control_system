@@ -138,7 +138,7 @@ void IOExt::readAllPins() {
   int16_t io1A = IOExtDevs[1].readPort(MCP23017Port::A);
   int16_t io1B = IOExtDevs[1].readPort(MCP23017Port::B);
   xSemaphoreGive(i2cBus.mutex);
-  
+
   for (CarStatePin &pin : carState.pins) {
     if (pin.mode != OUTPUT) {
       if (pin.port < 0x08) {
@@ -160,7 +160,7 @@ void IOExt::readAllPins() {
 bool IOExt::readAndHandlePins(PinHandleMode mode) {
   if (!isInInputHandler) {
     isInInputHandler = true;
-    
+
     bool hasChanges = false;
 
     readAllPins();

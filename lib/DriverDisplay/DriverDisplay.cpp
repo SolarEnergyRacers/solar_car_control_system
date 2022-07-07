@@ -197,7 +197,7 @@ void DriverDisplay::constant_drive_mode_show() {
 void DriverDisplay::eco_power_mode_show() {
   bool isEco = EcoModeOn.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(ecoPwrModeTextSize, ECO_MODE_STRING, PWR_MODE_STRING) + 4;
-  
+
   xSemaphoreTakeT(spiBus.mutex);
   tft.fillRoundRect(ecoPwrModeX - 2, ecoPwrModeY - 2, width, 18, 3, ILI9341_BLACK);
   tft.setCursor(ecoPwrModeX, ecoPwrModeY);

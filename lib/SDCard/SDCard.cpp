@@ -40,18 +40,16 @@ string SDCard::init() {
 
   if (!mount()) {
     hasError = true;
-    return fmt::format("[{}] SDCard inited.", hasError ? "--" : "ok");
-  }
-  console << "[v] SDCard inited.\n";
-
-  console << fmt::format("     Open '{}' (append)...", carState.LogFilename);
-
-  if (open_log_file()) {
-    write(carState.csv("Initial State", true));
-    console << "    ok.\n";
-    driverDisplay.print("    SD Card mounted.\n");
   } else {
-    console << "    failed.\n";
+    console << fmt::format("     Open '{}' (append)...", carState.LogFilename);
+
+    if (open_log_file()) {
+      write(carState.csv("Initial State", true));
+      console << "    ok.\n";
+      driverDisplay.print("    SD Card mounted.\n");
+    } else {
+      console << "    failed.\n";
+    }
   }
   return fmt::format("[{}] SDCard initialized.", hasError ? "--" : "ok");
 }

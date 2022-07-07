@@ -178,7 +178,6 @@ void app_main(void) {
   console << msg << "\n";
   msg = i2cBus.init();
   console << msg << "\n";
-  console << "------------------------------\n";
 
   msg = engineerDisplay.init();
   console << msg << "\n";
@@ -193,9 +192,9 @@ void app_main(void) {
   msg = ioExt.init();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
-  console << "Reread all IOs in foreced mode:\n";
+  console << "     Reread all IOs in foreced mode:";
   ioExt.readAndHandlePins(PinHandleMode::FORCED);
-  console << "------------------------------\n";
+  console << carState.printIOs("", true, false) << "\n";
 
 #if SD_ON
   msg = sdCard.init();
@@ -204,7 +203,6 @@ void app_main(void) {
 #endif
 
   //--- SD card available ----------------------------
-  sdCardDetectHandler();
   carState.init_values();
   //------from now config ini values can be used------
 
@@ -253,11 +251,16 @@ void app_main(void) {
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
-#if CARSPEED_ON
-  msg = carSpeed.init();
-  console << msg << "\n";
-  engineerDisplay.print(msg + "\n");
-#endif
+  // #if CARCONTROL_ON
+  //   carControl.init();
+  //   console << msg << "\n";
+  //   engineerDisplay.print(msg + "\n");
+  // #endif
+  // #if CARSPEED_ON
+  //   msg = carSpeed.init();
+  //   console << msg << "\n";
+  //   engineerDisplay.print(msg + "\n");
+  // #endif
 
   if (!startOk) {
     console << "ERROR in init sequence(s). System halted!\n";
@@ -328,12 +331,15 @@ void app_main(void) {
   engineerDisplay.print(msg + "\n");
 #endif
 #if CARCONTROL_ON
-  carControl.init();
+  msg = carControl.init();
+  console << msg << "\n";
   msg = carControl.create_task();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
 #if CARSPEED_ON
+  msg = carSpeed.init();
+  console << msg << "\n";
   msg = carSpeed.create_task(10, 250, 2048);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
@@ -370,11 +376,5 @@ void app_main(void) {
   console << "FreeRTOS tasks successfully created. System running.\n";
   console << "-----------------------------------------------------------------\n";
 
-  console << "1-----------------------------------------------------------------\n";
   ioExt.readAndHandlePins(PinHandleMode::FORCED);
-  //--- SD card available ----------------------------
-  console << "2-----------------------------------------------------------------\n";
-  carState.init_values();
-  //------from now config ini values can be used------
-  console << "3-----------------------------------------------------------------\n";
 }

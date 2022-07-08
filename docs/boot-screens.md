@@ -175,5 +175,414 @@ lib/ADC/ADC.cpp                 :186 read_adc_acc_dec                    : Dec (
 - [x] right paddle 0 .. 52
 - [x] Gyroscope
 
-## Boot Display Log - 2022.04 13
+## Boot Display Log - 2022.07.08
+
+```log
+Hard resetting via RTS pin...
+=========================================================================================================================== [SUCCESS] Took 112.89 seconds ===========================================================================================================================
+--- Available filters and text transformations: colorize, debug, default, direct, esp32_exception_decoder, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Miniterm on /dev/ttyUSB0  115200,8,N,1 ---
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H ---
+[  ] Init 'Uart (SerialWire-SerialRadio)'...
+     ---Serial------------
+     Serial TX0 is on pin: 1
+     Serial RX0 is on pin: 3
+     Serial Baud Rate:     115200
+     ---Serial2 HC-12------
+     Serial2 TX2 is on pin: 17
+     Serial2 RX2 is on pin: 16
+     Serial2 Baud Rate:     9600
+     done.
+[ok] Serial and Serial2 initialized.
+
+--------------------
+esp32dev + free RTOS
+Solar Energy Car Racers SER4 Controller: $GIT_BRANCH_$GIT_COMMIT_HASH
+--------------------
+-chip info -------------------
+This is ESP32 chip with 2 CPU cores, WiFi/BT/BLE, silicon revision 3, 4MB external flash
+-gpio pin settings ----------
+[  ] Init 'GPIputOutput' ...done.
+[ok] SPI_CS for TFT and SD card set, GPIO initialized.
+-init bus systems ------------
+[  ] Init 'SPI bus' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19...
+[E][esp32-hal-cpu.c:125] removeApbChangeCallback(): not found func=401078DC arg=3FFB01A4
+[ok] SPIBus initialized.
+[  ] Init 'OneWireBus'...
+[ok] OneWireBus initialized.  ONEWIRE_PIN=12
+[  ] Init 'I2C Bus'...
+     I2C inited: I2C_SDA=23, I2C_SCL=22, I2C_FREQ=50000.
+     Scanning I2C addresses:
+     00 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- 19 -- -- -- -- -- -- 
+     20 21 -- -- -- -- -- -- 28 -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- 48 49 4a -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- 68 69 -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     Scan completed: 10 I2C devices found.
+     Expected addresses:
+     Address | Device                               | Location      
+     ------- | ------------------------------------ | --------------
+      0x00   | ESP32 I2C master                     | main noard    
+      0x19   | BMI088, 6-axis inertial sensor, acc  | main board    
+      0x20   | MCP23017, Extended digital IOs       | main board    
+      0x21   | MCP23017, Extended digital IOs       | steering wheel
+      0x28   | DS1803, digital analog coder         | main board    
+      0x48   | ADS1115, analog digital coder        | main board    
+      0x49   | ADS1115, analog digital coder        | main board    
+      0x4a   | ADS1115, analog digital coder        | steering wheel
+      0x68   | DS1307, real time clock              | main board    
+      0x69   | BMI088, 6-axis inertial sensor, gyro | main board    
+[ok] I2CBus initialized.
+[  ] Init 'EngineerDisplay'...
+     Setup 'ILI9341' for 'EngineerDisplay' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[ok] Display initialized.  Screen 'ILI9341' 240x320.     Status: ENGINEER_CONSOLE
+[  ] Init IOExt devices...
+     DeviceNr [0]:
+     ok IOExt[0]
+     DeviceNr [1]:
+     ok IOExt[1]
+[ok] IOExt initialized.
+[  ] Init 'SDCard'...
+     No SD card detected!
+[--] SDCard initialized.
+Start reading CONFIG.INI:SER4CONF.INI
+     No SD card detected!
+WARN: No readable configfile: 'SER4CONF.INI' found. Using coded settings.
+     No SD card detected!
+[  ] Init 'CmdHandler'...
+[ok] CmdHandler initialized.
+[  ] Init 'RTC'...
+     DS1307_ADDRESS 68
+     [INFO] rtc compile date/time: 07/08/2022 15:21:07
+     [INFO] rtc time newer than compile time. Updating esp32time DateTime.
+[ok] RTC initialized.
+[  ] Init Indicator...done.
+[ok] Indicator initialized.
+[  ] Init 'DAC'...
+     DAC initialized with I2C_ADDRESS_DS1803=28.
+[ok] DAC initialized.
+     Init 'ADC[0]' with address 0x48 ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 4: 0.000750mV
+          [ADS1x15] AIN1 --> 2437: 0.456951mV
+          [ADS1x15] AIN2 --> 2446: 0.458639mV
+          [ADS1x15] AIN3 --> 2438: 0.457139mV
+     ok ADC[0] at 0x48 inited.
+     Init 'ADC[1]' with address 0x49 ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 2361: 0.442701mV
+          [ADS1x15] AIN1 --> 2380: 0.446264mV
+          [ADS1x15] AIN2 --> 2383: 0.446826mV
+          [ADS1x15] AIN3 --> 2376: 0.445514mV
+     ok ADC[1] at 0x49 inited.
+     Init 'ADC[2]' with address 0x4a ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> -2: -0.000375mV
+          [ADS1x15] AIN1 --> 15906: 2.982466mV
+          [ADS1x15] AIN2 --> 2687: 0.503828mV
+          [ADS1x15] AIN3 --> 2672: 0.501015mV
+     ok ADC[2] at 0x4a inited.
+[ok] ADC initialized.
+[  ] Init GyroAcc...
+     BMI088 is connected
+     BMI088 is initialized
+[ok] GyroAcc initialized.
+[  ] Init CANBus...
+     CANBus with rx=19m tx=1a inited.
+[ok] CANBus initialized.
+
+-----------------------------------------------------------------
+Startup sequence(s) successful. System creating FreeRTOS tasks...
+-----------------------------------------------------------------
+
+[  ] Create IOExt as prio-4-task (sleep_polling=100ms, stack=4000) ... done.
+[ok] IOExt started (100ms).
+[  ] Create Indicator as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] Indicator started (330ms).
+[  ] Create ADC as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] ADC started (330ms).
+[  ] Create GyroAcc as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] GyroAcc started (330ms).
+[  ] Create RTC as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] RTC started (330ms). RTC Time: 07/08/2022 15:21:34
+[  ] Create CmdHandler as prio-20-task (sleep_polling=350ms, stack=6000) ... done.
+[ok] CmdHandler started (350ms).
+[  ] Create CANBus as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] CANBus started (330ms).
+[  ] Init 'CarControl'... done.
+[ok] CarControl initialized.
+[  ] Create CarControl as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] CarControl started (330ms).
+[  ] Init 'CarSpeed'...
+[ok] CarSpeed initialized.
+[  ] Create CarSpeed as prio-10-task (sleep_polling=250ms, stack=2048) ... done.
+[ok] CarSpeed started (250ms).
+ets Jul 29 2019 12:21:46
+
+rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)
+configsip: 0, SPIWP:0xee
+clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00
+mode:DIO, clock div:2
+load:0x3fff0018,len:7084
+ho 0 tail 12 room 4
+load:0x40078000,len:14052
+load:0x40080400,len:4352
+entry 0x400806ec
+I (70) boot: Chip Revision: 3
+I (70) boot_comm: chip revision: 3, min. bootloader chip revision: 0
+I (40) boot: ESP-IDF 4.0.1 2nd stage bootloader
+I (40) boot: compile time 23:58:28
+I (40) boot: Enabling RNG early entropy source...
+I (44) boot: SPI Speed      : 40MHz
+I (48) boot: SPI Mode       : DIO
+I (52) boot: SPI Flash Size : 4MB
+I (56) boot: Partition Table:
+I (60) boot: ## Label            Usage          Type ST Offset   Length
+I (67) boot:  0 nvs              WiFi data        01 02 00009000 00006000
+I (75) boot:  1 phy_init         RF data          01 01 0000f000 00001000
+I (82) boot:  2 factory          factory app      00 00 00010000 00100000
+I (90) boot: End of partition table
+I (94) boot_comm: chip revision: 3, min. application chip revision: 0
+I (101) esp_image: segment 0: paddr=0x00010020 vaddr=0x3f400020 size=0x377a4 (227236) map
+I (191) esp_image: segment 1: paddr=0x000477cc vaddr=0x3ffb0000 size=0x0222c (  8748) load
+I (195) esp_image: segment 2: paddr=0x00049a00 vaddr=0x40080000 size=0x06610 ( 26128) load
+I (209) esp_image: segment 3: paddr=0x00050018 vaddr=0x400d0018 size=0x82a28 (535080) map
+I (401) esp_image: segment 4: paddr=0x000d2a48 vaddr=0x40086610 size=0x0561c ( 22044) load
+I (418) boot: Loaded app from partition at offset 0x10000
+I (418) boot: Disabling RNG early entropy source...
+I (418) cpu_start: Pro cpu up.
+I (422) cpu_start: Application information:
+I (427) cpu_start: Project name:     solar_car_control_system
+I (433) cpu_start: App version:      4d09524
+I (438) cpu_start: Compile time:     Jul  7 2022 23:49:44
+I (444) cpu_start: ELF file SHA256:  634b730938ae0688...
+I (450) cpu_start: ESP-IDF:          4.0.1
+I (455) cpu_start: Starting app cpu, entry point is 0x4008219c
+I (0) cpu_start: App cpu up.
+I (465) heap_init: Initializing. RAM available for dynamic allocation:
+I (472) heap_init: At 3FFAE6E0 len 00001920 (6 KiB): DRAM
+I (478) heap_init: At 3FFB72C8 len 00028D38 (163 KiB): DRAM
+I (484) heap_init: At 3FFE0440 len 00003AE0 (14 KiB): D/IRAM
+I (491) heap_init: At 3FFE4350 len 0001BCB0 (111 KiB): D/IRAM
+I (497) heap_init: At 4008BC2C len 000143D4 (80 KiB): IRAM
+I (503) cpu_start: Pro cpu start user code
+I (530) spi_flash: detected chip: generic
+I (531) spi_flash: flash io: dio
+I (531) cpu_start: Starting scheduler on PRO CPU.
+I (0) cpu_start: Starting scheduler on APP CPU.
+�[  ] Init 'Uart (SerialWire-SerialRadio)'...
+     ---Serial------------
+     Serial TX0 is on pin: 1
+     Serial RX0 is on pin: 3
+     Serial Baud Rate:     115200
+     ---Serial2 HC-12------
+     Serial2 TX2 is on pin: 17
+     Serial2 RX2 is on pin: 16
+     Serial2 Baud Rate:     9600
+     done.
+[ok] Serial and Serial2 initialized.
+
+--------------------
+esp32dev + free RTOS
+Solar Energy Car Racers SER4 Controller: $GIT_BRANCH_$GIT_COMMIT_HASH
+--------------------
+-chip info -------------------
+This is ESP32 chip with 2 CPU cores, WiFi/BT/BLE, silicon revision 3, 4MB external flash
+-gpio pin settings ----------
+[  ] Init 'GPIputOutput' ...done.
+[ok] SPI_CS for TFT and SD card set, GPIO initialized.
+-init bus systems ------------
+[  ] Init 'SPI bus' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19...
+[E][esp32-hal-cpu.c:125] removeApbChangeCallback(): not found func=401078DC arg=3FFB01A4
+[ok] SPIBus initialized.
+[  ] Init 'OneWireBus'...
+[ok] OneWireBus initialized.  ONEWIRE_PIN=12
+[  ] Init 'I2C Bus'...
+     I2C inited: I2C_SDA=23, I2C_SCL=22, I2C_FREQ=50000.
+     Scanning I2C addresses:
+     00 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- 19 -- -- -- -- -- -- 
+     20 21 -- -- -- -- -- -- 28 -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- 48 49 4a -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- 68 69 -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     Scan completed: 10 I2C devices found.
+     Expected addresses:
+     Address | Device                               | Location      
+     ------- | ------------------------------------ | --------------
+      0x00   | ESP32 I2C master                     | main noard    
+      0x19   | BMI088, 6-axis inertial sensor, acc  | main board    
+      0x20   | MCP23017, Extended digital IOs       | main board    
+      0x21   | MCP23017, Extended digital IOs       | steering wheel
+      0x28   | DS1803, digital analog coder         | main board    
+      0x48   | ADS1115, analog digital coder        | main board    
+      0x49   | ADS1115, analog digital coder        | main board    
+      0x4a   | ADS1115, analog digital coder        | steering wheel
+      0x68   | DS1307, real time clock              | main board    
+      0x69   | BMI088, 6-axis inertial sensor, gyro | main board    
+[ok] I2CBus initialized.
+[  ] Init 'EngineerDisplay'...
+     Setup 'ILI9341' for 'EngineerDisplay' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[ok] Display initialized.  Screen 'ILI9341' 240x320.     Status: ENGINEER_CONSOLE
+[  ] Init IOExt devices...
+     DeviceNr [0]:
+     ok IOExt[0]
+     DeviceNr [1]:
+     ok IOExt[1]
+[ok] IOExt initialized.
+[  ] Init 'SDCard'...
+     Mounting SD card ...
+     SD card mounted.
+[ok] SDCard initialized.
+Start reading CONFIG.INI:SER4CONF.INI
+     Mounting SD card ...
+     SD card mounted.
+     Log file opend for append.
+[  ] Init 'CmdHandler'...
+[ok] CmdHandler initialized.
+[  ] Init 'RTC'...
+     DS1307_ADDRESS 68
+     [INFO] rtc compile date/time: 07/08/2022 15:21:07
+     [INFO] rtc time newer than compile time. Updating esp32time DateTime.
+[ok] RTC initialized.
+[  ] Init Indicator...done.
+[ok] Indicator initialized.
+[  ] Init 'DAC'...
+     DAC initialized with I2C_ADDRESS_DS1803=28.
+[ok] DAC initialized.
+     Init 'ADC[0]' with address 0x48 ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 4: 0.000750mV
+          [ADS1x15] AIN1 --> 2437: 0.456951mV
+          [ADS1x15] AIN2 --> 2440: 0.457514mV
+          [ADS1x15] AIN3 --> 2441: 0.457701mV
+     ok ADC[0] at 0x48 inited.
+     Init 'ADC[1]' with address 0x49 ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 2366: 0.443639mV
+          [ADS1x15] AIN1 --> 2380: 0.446264mV
+          [ADS1x15] AIN2 --> 2370: 0.444389mV
+          [ADS1x15] AIN3 --> 2372: 0.444764mV
+     ok ADC[1] at 0x49 inited.
+     Init 'ADC[2]' with address 0x4a ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> -6: -0.001125mV
+          [ADS1x15] AIN1 --> 15927: 2.986404mV
+          [ADS1x15] AIN2 --> 2704: 0.507015mV
+          [ADS1x15] AIN3 --> 2682: 0.502890mV
+     ok ADC[2] at 0x4a inited.
+[ok] ADC initialized.
+[  ] Init GyroAcc...
+     BMI088 is connected
+     BMI088 is initialized
+[ok] GyroAcc initialized.
+[  ] Init CANBus...
+     CANBus with rx=19m tx=1a inited.
+[ok] CANBus initialized.
+
+-----------------------------------------------------------------
+Startup sequence(s) successful. System creating FreeRTOS tasks...
+-----------------------------------------------------------------
+
+[  ] Create IOExt as prio-4-task (sleep_polling=100ms, stack=4000) ... done.
+[ok] IOExt started (100ms).
+[  ] Create Indicator as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] Indicator started (330ms).
+[  ] Create ADC as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] ADC started (330ms).
+[  ] Create GyroAcc as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] GyroAcc started (330ms).
+[  ] Create RTC as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] RTC started (330ms). RTC Time: 07/08/2022 15:21:57
+[  ] Create CmdHandler as prio-20-task (sleep_polling=350ms, stack=6000) ... done.
+[ok] CmdHandler started (350ms).
+[  ] Create CANBus as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] CANBus started (330ms).
+[  ] Init 'CarControl'... done.
+[ok] CarControl initialized.
+[  ] Create CarControl as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] CarControl started (330ms).
+[  ] Init 'CarSpeed'...
+[ok] CarSpeed initialized.
+[  ] Create CarSpeed as prio-10-task (sleep_polling=250ms, stack=2048) ... done.
+[ok] CarSpeed started (250ms).
+[  ] Create EngineerDisplay as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] EngineerDisplay started (1500ms).
+[  ] Init 'DriverDisplay'...
+     Setup 'ILI9341' for 'DriverDisplay' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[  ] Create DriverDisplay as prio-16-task (sleep_polling=330ms, stack=4096) ... done.
+     Setup 'ILI9341' for 'DriverDisplay[ok] DriverDisplay started (330ms).' with: SPI_CLK=DRIVER_SETUP
+5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[v] 'DriverDisplay' inited: screen E ILI9341 with 240 x 320
+-----------------------------------------------------------------
+FreeRTOS tasks successfully created. System running.
+-----------------------------------------------------------------
+Battery On
+PV On
+MC On
+EcoMowerMode Eco
+Direction Forward
+Break pedal pressed released
+Horn Off
+Increase constant mode target.
+Decrease constant mode target.
+SD card detected, try to start logging...
+[  ] Init 'SDCard'...
+[ok] SDCard initialized.
+     Log file opend for append.
+Request Paddle Adjust
+ paddle adjust:
+ 24 paddle adjust:
+ 23 paddle adjust:
+ 22 paddle adjust:
+ 21 paddle adjust:
+ 20 paddle adjust:
+ 19 paddle adjust:
+ 18 paddle adjust:
+ 17 paddle adjust:
+ 16 paddle adjust:
+ 15 paddle adjust:
+ 14 paddle adjust:
+ 13 paddle adjust:
+ 12 paddle adjust:
+ 11 paddle adjust:
+ 10 paddle adjust:
+  9 paddle adjust:
+  8 paddle adjust:
+  7 paddle adjust:
+  6 paddle adjust:
+  5 paddle adjust:
+  4 paddle adjust:
+  3 paddle adjust:
+  2 paddle adjust:
+  1 paddle adjust:
+  0
+    ==>dec 18131-20450 == acc  6860-18726
+```
 

@@ -84,13 +84,13 @@ bool SDCard::open_log_file() {
       dataFile = SD.open(carState.LogFilename.c_str(), FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE
       xSemaphoreGive(spiBus.mutex);
       if (dataFile != 0) {
-        console << "Log file opend for append.\n";
+        console << "     Log file opend for append.\n";
         return true;
       }
-      console << "ERROR opening '" << carState.LogFilename << "'\n";
+      console << "     ERROR opening '" << carState.LogFilename << "'\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      console << "ERROR opening '" << carState.LogFilename << "': " << ex.what() << "\n";
+      console << "     ERROR opening '" << carState.LogFilename << "': " << ex.what() << "\n";
     }
   }
   return false;
@@ -108,10 +108,10 @@ void SDCard::unmount() {
       dataFile.close();
       SD.end();
       xSemaphoreGive(spiBus.mutex);
-      console << "Log file closed.\n";
+      console << "     Log file closed.\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      console << "ERROR closing log file: " << ex.what() << "\n";
+      console << "     ERROR closing log file: " << ex.what() << "\n";
     }
   }
   if (isMounted()) {
@@ -119,10 +119,10 @@ void SDCard::unmount() {
       xSemaphoreTakeT(spiBus.mutex);
       SD.end();
       xSemaphoreGive(spiBus.mutex);
-      console << "SD card unmounted.\n";
+      console << "     SD card unmounted.\n";
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
-      console << "ERROR unmounting SD card: " << ex.what() << "\n";
+      console << "     ERROR unmounting SD card: " << ex.what() << "\n";
     }
     mounted = false;
   }
@@ -182,7 +182,7 @@ void SDCard::write(string msg) {
     } catch (exception &ex) {
       xSemaphoreGive(spiBus.mutex);
       mounted = false; // prepare for complete re_init
-      console << "ERROR writing SD card: " << ex.what() << "\n";
+      console << "     ERROR writing SD card: " << ex.what() << "\n";
     }
   }
 }

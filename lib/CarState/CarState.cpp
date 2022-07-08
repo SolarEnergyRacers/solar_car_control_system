@@ -92,13 +92,17 @@ bool CarState::initalize_config() {
   return true;
 }
 
+const char *getCleanString(string str) {
+  replace(str.begin(), str.end(), '\n', '.');
+  return str.c_str();
+}
+
 const string CarState::print(string msg, bool withColors) {
   time_t theTime = time(NULL);
   struct tm t = *localtime(&theTime);
 
   stringstream ss(msg);
-  string tempStr = DriverInfo;
-  replace(tempStr.begin(), tempStr.end(), '\n', ' ');
+  string tempStr = getCleanString(DriverInfo);
   ss << "====SER4 Car Status====" << VERSION << "==";
   ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
   ss << "====uptime:" << getTimeStamp(millis() / 1000) << "s====" << asctime(&t) << "==";
@@ -133,7 +137,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "------------------------" << endl;
   ss << "Indicator ............. " << INDICATOR_str[(int)(Indicator)] << endl;
   ss << "Constant Mode On ...... " << BOOL_str[(int)(ConstantModeOn)] << endl;
-  ss << "Constant Mode ......... " << CONSTANT_MODE_str[(int)(ConstantMode)] << endl;
+  ss << "Constant Mode ......... " << CONSVTANT_MODE_str[(int)(ConstantMode)] << endl;
   ss << "Target Speed .......... " << TargetSpeed << endl;
   ss << "Target Power .......... " << TargetPower << endl;
   ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;
@@ -181,6 +185,7 @@ const string CarState::serialize(string msg) {
   struct tm t = *localtime(&theTime);
   string timeStamp = asctime(&t);
   timeStamp.erase(timeStamp.end() - 1);
+  string tempStr = getCleanString(DriverInfo);
 
   cJSON *carData = cJSON_CreateObject();
   cJSON *dynData = cJSON_CreateObject();
@@ -224,7 +229,7 @@ const string CarState::serialize(string msg) {
   cJSON_AddStringToObject(ctrData, "constantMode", CONSTANT_MODE_str[(int)(ConstantMode)]);
   cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed);
   cJSON_AddNumberToObject(ctrData, "targetPower", TargetPower);
-  cJSON_AddStringToObject(ctrData, "driverInfo", fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str()).c_str());
+  cJSON_AddStringToObject(ctrData, "driverInfo", fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], tempStr).c_str());
   cJSON_AddStringToObject(ctrData, "speedArrow", SPEED_ARROW_str[(int)SpeedArrow]);
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
   cJSON_AddBoolToObject(dynData, "greenLight", GreenLight);
@@ -238,6 +243,7 @@ const string CarState::csv(string msg, bool withHeader) {
   struct tm t = *localtime(&theTime);
   string timeStamp = asctime(&t);
   timeStamp.erase(timeStamp.end() - 1);
+  string tempStr = getCleanString(DriverInfo);
 
   stringstream ss(msg);
   if (withHeader) {
@@ -324,8 +330,10 @@ const string CarState::csv(string msg, bool withHeader) {
 
   ss << INDICATOR_str[(int)(Indicator)] << ", ";
   ss << DRIVE_DIRECTION_str[(int)(DriveDirection)] << ", ";
-  ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
-  ss << BOOL_str[(int)(SdCardDetect)] << ", ";
+   // ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
+  ss << ConstantModeOn << ", ";
+  // ss << BOOL_str[(int)(SdCardDetect)] << ", ";
+  ss << SdCardDetect << ", ";
 
   ss << DISPLAY_STATUS_str[(int)displayStatus] << ", ";
   ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
@@ -334,13 +342,12 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << Ki << ", ";
   ss << Kd << ", ";
   ss << TargetPower << ", ";
-  string field = DriverInfo.replace(DriverInfo.begin(), DriverInfo.end(), '\n', ' ');
-  ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], field) << ", ";
+  ss << fmt::format("\"{}: {}\"", INFO_TYPE_str[(int)DriverInfoType], tempStr) << ", ";
   ss << SPEED_ARROW_str[(int)SpeedArrow] << ", ";
   ss << LIGHT_str[(int)(Light)] << ", ";
   ss << GreenLight << ", ";
   ss << Fan << ", ";
-  ss << printIOs("", false).c_str() << ", ";
+  ss << printIOs("", false).c_str();
   ss << endl;
   return ss.str();
 }

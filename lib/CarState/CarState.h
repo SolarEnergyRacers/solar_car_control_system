@@ -27,7 +27,7 @@ enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
 static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
 
 enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
-static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
+static const char *SPEED_ARROW_str[] = {"OFF", "INCREASE", "DECREASE"};
 
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
 static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
@@ -252,7 +252,7 @@ public:
   // [Dynamic]
   int PaddleDamping;        // = 10;         // 0...99
   int PaddleOffset;         // = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
-  int PaddleAdjustCounter;  // = 20;   // about seconds§
+  int PaddleAdjustCounter;  // = 24;   // about seconds
   float ConstSpeedIncrease; // = 1.0; // [km/h] per click
   float ConstPowerIncrease; // = 1.0; // [W] per click
 
@@ -260,7 +260,7 @@ public:
   int I2CFrequence;             // = 200;       // [kHz]
   int CarDataLogPeriod;         // = 1000;  // [ms]
   int Serial1Baudrate = 115200; // baud
-  int Serial2Baudrate = 115200; // baud
+  int Serial2Baudrate = 9600;   // baud
 
   // [Telemetry]
   int SendInterval;     // = 1000;    // [ms]

@@ -123,8 +123,6 @@ bool CarControl::read_speed() {
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    // XXXXXX
-    // console << "Break Pedal Pressed (paddle control)\n";
     _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
     return true;
   }
@@ -201,8 +199,7 @@ void CarControl::adjust_paddles(int seconds) {
   int cycles = (seconds);
   if (cycles < 1)
     cycles = 1;
-  string s("    adjust...");
-  console << s;
+  string s("    adjust: ");
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
     carState.DriverInfo = s;
   } else {
@@ -216,7 +213,7 @@ void CarControl::adjust_paddles(int seconds) {
     if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
       carState.DriverInfo = s;
     } else {
-      engineerDisplay.write_ganz_99(x + 2, y, cycles + 1, cycles, 1, false, ILI9341_BLUE, ILI9341_ORANGE);
+      engineerDisplay.write_ganz_99(x + 2, y, cycles + 1, cycles, 1, true, ILI9341_BLUE, ILI9341_WHITE);
     }
 
 #if ADC_ON

@@ -128,6 +128,8 @@ string msg;
 
 void app_main(void) {
 
+console << "\n";
+
 #if SERIAL_RADIO_ON
   // init console IO and radio console
   Uart uart; // SERIAL
@@ -196,7 +198,6 @@ void app_main(void) {
   // ioExt.readAndHandlePins(PinHandleMode::FORCED);
   // console << carState.printIOs("", true, false) << "\n";
 
-  console << "-1----------------------------------\n";
 #if SD_ON
   msg = sdCard.init();
   console << msg << "\n";
@@ -204,11 +205,8 @@ void app_main(void) {
 #endif
 
   //--- SD card available ----------------------------
-  console << "-2----------------------------------\n";
   carState.init_values();
-  console << "-3----------------------------------\n";
   sdCard.open_log_file();
-  console << "-4----------------------------------\n";
   //------from now config ini values can be used------
 
 #if COMMANDHANDLER_ON
@@ -326,7 +324,7 @@ void app_main(void) {
   engineerDisplay.print(msg + "\n");
 #endif
 #if COMMANDHANDLER_ON
-  msg = cmdHandler.create_task();
+  msg = cmdHandler.create_task(20, 350, 6000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif

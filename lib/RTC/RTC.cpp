@@ -126,6 +126,31 @@ RtcDateTime RTC::read_rtc_datetime(void) {
   return now;
 }
 
+void RTC::write_rtc_datetime(RtcDateTime dateTime) {
+  RtcDateTime now;
+  // check connection & confidence
+  xSemaphoreTakeT(i2cBus.mutex);
+  bool isValid = Rtc.IsDateTimeValid();
+  xSemaphoreGive(i2cBus.mutex);
+  if (!isValid) {
+    uint8_t lastError = Rtc.LastError();
+    xSemaphoreGive(i2cBus.mutex);
+    if (lastError != 0) {
+      // report
+      console << "     ERROR: RTC i2c communications error: " << Rtc.LastError() << "\n";
+    } else {
+      // Common Causes:
+      //   - the battery on the device is low or even missing and the power line
+      //   was disconnected
+      console << "     ERROR: RTC lost confidence in the datetime\n";
+    }
+  }
+  // set datetime
+  xSemaphoreTakeT(i2cBus.mutex);
+  Rtc.SetDateTime(dateTime);
+  xSemaphoreGive(i2cBus.mutex);
+}
+
 void RTC::task() {
 
   while (1) {

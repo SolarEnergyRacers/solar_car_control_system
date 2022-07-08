@@ -22,10 +22,10 @@ public:
   void task(void);
 
   // Class functions and members
-  string commands = "!-:<>CcDdEFGHiIJklLMPRsSUuVvw";
+  string commands = "!-:<>CcDdEFGHiIJklLMPRsStTUuVvw";
   string helpText = "Available commands (" + commands +
                     "):\n"
-                    "\t-------- SYSTEM COMMANDS -----------\n"
+                    "\t-------- SYSTEM COMMANDS -------------------------\n"
                     "\tR          - reset and reinit driver display\n"
                     "\tC          - switch to console screen\n"
                     "\tE          - switch to engineer screen\n"
@@ -40,11 +40,13 @@ public:
                     "\tU          - unmount sdcard and disable logging\n"
                     "\tH          - memory_info\n"
                     "\tk kp ki kd - update PID constants\n"
+                    "\tt          - get date and time\n"
+                    "\tT yyyy mm dd hh MM - set RTC date and time\n"
                     "\tI          - scan I2C devices\n"
                     "\ti [|i|o|R] - read IOs (i|o-show in|out continously, R-reinit)\n"
                     "\tG [-]      - Green light on  (-:off)\n"
                     "\tF [-]      - Fan on  (-:off)\n"
-                    "\t-------- DRIVER_RUNNING INFO COMMANDS -----------\n"
+                    "\t-------- DRIVER INFO COMMANDS --------------------\n"
                     "\t:<text>    - display driver info text\n"
                     "\t!<text>    - display driver warn text\n"
                     "\tu [-]      - green speed up arrow (-:off)\n"

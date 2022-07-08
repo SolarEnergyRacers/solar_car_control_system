@@ -330,7 +330,7 @@ const string CarState::csv(string msg, bool withHeader) {
 
   ss << INDICATOR_str[(int)(Indicator)] << ", ";
   ss << DRIVE_DIRECTION_str[(int)(DriveDirection)] << ", ";
-   // ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
+  // ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
   ss << ConstantModeOn << ", ";
   // ss << BOOL_str[(int)(SdCardDetect)] << ", ";
   ss << SdCardDetect << ", ";

@@ -102,6 +102,7 @@ PWM pwm;
 #endif
 #if RTC_ON
 RTC rtc;
+ESP32Time esp32time;
 #endif
 #if DAC_ON
 DAC dac;
@@ -111,9 +112,6 @@ CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
 #endif
 #if CARSPEED_ON
 CarSpeed carSpeed;
-#endif
-#if RTC_ON
-ESP32Time esp32time;
 #endif
 
 bool startOk = true;
@@ -128,7 +126,7 @@ string msg;
 
 void app_main(void) {
 
-console << "\n";
+  console << "\n";
 
 #if SERIAL_RADIO_ON
   // init console IO and radio console

@@ -17,7 +17,9 @@
 #include <freertos/task.h>
 
 #include <Arduino.h>
+#include <ESP32Time.h>
 #include <I2CBus.h>
+#include <RtcDateTime.cpp>
 #include <Wire.h> // I2C
 
 #include <ADC.h>
@@ -35,6 +37,7 @@
 #include <IOExt.h>
 #include <IOExtHandler.h>
 #include <Indicator.h>
+#include <RTC.h>
 #include <SDCard.h>
 #include <system.h>
 
@@ -55,6 +58,10 @@ extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 extern SDCard sdCard;
 extern Console console;
+#if RTC_ON
+extern RTC rtc;
+extern ESP32Time esp32time;
+#endif
 
 using namespace std;
 
@@ -200,6 +207,33 @@ void CmdHandler::task() {
           console << "Car speed control deactivated\n";
 #endif
         break;
+        case 't': {
+          time_t theTime = time(NULL);
+          struct tm t = *localtime(&theTime);
+          console << "DateTime: " << asctime(&t) << "\n";
+        } break;
+        case 'T': {
+#if RTC_ON
+          string arr[6];
+          splitString(arr, &input[1]);
+          int yy = atof(arr[0].c_str());
+          int mm = atof(arr[1].c_str());
+          int dd = atof(arr[2].c_str());
+          int hh = atof(arr[3].c_str());
+          int MM = atof(arr[4].c_str());
+          int ss = atof(arr[5].c_str());
+          uint16_t days = DaysSinceFirstOfYear2000<uint16_t>(yy, mm, dd);
+          uint64_t seconds = SecondsIn<uint64_t>(days, hh, MM, ss);
+          RtcDateTime dateTime = RtcDateTime(seconds);
+          rtc.write_rtc_datetime(dateTime);
+          esp32time.setTime(ss, MM, hh, dd, mm, yy);
+          time_t theTime = time(NULL);
+          struct tm t = *localtime(&theTime);
+          console << "Set dateTime to: " << asctime(&t) << "\n";
+#else
+          console << "RTC deactivated\n";
+#endif
+        } break;
         case '-':
           console << "Received: " << input << " -->  carControl.adjust_paddles(" << carState.PaddleAdjustCounter << ")\n";
           carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)

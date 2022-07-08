@@ -29,6 +29,7 @@ private:
 
 public:
   RtcDateTime read_rtc_datetime(void);
+  void write_rtc_datetime(RtcDateTime dateTime);
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_RTC_H

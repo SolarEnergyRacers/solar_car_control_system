@@ -87,32 +87,40 @@ void hornHandler() {
 void lightHandler() {
   int value = carState.getPin(PinLight)->value;
   if (value == 0) {
-    console << "Light toggle\n";
-    ;
     if (carState.Light == LIGHT::L1) {
       carState.Light = LIGHT::OFF;
-      carState.getPin(PinLightOut)->value = 0;
-      carState.getPin(PinHeadLightOut)->value = 0;
     } else {
       carState.Light = LIGHT::L1;
-      carState.getPin(PinLightOut)->value = 1;
     }
+    light_switch();
   }
 }
-
 void headLightHandler() {
   int value = carState.getPin(PinHeadLight)->value;
   if (value == 0) {
-    console << "Drive Light toggle\n";
     if (carState.Light == LIGHT::L2) {
       carState.Light = LIGHT::L1;
-      carState.getPin(PinLightOut)->value = 1;
-      carState.getPin(PinHeadLightOut)->value = 0;
     } else {
       carState.Light = LIGHT::L2;
-      carState.getPin(PinLightOut)->value = 1;
-      carState.getPin(PinHeadLightOut)->value = 1;
     }
+  }
+  light_switch();
+}
+void light_switch() {
+  console << "Light toggle\n";
+  switch (carState.Light) {
+  case LIGHT::OFF:
+    carState.getPin(PinLightOut)->value = 0;
+    carState.getPin(PinHeadLightOut)->value = 0;
+    break;
+  case LIGHT::L1:
+    carState.getPin(PinLightOut)->value = 1;
+    carState.getPin(PinHeadLightOut)->value = 0;
+    break;
+  case LIGHT::L2:
+    carState.getPin(PinLightOut)->value = 1;
+    carState.getPin(PinHeadLightOut)->value = 1;
+    break;
   }
 }
 

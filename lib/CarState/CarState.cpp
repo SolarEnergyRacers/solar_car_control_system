@@ -137,7 +137,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "------------------------" << endl;
   ss << "Indicator ............. " << INDICATOR_str[(int)(Indicator)] << endl;
   ss << "Constant Mode On ...... " << BOOL_str[(int)(ConstantModeOn)] << endl;
-  ss << "Constant Mode ......... " << CONSVTANT_MODE_str[(int)(ConstantMode)] << endl;
+  ss << "Constant Mode ......... " << CONSTANT_MODE_str[(int)(ConstantMode)] << endl;
   ss << "Target Speed .......... " << TargetSpeed << endl;
   ss << "Target Power .......... " << TargetPower << endl;
   ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;

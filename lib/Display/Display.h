@@ -69,6 +69,7 @@ public:
   int write_ganz_99(int x, int y, int valueLast, int value, int textSize, bool justInited = false, int color = ILI9341_ORANGE,
                     int bgColor = ILI9341_BLACK);
   void getCursor(int &x, int &y);
+  void setCursor(int x, int y);
   void clear_screen(int bgColor);
   int getPixelWidthOfTexts(int textSize, string t1, string t2);
 

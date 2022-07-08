@@ -52,6 +52,7 @@ void CarState::init_values() {
   Light = LIGHT::OFF;
   GreenLight = false;
   Fan = false;
+  LogFilename = "/SER4log.CSV";
 
   // read from ser4config.ini file
   initalize_config();

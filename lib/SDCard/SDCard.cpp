@@ -38,29 +38,19 @@ string SDCard::init() {
   bool hasError = false;
   console << "[  ] Init 'SDCard'...\n";
 
-  if (!mount()) {
+  if (!mount())
     hasError = true;
-  } else {
-    console << fmt::format("     Open '{}' (append)...", carState.LogFilename);
 
-    if (open_log_file()) {
-      write(carState.csv("Initial State", true));
-      console << "    ok.\n";
-      driverDisplay.print("    SD Card mounted.\n");
-    } else {
-      console << "    failed.\n";
-    }
-  }
   return fmt::format("[{}] SDCard initialized.", hasError ? "--" : "ok");
 }
 
 bool SDCard::mount() {
   if (sdCard.isMounted()) {
-    console << "     SD card already mounted.\n";
     return true;
   }
   if (!carState.SdCardDetect) {
     ioExt.readAllPins();
+    carState.SdCardDetect = carState.getPin(PinSdCardDetect)->value == 1;
   }
   if (!carState.SdCardDetect) {
     console << "     No SD card detected!\n";

@@ -206,6 +206,7 @@ void CarControl::adjust_paddles(int seconds) {
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
     carState.DriverInfo = s;
   } else {
+    engineerDisplay.setCursor(4, 70);
     engineerDisplay.print(s.c_str());
     engineerDisplay.getCursor(x, y);
   }
@@ -215,7 +216,7 @@ void CarControl::adjust_paddles(int seconds) {
     if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
       carState.DriverInfo = s;
     } else {
-      engineerDisplay.write_ganz_99(x, y, cycles + 1, cycles, 1, false, ILI9341_BLUE, ILI9341_ORANGE);
+      engineerDisplay.write_ganz_99(x + 2, y, cycles + 1, cycles, 1, false, ILI9341_BLUE, ILI9341_ORANGE);
     }
 
 #if ADC_ON

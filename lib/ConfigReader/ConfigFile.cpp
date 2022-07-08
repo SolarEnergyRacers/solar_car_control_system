@@ -30,8 +30,8 @@ string trim(string const &source, char const *delims = " \t\r\n") {
 }
 
 ConfigFile::ConfigFile(string const &configFile) {
+  console << "Start reading CONFIG.INI:" << configFile << "\n";
   if (sdCard.mount()) {
-    console << "Start reading CONFIG.INI:" << configFile << "\n";
     try {
       ifstream file(configFile, ios_base::in);
       string inSection = "UNKNOWN";

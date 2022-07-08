@@ -144,6 +144,12 @@ void Display::getCursor(int &x, int &y) {
   xSemaphoreGive(spiBus.mutex);
 }
 
+void Display::setCursor(int x, int y) {
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.setCursor(x, y);
+  xSemaphoreGive(spiBus.mutex);
+}
+
 //------------------------------------------------------------------------
 void Display::setupScrollArea(uint16_t TFA, uint16_t BFA) {
   xSemaphoreTakeT(spiBus.mutex);

@@ -10,7 +10,21 @@
 
 ### Emergency Controls
 
+TODO: DESCRIBE IT!
+
 ### Switch Board
+
+
+| Switch Name | Function (what is switched)        | Driver Screen | Engineer Screen |
+| ------------- | ------------------------------------ | --------------- | ----------------- |
+| 12V on/off  | Main switch for controller.        | no            | no              |
+| MC on/off   | Montor controller                  | yes           | yes             |
+| Batt on/off | Battery                            | yes           | yes             |
+| PV on/off   | Photo Voltaic                      | yes           | yes             |
+| Fwd/Bwd     | Drive direction forward / backward | yes           | no              |
+| Eco/Pwr     | Drive mode econimically / power    | yes           | no              |
+| Spare2      | %                                  | %             | %               |
+| Spare1      | Rear view power on off             | no            | no              |
 
 ### Steering Wheel
 

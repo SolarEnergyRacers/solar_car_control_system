@@ -113,7 +113,7 @@ void IOExt::setPort(int port, bool value) {
   xSemaphoreTakeT(i2cBus.mutex);
   ioExt.IOExtDevs[devNr].digitalWrite(pinNr, value ? 1 : 0);
   xSemaphoreGive(i2cBus.mutex);
-  if (verboseModeOut) {
+  if (verboseModeDigitalOut) {
     CarStatePin *pin = carState.getPin(devNr, pinNr);
     console << fmt::format("Set BOOL -- 0x{:02x}, [{:x}|{:x}]: {} --> {}, inited: {:5}  <-- {:18s} \t({}ms)\n", pin->port, devNr, pinNr,
                            pin->oldValue, pin->value, pin->inited, pin->name, millis());
@@ -152,7 +152,7 @@ void IOExt::readAllPins() {
       }
     }
   }
-  if (verboseModeIn) {
+  if (verboseModeDigitalIn) {
     console << fmt::format("IOExt ({}ms)\t", millis()) << carState.printIOs("", true, false) << "\n";
   }
 }

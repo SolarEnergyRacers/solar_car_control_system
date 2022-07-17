@@ -124,6 +124,12 @@ void ADC::task() {
     carState.STW_ACC = read(STW_ACC);
     carState.STW_DEC = read(STW_DEC);
 
+    if (verboseModeADC) {
+      console << fmt::format("{:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d}\n", carState.MOTOR_SPEED,
+                             carState.BAT_CURRENT, carState.MOTOR_CURRENT, carState.PV_CURRENT, carState.BAT_VOLTAGE,
+                             carState.MOTOR_VOLTAGE, carState.REFERENCE_CELL, carState.STW_ACC, carState.STW_DEC);
+    }
+
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

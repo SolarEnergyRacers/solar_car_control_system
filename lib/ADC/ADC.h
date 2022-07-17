@@ -52,6 +52,7 @@ public:
 
   int16_t read(Pin port);
   float get_multiplier(Pin port);
+  bool verboseModeADC = false;
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_ADC_H

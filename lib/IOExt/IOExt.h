@@ -78,8 +78,8 @@ public:
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
-  bool verboseModeIn = false;
-  bool verboseModeOut = false;
+  bool verboseModeDigitalIn = false;
+  bool verboseModeDigitalOut = false;
 
 private:
   // bool isInInterruptHandler = false;

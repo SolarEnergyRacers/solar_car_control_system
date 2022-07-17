@@ -173,11 +173,17 @@ void CmdHandler::task() {
           break;
         case 'i':
           if (input[1] == 'i') {
-            ioExt.verboseModeIn = !ioExt.verboseModeIn;
-            console << "Received: " << input << " -->  set ioExt.verboseModeIn: " << ioExt.verboseModeIn << "\n";
+            ioExt.verboseModeDigitalIn = !ioExt.verboseModeDigitalIn;
+            console << "Received: " << input << " -->  set verboseModeDigitalIn: " << ioExt.verboseModeDigitalIn << "\n";
           } else if (input[1] == 'o') {
-            ioExt.verboseModeOut = !ioExt.verboseModeOut;
-            console << "Received: " << input << " -->  set ioExt.verboseModeOut: " << ioExt.verboseModeOut << "\n";
+            ioExt.verboseModeDigitalOut = !ioExt.verboseModeDigitalOut;
+            console << "Received: " << input << " -->  set verboseModeDigitalOut: " << ioExt.verboseModeDigitalOut << "\n";
+          } else if (input[1] == 'a') {
+            adc.verboseModeADC = !adc.verboseModeADC;
+            console << "Received: " << input << " -->  set verboseModeADC: " << adc.verboseModeADC << "\n";
+          } else if (input[1] == 'd') {
+            dac.verboseModeDAC = !dac.verboseModeDAC;
+            console << "Received: " << input << " -->  set verboseModeDAC: " << dac.verboseModeDAC << "\n";
           } else if (input[1] == 'R') {
             console << "Received: " << input << " -->  ioExt.re_init()\n";
             msg = ioExt.re_init();

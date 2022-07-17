@@ -121,6 +121,12 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     }
     Wire.endTransmission();
     xSemaphoreGive(i2cBus.mutex);
+    if (verboseModeDAC) {
+      console << fmt::format("{:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d}\n", carState.MOTOR_SPEED,
+                             carState.BAT_CURRENT, carState.MOTOR_CURRENT, carState.PV_CURRENT, carState.BAT_VOLTAGE,
+                             carState.MOTOR_VOLTAGE, carState.REFERENCE_CELL, carState.STW_ACC, carState.STW_DEC);
+    }
+
     // console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command,
     //                         val, get_pot(channel));
   }

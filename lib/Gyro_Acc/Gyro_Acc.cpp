@@ -10,7 +10,7 @@
 #include <stdio.h>
 #include <string>
 
-#include <BMI088.h> // gyro & acc lib
+#include <BMI088.h>
 #include <Console.h>
 #include <Gyro_Acc.h>
 #include <I2CBus.h>
@@ -18,21 +18,28 @@
 extern I2CBus i2cBus;
 extern Console console;
 
-void GyroAcc::re_init() { init(); }
+string GyroAcc::re_init() { return init(); }
 
-void GyroAcc::init(void) {
+string GyroAcc::init(void) {
+  bool hasError = false;
+  console << "[  ] Init GyroAcc...\n";
   // check connection & report
   if (bmi088.isConnection()) {
-    console << "[BMI088] is connected\n";
-
+    console << "     BMI088 is connected\n";
     // init sensor
     bmi088.initialize();
-    console << "[BMI088] is initialized\n";
-
+    console << "     BMI088 is initialized\n";
   } else {
-    console << "[BMI088] is not connected\n";
+    console << "     BMI088 is not connected\n";
+    hasError = true;
   }
+  return fmt::format("[{}] GyroAcc initialized.", hasError ? "--" : "ok");
 }
+
+void GyroAcc::exit(void) {
+  // TODO
+}
+// -----------------
 
 Float3D GyroAcc::read_gyroscope(void) {
   // allocate struct
@@ -74,7 +81,7 @@ void GyroAcc::task() {
       // console << fmt::sprintf("[BMI088] ax=%f, ay=%f, az=%f\n", acc.x, acc.y, acc.z);
     }
 
-    // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    // sleep
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

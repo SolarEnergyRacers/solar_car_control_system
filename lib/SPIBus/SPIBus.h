@@ -13,8 +13,8 @@ private:
 public:
   SemaphoreHandle_t mutex = NULL;
   SPIClass spi;
-  void init();
-  void re_init();
+  string init();
+  string re_init();
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_SPIBUS_H

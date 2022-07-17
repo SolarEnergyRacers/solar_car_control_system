@@ -26,21 +26,23 @@
 extern Console console;
 extern PID pid;
 extern CarSpeed carSpeed;
-// extern ADC adc;
+#if DAC_ON
 extern DAC dac;
+#endif
 extern CarState carState;
 
 // ------------------
 // FreeRTOS functions
 
-void CarSpeed::re_init() { init(); }
+string CarSpeed::re_init() { return init(); }
 
-void CarSpeed::init() {
+string CarSpeed::init() {
+  bool hasError = false;
+  console << "[  ] Init 'CarSpeed'...\n";
   target_speed = 0;
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
-  sleep_polling_ms = 400;
-  console << "[v]" << getName() << " initialized.\n";
+  return fmt::format("[{}] CarSpeed initialized.", hasError ? "--" : "ok");
 }
 
 void CarSpeed::exit(void) { set_target_speed(0); }
@@ -66,7 +68,7 @@ double CarSpeed::get_current_speed() {
   float voltage = value * 5.0 / 65536; // TODO: check if we really use 16bit ADS1115
 
   // convert value from voltage to revolutions per minute: 370rpm / V
-  float wheel_circumference = 1.0; // TODO: set circumference = diameter*pi, in meters
+  float wheel_circumference = 1.76; // TODO: set circumference = diameter*pi, in meters
   return (double)370 * wheel_circumference / 60.0;
 }
 
@@ -110,7 +112,7 @@ void CarSpeed::task() {
         console << fmt::format("WARN::PID dejustified {} > {}!\n", output_setpoint, DAC_MAX);
         output_setpoint = DAC_MAX;
       }
-
+#if DAC_ON
       // set acceleration & deceleration
       if (output_setpoint >= 0) {
         //   carState.Acceleration = output_setpoint; // acceleration
@@ -127,9 +129,7 @@ void CarSpeed::task() {
         console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
                 << "\n";
       }
-      // TODO: replace dac.set_pot with carControl functions
-
-      console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint << "\n";
+#endif
     }
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

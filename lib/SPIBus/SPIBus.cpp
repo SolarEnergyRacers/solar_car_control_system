@@ -18,10 +18,11 @@
 extern Console console;
 using namespace std;
 
-void SPIBus::re_init() { init(); }
+string SPIBus::re_init() { return init(); }
 
-void SPIBus::init(void) {
-  console << "[?] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "\n";
+string SPIBus::init(void) {
+  bool hasError = false;
+  console << "[  ] Init 'SPI bus' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI << ", SPI_MISO=" << SPI_MISO << "...\n";
 
   mutex = xSemaphoreCreateMutex();
   spi = SPIClass(VSPI);
@@ -37,5 +38,5 @@ void SPIBus::init(void) {
   xSemaphoreGive(mutex);
   // // CRITICAL SECTION SPI: end
 
-  console << "[v] SPI inited.\n";
+  return fmt::format("[{}] SPIBus initialized.", hasError ? "--" : "ok");
 }

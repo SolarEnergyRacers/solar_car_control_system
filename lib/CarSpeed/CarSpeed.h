@@ -11,6 +11,21 @@
 
 class CarSpeed : public abstract_task {
 private:
+  uint32_t sleep_polling_ms;
+
+public:
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+
+  // RTOS task
+  string getName(void) { return "CarSpeed"; };
+  string init(void);
+  string re_init(void);
+  void exit(void);
+  void task(void);
+
+  // Class functions and members
+private:
   double input_value;
   double output_setpoint;
   double target_speed;
@@ -21,11 +36,6 @@ private:
   PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
 
 public:
-  string getName(void) { return "CarSpeed"; };
-  void init(void);
-  void re_init(void);
-  void exit(void);
-  void task(void);
   void set_target_speed(double speed);
   double get_target_speed();
   double get_current_speed(); // speed in m/s

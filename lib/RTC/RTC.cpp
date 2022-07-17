@@ -27,86 +27,102 @@ extern DriverDisplay driverDisplay;
 // ------------------
 // FreeRTOS functions
 
-void RTC::re_init() { init(); }
+string RTC::re_init() { return init(); }
 
-void RTC::exit() {
-  // TODO
-}
-
-void RTC::init(void) {
-  string s;
-  console << "[?] Init 'RTC'...\n";
+string RTC::init(void) {
+  bool hasError = false;
+  console << "[  ] Init 'RTC'...\n";
+  console << fmt::format("     DS1307_ADDRESS {:02x}\n", DS1307_ADDRESS);
   // print compile time
   RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  s = fmt::format("    [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}", compiled.Month(), compiled.Day(),
-                  compiled.Year(), compiled.Hour(), compiled.Minute(), compiled.Second());
-  console << s << "\n";
+  console << fmt::format("     [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}\n", compiled.Month(), compiled.Day(),
+                         compiled.Year(), compiled.Hour(), compiled.Minute(), compiled.Second());
   xSemaphoreTakeT(i2cBus.mutex);
   Rtc.Begin();
-
   // check validity and possibly update time
-  if (!Rtc.IsDateTimeValid()) {
+  bool isValid = Rtc.IsDateTimeValid();
+  xSemaphoreGive(i2cBus.mutex);
+  if (!isValid) {
     // check & report error
-    if (Rtc.LastError() != 0) {
-      console << "    [INFO] rtc Communication error " << Rtc.LastError() << "\n";
+    xSemaphoreTakeT(i2cBus.mutex);
+    uint8_t lastError = Rtc.LastError();
+    xSemaphoreGive(i2cBus.mutex);
+    if (lastError != 0) {
+      console << "     [INFO] rtc Communication error " << Rtc.LastError() << "\n";
     } else {
       // Common Causes:
       //    1) first time you ran and the device wasn't running yet
       //    2) the battery on the device is low or even missing
-      console << "    [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n";
+      console << "     [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n";
+      xSemaphoreTakeT(i2cBus.mutex);
       Rtc.SetDateTime(compiled);
+      xSemaphoreGive(i2cBus.mutex);
     }
   }
   // ------------------
 
   // start device
-  if (!Rtc.GetIsRunning()) {
-    console << "    [INFO] rtc was not actively running, starting now\n";
+  xSemaphoreTakeT(i2cBus.mutex);
+  bool isRunning = Rtc.GetIsRunning();
+  xSemaphoreGive(i2cBus.mutex);
+  if (!isRunning) {
+    console << "     [INFO] rtc was not actively running, starting now\n";
+    xSemaphoreTakeT(i2cBus.mutex);
     Rtc.SetIsRunning(true);
+    xSemaphoreGive(i2cBus.mutex);
   }
 
   // check time
+  xSemaphoreTakeT(i2cBus.mutex);
   RtcDateTime now = Rtc.GetDateTime();
+  xSemaphoreGive(i2cBus.mutex);
   if (now < compiled) {
-    console << "   [INFO] rtc time older than compile time! Updating DateTime.\n";
+    console << "     [INFO] rtc time older than compile time! Updating DateTime.\n";
+    xSemaphoreTakeT(i2cBus.mutex);
     Rtc.SetDateTime(compiled);
+    xSemaphoreGive(i2cBus.mutex);
   } else if (now > compiled) {
-    console << "   [INFO] rtc time newer than compile time.\n";
+    console << "     [INFO] rtc time newer than compile time. Updating esp32time DateTime.\n";
+    esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
   } else if (now == compiled) {
-    console << "   [INFO] rtc time equal to compile time.\n";
+    console << "     [INFO] rtc time equal to compile time.\n";
   }
 
   // set pin
+  xSemaphoreTakeT(i2cBus.mutex);
   Rtc.SetSquareWavePin(DS1307SquareWaveOut_Low);
-
   xSemaphoreGive(i2cBus.mutex);
 
-  set_SleepTime(1000);
-  s = "[v] Init 'RTC' inited\n";
-  console << s;
-  driverDisplay.print(s.c_str());
+  return fmt::format("[{}] RTC initialized.", hasError ? "--" : "ok");
+}
+
+void RTC::exit() {
+  // TODO
 }
 
 RtcDateTime RTC::read_rtc_datetime(void) {
   RtcDateTime now;
-  xSemaphoreTakeT(i2cBus.mutex);
   // check connection & confidence
-  if (!Rtc.IsDateTimeValid()) {
-    if (Rtc.LastError() != 0) {
+  xSemaphoreTakeT(i2cBus.mutex);
+  bool isValid = Rtc.IsDateTimeValid();
+  xSemaphoreGive(i2cBus.mutex);
+  if (!isValid) {
+    uint8_t lastError = Rtc.LastError();
+    xSemaphoreGive(i2cBus.mutex);
+    if (lastError != 0) {
       // report
-      console << "[RTC] i2c communications error: " << Rtc.LastError() << "\n";
+      console << "     ERROR: RTC i2c communications error: " << Rtc.LastError() << "\n";
     } else {
       // Common Causes:
       //   - the battery on the device is low or even missing and the power line
       //   was disconnected
-      console << "[RTC] lost confidence in the datetime\n";
+      console << "     ERROR: RTC lost confidence in the datetime\n";
     }
   }
   // get datetime
+  xSemaphoreTakeT(i2cBus.mutex);
   now = Rtc.GetDateTime();
-
   xSemaphoreGive(i2cBus.mutex);
-
   return now;
 }
 
@@ -114,15 +130,11 @@ void RTC::task() {
 
   while (1) {
 
-    // get date & time
-    RtcDateTime now = read_rtc_datetime();
-    // debug_printf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
-    //              now.Second());
-    console << fmt::sprintf("[RTC] current datetime: %02u/%02u/%04u %02u:%02u:%02u\n", now.Month(), now.Day(), now.Year(), now.Hour(),
-                            now.Minute(), now.Second());
-    // setTime(30, 24, 15, 17, 1, 2021); // 17th Jan 2021 15:24:30
-    esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year()); // 17th Jan 2021 15:24:30
-    // sleep for 1s
+    // RtcDateTime now = read_rtc_datetime();
+
+    // // setTime(30, 24, 15, 17, 1, 2021); // 17th Jan 2021 15:24:30
+    // esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year()); // 17th Jan 2021 15:24:30
+
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

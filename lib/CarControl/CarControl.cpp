@@ -21,22 +21,26 @@
 #include <EngineerDisplay.h>
 #include <Helper.h>
 #include <I2CBus.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <MCP23017.h>
 #include <SDCard.h>
 
+#if ADC_ON
 extern ADC adc;
+#endif
 extern CarControl carControl;
 extern CarSpeed carSpeed;
 extern CarState carState;
 extern Console console;
+#if DAC_ON
 extern DAC dac;
+#endif
 extern DriverDisplay driverDisplay;
 extern EngineerDisplay engineerDisplay;
 extern I2CBus i2cBus;
 extern Indicator indicator;
-extern IOExt2 ioExt;
+extern IOExt ioExt;
 extern SDCard sdCard;
 
 using namespace std;
@@ -46,52 +50,61 @@ unsigned long millisNextStamp = millis();
 // ------------------
 // FreeRTOS functions
 
-void CarControl::re_init() { init(); }
+string CarControl::re_init() { return init(); }
 
-void CarControl::init() {
-  console << "[?] Setup '" << getName() << "'...\n";
+string CarControl::init() {
+  bool hasError = false;
+  console << "[  ] Init 'CarControl'... ";
   justInited = true;
-  mutex = xSemaphoreCreateMutex();
-  xSemaphoreGive(mutex);
+  // mutex = xSemaphoreCreateMutex();
+  // xSemaphoreGive(mutex);
   carState.AccelerationDisplay = -99;
   // adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (5s handling time)
-  sleep_polling_ms = 250;
-  string s = fmt::format("[v] {} inited.\n", getName());
-  console << s;
-  driverDisplay.print(s.c_str());
+  console << "done.\n";
+  return fmt::format("[{}] CarControl initialized.", hasError ? "--" : "ok");
 }
 
 void CarControl::exit(void) {
   // TODO
 }
+// --------------------
 
 void CarControl::_handleValueChanged() {
   // TODO
 }
 
 bool CarControl::read_battery_data() {
+#if ADC_ON
   carState.BatteryVoltage = adc.read(ADC::Pin::BAT_VOLTAGE) / 100.;  // TODO
   carState.BatteryCurrent = adc.read(ADC::Pin::BAT_CURRENT) / 1000.; // TODO
+#endif
   return true;
 }
 
 bool CarControl::read_motor_data() {
+#if ADC_ON
   carState.MotorVoltage = adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.;  // TODO
   carState.MotorCurrent = adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.; // TODO
+#endif
   return true;
 }
 
 bool CarControl::read_pv_data() {
+#if ADC_ON
   carState.PhotoVoltaicCurrent = adc.read(ADC::Pin::PV_CURRENT) / 100.; // TODO
+#endif
   return true;
 }
 
 bool CarControl::read_reference_cell_data() {
+#if ADC_ON
   carState.ReferenceSolarCell = adc.read(ADC::Pin::REFERENCE_CELL);
+#endif
   return true;
 }
 
 bool CarControl::read_speed() {
+#if ADC_ON
   // native input
   int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
   // voltage
@@ -103,19 +116,20 @@ bool CarControl::read_speed() {
   float speed = 3.1415 * radius * rpm / 60 * 3.6;
   carState.Speed = (int)speed;
   // console << fmt::sprintf("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
+#endif
   return true;
 }
 
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    console << "Break Pedal Pressed (paddle control)\n";
+    // XXXXXX
+    // console << "Break Pedal Pressed (paddle control)\n";
     _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
     return true;
   }
-  int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
-  int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-
+  int16_t valueDec = carState.STW_DEC; // adc.read(ADC::Pin::STW_DEC);
+  int16_t valueAcc = carState.STW_ACC; // adc.read(ADC::Pin::STW_ACC);
   // check if change is in damping
   if (valueAcc != 0 && valueDec != 0)
     if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
@@ -160,11 +174,12 @@ bool CarControl::read_paddles() {
 }
 
 void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
-  // debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-  //              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
+// debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+//              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
+#if DAC_ON
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);
-
+#endif
   carState.Deceleration = valueDec;
   carState.Acceleration = valueAcc;
   carState.AccelerationDisplay = valueDisplay;
@@ -174,10 +189,10 @@ void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t v
 
 void CarControl::adjust_paddles(int cycles) {
   int x, y;
-  int16_t value;
 
+#if DAC_ON
   dac.reset_and_lock_pot();
-
+#endif
   ads_min_acc = 50000;
   ads_min_dec = 50000;
   ads_max_acc = 0;
@@ -202,6 +217,8 @@ void CarControl::adjust_paddles(int cycles) {
       engineerDisplay.write_ganz_99(x, y, cycles + 1, cycles, 1, false, ILI9341_BLUE, ILI9341_ORANGE);
     }
 
+#if ADC_ON
+    int16_t value;
     value = adc.read(ADC::Pin::STW_DEC);
     if (value > 0) {
       if (ads_min_dec > value)
@@ -216,6 +233,7 @@ void CarControl::adjust_paddles(int cycles) {
       if (ads_max_acc < value)
         ads_max_acc = value;
     }
+#endif
     delay(100);
   }
   // make sure null level to avoid automatic acceleration/deceleration
@@ -242,13 +260,31 @@ int CarControl::_normalize(int minDisplayValue, int maxDisplayValue, int minValu
   return (int)retValue;
 }
 
-void CarControl::_handle_indicator() {}
+void CarControl::_handle_indicator() {
+  // if (valueChangeRequest) {
+  if (carState.Indicator == INDICATOR::RIGHT) {
+    carState.getPin(PinIndicatorOutLeft)->value = 0;
+    carState.getPin(PinIndicatorOutRight)->value = 1;
+  } else if (carState.Indicator == INDICATOR::LEFT) {
+    carState.getPin(PinIndicatorOutLeft)->value = 1;
+    carState.getPin(PinIndicatorOutRight)->value = 0;
+  } else if (carState.Indicator == INDICATOR::WARN) {
+    carState.getPin(PinIndicatorOutRight)->value = 1;
+    carState.getPin(PinIndicatorOutLeft)->value = 1;
+  } else {
+    // INDICATOR::OFF
+    carState.getPin(PinIndicatorOutLeft)->value = 0;
+    carState.getPin(PinIndicatorOutRight)->value = 0;
+  }
+  //}
+}
+
 volatile int CarControl::valueChangeRequest = 0;
 
-// int lastValue = 0;
 void CarControl::task() {
   // polling loop
   while (1) {
+    carState.getPin(PinDacLifeSign)->value = !carState.getPin(PinDacLifeSign)->value;
     bool someThingChanged = false;
     someThingChanged |= read_paddles();
     someThingChanged |= read_motor_data();

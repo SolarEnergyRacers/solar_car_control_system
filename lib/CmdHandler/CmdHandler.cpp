@@ -32,15 +32,19 @@
 #include <DriverDisplay.h>
 #include <EngineerDisplay.h>
 #include <Helper.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <SDCard.h>
 #include <system.h>
 
-extern I2CBus i2cBus;
-extern DAC dac;
+#if ADC_ON
 extern ADC adc;
-extern IOExt2 ioExt;
+#endif
+extern I2CBus i2cBus;
+#if DAC_ON
+extern DAC dac;
+#endif
+extern IOExt ioExt;
 extern I2CBus i2cBus;
 extern Indicator indicator;
 extern CarState carState;
@@ -56,19 +60,20 @@ using namespace std;
 // ------------------
 // FreeRTOS functions
 
-void CmdHandler::re_init() { init(); }
+string CmdHandler::re_init() { return init(); }
 
-void CmdHandler::init() {
+string CmdHandler::init() {
+  bool hasError = false;
+  console << "[  ] Init 'CmdHandler'...\n";
   // nothing to do, i2c bus is getting initialized externally
-  string s = "[v] " + getName() + " initialized.\n";
-  console << s;
-  driverDisplay.print(s.c_str());
+  return fmt::format("[{}] CmdHandler initialized.", hasError ? "--" : "ok");
 }
 
 void CmdHandler::exit() {
   // TODO
 }
 // ------------------
+
 template <size_t N> void splitString(string (&arr)[N], string str) {
   int n = 0;
   istringstream iss(str);
@@ -77,7 +82,7 @@ template <size_t N> void splitString(string (&arr)[N], string str) {
 }
 
 void CmdHandler::task() {
-  string state;
+  string state, msg;
   while (1) {
     try {
       while (Serial.available() || Serial2.available()) {
@@ -99,14 +104,15 @@ void CmdHandler::task() {
           input = input.substring(0, input.length() - 1);
         }
 
-        console << "Received: " << input.c_str() << "\n";
-
         if (input.length() < 1 || commands.find(input[0], 0) == -1) {
           input = "h"; // help
         }
 
         switch (input[0]) {
         // ---------------- controller commands
+        case '\n':
+          console << "\n";
+          break;
         case 'R':
           engineerDisplay.set_DisplayStatus(DISPLAY_STATUS::ENGINEER_HALTED);
           driverDisplay.re_init();
@@ -146,15 +152,6 @@ void CmdHandler::task() {
           sdCard.write(state);
           console << state;
           break;
-        case 'k': {
-          string arr[4];
-          splitString(arr, &input[1]);
-          float Kp = atof(arr[0].c_str());
-          float Ki = atof(arr[1].c_str());
-          float Kd = atof(arr[2].c_str());
-          carSpeed.update_pid(Kp, Ki, Kd);
-          console << "PID set to Kp=" << Kp << ", Ki=" << Ki << ", Kd=" << Kd << "\n";
-        } break;
         case 'P':
           sdCard.directory();
           break;
@@ -167,41 +164,82 @@ void CmdHandler::task() {
         case 'H':
           memory_info();
           break;
+        case 'i':
+          if (input[1] == 'o') {
+            console << "Received: " << input << " -->  ioExt.verboseMode: " << ioExt.verboseMode << "\n";
+            ioExt.verboseMode = !ioExt.verboseMode;
+          } else if (input[1] == 'R') {
+            console << "Received: " << input << " -->  ioExt.re_init()\n";
+            msg = ioExt.re_init();
+            console << msg << "\n";
+          } else {
+            console << "Received: " << input
+                    << ": ioExt.readAll(false, false, "
+                       ", true)\n";
+            // ioExt.readAll(false, false, "", true);
+            ioExt.readPins(PinReadMode::ALL);
+          }
+          break;
+        case 'I':
+          console << "Received: " << input << " -->  i2cBus.scan_i2c_devices()\n";
+          i2cBus.scan_i2c_devices();
+          break;
         // -------------- chase car commands
+        case 'k': {
+          string arr[4];
+          splitString(arr, &input[1]);
+          float Kp = atof(arr[0].c_str());
+          float Ki = atof(arr[1].c_str());
+          float Kd = atof(arr[2].c_str());
+#if CARSPEED_ON
+          carSpeed.update_pid(Kp, Ki, Kd);
+#endif
+          console << "PID set to Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+        } break;
         case '-':
+          console << "Received: " << input << " -->  carControl.adjust_paddles(" << carState.PaddleAdjustCounter << ")\n";
           carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
           break;
         case 'u':
-          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
+          if (input[1] == '-' || carState.SpeedArrow == SPEED_ARROW::INCREASE) {
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
           }
+          console << "Received: " << input << " -->  carState.SpeedArrow=" << SPEED_ARROW_str[(int)(carState.SpeedArrow)] << "\n";
           break;
         case 'd':
-          if (string("off") == string(&input[2]) || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
+          if (input[1] == '-' || carState.SpeedArrow == SPEED_ARROW::DECREASE) {
             carState.SpeedArrow = SPEED_ARROW::OFF;
           } else {
             carState.SpeedArrow = SPEED_ARROW::DECREASE;
           }
+          console << "Received: " << input << " -->  carState.SpeedArrow=" << SPEED_ARROW_str[(int)(carState.SpeedArrow)] << "\n";
           break;
         case ':':
           carState.DriverInfoType = INFO_TYPE::INFO;
           carState.DriverInfo = &input[1];
+          console << "Received: " << input << " -->  carState.DriverInfo [" << INFO_TYPE_str[(int)carState.DriverInfoType]
+                  << "]=" << carState.DriverInfo << "\n";
           break;
         case '!':
           carState.DriverInfoType = INFO_TYPE::WARN;
           carState.DriverInfo = &input[1];
+          console << "Received: " << input << " -->  carState.DriverInfo [" << INFO_TYPE_str[(int)carState.DriverInfoType]
+                  << "]=" << carState.DriverInfo << "\n";
           break;
         // -------------- steering wheel input element emulators
         case '<':
           indicator.setIndicator(INDICATOR::LEFT);
+          console << "Received: " << input << " -->  carState.Light=" << INDICATOR_str[(int)(carState.Indicator)] << "\n";
           break;
         case '>':
           indicator.setIndicator(INDICATOR::RIGHT);
+          console << "Received: " << input << " -->  carState.Light=" << INDICATOR_str[(int)(carState.Indicator)] << "\n";
           break;
         case 'w':
           indicator.setIndicator(INDICATOR::WARN);
+          console << "Received: " << input << " -->  carState.Light=" << INDICATOR_str[(int)(carState.Indicator)] << "\n";
           break;
         case 'l':
           if (input[1] == '-') {
@@ -209,6 +247,7 @@ void CmdHandler::task() {
           } else {
             carState.Light = LIGHT::L1;
           }
+          console << "Received: " << input << " -->  carState.Light=" << LIGHT_str[(int)(carState.Light)] << "\n";
           break;
         case 'L':
           if (input[1] == '-') {
@@ -216,6 +255,7 @@ void CmdHandler::task() {
           } else {
             carState.Light = LIGHT::L2;
           }
+          console << "Received: " << input << " -->  carState.Light=" << LIGHT_str[(int)(carState.Light)] << "\n";
           break;
         case 'c':
           if (input[2] == 's') {
@@ -225,20 +265,13 @@ void CmdHandler::task() {
             carState.ConstantMode = CONSTANT_MODE::POWER;
             carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
           } else {
-            if (carState.ConstantModeOn) {
-              carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
-            } else {
-              carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
-            }
+            carState.ConstantModeOn = !carState.ConstantModeOn; // #SAFETY#: deceleration unlock const mode
           }
-          break;
-        case 'i':
-          ioExt.readAll();
-          break;
-        case 'I':
-          i2cBus.scan_i2c_devices();
+          console << "Received: " << input << " -->  carState.ConstantMode - " << CONSTANT_MODE_str[(int)(carState.ConstantMode)]
+                  << " On: " << carState.ConstantModeOn << "\n";
           break;
         default:
+          console << "Received: " << input << "\n";
           console << "ERROR:: Unknown command '" << input << "' \n" << helpText << "\n";
           break;
         case 'h':
@@ -255,9 +288,11 @@ void CmdHandler::task() {
 
 string CmdHandler::printSystemValues() {
   stringstream ss("");
-  int16_t valueRec = adc.read(ADC::Pin::STW_DEC);
+#if ADC_ON
+  int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
-  ss << fmt::format("v0={:5d}  v1={:5d}\n", valueRec, valueAcc);
+  ss << fmt::format("dec={:5d}  acc={:5d}\n", valueDec, valueAcc);
+#endif
 
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
@@ -267,7 +302,9 @@ string CmdHandler::printSystemValues() {
       }
     }
   }
+#if DAC_ON
   ss << fmt::format("POT-0 (accel)= {:4d}, POT-1 (recup)= {:4d}\n", dac.get_pot(DAC::pot_chan::POT_CHAN0),
                     dac.get_pot(DAC::pot_chan::POT_CHAN1));
+#endif
   return ss.str();
 }

@@ -1,6 +1,8 @@
 //
 // CAN Bus
 //
+#include <fmt/core.h>
+
 #include <definitions.h>
 
 #include <freertos/FreeRTOS.h>
@@ -11,9 +13,11 @@
 
 #include <CANBus.h>
 #include <CarState.h>
+#include <Console.h>
 
 extern CarState carState;
 extern CANBus can;
+extern Console console;
 
 void onReceiveForwarder(int packetSize) { can.onReceive(packetSize); }
 
@@ -111,24 +115,29 @@ CANBus::CANBus() {
   ages[MPPT3_BASE_ADDR | 0x6] = INT32_MAX;
 }
 
-string CANBus::getName() { return "CAN_Task"; }
-
-void CANBus::re_init() {
+string CANBus::re_init() {
   CAN.end();
-  CANBus::init();
+  return CANBus::init();
 }
 
-void CANBus::init() {
+string CANBus::init() {
+  bool hasError = false;
+  console << "[  ] Init CANBus...\n";
   mutex = xSemaphoreCreateBinary();
-
   CAN.setPins(CAN_RX, CAN_TX);
   CAN.onReceive(onReceiveForwarder); // couldn't get it to work with method of object
 
   if (!CAN.begin(CAN_SPEED)) {
+    xSemaphoreGive(mutex);
     // opening CAN failed :,(
+    console << fmt::format("     ERROR: CANBus with rx={:02x}m tx={:02x} NOT inited.\n", CAN_RX, CAN_TX);
+    hasError = true;
+  } else {
+    xSemaphoreGive(mutex);
+    console << fmt::format("     CANBus with rx={:02x}m tx={:02x} inited.\n", CAN_RX, CAN_TX);
   }
 
-  xSemaphoreGive(mutex);
+  return fmt::format("[{}] CANBus initialized.", hasError ? "--" : "ok");
 }
 
 void CANBus::exit() {
@@ -260,7 +269,7 @@ void CANBus::task() {
       }
     }
     // sleep(CAN_TASK_WAIT);
-    vTaskDelay(CAN_TASK_WAIT / portTICK_RATE_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_RATE_MS);
   }
 }
 

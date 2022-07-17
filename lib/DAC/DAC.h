@@ -23,9 +23,9 @@ private:
   uint8_t get_cmd(pot_chan channel);
 
 public:
-  void init();
-  void re_init();
   string getName(void) { return "DAC"; };
+  string init();
+  string re_init();
   void reset_and_lock_pot();
   void lock();
   void set_pot(uint8_t val, pot_chan channel);

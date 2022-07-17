@@ -9,12 +9,15 @@
 
 class Uart : public abstract_task {
 private:
+  uint32_t sleep_polling_ms;
+
 public:
-  // use default Serial2
-  // SoftwareSerial Serial2;
-  void init();
-  void re_init();
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
   string getName() { return "SerialWire-SerialRadio"; };
+  string init(void);
+  string re_init(void);
   void exit(void);
   void task(void);
 };

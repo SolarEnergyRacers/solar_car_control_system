@@ -9,25 +9,30 @@
 #include <definitions.h>
 #include <driver/gpio.h>
 
-class GPInputOutput : public abstract_task { // Note: This class is called weirdly due to a naming conflict. Suggestions are welcome :)
+class GPIputOutput : public abstract_task {
 private:
-  // add local variables required for the handler
+  uint32_t sleep_polling_ms;
+
 public:
-  string getName(void) { return "GPInputOutput"; };
-  void init(void);
-  void re_init(void);
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
+  string getName(void) { return "GPIO"; };
+  string init(void);
+  string re_init(void);
   void exit(void);
   void task(void);
 
+  // Class functions and members
   void register_gpio_interrupt(void);
   static volatile int interrupt_counter;
-  static portMUX_TYPE mux;
+  static portMUX_TYPE mutex;
 
   static void IRAM_ATTR handle_gpio_interrupt(void) {
-    portENTER_CRITICAL_ISR(&mux);
+    // portENTER_CRITICAL_ISR(&mutex);
     // count number of interrupts
     interrupt_counter++;
-    portEXIT_CRITICAL_ISR(&mux);
+    // portEXIT_CRITICAL_ISR(&mutex);
   };
 };
 

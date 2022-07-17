@@ -26,6 +26,18 @@ template <typename Enumeration> auto as_integer(Enumeration const value) -> type
 }
 
 class Display : public abstract_task {
+protected:
+  uint32_t sleep_polling_ms;
+
+public:
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
+  virtual string getName(void);
+  string init(void);
+  string re_init(void);
+  void exit(void);
+  void task(void);
 
 private:
   //==== Display definitions ==== START
@@ -36,7 +48,7 @@ private:
   void setupScrollArea(uint16_t TFA, uint16_t BFA);
   void scrollAddress(uint16_t VSP);
   int scroll(int lines);
-  void _setup(void);
+  string _setup(void);
 
 protected:
   int bgColor;
@@ -48,10 +60,6 @@ public:
   virtual ~Display(){};
   Display() { carState.displayStatus = DISPLAY_STATUS::ENGINEER_CONSOLE; };
 
-  // RTOS task
-  void init(void);
-  void re_init(void);
-  void exit(void);
   void set_DisplayStatus(DISPLAY_STATUS theNewStatus) { carState.displayStatus = theNewStatus; };
 
   DISPLAY_STATUS get_DisplayStatus() { return carState.displayStatus; };
@@ -63,11 +71,6 @@ public:
   void getCursor(int &x, int &y);
   void clear_screen(int bgColor);
   int getPixelWidthOfTexts(int textSize, string t1, string t2);
-
-  // internal functions for inner task communication
-  void task(void);
-
-  virtual string getName(void);
 
 protected:
   int height;

@@ -15,11 +15,19 @@ typedef struct {
 
 class GyroAcc : public abstract_task {
 private:
+  uint32_t sleep_polling_ms;
+
 public:
-  string getName(void) { return "Gyro"; };
-  void init();
-  void re_init();
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
+  string getName(void) { return "GyroAcc"; };
+  string init(void);
+  string re_init(void);
+  void exit(void);
   void task(void);
+
+  // Class functions and members
   Float3D read_gyroscope(void);
   Float3D read_acceleration(void);
 };

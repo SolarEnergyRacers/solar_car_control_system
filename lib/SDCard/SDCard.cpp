@@ -30,57 +30,56 @@ extern SPIBus spiBus;
 extern SDCard sdCard;
 extern DriverDisplay driverDisplay;
 
-void SDCard::re_init() { init(); }
+string SDCard::re_init() { return init(); }
 
-void SDCard::init() {
-  string s = "[?] Init 'SDCard'...\n";
-  console << s;
-  driverDisplay.print(s.c_str());
+string SDCard::init() {
+  bool hasError = false;
+  console << "[  ] Init 'SDCard'...\n";
 
   if (!mount()) {
-    console << "initialization failed!\n";
-    return;
+    hasError = true;
+    return fmt::format("[{}] SDCard inited.", hasError ? "--" : "ok");
   }
-  s = "[v] SDCard initialized.\n";
-  console << s;
-  driverDisplay.print(s.c_str());
+  console << "[v] SDCard inited.\n";
 
-  s = fmt::format("    Open '{}' (append)...", carState.LogFilename);
-  console << s;
-  driverDisplay.print(s.c_str());
+  console << fmt::format("     Open '{}' (append)...", carState.LogFilename);
 
   if (open_log_file()) {
     write(carState.csv("Initial State", true));
-    console << "ok.\n";
-    driverDisplay.print("SD Card mounted.\n");
+    console << "    ok.\n";
+    driverDisplay.print("    SD Card mounted.\n");
   } else {
-    console << "failed.\n";
+    console << "    failed.\n";
   }
+  return fmt::format("[{}] SDCard initialized.", hasError ? "--" : "ok");
 }
 
 bool SDCard::mount() {
   if (!carState.SdCardDetect) {
-    console << "No SD card detected!\n";
+    console << "     No SD card detected!\n";
     mounted = false;
+    xSemaphoreTakeT(spiBus.mutex);
     SD.end();
+    xSemaphoreGive(spiBus.mutex);
     return false;
   }
   if (sdCard.isMounted()) {
-    console << "SD card already mounted.\n";
+    console << "     SD card already mounted.\n";
     return true;
   }
   try {
+    console << "     Mounting SD card ...\n";
     xSemaphoreTakeT(spiBus.mutex);
     mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
-      console << "SD card mounted.\n";
+      console << "     SD card mounted.\n";
       return true;
     }
-    console << "ERROR: Unable to mount SD card.\n";
+    console << "     ERROR: Unable to mount SD card.\n";
   } catch (exception &ex) {
     xSemaphoreGive(spiBus.mutex);
-    console << "ERROR: Unable to mount SD card: " << ex.what() << "\n";
+    console << "     ERROR: Unable to mount SD card: " << ex.what() << "\n";
   }
   return false;
 }

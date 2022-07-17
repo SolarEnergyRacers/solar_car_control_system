@@ -1,7 +1,7 @@
 /*
  * Driver's Display
  *
- * The driver's display is passive with the exception of the indicator function.
+ * The driver's display is passive.
  * This means that all sensors send their values to the display.
  */
 
@@ -13,7 +13,7 @@
 #include <fmt/core.h>
 #include <iostream>
 
-#include <ADC.h>
+// #include <ADC.h>
 #include <CarState.h>
 #include <Console.h>
 #include <Display.h>
@@ -35,7 +35,6 @@
 #include <Fonts/FreeSans9pt7b.h>
 
 extern SPIBus spiBus;
-extern ADC adc;
 extern CarState carState;
 extern SDCard sdCard;
 extern Console console;
@@ -56,23 +55,23 @@ bool lifeSignState = false;
 
 string Display::getName() { return "Display"; };
 
-void Display::init() {
-  abstract_task::init();
-  console << "\n";
-  re_init();
+string Display::init() {
+  console << "[  ] Init '" << getInfo() << "'...\n";
+  return re_init();
 }
 
-void Display::re_init(void) {
-#if WithTaskSuspend == true
-  vTaskResume(getHandle());
-#endif
-  _setup();
+string Display::re_init(void) { return _setup(); }
+
+void Display::exit() {
+  // todo
 }
+// ------------
 
 Adafruit_ILI9341 Display::tft = Adafruit_ILI9341(&spiBus.spi, SPI_DC, SPI_CS_TFT, SPI_RST);
 
-void Display::_setup() {
-  console << "    Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
+string Display::_setup() {
+  bool hasError = false;
+  console << "     Setup 'ILI9341' for '" << getName() << "' with: SPI_CLK=" << SPI_CLK << ", SPI_MOSI=" << SPI_MOSI
           << ", SPI_MISO=" << SPI_MISO << ", SPI_CS_TFT=" << SPI_CS_TFT << "\n";
   height = 0;
   width = 0;
@@ -93,28 +92,28 @@ void Display::_setup() {
     rdpixfmt = tft.readcommand8(ILI9341_RDPIXFMT);
     rdimgfmt = tft.readcommand8(ILI9341_RDIMGFMT);
     rdselfdiag = tft.readcommand8(ILI9341_RDSELFDIAG);
+
     tft.setCursor(0, 0);
     tft.setTextSize(1);
     tft.fillScreen(bgColor);
     tft.setTextColor(ILI9341_BLUE);
     tft.setScrollMargins(0, height);
-    tft.printf("%s inited (%dx%d)-->%s\n", getName().c_str(), height, width, DISPLAY_STATUS_str[(int)carState.displayStatus]);
     xSemaphoreGive(spiBus.mutex);
 
-    printf("    ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
-    printf("    ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
-    printf("    ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
-    printf("    ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
-    printf("    ILI9341_RDMODE:     0x%x\n", rdmode);
+    printf("     ILI9341_RDMADCTL:   0x%x\n", rdmadctl);
+    printf("     ILI9341_RDPIXFMT:   0x%x\n", rdpixfmt);
+    printf("     ILI9341_RDIMGFMT:   0x%x\n", rdimgfmt);
+    printf("     ILI9341_RDSELFDIAG: 0x%x\n", rdselfdiag);
+    printf("     ILI9341_RDMODE:     0x%x\n", rdmode);
   } catch (exception &ex) {
-    console << fmt::format("[x] Display: Unable to initialize screen 'ILI9341': {}\n", ex.what());
+    console << fmt::format("[--] Display: Unable to initialize screen 'ILI9341': {}\n", ex.what());
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
   lifeSignX = width - lifeSignRadius - 6;
   lifeSignY = height - lifeSignRadius - 6;
-  console << "[v] '" << getName() << "' Display inited: screen 'ILI9341' with " << height << " x " << width
-          << ". Status: " << DISPLAY_STATUS_str[(int)carState.displayStatus] << "\n";
+  return fmt::format("[{}] Display initialized.  Screen 'ILI9341' {}x{}.     Status: {}", hasError ? "--" : "ok", height, width,
+                     DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }
 
 void Display::clear_screen(int bgColor) {
@@ -122,8 +121,6 @@ void Display::clear_screen(int bgColor) {
   tft.fillScreen(bgColor);
   xSemaphoreGive(spiBus.mutex);
 }
-
-void Display::exit() {}
 
 int Display::getPixelWidthOfTexts(int textSize, string t1, string t2) {
   int l1 = t1.length() * textSize * 6;

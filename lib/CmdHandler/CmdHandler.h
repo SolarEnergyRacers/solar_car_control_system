@@ -9,7 +9,19 @@
 
 class CmdHandler : public abstract_task {
 private:
-  uint32_t sleep_polling_ms = 250;
+  uint32_t sleep_polling_ms;
+
+public:
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
+  string getName(void) { return "CmdHandler"; };
+  string init(void);
+  string re_init(void);
+  void exit(void);
+  void task(void);
+
+  // Class functions and members
   string commands = "!-:<>CcDdEHiIJklLMPRsSUuVvw";
   string helpText = "Available commands (" + commands +
                     "):\n"
@@ -23,7 +35,7 @@ private:
                     "\ts          - print status of all values\n"
                     "\tS          - print status\n"
                     "\tJ          - write JSON status to sdcard\n"
-                    "\t[V|v]      - write CSV status header (v - w/o header) to sdcard with\n"
+                    "\t[V|v]      - write CSV status (V - with, v - w/o header) to sdcard\n"
                     "\tM          - mount sdcard and eneable logging\n"
                     "\tU          - unmount sdcard and disable logging\n"
                     "\tH          - memory_info\n"
@@ -31,27 +43,20 @@ private:
                     "\t-------- DRIVER_RUNNING INFO COMMANDS -----------\n"
                     "\t:<text>    - display driver info text\n"
                     "\t!<text>    - display driver warn text\n"
-                    "\tu [off]    - speed up arrow (green)      [|off]\n"
-                    "\td [off]    - speed down arrow (red)      [|off]\n"
+                    "\tu [-]      - speed up arrow (green)\n"
+                    "\td [-]      - speed down arrow (red)\n"
                     "\t-------- SUPPORT COMMANDS ------------------\n"
-                    "\t< [off]    - left indicator              [|off]\n"
-                    "\t> [off]    - right indicator             [|off]\n"
-                    "\tw [off]    - hazard warning lights       [|off]\n"
-                    "\tl [off]    - position lights on/off      [|off]\n"
-                    "\tL [off]    - beam light on/off           [|off]\n"
-                    "\tc [c|s|p]  - constant speed|power mode   [|c|s|p]\n"
-                    "\tI          - scan I2C devices \n"
-                    "\ti          - ioExt.readAll() \n"
+                    "\t<          - left indicator on/off\n"
+                    "\t>          - right indicator on/off\n"
+                    "\tw          - hazard warning lights on/off\n"
+                    "\tl [-]      - position lights on/off\n"
+                    "\tL [-]      - beam light on/off\n"
+                    "\tc [c|s|p]  - constant speed|power mode\n"
+                    "\tI          - scan I2C devices\n"
+                    "\ti [|o|R]   - ioExt.readAll (o - ioExt show in console continously, R -ioExt.re_init)\n"
                     "\t\n";
 
   string printSystemValues(void);
-
-public:
-  void init();
-  void re_init();
-  string getName(void) { return "CmdHandler"; };
-  void exit(void);
-  void task(void); // this is the actual task
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_CMDHANDLER_H

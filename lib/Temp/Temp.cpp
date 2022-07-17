@@ -2,19 +2,27 @@
 // Temperature Sensor Array (1-Wire)
 //
 
-#include <OneWireBus.h>
+#include <definitions.h>
 
+// standard libraries
+#include <fmt/core.h>
+#include <iostream>
+#include <stdio.h>
+#include <string>
+
+#include <Console.h>
+#include <DallasTemperature.h> // DS18B20
+#include <OneWireBus.h>
 #include <Temp.h>
 
-#include <DallasTemperature.h> // DS18B20
-
 extern OneWireBus oneWireBus;
+extern Console console;
 
-void Temp::re_init() { init(); }
+string Temp::re_init() { return init(); }
 
-void Temp::init(void) {
-
-  // CRITICAL SECTION ONEWIRE: start
+string Temp::init(void) {
+  bool hasError = false;
+  console << "[  ] Init 'Temp (OneWire)'...\n";
   xSemaphoreTake(oneWireBus.mutex, portMAX_DELAY);
 
   // init devices
@@ -22,7 +30,7 @@ void Temp::init(void) {
   ds.begin();
 
   // report devices found
-  printf("[OneWire] num devices on bus: %d\n", ds.getDeviceCount());
+  console << fmt::format("     OneWire devices on bus: {}\n", ds.getDeviceCount());
 
   // clear old search
   oneWireBus.oneWire.reset_search();
@@ -31,39 +39,36 @@ void Temp::init(void) {
   DeviceAddress device_addr;
   while (oneWireBus.oneWire.search(device_addr)) {
 
-    printf("[DS18B20] Address:");
+    console << "     [DS18B20] Address:";
     for (uint8_t i = 0; i < 8; i++) {
 
-      printf(" %d", device_addr[i]);
+      console << fmt::format(" {}", device_addr[i]);
     }
-    printf(" ");
+    console << " ";
 
-    printf("Resolution: %d", ds.getResolution(device_addr));
-    printf(" ");
+    console << fmt::format("     Resolution: {}", ds.getResolution(device_addr));
+    console << " ";
 
-    printf("Power Mode: ");
+    console << "    Power Mode: ";
     if (ds.isParasitePowerMode()) {
-      printf("External");
+      console << "External\n";
     } else {
-      printf("Parasite");
+      console << "Parasite\n";
     }
-    printf("\n");
   }
 
   xSemaphoreGive(oneWireBus.mutex);
-  // CRITICAL SECTION ONEWIRE: end
+  return fmt::format("[{}] Temp initialized.", hasError ? "--" : "ok");
 }
 
 void Temp::request_temperatures(void) {
 
-  // CRITICAL SECTION ONEWIRE: start
   xSemaphoreTake(oneWireBus.mutex, portMAX_DELAY);
 
   // request all temperature sensor readings
   ds.requestTemperatures();
 
   xSemaphoreGive(oneWireBus.mutex);
-  // CRITICAL SECTION ONEWIRE: end
 }
 
 int Temp::get_num_temp_dev(void) {
@@ -104,10 +109,9 @@ void read_ds_demo_task(void *pvParameter) {
 
     // print previously fetched results
     for (int i = 0; i < ds.get_num_temp_dev(); i++) {
-      printf("[DS18B20] Temperature: %fC / %fF\n", ds.read_tempC_index(i), ds.read_tempF_index(i));
+      console << fmt::format("    [DS18B20] Temperature: {:4.2f}C / {:4.2f}F\n", ds.read_tempC_index(i), ds.read_tempF_index(i));
     }
 
-    // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(ds.get_SleepTime() / portTICK_PERIOD_MS);
   }
 }

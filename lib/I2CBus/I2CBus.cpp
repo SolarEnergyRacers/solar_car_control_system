@@ -20,19 +20,20 @@ extern CarState carState;
 
 using namespace std;
 
-void I2CBus::re_init() { init(); }
+string I2CBus::re_init() { return init(); }
 
-void I2CBus::init(void) {
-  console << "[?] Init '" << getName() << "'\n";
+string I2CBus::init(void) {
+  bool hasError = false;
+  console << "[  ] Init '" << getName() << "'...\n";
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
   // Wire.begin(I2C_SDA, I2C_SCL, carState.I2CFrequence * 1000); // frequency in Hz
   Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ); // frequency in MHz
   xSemaphoreGive(mutex);
-
-  console << "[v] I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
+  console << "     I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
   scan_i2c_devices();
+  return fmt::format("[{}] I2CBus initialized.", hasError ? "--" : "ok");
 }
 
 // test if the i2c bus is available and ready for transaction at address adr
@@ -59,19 +60,20 @@ void I2CBus::scan_i2c_devices() {
    * Connect a 2.4k resistor between SDA and Vcc
    * Connect a 2.4k resistor between SCL and Vcc
    */
-  console << "    Scanning I2C addresses:\n    ";
+  console << "     Scanning I2C addresses:\n    ";
   uint8_t cnt = 0;
   string s;
 
-  xSemaphoreTake(mutex, portMAX_DELAY);
   for (uint8_t addr = 0; addr < 0x80; addr++) {
     uint8_t ec = -1;
+    xSemaphoreTake(mutex, portMAX_DELAY);
     try {
       Wire.beginTransmission(addr);
       ec = Wire.endTransmission(true);
     } catch (exception &ex) {
       // do nothing
     }
+    xSemaphoreGive(mutex);
     if (ec == 0) {
       s = fmt::format("{:02x} ", addr);
       cnt++;
@@ -79,11 +81,25 @@ void I2CBus::scan_i2c_devices() {
       s = "-- ";
     }
     if ((addr & 0x0f) == 0x0f) {
-      s.append("\n    ");
+      s.append("\n     ");
     }
     console << s;
   }
-  xSemaphoreGive(mutex);
 
   console << "Scan completed: " << fmt::format("{}", cnt) << " I2C devices found.\n";
+
+  s = "     Expected addresses:\n";
+  s += "     Address | Device                               | Location      \n";
+  s += "     ------- | ------------------------------------ | --------------\n";
+  s += "      0x00   | ESP32 I2C master                     | main noard    \n";
+  s += "      0x19   | BMI088, 6-axis inertial sensor, acc  | main board    \n";
+  s += "      0x20   | MCP23017, Extended digital IOs       | main board    \n";
+  s += "      0x21   | MCP23017, Extended digital IOs       | steering wheel\n";
+  s += "      0x28   | DS1803, digital analog coder         | main board    \n";
+  s += "      0x48   | ADS1115, analog digital coder        | main board    \n";
+  s += "      0x49   | ADS1115, analog digital coder        | main board    \n";
+  s += "      0x4a   | ADS1115, analog digital coder        | steering wheel\n";
+  s += "      0x68   | DS1307, real time clock              | main board    \n";
+  s += "      0x69   | BMI088, 6-axis inertial sensor, gyro | main board    \n";
+  console << s;
 }

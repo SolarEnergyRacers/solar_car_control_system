@@ -17,13 +17,27 @@
 
 using namespace std;
 
-// public structures
+// public structures and structure texts
+static const char *BOOL_str[] = {"false", "true"};
+
 enum class INDICATOR { OFF, LEFT, RIGHT, WARN };
+static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASH"};
+
 enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
+static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
+
 enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
+static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
+
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
+static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
+
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
+static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
+
 enum class LIGHT { OFF, L1, L2 };
+static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
+
 enum class DISPLAY_STATUS {
   DRIVER_HALTED,
   DRIVER_SETUP,
@@ -36,7 +50,6 @@ enum class DISPLAY_STATUS {
   ENGINEER_BACKGROUND,
   ENGINEER_RUNNING
 };
-
 static const char *DISPLAY_STATUS_str[] = {
     "DRIVER_HALTED",       // no action on this display
     "DRIVER_SETUP",        // driver screen setup
@@ -51,7 +64,6 @@ static const char *DISPLAY_STATUS_str[] = {
 };
 
 enum class PRECHARGE_STATE { ERROR, IDLE, MEASURE, PRECHARGE, RUN, ENABLE_PACK };
-
 static const char *PRECHARGE_STATE_str[] = {"ERROR", "IDLE", "MEASURE", "PRECHARGE", "RUN", "ENABLE_PACK"};
 
 enum class BATTERY_ERROR {
@@ -69,11 +81,21 @@ enum class BATTERY_ERROR {
   CONTACTOR_STUCK,
   EXTRA_CELL_DETECTED
 };
-
 static const char *BATTERY_ERROR_str[] = {
-    "CELL_OVER_VOLTAGE",    "CELL_UNDER_VOLTAGE", "CELL_OVER_TEMP",     "MEASUREMENT_UNTRUSTED",    "CMU_COMM_TIMEOUT",
-    "VEHICLE_COMM_TIMEOUT", "BMU_IN_SETUP_MODE",  "CMU_CAN_POWER",      "PACK_ISOLATION_TEST_FAIL", "SOC_MEASUREMENT_INVALID",
-    "CAN_12V_LOW",          "CONTACTOR_STUCK",    "EXTRA_CELL_DETECTED"};
+    "CELL_OVER_VOLTAGE",        //
+    "CELL_UNDER_VOLTAGE",       //
+    "CELL_OVER_TEMP",           //
+    "MEASUREMENT_UNTRUSTED",    //
+    "CMU_COMM_TIMEOUT",         //
+    "VEHICLE_COMM_TIMEOUT",     //
+    "BMU_IN_SETUP_MODE",        //
+    "CMU_CAN_POWER",            //
+    "PACK_ISOLATION_TEST_FAIL", //
+    "SOC_MEASUREMENT_INVALID",  //
+    "CAN_12V_LOW",              //
+    "CONTACTOR_STUCK",          //
+    "EXTRA_CELL_DETECTED"       //
+};
 
 class CarState {
 
@@ -103,9 +125,34 @@ public:
     // #SAFETY#: acceleration lock
     PaddlesJustAdjusted = false;
     AccelerationLocked = true;
+    // BEGIN prevent stupid compiler warnings "defined but not used"
+    (void)BOOL_str;
+    (void)INDICATOR_str;
+    (void)INFO_TYPE_str;
+    (void)SPEED_ARROW_str;
+    (void)CONSTANT_MODE_str;
+    (void)DRIVE_DIRECTION_str;
+    (void)LIGHT_str;
+    (void)DISPLAY_STATUS_str;
+    (void)PRECHARGE_STATE_str;
+    (void)BATTERY_ERROR_str;
+    // BEGIN prevent stupid compiler warnings "defined but not used"
   }
   ~CarState(){};
   bool initalize_config();
+
+  // ADC native values
+  int16_t MOTOR_SPEED;
+  int16_t BAT_CURRENT;
+  int16_t MOTOR_CURRENT;
+  int16_t PV_CURRENT;
+  // ADC1
+  int16_t BAT_VOLTAGE;
+  int16_t MOTOR_VOLTAGE;
+  int16_t REFERENCE_CELL;
+  // ADC2 (steering wheel)
+  int16_t STW_ACC;
+  int16_t STW_DEC;
 
   // physical car data (measurement values)
   int Speed;        // ADC
@@ -209,7 +256,7 @@ public:
   int I2CFrequence;             // = 200;       // [kHz]
   int CarDataLogPeriod;         // = 1000;  // [ms]
   int Serial1Baudrate = 115200; // baud
-  int Serial2Baudrate = 9600;   // baud
+  int Serial2Baudrate = 115200; // baud
 
   // [Telemetry]
   int SendInterval;     // = 1000;    // [ms]

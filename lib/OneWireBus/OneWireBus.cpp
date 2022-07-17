@@ -19,16 +19,13 @@
 extern Console console;
 using namespace std;
 
-void OneWireBus::init(void) {
+string OneWireBus::init(void) {
+  bool hasError = false;
+  console << "[  ] Init 'OneWireBus'...\n";
 
-  // init mutex (it is acquired)
   mutex = xSemaphoreCreateMutex();
-
-  // init
   oneWire = OneWire(ONEWIRE_PIN);
-
-  // release mutex
   xSemaphoreGive(mutex);
 
-  console << "[v] OneWire inited: ONEWIRE_PIN=" << ONEWIRE_PIN << "\n";
+  return fmt::format("[{}] OneWireBus initialized.  ONEWIRE_PIN={}", hasError ? "--" : "ok", ONEWIRE_PIN);
 }

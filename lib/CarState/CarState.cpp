@@ -12,7 +12,7 @@
 #include <ConfigFile.h>
 #include <Console.h>
 #include <Helper.h>
-#include <IOExt2.h>
+#include <IOExt.h>
 #include <Indicator.h>
 #include <SDCard.h>
 #include <definitions.h>
@@ -22,20 +22,12 @@ using namespace std;
 extern CarState carState;
 extern Console console;
 extern SDCard sdCard;
-extern IOExt2 ioExt;
+extern IOExt ioExt;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
-CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt2::getIdx(devNr, pinNr)]); }
-CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt2::getIdx(port)]); }
+CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
+CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(port)]); }
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
-
-static const char *INDICATOR_str[] = {"OFF", "LEFT", "RIGHT", "HAZARD FLASHR"};
-static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
-static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
-static const char *BOOL_str[] = {"false", "true"};
-static const char *LIGHT_str[] = {"OFF", "L1", "L2"};
-static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
-static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
 
 void CarState::init_values() {
   Speed = 0;
@@ -59,24 +51,18 @@ void CarState::init_values() {
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
 
-  console << "Reread all IOs in foreced mode...\n";
-  ioExt.readAll(false, true);
-  console << print("Initial State") << "\n";
-
   // read from ser4config.ini file
   initalize_config();
-  console << print("State after SER4CONF.INI") << "\n";
+  // console << print("State after SER4CONF.INI") << "\n";
 }
 
 bool CarState::initalize_config() {
   try {
     ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
     // [Main]
-    LogFilename = cf.get("Main", "LogFilename", "/ser4data.csv");
+    LogFilename = cf.get("Main", "LogFilename", "/SER4DATA.CSV");
     LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
     LogInterval = cf.get("Main", "LogInterval", 1);
-    // [TaskTimings]
-    // SleepTimeIOExt = cf.get("TaskTimings", "SleepTimeIOExt", 400);
     // [PID]
     Kp = cf.get("PID", "Kp", 2);
     Ki = cf.get("PID", "Ki", 1);
@@ -91,7 +77,7 @@ bool CarState::initalize_config() {
     // I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
     CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
     Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
-    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
+    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 115200);
     // [Telemetry]
     SendInterval = cf.get("Telemetry", "", 1000);
     MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);
@@ -108,12 +94,11 @@ const string CarState::print(string msg, bool withColors) {
   struct tm t = *localtime(&theTime);
 
   stringstream ss(msg);
-  ss << "====SER4 Car Status====" << VERSION;
+  ss << "====SER4 Car Status====" << VERSION << "==";
   ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
-  ss << "====uptime: " << getTimeStamp(millis() / 1000) << "s====" << asctime(&t);
+  ss << "====uptime:" << getTimeStamp(millis() / 1000) << "s====" << asctime(&t) << "==";
   if (msg.length() > 0)
     ss << msg << endl;
-  // ss << ss.fixed << ss.precision(3) << ss.width(7)
   ss << "Display Status ........ " << DISPLAY_STATUS_str[(int)displayStatus] << endl;
   ss << "Speed ................. " << Speed << endl;
   ss << "Acceleration locked ... " << BOOL_str[(int)(AccelerationLocked)] << endl;
@@ -150,7 +135,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;
   ss << "Info Last ............. "
      << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
-  ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << "]" << endl;
+  ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
   ss << "IO .................... " << printIOs("", false) << endl;
 
@@ -181,7 +166,7 @@ const string CarState::print(string msg, bool withColors) {
 
   // [Telemetry]
   ss << "Telemetry send intervall" << SendInterval << endl;
-  ss << "Telemetry cahce records " << MaxCachedRecords << endl;
+  ss << "Telemetry cache records " << MaxCachedRecords << endl;
 
   ss << "===========================================================================================" << endl;
   return ss.str();
@@ -362,7 +347,7 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
     ss << devNr << ": ";
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
-      int idx = IOExt2::getIdx(devNr, pinNr);
+      int idx = IOExt::getIdx(devNr, pinNr);
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       if (pin->mode == OUTPUT && withColors) {
         if (pin->value != pin->oldValue) {

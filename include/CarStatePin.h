@@ -16,7 +16,7 @@ public:
   int value;
   int oldValue;
   bool inited;
-  long timestamp;
+  unsigned long timestamp;
   string name;
   void (*handlerFunction)();
 };

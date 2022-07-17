@@ -2,11 +2,10 @@
  * MCP23017 I/O Extension over I2C  !!! UNTESTED !!!
  */
 
-#ifndef SER_IOEXT2_H
-#define SER_IOEXT2_H
+#ifndef SER_IOEXT_H
+#define SER_IOEXT_H
 
 #include <definitions.h>
-#if IOEXT2_ON
 
 #include <MCP23017.h>
 #include <list>
@@ -24,7 +23,7 @@
 #define PinPvOnOff "PvOnOff"
 #define PinMcOnOff "McOnOff"
 #define PinEcoPower "EcoPower"
-#define PinDUMMY04 "DUMMY04"
+#define PinDacLifeSign "PinDacLifeSign"
 #define PinFwdBwd "FwdBwd"
 #define PinDUMMY06 "DUMMY06"
 #define PinRelais11 "Relais11"
@@ -54,58 +53,46 @@
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
-// known pin handler
-// the handler must its bit copy to oldValue
-void batteryOnOffHandler();
-void mcOnOffHandler();
-void pvOnOffHandler();
-void fwdBwdHandler();
-void ecoPowerHandler();
-void breakPedalHandler();
-void indicatorHandler();
-void hornHandler();
-void nextScreenHandler();
-void lightHandler();
-void headLightHandler();
-void constantModeHandler();
-void constantModeOnHandler();
-void constantModeOffHandler();
-void decreaseHandler();
-void increaseHandler();
+enum class PinReadMode { ALL, CHANGED };
+enum class PinHandleMode { NORMAL, FORCED };
 
-void paddleAdjustHandler();
-void sdCardDetectHandler();
-// end pin handler
+class IOExt : public abstract_task {
+private:
+  uint32_t sleep_polling_ms;
 
-class IOExt2 : public abstract_task {
 public:
-  string getName(void) { return "IOExt2"; };
-
-  void init(void);
-  void re_init(void);
+  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
+  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
+  string getName(void) { return "IOExt"; };
+  string init(void);
+  string re_init(void);
   void exit(void);
   void task(void);
 
+  // Class member and functions
   void setPort(int port, bool value);
   int getPort(int port);
 
-  void readAll(bool deltaOnly = false, bool forced = false);
+  // void readAll(bool deltaOnly = false, bool forced = false, string indent = "", bool verbose = false);
+  bool readPins(PinReadMode type = PinReadMode::CHANGED);
+  bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
+  bool verboseMode = false;
+
 private:
-  // static volatile bool ioInterruptRequest;
-  bool isInInterruptHandler = false;
+  // bool isInInterruptHandler = false;
+  bool isInInputHandler = false;
 
   void setPortMode(int port, uint8_t mode);
   void handleIoInterrupt();
-  // static void ioExt_interrupt_handler() { ioInterruptRequest = true; };
 
   MCP23017 IOExtDevs[2] = {
       MCP23017(I2C_ADDRESS_MCP23017_IOExt0), // Pins 00-15: Main board
       MCP23017(I2C_ADDRESS_MCP23017_IOExt1)  // Pins 16-31: Steering wheel
   };
 };
-#endif
-#endif // SER_IOEXT2_H
+#endif // SER_IOEXT_H

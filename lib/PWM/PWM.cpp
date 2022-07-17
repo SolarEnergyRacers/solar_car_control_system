@@ -4,11 +4,16 @@
 
 #include <definitions.h>
 
+// standard libraries
+#include <fmt/core.h>
 #include <iostream>
+#include <stdio.h>
+#include <string>
 
 #include <Wire.h>
 
 #include <Console.h>
+#include <Helper.h>
 #include <I2CBus.h>
 #include <PWM.h>
 
@@ -17,23 +22,20 @@
 extern Console console;
 extern I2CBus i2cBus;
 
-void PWM::init(void) {
+string PWM::init(void) {
+  bool hasError = false;
+  xSemaphoreTakeT(i2cBus.mutex);
 
-  // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
-
-  // init device
   pwm.begin();
-
-  // set up parameters
   pwm.setOscillatorFrequency(27000000);
   pwm.setPWMFreq(1600); // max pwm freq
 
   xSemaphoreGive(i2cBus.mutex);
-  // CRITICAL SECTION I2C: end
+
+  return fmt::format("[{}] PWM initialized.", hasError ? "--" : "ok");
 }
 
-void PWM::re_init() { init(); }
+string PWM::re_init() { return init(); }
 
 void PWM::exit() {
   // TODO
@@ -51,7 +53,7 @@ void PWM::update_pwm(int channel, int value) {
   }
 
   // CRITICAL SECTION I2C: start
-  xSemaphoreTake(i2cBus.mutex, portMAX_DELAY);
+  xSemaphoreTakeT(i2cBus.mutex);
 
   pwm.setPWM(channel, 0, value);
 
@@ -72,7 +74,7 @@ void PWM::task() {
       console << "[PCA9685] set all outputs to: " << i;
 
       // sleep for 1s
-      vTaskDelay(1000 / portTICK_PERIOD_MS);
+      vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
     }
   }
 }

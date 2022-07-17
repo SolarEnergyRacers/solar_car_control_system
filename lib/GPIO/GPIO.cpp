@@ -19,25 +19,29 @@
 
 extern Console console;
 
-void GPInputOutput::re_init() { init(); }
+string GPIputOutput::re_init() { return init(); }
 
-void GPInputOutput::init() {
+string GPIputOutput::init() {
+  bool hasError = false;
+  console << "[  ] Init 'GPIputOutput' ...";
+  vPortCPUInitializeMutex(&mutex);
   // Init GPIO pins for CS of SD-card and TFT
   pinMode(SPI_CS_SDCARD, OUTPUT);
   digitalWrite(SPI_CS_SDCARD, HIGH);
   pinMode(SPI_CS_TFT, OUTPUT);
   digitalWrite(SPI_CS_TFT, HIGH);
-  console << "SPI_CS for TFT and SD card set.\n";
+  console << "done.\n";
+  return fmt::format("[{}] SPI_CS for TFT and SD card set, GPIO initialized.", hasError ? "--" : "ok");
 }
 
-void GPInputOutput::exit() {
+void GPIputOutput::exit() {
   // TODO
 }
 
-void GPInputOutput::register_gpio_interrupt() {
+void GPIputOutput::register_gpio_interrupt() {
 
   // report
-  console << "[HW Interrupt] Register GPInputOutput interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)\n";
+  console << "[HW Interrupt] Register GPIO interrupt pin " << GPIO_INTERRUPT_PIN << " (falling edge)\n";
 
   // set operating mode of interrupt pin to pull-up (i.e. interrupt is generated
   // if pin is getting grounded)
@@ -46,10 +50,10 @@ void GPInputOutput::register_gpio_interrupt() {
   attachInterrupt(digitalPinToInterrupt(GPIO_INTERRUPT_PIN), handle_gpio_interrupt, FALLING);
 }
 
-volatile int GPInputOutput::interrupt_counter = 0;
-portMUX_TYPE GPInputOutput::mux = portMUX_INITIALIZER_UNLOCKED;
+volatile int GPIputOutput::interrupt_counter = 0;
+portMUX_TYPE GPIputOutput::mutex = portMUX_INITIALIZER_UNLOCKED;
 
-void GPInputOutput::task() {
+void GPIputOutput::task() {
 
   // polling loop
   while (1) {
@@ -62,6 +66,6 @@ void GPInputOutput::task() {
     }
 
     // sleep for 1s
-    vTaskDelay(1000 / portTICK_PERIOD_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

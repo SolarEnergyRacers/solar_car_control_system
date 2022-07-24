@@ -1,26 +1,90 @@
 # Checklist for SER-4 Electronik
 
+## Intro
+
+The control elements described in the drivers manual (`ser4-drivers-manual.md`) are not explained wit images in this document. Please look there.
+
 ## Hardware
 
 ### Main Board
 
+Main control unit for controlling the car electrically systems.
+
+Includes the radio communication module for data transfer between the chase car and SER4 racing car.
+
 ### Switch Board
+
+Additional board in the drivers cockpit with mechanical switches for car functions.
 
 ### Display Board
 
+Integrated in the steering wheel. Shows all car data for engineers and driver. Displays short messages from the chase car to car driver.
+
 ### BMC
+
+Battery management system. It is integrated in the battery box.
+
+### Motor
+
+Producer:
+
+Power:   kW
 
 ### MPPTs
 
+### Photo-voltaic Generator (PV)
+
+Material:
+
+Size:  m^2^
+
 ### Battery
 
+Cell type:
+
+Cell number:
+
+Voltage working range:
+
 ### Back Camera
+
+### Lights
+
+#### Green Light
+
+- show the switched off electric power system (PV, battery, motor)
+
+#### Position Lights
+
+- front (white)
+- rear (red)
+- side (?)
+
+#### Indicators / Hazard Warning Lights
+
+#### Driving Light
+
+White front light
+
+#### Break Lights
+
+Switched by:
+
+- Breakpedal buttons
+- Recuperation paddle
+- Constant Speed/Power mode car controller
+
+### Break buttons
+
+### Temperature Sensors
+
+
 
 ## Software
 
 ### Boot Screen
 
-Boot screen waiting for `paddle adjust`
+~~Boot screen waiting for `paddle adjust`~~ (Will be done manually by driver)
 
 ![phase1](assets.CHECKLIST_HW_SW/bootscreen-phase1.jpg)
 
@@ -59,8 +123,7 @@ Simulate with CAN-Bus test program:
 
 ### Driver Screen
 
-- [ ] Switch on from engineering display with driver display button
-- [ ] 
+- [ ] Switch between engineering and with driver display (button next screen)
 
 Simulate by switching on switch board:
 
@@ -73,17 +136,19 @@ Simulate by switching on switch board:
 
 - [ ] Check mount - write log - unmount cycle
 - [ ] Check file and folder print
+  - [ ] size increasing by log intervall
 
-| Command (case sensitive) | Function                                   |
-| ------------------------ | ------------------------------------------ |
-| M                        | mount cd card                              |
-| P                        | print files and folders to console         |
-| C                        | write csv data row into `/ser4data.csv`  |
-| J                        | write json data set into `/ser4data.csv` |
-| U                        | unmount sd card                            |
+| Command (case sensitive) | Function                                  |
+| ------------------------ | ----------------------------------------- |
+| M                        | mount cd card                             |
+| P                        | print files and folders to console        |
+| C                        | write csv data row into `/SER4DATA.CSV`   |
+| J                        | write json data set into `/SER4DATA.JSON` |
+| U                        | unmount sd card                           |
 
 - [ ] Life sign blinking red: no logging after Unmount or without inserted card
 - [ ] Life sign blinking green: logging active and writing to sd card
+- [ ] Insert of sd card switch on logging automatically
 
 ## Integration
 

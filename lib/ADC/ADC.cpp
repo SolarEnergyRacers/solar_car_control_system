@@ -125,9 +125,10 @@ void ADC::task() {
     carState.STW_DEC = read(STW_DEC);
 
     if (verboseModeADC) {
-      console << fmt::format("{:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d}\n", carState.MOTOR_SPEED,
-                             carState.BAT_CURRENT, carState.MOTOR_CURRENT, carState.PV_CURRENT, carState.BAT_VOLTAGE,
-                             carState.MOTOR_VOLTAGE, carState.REFERENCE_CELL, carState.STW_ACC, carState.STW_DEC);
+      console << fmt::format(
+          "adc: {:5d}-spd | {:5d}-batI | {:5d}-motI | {:5d}-pvI | {:5d}-batV | {:5d}-motV | {:5d}-ref | {:5d}-acc | {:5d}-dec\n",
+          carState.MOTOR_SPEED, carState.BAT_CURRENT, carState.MOTOR_CURRENT, carState.PV_CURRENT, carState.BAT_VOLTAGE,
+          carState.MOTOR_VOLTAGE, carState.REFERENCE_CELL, carState.STW_ACC, carState.STW_DEC);
     }
 
     // sleep

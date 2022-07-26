@@ -87,6 +87,7 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
   // #SAFETY#: acceleration lock
   if (isLocked) {
     if (carState.PaddlesJustAdjusted && carState.AccelerationDisplay == 0) {
+      // release unlock state and take over into to car state
       unlock();
       carState.AccelerationLocked = false;
       string s = "DAC unlocked.\n";
@@ -95,12 +96,6 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
         driverDisplay.print(s.c_str());
       }
     } else {
-      // XXXXX
-      // string s = "Motor potentiometer locked!\n";
-      // console << s;
-      // if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
-      //   driverDisplay.print(s.c_str());
-      // }
       return;
     }
   }
@@ -122,9 +117,8 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     Wire.endTransmission();
     xSemaphoreGive(i2cBus.mutex);
     if (verboseModeDAC) {
-      console << fmt::format("{:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d} | {:5d}\n", carState.MOTOR_SPEED,
-                             carState.BAT_CURRENT, carState.MOTOR_CURRENT, carState.PV_CURRENT, carState.BAT_VOLTAGE,
-                             carState.MOTOR_VOLTAGE, carState.REFERENCE_CELL, carState.STW_ACC, carState.STW_DEC);
+      console << fmt::format("dac:    {:02x}-chn | {:5d}-val  | {:5d}-acc  | {:5d}-dec | {:5d}-accD | {}-lck\n", channel, val,
+                             carState.Acceleration, carState.Deceleration, carState.AccelerationDisplay, carState.AccelerationLocked);
     }
 
     // console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command,

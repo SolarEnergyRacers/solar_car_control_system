@@ -247,7 +247,7 @@ void CarControl::adjust_paddles(int seconds) {
     engineerDisplay.print(s.c_str());
   }
   //#SAFTY#
-  carState.PaddlesJustAdjusted = true;
+  carState.PaddlesAdjusted = true;
 }
 
 int CarControl::_normalize(int minDisplayValue, int maxDisplayValue, int minValue, int maxValue, int value) {

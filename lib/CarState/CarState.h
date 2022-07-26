@@ -124,7 +124,7 @@ public:
 
     // init state flags
     // #SAFETY#: acceleration lock
-    PaddlesJustAdjusted = false;
+    PaddlesAdjusted = false;
     AccelerationLocked = true;
     GreenLight = false;
     // BEGIN prevent stupid compiler warnings "defined but not used"
@@ -161,9 +161,9 @@ public:
   int Acceleration; // ADC Steering Wheel
   int Deceleration; // ADC Steering Wheel
   // #SAFETY#: acceleration lock
-  bool AccelerationLocked;  // DSC lock
-  bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
-  int AccelerationDisplay;  // Display Value (-99...+99)
+  bool AccelerationLocked; // DSC lock
+  bool PaddlesAdjusted;    // did just padd adjustment: release lock if AccelerationDisplay==0
+  int AccelerationDisplay; // Display Value (-99...+99)
   //#SAFETY-END#
 
   bool BatteryOn;      // IO-In
@@ -260,7 +260,7 @@ public:
   int I2CFrequence;             // = 200;       // [kHz]
   int CarDataLogPeriod;         // = 1000;  // [ms]
   int Serial1Baudrate = 115200; // baud
-  int Serial2Baudrate = 9600;   // baud
+  int Serial2Baudrate = 115200; // 9600;   // baud
 
   // [Telemetry]
   int SendInterval;     // = 1000;    // [ms]

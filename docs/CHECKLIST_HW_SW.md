@@ -114,7 +114,7 @@ Simulate by turning potis on test console:
 - [ ] T-3
 - [ ] T-4
 
-Simulate with CAN-Bus test program:
+Simulate with CAN-Bus test program (TODO):
 
 - [ ] MPPT-1
 - [ ] MPPT-2
@@ -127,28 +127,28 @@ Simulate with CAN-Bus test program:
 
 Simulate by switching on switch board:
 
-- [ ] MC on/off
-- [ ] Bat on/off
-- [ ] PV on/off
+- [ ] MC on/off (LED on connector board)
+- [ ] Bat on/off (LED on connector board)
+- [ ] PV on/off (LED on connector board)
 - [ ] Speed
 
 ### SD Card
 
 - [ ] Check mount - write log - unmount cycle
-- [ ] Check file and folder print
-  - [ ] size increasing by log intervall
 
-| Command (case sensitive) | Function                                  |
-| ------------------------ | ----------------------------------------- |
-| M                        | mount cd card                             |
-| P                        | print files and folders to console        |
-| C                        | write csv data row into `/SER4DATA.CSV`   |
-| J                        | write json data set into `/SER4DATA.JSON` |
-| U                        | unmount sd card                           |
+| Command (case sensitive) | Function                                                     |
+| ------------------------ | ------------------------------------------------------------ |
+| M                        | mount cd card                                                |
+| P                        | print files and folders to console                           |
+| V and v,v,v              | Log state as csv with header and then 3 data rows  to sd card (`/SER4DATA.CSV`) |
+| J                        | write json data set into `/SER4DATA.CSV`                     |
+| U                        | unmount sd card                                              |
 
 - [ ] Life sign blinking red: no logging after Unmount or without inserted card
 - [ ] Life sign blinking green: logging active and writing to sd card
-- [ ] Insert of sd card switch on logging automatically
+- [ ] Inserting sd card mounts the card and switches on the logging automatically
+- [ ] Check file and folder print
+  - [ ] size increasing by log interval
 
 ## Integration
 
@@ -157,19 +157,19 @@ Simulate by switching on switch board:
 - **Left**
 
   - [ ] left screen
-  - [ ] left output *O_ind.Left*
+  - [ ] left output *O_ind.Left*  (LED on connector board)
 
   - Delay from button press to switch: ____ ms
 - **Right**
 
   - [ ] right screen
-  - [ ] right output *O_ind.Right*
+  - [ ] right output *O\_ind.Right*  (LED on connector board)
 
   - Delay from button press to switch: ____ ms
 - **Hazard Flash**
 
   - [ ] right+left screen
-  - [ ] right output *O_ind.Right* + left output *O_ind.Left*
+  - [ ] right output *O\_ind.Right* + left output *O_ind.Left*
 
   - Delay from button press to switch: ____ ms
 

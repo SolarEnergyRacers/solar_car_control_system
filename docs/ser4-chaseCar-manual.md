@@ -34,7 +34,7 @@ Available commands (!-:<>CcDdEHiIJklLMPRsSUuVvw):
 | s                | print status of all values         |
 | S                | print status                       |
 | J                | write JSON status to sdcard        |
-| V or v           | Log state as csv, V: with header   |
+| v or V         | Log state as csv to sd card, V: with header (write csv data row into `/SER4DATA.CSV`) |
 | M                | mount sdcard and eneable logging   |
 | P                | print directory of sdcard          |
 | U                | unmount sdcard and disable logging |
@@ -44,6 +44,7 @@ Available commands (!-:<>CcDdEHiIJklLMPRsSUuVvw):
 | i                | IO ReadAll                         |
 | ii               | verbose IO input view              |
 | io               | verbose IO output view             |
+|  |  |
 | iR               | re-init IO                         |
 
 #### DRIVER INFO COMMANDS

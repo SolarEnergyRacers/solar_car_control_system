@@ -42,6 +42,7 @@ string CarSpeed::init() {
   target_speed = 0;
   pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
+  pid.SetOutputLimits(-DAC_MAX,DAC_MAX);
   return fmt::format("[{}] CarSpeed initialized.", hasError ? "--" : "ok");
 }
 
@@ -62,14 +63,15 @@ double CarSpeed::get_current_speed() {
   // read analog value
   // TODO: Which methode?
   // int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
-  int16_t value = carState.Speed;
+  int16_t value = carState.Speed / 3.6; // convert from km/h to m/s
 
-  // convert value to voltage
-  float voltage = value * 5.0 / 65536; // TODO: check if we really use 16bit ADS1115
+  // // convert value to voltage
+  // float voltage = value * 5.0 / 65536; // use 16bit ADS1115
 
-  // convert value from voltage to revolutions per minute: 370rpm / V
-  float wheel_circumference = 1.76; // TODO: set circumference = diameter*pi, in meters
-  return (double)370 * wheel_circumference / 60.0;
+  // // convert value from voltage to revolutions per minute: 370rpm / V
+  // float wheel_circumference = 1.76; // TODO: set circumference = diameter*pi, in meters
+  // return (double)370 * wheel_circumference / 60.0;
+  return value;
 }
 
 void CarSpeed::update_pid(double Kp, double Ki, double Kd) {
@@ -87,7 +89,7 @@ void CarSpeed::task() {
    * - acceleration: Digital to analog converter value representing the target speed -> 0V: stop, 5V -> max speed
    * - a separate I/O is used for forward/reverse switching
    * - deceleration/recuperation: Digital to analog converter value representing the recuperation amount: -> 0V: no rec, 5V: max recup
-   * -> Note: n case of recup > 0, we should have acceleration 0
+   * -> Note: In case of recup > 0, we should have acceleration 0
    *
    * TODO: ini file: recuperate on constant speed mode , or just let it roll (i.e. let it roll if the speed is too high is less convenient
    * for the driver, however, it conserves energy since we do not over-regulate) For the moment, we recuperate
@@ -101,34 +103,31 @@ void CarSpeed::task() {
       target_speed = carState.TargetSpeed;
 
       // update pid controller
-      pid.Compute();
-
-      // check range
-      if (output_setpoint < -DAC_MAX) {
-        console << fmt::format("WARN::PID dejustified {} < -{}!\n", output_setpoint, DAC_MAX);
-        output_setpoint = -DAC_MAX;
+      bool hasNewValue = pid.Compute();
+      if (!hasNewValue) {
+        console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => cst=" << 0 << " (" << output_setpoint
+                << "\n";
+        return;
       }
-      if (output_setpoint > DAC_MAX) {
-        console << fmt::format("WARN::PID dejustified {} > {}!\n", output_setpoint, DAC_MAX);
-        output_setpoint = DAC_MAX;
-      }
-#if DAC_ON
+     
       // set acceleration & deceleration
-      if (output_setpoint >= 0) {
-        //   carState.Acceleration = output_setpoint; // acceleration
-        //   carState.Deceleration = 0;               // deceleration
-        dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN0); // acceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN1);               // recuperation
-      } else {
-        //   carState.Acceleration = 0;                // acceleration
-        //   carState.Deceleration = -output_setpoint; // deceleration
-        dac.set_pot(0, DAC::pot_chan::POT_CHAN0); // acceleration
-        // TODO: (+/- output_setpoint)
-        // dac.set_pot(output_setpoint, DAC::pot_chan::POT_CHAN1); // recuperation
-        dac.set_pot(-output_setpoint, DAC::pot_chan::POT_CHAN1); // deceleration
-        console << "#--- input_value=" << input_value << ", target_speed=" << target_speed << " ==> deceleration=" << output_setpoint
+      int8_t acc = 0;
+      int8_t dec = 0;
+
+      if (output_setpoint > 0) {
+        acc = round(output_setpoint);
+        console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => acc=" << acc << " (" << output_setpoint
+                << ")\n";
+      } else if (output_setpoint < 0) {
+        dec = round(-output_setpoint);
+        console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => dec=" << dec << " (" << output_setpoint
                 << "\n";
       }
+      // carState.Acceleration = acc; // acceleration
+      // carState.Deceleration = dec; // deceleration
+#if DAC_ON
+      dac.set_pot(acc, DAC::pot_chan::POT_CHAN0); // acceleration
+      dac.set_pot(dec, DAC::pot_chan::POT_CHAN1); // deceleration
 #endif
     }
     // sleep

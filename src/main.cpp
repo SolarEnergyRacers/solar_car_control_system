@@ -343,7 +343,7 @@ void app_main(void) {
 #if CARSPEED_ON
   msg = carSpeed.init();
   console << msg << "\n";
-  msg = carSpeed.create_task(10, 250, 2048);
+  msg = carSpeed.create_task(10, 250, 3000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif

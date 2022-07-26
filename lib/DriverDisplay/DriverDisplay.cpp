@@ -193,7 +193,7 @@ void DriverDisplay::constant_drive_mode_show() {
 }
 
 #define ECO_MODE_STRING " eco"
-#define PWR_MODE_STRING " Power"
+#define PWR_MODE_STRING " power"
 void DriverDisplay::eco_power_mode_show() {
   bool isEco = EcoModeOn.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(ecoPwrModeTextSize, ECO_MODE_STRING, PWR_MODE_STRING) + 4;

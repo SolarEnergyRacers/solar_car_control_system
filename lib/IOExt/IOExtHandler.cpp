@@ -169,6 +169,7 @@ void constantModeOffHandler() {
     }
   }
 }
+
 void constantModeHandler() {
   if (!systemOk)
     return;

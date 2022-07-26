@@ -116,7 +116,7 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     Wire.endTransmission();
     xSemaphoreGive(i2cBus.mutex);
     if (verboseModeDAC) {
-      console << fmt::format("dac:    {:02x}-chn | {:5d}-val  | {:5d}-acc  | {:5d}-dec | {:5d}-accD | {}-lck\n", channel, val,
+      console << fmt::format("dac:    {:02x}-chn | {:5d}-val | {:5d}-acc | {:5d}-dec  | {:5d}-accD | {}-lck\n", channel, val,
                              carState.Acceleration, carState.Deceleration, carState.AccelerationDisplay, carState.AccelerationLocked);
     }
   }

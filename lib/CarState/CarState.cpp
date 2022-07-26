@@ -39,6 +39,10 @@ void CarState::init_values() {
   ReferenceSolarCell = 0;
   MotorCurrent = 0;
 
+  Kp = 1;
+  Ki = 0;
+  Kd = 0;
+
   Indicator = INDICATOR::OFF;
   DriveDirection = DRIVE_DIRECTION::FORWARD;
   ConstantMode = CONSTANT_MODE::SPEED;
@@ -86,7 +90,7 @@ bool CarState::initalize_config() {
     MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);
 
   } catch (exception &ex) {
-    console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";
+    console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found or readable: " << ex.what() << "\n";
     return false;
   }
   return true;

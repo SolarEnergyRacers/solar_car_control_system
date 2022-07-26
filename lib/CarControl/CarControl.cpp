@@ -104,18 +104,12 @@ bool CarControl::read_reference_cell_data() {
 }
 
 bool CarControl::read_speed() {
+  float diameter = 0.50; // m
 #if ADC_ON
-  // native input
-  int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
-  // voltage
+  int16_t value = adc.read(ADC::Pin::MOTOR_SPEED); // native input
   float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED);
-  // round per minute
-  float rpm = 370 * voltage;
-  // speed
-  float radius = 0.50; // m
-  float speed = 3.1415 * radius * rpm / 60 * 3.6;
-  carState.Speed = (int)speed;
-  // console << fmt::sprintf("raw %5d | %5.2f, rpm:%5.2f, speed:%5.2f, %4d\n", value, voltage, rpm, speed, (int)speed);
+  float rpm = 370 * voltage; // round per minute
+  carState.Speed = round(3.1415 * diameter * rpm * 6. / 100.); // unit: km/h
 #endif
   return true;
 }
@@ -131,7 +125,7 @@ bool CarControl::read_paddles() {
   // check if change is in damping
   if (valueAcc != 0 && valueDec != 0)
     if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
-      return hasChanged;
+      return false;
 
   int16_t valueDecNorm = 0;
   int16_t valueAccNorm = 0;

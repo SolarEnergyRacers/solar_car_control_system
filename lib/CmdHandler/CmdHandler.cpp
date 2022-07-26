@@ -82,11 +82,12 @@ void CmdHandler::exit() {
 }
 // ------------------
 
-template <size_t N> void splitString(string (&arr)[N], string str) {
+template <size_t N> int splitString(string (&arr)[N], string str) {
   int n = 0;
   istringstream iss(str);
   for (auto it = istream_iterator<string>(iss); it != istream_iterator<string>() && n < N; ++it, ++n)
     arr[n] = *it;
+  return n;
 }
 
 void CmdHandler::task() {
@@ -202,12 +203,16 @@ void CmdHandler::task() {
 #if CARSPEED_ON
         {
           string arr[4];
-          splitString(arr, &input[1]);
-          float Kp = atof(arr[0].c_str());
-          float Ki = atof(arr[1].c_str());
-          float Kd = atof(arr[2].c_str());
-          carSpeed.update_pid(Kp, Ki, Kd);
-          console << "PID set to Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+          int count = splitString(arr, &input[1]);
+          if (count == 0) {
+            console << "PID settings Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+          } else {
+            float Kp = atof(arr[0].c_str());
+            float Ki = atof(arr[1].c_str());
+            float Kd = atof(arr[2].c_str());
+            carSpeed.update_pid(Kp, Ki, Kd);
+            console << "PID set to   Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+          }
         }
 #else
           console << "Car speed control deactivated\n";

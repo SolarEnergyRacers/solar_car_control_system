@@ -40,9 +40,9 @@ string CarSpeed::init() {
   bool hasError = false;
   console << "[  ] Init 'CarSpeed'...\n";
   target_speed = 0;
-  pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
+  pid = PID(&input_value, &output_setpoint, &target_speed, carState.Kp, carState.Ki, carState.Kd, DIRECT);
   pid.SetMode(AUTOMATIC);
-  pid.SetOutputLimits(-DAC_MAX,DAC_MAX);
+  pid.SetOutputLimits(-DAC_MAX, DAC_MAX);
   return fmt::format("[{}] CarSpeed initialized.", hasError ? "--" : "ok");
 }
 
@@ -57,22 +57,7 @@ void CarSpeed::target_speed_decr(void) { target_speed -= speed_increment; }
 
 double CarSpeed::get_target_speed() { return target_speed; }
 
-double CarSpeed::get_current_speed() {
-  // TODO: this function can be heavily optimized (i.e. use int instead of float, use less arithmetic operations
-
-  // read analog value
-  // TODO: Which methode?
-  // int16_t value = adc.read(ADC::Pin::MOTOR_SPEED);
-  int16_t value = carState.Speed / 3.6; // convert from km/h to m/s
-
-  // // convert value to voltage
-  // float voltage = value * 5.0 / 65536; // use 16bit ADS1115
-
-  // // convert value from voltage to revolutions per minute: 370rpm / V
-  // float wheel_circumference = 1.76; // TODO: set circumference = diameter*pi, in meters
-  // return (double)370 * wheel_circumference / 60.0;
-  return value;
-}
+double CarSpeed::get_current_speed() { return carState.Speed; }
 
 void CarSpeed::update_pid(double Kp, double Ki, double Kd) {
   carState.Kp = Kp;
@@ -106,13 +91,13 @@ void CarSpeed::task() {
       bool hasNewValue = pid.Compute();
       if (!hasNewValue) {
         console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => cst=" << 0 << " (" << output_setpoint
-                << "\n";
+                << ")\n";
         return;
       }
-     
+
       // set acceleration & deceleration
-      int8_t acc = 0;
-      int8_t dec = 0;
+      uint8_t acc = 0;
+      uint8_t dec = 0;
 
       if (output_setpoint > 0) {
         acc = round(output_setpoint);
@@ -121,13 +106,13 @@ void CarSpeed::task() {
       } else if (output_setpoint < 0) {
         dec = round(-output_setpoint);
         console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => dec=" << dec << " (" << output_setpoint
-                << "\n";
+                << ")\n";
       }
       // carState.Acceleration = acc; // acceleration
       // carState.Deceleration = dec; // deceleration
 #if DAC_ON
-      dac.set_pot(acc, DAC::pot_chan::POT_CHAN0); // acceleration
-      dac.set_pot(dec, DAC::pot_chan::POT_CHAN1); // deceleration
+      // dac.set_pot(acc, DAC::pot_chan::POT_CHAN0); // acceleration
+      // dac.set_pot(dec, DAC::pot_chan::POT_CHAN1); // deceleration
 #endif
     }
     // sleep

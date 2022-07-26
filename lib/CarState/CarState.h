@@ -251,7 +251,7 @@ public:
 
   // [Dynamic]
   int PaddleDamping;        // = 10;         // 0...99
-  int PaddleOffset;         // = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
+  int PaddleOffset;         // = 100;        // 0 ... 65535: offset when paddle recognize not 0 values
   int PaddleAdjustCounter;  // = 24;   // about seconds
   float ConstSpeedIncrease; // = 1.0; // [km/h] per click
   float ConstPowerIncrease; // = 1.0; // [W] per click

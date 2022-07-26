@@ -38,7 +38,7 @@ public:
   bool read_motor_data();
   bool read_pv_data();
   bool read_reference_cell_data();
-  bool read_speed();
+  bool read_speed(); // in km/h
 
   bool read_paddles();
   void adjust_paddles(int second = 1);

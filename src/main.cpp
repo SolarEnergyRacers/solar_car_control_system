@@ -197,9 +197,11 @@ void app_main(void) {
   // console << carState.printIOs("", true, false) << "\n";
 
 #if SD_ON
+  sdCardDetectHandler();
   msg = sdCard.init();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
+  console << "---01------------------------------------------\n";
 #endif
 
   //--- SD card available ----------------------------

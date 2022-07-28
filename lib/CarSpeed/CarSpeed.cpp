@@ -9,15 +9,16 @@
 
 #include <fmt/core.h>
 #include <fmt/format.h>
-#include <fmt/printf.h>
 #include <inttypes.h>
 #include <iostream>
 #include <sstream>
 #include <stdio.h>
 #include <string>
 
+#include <CarControl.h>
 #include <CarSpeed.h>
 #include <CarState.h>
+
 #include <Console.h>
 #include <DAC.h>
 #include <Helper.h>
@@ -26,10 +27,10 @@
 extern Console console;
 extern PID pid;
 extern CarSpeed carSpeed;
+extern CarState carState;
 #if DAC_ON
 extern DAC dac;
 #endif
-extern CarState carState;
 
 // ------------------
 // FreeRTOS functions
@@ -87,33 +88,35 @@ void CarSpeed::task() {
       input_value = carState.Speed;
       target_speed = carState.TargetSpeed;
 
+      stringstream ss("#- input_value=");
+      ss << input_value << ", target_speed=" << target_speed << " =>";
       // update pid controller
       bool hasNewValue = pid.Compute();
       if (!hasNewValue) {
-        console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => cst=" << 0 << " (" << output_setpoint
-                << ")\n";
+        if (verboseModePID) {
+          ss << " cst=0" << carState.AccelerationDisplay << "(" << output_setpoint << ")\n";
+        }
         return;
       }
 
       // set acceleration & deceleration
       uint8_t acc = 0;
       uint8_t dec = 0;
-
       if (output_setpoint > 0) {
         acc = round(output_setpoint);
-        console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => acc=" << acc << " (" << output_setpoint
-                << ")\n";
+        ss << "acc=" << acc;
       } else if (output_setpoint < 0) {
         dec = round(-output_setpoint);
-        console << "#- input_value=" << input_value << ", target_speed=" << target_speed << " => dec=" << dec << " (" << output_setpoint
-                << ")\n";
+        ss << "dec=" << dec;
       }
-      // carState.Acceleration = acc; // acceleration
-      // carState.Deceleration = dec; // deceleration
 #if DAC_ON
-      // dac.set_pot(acc, DAC::pot_chan::POT_CHAN0); // acceleration
-      // dac.set_pot(dec, DAC::pot_chan::POT_CHAN1); // deceleration
+      dac.set_pot(acc, DAC::pot_chan::POT_CHAN0); // acceleration
+      dac.set_pot(dec, DAC::pot_chan::POT_CHAN1); // deceleration
 #endif
+      carState.AccelerationDisplay = round((acc > 0 ? acc : -dec) * MAX_ACCELERATION_DISPLAY_VALUE / DAC_MAX);
+      if (verboseModePID) {
+        ss << carState.AccelerationDisplay << " (" << output_setpoint << ")\n";
+      }
     }
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);

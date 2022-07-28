@@ -28,8 +28,8 @@ string I2CBus::init(void) {
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
-  // Wire.begin(I2C_SDA, I2C_SCL, carState.I2CFrequence * 1000); // frequency in Hz
-  Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ); // frequency in MHz
+  // Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ); // frequency in MHz
+  Wire.begin(I2C_SDA, I2C_SCL, carState.I2CFrequence * 1000); // frequency in kHz
   xSemaphoreGive(mutex);
   console << "     I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
   scan_i2c_devices();

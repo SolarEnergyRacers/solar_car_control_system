@@ -30,6 +30,7 @@ CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(p
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
 void CarState::init_values() {
+  // values read from sensors
   Speed = 0;
   Acceleration = 0;
   Deceleration = 0;
@@ -38,17 +39,13 @@ void CarState::init_values() {
   PhotoVoltaicCurrent = 0;
   ReferenceSolarCell = 0;
   MotorCurrent = 0;
+  SdCardDetect = false;
 
-  Kp = 1;
-  Ki = 0;
-  Kd = 0;
-
+  // values set by control elements or CarControl
   Indicator = INDICATOR::OFF;
   DriveDirection = DRIVE_DIRECTION::FORWARD;
   ConstantMode = CONSTANT_MODE::SPEED;
   ConstantModeOn = false; //#SAFETY#: deceleration unlock const mode
-  SdCardDetect = false;
-
   TargetSpeed = 0;
   TargetPower = 0;
   DriverInfo = "Acceleration\nstill locked!";
@@ -56,11 +53,10 @@ void CarState::init_values() {
   Light = LIGHT::OFF;
   GreenLight = false;
   Fan = false;
-  LogFilename = "/SER4log.CSV";
 
-  // read from ser4config.ini file
+  // read from SER4CONFIG.INI file
   initalize_config();
-  // console << print("State after SER4CONF.INI") << "\n";
+  console << print("State after reading SER4CONFIG.INI") << "\n";
 }
 
 bool CarState::initalize_config() {
@@ -68,7 +64,7 @@ bool CarState::initalize_config() {
     ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
     // [Main]
     LogFilename = cf.get("Main", "LogFilename", "/SER4DATA.CSV");
-    LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
+    LogFilePeriod = cf.get("Main", "LogFilePeriod", 1000);
     LogInterval = cf.get("Main", "LogInterval", 1);
     // [PID]
     Kp = cf.get("PID", "Kp", 2);
@@ -76,8 +72,8 @@ bool CarState::initalize_config() {
     Kd = cf.get("PID", "Kd", 0.1);
     // [Dynamic]
     PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
-    PaddleOffset = cf.get("Dynamic", "PaddleOffset", 3000);
-    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 25);
+    PaddleOffset = cf.get("Dynamic", "PaddleOffset", 999);
+    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 24);
     ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
     ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
     // [Communication]
@@ -90,7 +86,7 @@ bool CarState::initalize_config() {
     MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);
 
   } catch (exception &ex) {
-    console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found or readable: " << ex.what() << "\n";
+    console << "WARN: No config file: '" << FILENAME_SER4CONFIG << "' found or readable: " << ex.what() << "\n";
     return false;
   }
   return true;

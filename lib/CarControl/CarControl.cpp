@@ -108,10 +108,28 @@ bool CarControl::read_speed() {
 #if ADC_ON
   int16_t value = adc.read(ADC::Pin::MOTOR_SPEED); // native input
   float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED);
-  float rpm = 370 * voltage; // round per minute
+  float rpm = 370 * voltage;                                   // round per minute
   carState.Speed = round(3.1415 * diameter * rpm * 6. / 100.); // unit: km/h
 #endif
   return true;
+}
+
+int CarControl::calculate_displayvalue_acc_dec(int valueDec, int valueAcc) {
+  int16_t valueDecNorm = 0;
+  int16_t valueAccNorm = 0;
+  int valueDisplay = 0;
+  valueDecNorm = CarControl::_normalize(0, MAX_ACCELERATION_DISPLAY_VALUE, ads_min_dec, ads_max_dec, valueDec);
+  if (valueDecNorm > 0) {
+    valueDisplay = -valueDecNorm;
+  } else {
+    valueAccNorm = CarControl::_normalize(0, MAX_ACCELERATION_DISPLAY_VALUE, ads_min_acc, ads_max_acc, valueAcc);
+    if (valueAccNorm > 0) {
+      valueDisplay = valueAccNorm;
+    } else {
+      valueDisplay = 0;
+    }
+  }
+  return valueDisplay;
 }
 
 bool CarControl::read_paddles() {
@@ -122,35 +140,27 @@ bool CarControl::read_paddles() {
   }
   int16_t valueDec = carState.STW_DEC; // adc.read(ADC::Pin::STW_DEC);
   int16_t valueAcc = carState.STW_ACC; // adc.read(ADC::Pin::STW_ACC);
-  // check if change is in damping
+                                       // check if change is in damping
+                                       // if (valueAcc != 0 && valueDec != 0)
   if (valueAcc != 0 && valueDec != 0)
     if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
       return false;
 
-  int16_t valueDecNorm = 0;
-  int16_t valueAccNorm = 0;
-  int valueDisplay = 0;
-
-  valueDecNorm = CarControl::_normalize(0, MIN_DISPLAY_VALUE, ads_min_dec, ads_max_dec, valueDec);
-  if (valueDecNorm > 0) {
-    valueDisplay = -valueDecNorm;
-  } else {
-    valueAccNorm = CarControl::_normalize(0, MAX_DISPLAY_VALUE, ads_min_acc, ads_max_acc, valueAcc);
-    if (valueAccNorm > 0) {
-      valueDisplay = valueAccNorm;
-    } else {
-      valueDisplay = 0;
-    }
+  // #SAFETY#: Reset constant mode on deceleration paddel touched
+  if (valueDec > carState.PaddleDamping) {
+    carState.ConstantModeOn = false;
   }
+
+  int valueDisplay = calculate_displayvalue_acc_dec(valueDec, valueAcc);
   // prepare and write motor acceleration and recuperation values to DigiPot
   int valueDecPot = 0;
   int valueAccPot = 0;
   if (valueDisplay < 0) {
-    valueDecPot = -(int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * DAC_MAX);
+    valueDecPot = -(int)(((float)valueDisplay / MAX_ACCELERATION_DISPLAY_VALUE) * DAC_MAX);
     valueAccPot = 0;
   } else {
     valueDecPot = 0;
-    valueAccPot = (int)(((float)valueDisplay / MAX_DISPLAY_VALUE) * DAC_MAX);
+    valueAccPot = (int)(((float)valueDisplay / MAX_ACCELERATION_DISPLAY_VALUE) * DAC_MAX);
   }
 
   if (valueDisplayLast != valueDisplay) {
@@ -166,8 +176,10 @@ bool CarControl::read_paddles() {
 }
 
 void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
-// debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-//              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
+  // debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
+  //              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
+  if (carState.ConstantModeOn && valueDec == 0 && valueAcc == 0)
+    return;
 #if DAC_ON
   dac.set_pot(valueDecPot, DAC::pot_chan::POT_CHAN1);
   dac.set_pot(valueAccPot, DAC::pot_chan::POT_CHAN0);

@@ -39,7 +39,7 @@ public:
                     "\tM            - mount sdcard and eneable logging\n"
                     "\tU            - unmount sdcard and disable logging\n"
                     "\tH            - memory_info\n"
-                    "\tk [kp ki kd] - show / update PID constants\n"
+                    "\tk [|kp ki kd|v] - show / update PID constants, v- verbose display\n"
                     "\tt            - get date and time\n"
                     "\tT yyyy mm dd hh MM - set RTC date and time\n"
                     "\tI            - scan I2C devices\n"

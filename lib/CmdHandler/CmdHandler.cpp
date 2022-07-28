@@ -201,23 +201,25 @@ void CmdHandler::task() {
         // -------------- chase car commands
         case 'k':
 #if CARSPEED_ON
-        {
-          string arr[4];
-          int count = splitString(arr, &input[1]);
-          if (count == 0) {
-            console << "PID settings Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+          if (input[1] == 'v') {
+            carSpeed.verboseModePID = !carSpeed.verboseModePID;
           } else {
-            float Kp = atof(arr[0].c_str());
-            float Ki = atof(arr[1].c_str());
-            float Kd = atof(arr[2].c_str());
-            carSpeed.update_pid(Kp, Ki, Kd);
-            console << "PID set to   Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+            string arr[4];
+            int count = splitString(arr, &input[1]);
+            if (count == 0) {
+              console << "PID settings Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+            } else {
+              float Kp = atof(arr[0].c_str());
+              float Ki = atof(arr[1].c_str());
+              float Kd = atof(arr[2].c_str());
+              carSpeed.update_pid(Kp, Ki, Kd);
+              console << "PID set to   Kp=" << carState.Kp << ", Ki=" << carState.Ki << ", Kd=" << carState.Kd << "\n";
+            }
           }
-        }
 #else
           console << "Car speed control deactivated\n";
 #endif
-        break;
+          break;
         case 't': {
           time_t theTime = time(NULL);
           struct tm t = *localtime(&theTime);

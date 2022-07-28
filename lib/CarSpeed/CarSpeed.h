@@ -5,10 +5,10 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H
 #define SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H
 
+#include <CarState.h>
 #include <PID_v1.h>
 #include <abstract_task.h>
 #include <stdio.h>
-#include <CarState.h>
 
 extern CarState carState;
 
@@ -31,7 +31,7 @@ public:
 private:
   double input_value;
   double output_setpoint;
-  double target_speed; // in m/s
+  double target_speed;          // in m/s
   double speed_increment = 1.0; // in m/s
   PID pid = PID(&input_value, &output_setpoint, &target_speed, carState.Kp, carState.Ki, carState.Kd, DIRECT);
 
@@ -45,6 +45,7 @@ public:
   double GetKp() { return pid.GetKp(); }
   double GetKi() { return pid.GetKi(); }
   double GetKd() { return pid.GetKd(); }
+  bool verboseModePID = false;
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H

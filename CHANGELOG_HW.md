@@ -36,6 +36,10 @@
 | SD Card detect     | %        | IOExt2:5 |
 | ILI C/D Low active | R to GND | R to VCC |
 
+2022.07.30:
+
+- [ ] PV on/off switch (on switchboard) switches MCin/MCout, but where are MCin and MCout?
+
 ## 2022.06.14 -  Test im Auto
 
 ### Main Board

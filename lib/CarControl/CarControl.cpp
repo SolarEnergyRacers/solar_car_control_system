@@ -75,30 +75,30 @@ void CarControl::_handleValueChanged() {
 
 bool CarControl::read_battery_data() {
 #if ADC_ON
-  carState.BatteryVoltage = adc.read(ADC::Pin::BAT_VOLTAGE) / 100.;  // TODO
-  carState.BatteryCurrent = adc.read(ADC::Pin::BAT_CURRENT) / 1000.; // TODO
+  carState.BatteryVoltage = adc.BAT_VOLTAGE / 100.;  // TODO
+  carState.BatteryCurrent = adc.BAT_CURRENT / 1000.; // TODO
 #endif
   return true;
 }
 
 bool CarControl::read_motor_data() {
 #if ADC_ON
-  carState.MotorVoltage = adc.read(ADC::Pin::MOTOR_VOLTAGE) / 100.;  // TODO
-  carState.MotorCurrent = adc.read(ADC::Pin::MOTOR_CURRENT) / 1000.; // TODO
+  carState.MotorVoltage = adc.MOTOR_VOLTAGE / 100.;  // TODO
+  carState.MotorCurrent = adc.MOTOR_CURRENT / 1000.; // TODO
 #endif
   return true;
 }
 
 bool CarControl::read_pv_data() {
 #if ADC_ON
-  carState.PhotoVoltaicCurrent = adc.read(ADC::Pin::PV_CURRENT) / 100.; // TODO
+  carState.PhotoVoltaicCurrent = adc.PV_CURRENT / 100.; // TODO
 #endif
   return true;
 }
 
 bool CarControl::read_reference_cell_data() {
 #if ADC_ON
-  carState.ReferenceSolarCell = adc.read(ADC::Pin::REFERENCE_CELL);
+  carState.ReferenceSolarCell = adc.REFERENCE_CELL; // TODO
 #endif
   return true;
 }
@@ -106,8 +106,8 @@ bool CarControl::read_reference_cell_data() {
 bool CarControl::read_speed() {
   float diameter = 0.50; // m
 #if ADC_ON
-  int16_t value = adc.read(ADC::Pin::MOTOR_SPEED); // native input
-  float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED);
+  int16_t value = adc.MOTOR_SPEED; // native input
+  float voltage = value * adc.get_multiplier(ADC::Pin::MOTOR_SPEED_PORT);
   float rpm = 370 * voltage;                                   // round per minute
   carState.Speed = round(3.1415 * diameter * rpm * 6. / 100.); // unit: km/h
 #endif
@@ -201,10 +201,9 @@ bool CarControl::read_paddles() {
     _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
     return true;
   }
-  int16_t valueDec = carState.STW_DEC; // adc.read(ADC::Pin::STW_DEC);
-  int16_t valueAcc = carState.STW_ACC; // adc.read(ADC::Pin::STW_ACC);
-                                       // check if change is in damping
-                                       // if (valueAcc != 0 && valueDec != 0)
+  int16_t valueDec = adc.STW_DEC;
+  int16_t valueAcc = adc.STW_ACC;
+  // check if change is in damping
   if (valueAcc != 0 && valueDec != 0)
     if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
       return false;
@@ -283,14 +282,14 @@ void CarControl::adjust_paddles(int cycles) {
 
 #if ADC_ON
     int16_t value;
-    value = adc.read(ADC::Pin::STW_DEC);
+    value = adc.read(ADC::Pin::STW_DEC_PORT);
     if (value > 0) {
       if (ads_min_dec > value)
         ads_min_dec = value;
       if (ads_max_dec < value)
         ads_max_dec = value;
     }
-    value = adc.read(ADC::Pin::STW_ACC);
+    value = adc.read(ADC::Pin::STW_ACC_PORT);
     if (value > 0) {
       if (ads_min_acc > value)
         ads_min_acc = value;
@@ -321,7 +320,7 @@ int CarControl::_normalize(int minDisplayValue, int maxDisplayValue, int minValu
 
   float retValue = (value - minValue) * displArea / valueArea;
 
-  return (int)retValue;
+  return round(retValue);
 }
 
 void CarControl::_handle_indicator() {
@@ -357,10 +356,11 @@ void CarControl::task() {
     bool someThingChanged = false;
     if (carState.ControlMode == CONTROL_MODE::PADDLES)
       someThingChanged |= read_paddles();
-    else
+    else if (!carState.ConstantModeOn)
       someThingChanged |= read_PLUS_MINUS();
     someThingChanged |= read_motor_data();
     someThingChanged |= read_battery_data();
+    someThingChanged |= read_pv_data();
     someThingChanged |= read_speed();
     someThingChanged |= read_reference_cell_data();
 

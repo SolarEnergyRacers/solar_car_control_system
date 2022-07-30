@@ -373,8 +373,8 @@ void CmdHandler::task() {
 string CmdHandler::printSystemValues() {
   stringstream ss("");
 #if ADC_ON
-  int16_t valueDec = adc.read(ADC::Pin::STW_DEC);
-  int16_t valueAcc = adc.read(ADC::Pin::STW_ACC);
+  int16_t valueDec = adc.STW_DEC;
+  int16_t valueAcc = adc.STW_ACC;
   ss << fmt::format("ADC: dec={:5d}  acc={:5d}\n", valueDec, valueAcc);
 #endif
 #if DAC_ON

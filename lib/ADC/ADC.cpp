@@ -15,7 +15,7 @@
 #include <Wire.h> // I2C
 
 #include <ADC.h>
-#include <CarState.h>
+//#include <CarState.h>
 #include <Console.h>
 #include <DAC.h>
 #include <DriverDisplay.h>
@@ -23,7 +23,7 @@
 #include <abstract_task.h>
 
 extern Console console;
-extern CarState carState;
+// extern CarState carState;
 extern I2CBus i2cBus;
 extern ADC adc;
 extern DAC dac;
@@ -108,23 +108,22 @@ void ADC::task() {
   // polling loop
   while (1) {
     // ADC0
-    carState.MOTOR_SPEED = read(MOTOR_SPEED);
-    carState.BAT_CURRENT = read(BAT_CURRENT);
-    carState.MOTOR_CURRENT = read(MOTOR_CURRENT);
-    carState.PV_CURRENT = read(PV_CURRENT);
+    MOTOR_SPEED = read(Pin::MOTOR_SPEED_PORT);
+    BAT_CURRENT = read(Pin::BAT_CURRENT_PORT);
+    MOTOR_CURRENT = read(Pin::MOTOR_CURRENT_PORT);
+    PV_CURRENT = read(Pin::PV_CURRENT_PORT);
     // ADC1
-    carState.BAT_VOLTAGE = read(BAT_VOLTAGE);
-    carState.MOTOR_VOLTAGE = read(MOTOR_VOLTAGE);
-    carState.REFERENCE_CELL = read(REFERENCE_CELL);
+    BAT_VOLTAGE = read(Pin::BAT_VOLTAGE_PORT);
+    MOTOR_VOLTAGE = read(Pin::MOTOR_VOLTAGE_PORT);
+    REFERENCE_CELL = read(Pin::REFERENCE_CELL_PORT);
     // ADC2 (steering wheel)
-    carState.STW_ACC = read(STW_ACC);
-    carState.STW_DEC = read(STW_DEC);
+    STW_ACC = read(Pin::STW_ACC_PORT);
+    STW_DEC = read(Pin::STW_DEC_PORT);
 
     if (verboseModeADC) {
       console << fmt::format(
-          "adc: {:5d}-spd | {:5d}-acc | {:5d}-dec | {:5d}-batI | {:5d}-motI | {:5d}-pvI | {:5d}-batV | {:5d}-motV | {:5d}-ref\n",
-          carState.MOTOR_SPEED, carState.STW_ACC, carState.STW_DEC, carState.BAT_CURRENT, carState.MOTOR_CURRENT, carState.PV_CURRENT,
-          carState.BAT_VOLTAGE, carState.MOTOR_VOLTAGE, carState.REFERENCE_CELL);
+          "adc: speed {:5d}-spd | acc {:5d} | dec {:5d} | batC {:5d} | motC {:5d}I | pvC {:5d} | batV {:5d} | motV {:5d} | refV {:5d}\n",
+          MOTOR_SPEED, STW_ACC, STW_DEC, BAT_CURRENT, MOTOR_CURRENT, PV_CURRENT, BAT_VOLTAGE, MOTOR_VOLTAGE, REFERENCE_CELL);
     }
 
     // sleep

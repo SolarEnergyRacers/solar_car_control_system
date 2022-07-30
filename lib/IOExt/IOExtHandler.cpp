@@ -242,37 +242,27 @@ void sdCardDetectHandler() {
 }
 
 void decreaseHandler() {
-  if (!systemOk || !carState.ConstantModeOn)
+  if (!systemOk || !carState.ConstantModeOn) // || carState.ControlMode == CONTROL_MODE::BUTTONS)
     return;
-  if (carState.ControlMode == CONTROL_MODE::PADDLES) {
-    console << "Decrease constant mode target.\n";
-    carState.TargetSpeed -= carState.ConstSpeedIncrease;
-    if (carState.TargetSpeed < 0)
-      carState.TargetSpeed = 0;
+  console << "Decrease constant mode target.\n";
+  carState.TargetSpeed -= carState.ConstSpeedIncrease;
+  if (carState.TargetSpeed < 0)
+    carState.TargetSpeed = 0;
 
-    carState.TargetPower -= carState.ConstPowerIncrease;
-    if (carState.TargetPower < 0)
-      carState.TargetPower = 0;
-  } else {
-    // carState.Acceleration -= carState.ButtonControlModeIncrease;
-    // console << fmt::format("Decrease acceleration to {}.\n", carState.Acceleration);
-  }
+  carState.TargetPower -= carState.ConstPowerIncrease;
+  if (carState.TargetPower < 0)
+    carState.TargetPower = 0;
 }
 
 void increaseHandler() {
-  if (!systemOk || !carState.ConstantModeOn)
+  if (!systemOk || !carState.ConstantModeOn) // || carState.ControlMode == CONTROL_MODE::BUTTONS)
     return;
-  if (carState.ControlMode == CONTROL_MODE::PADDLES) {
-    console << "Increase constant mode target.\n";
-    carState.TargetSpeed += carState.ConstSpeedIncrease;
-    if (carState.TargetSpeed > 111) // only until 111km/h
-      carState.TargetSpeed = 111;
+  console << "Increase constant mode target.\n";
+  carState.TargetSpeed += carState.ConstSpeedIncrease;
+  if (carState.TargetSpeed > 111) // only until 111km/h
+    carState.TargetSpeed = 111;
 
-    carState.TargetPower += carState.ConstPowerIncrease;
-    if (carState.TargetPower > 4500) // only until 5kW
-      carState.TargetPower = 4500;
-  } else {
-    // carState.Acceleration += carState.ButtonControlModeIncrease;
-    // console << fmt::format("Increase acceleration to {}.\n", carState.Acceleration);
-  }
+  carState.TargetPower += carState.ConstPowerIncrease;
+  if (carState.TargetPower > 4500) // only until 5kW
+    carState.TargetPower = 4500;
 }

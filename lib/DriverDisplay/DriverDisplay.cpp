@@ -109,7 +109,8 @@ void DriverDisplay::draw_speed_border(int color) {
 #define ACCELERATION_UNIT "%"
 void DriverDisplay::draw_acceleration_border(int color) {
   accFrameSizeX = speedFrameX - 3;
-  int accUnitX = accFrameX + accFrameSizeX - 4 - getPixelWidthOfTexts(constantModeTextSize, ACCELERATION_UNIT, ACCELERATION_UNIT);;
+  int accUnitX = accFrameX + accFrameSizeX - 4 - getPixelWidthOfTexts(constantModeTextSize, ACCELERATION_UNIT, ACCELERATION_UNIT);
+  ;
   xSemaphoreTakeT(spiBus.mutex);
   tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
   tft.setCursor(accUnitX, speedUnitY);
@@ -214,10 +215,11 @@ void DriverDisplay::control_mode_show() {
   tft.fillRoundRect(controlModeX - 2, controlModeY - 2, width, 18, 3, ILI9341_BLACK);
   tft.setCursor(controlModeX, controlModeY);
   tft.setTextSize(controlModeTextSize);
-  tft.setTextColor(ILI9341_GREENYELLOW);
   if (mode == CONTROL_MODE::PADDLES) {
+    tft.setTextColor(ILI9341_DARKGREEN);
     tft.print(CONTROLMODE_PADDLES_STRING);
   } else {
+    tft.setTextColor(ILI9341_GREENYELLOW);
     tft.print(CONTROLMODE_BUTTONS_STRING);
   }
   xSemaphoreGive(spiBus.mutex);
@@ -482,7 +484,8 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (BatteryOn.is_changed() || justInited) {
       BatteryOn.showValue(tft);
     }
-    PhotoVoltaicCurrent.Value = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+    // TODO: PhotoVoltaicCurrent.Value = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+    PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent;
     if (PhotoVoltaicCurrent.is_changed() || justInited) {
       PhotoVoltaicCurrent.showValue(tft);
     }

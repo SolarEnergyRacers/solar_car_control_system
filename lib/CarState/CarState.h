@@ -147,19 +147,6 @@ public:
   ~CarState(){};
   bool initalize_config();
 
-  // ADC native values
-  int16_t MOTOR_SPEED;
-  int16_t BAT_CURRENT;
-  int16_t MOTOR_CURRENT;
-  int16_t PV_CURRENT;
-  // ADC1
-  int16_t BAT_VOLTAGE;
-  int16_t MOTOR_VOLTAGE;
-  int16_t REFERENCE_CELL;
-  // ADC2 (steering wheel)
-  int16_t STW_ACC;
-  int16_t STW_DEC;
-
   // physical car data (measurement values)
   int Speed;        // ADC
   int Acceleration; // ADC Steering Wheel

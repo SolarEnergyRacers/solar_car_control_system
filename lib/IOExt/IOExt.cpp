@@ -204,7 +204,7 @@ int IOExt::getPort(int port) {
   xSemaphoreTakeT(i2cBus.mutex);
   int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
   xSemaphoreGive(i2cBus.mutex);
-  //console << fmt::format("port 0x{:02x} [{}|{}]: {} -- {}ms\n", port, devNr, pin, value, millis());
+  // console << fmt::format("port 0x{:02x} [{}|{}]: {} -- {}ms\n", port, devNr, pin, value, millis());
   return value;
 }
 

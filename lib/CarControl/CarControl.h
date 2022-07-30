@@ -42,7 +42,10 @@ public:
 
   int calculate_displayvalue_acc_dec(int valueDec, int valueAcc);
   bool read_paddles();
+  bool read_PLUS_MINUS();
   void adjust_paddles(int second = 1);
+  void reset_acceleration_values() { _set_dec_acc_values(0, 0, 0, 0, 0); }
+  bool verboseMode = false;
 
 private:
   int ads_min_dec = 14000; // paddle_adjust overwrites this values

@@ -92,10 +92,6 @@ int16_t ADC::read(ADC::Pin port) {
     value = ADC::adss[idx].readADC(pin);
     xSemaphoreGive(i2cBus.mutex);
   }
-
-  // if (port == STW_ACC || port == STW_DEC || port == MOTOR_SPEED) {
-  //    console << fmt::sprintf("port 0x%02x: index: 0x%x, pin: 0x%x => value=%d\n", port, idx, pin, value);
-  // }
   return value;
 }
 

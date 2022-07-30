@@ -132,6 +132,69 @@ int CarControl::calculate_displayvalue_acc_dec(int valueDec, int valueAcc) {
   return valueDisplay;
 }
 
+bool CarControl::read_PLUS_MINUS() {
+  bool hasChanged = false;
+  if (carState.BreakPedal) {
+    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
+    return true;
+  }
+
+  bool plusButton = ioExt.getPort(carState.getPin(PinIncrease)->port) == 0;  // currently pressed?
+  bool minusButton = ioExt.getPort(carState.getPin(PinDecrease)->port) == 0; // currently pressed?
+  if (!plusButton && !minusButton)
+    return false;
+
+  int8_t acceleration; // -99 ... +99
+  if (carState.Deceleration > 0) {
+    acceleration = -carState.Deceleration;
+  } else {
+    acceleration = carState.Acceleration;
+  }
+
+  if (minusButton) {
+    if (acceleration - carState.ButtonControlModeIncrease > -99)
+      acceleration -= carState.ButtonControlModeIncrease;
+    else
+      acceleration = -99;
+  } else if (plusButton) {
+    if (acceleration + carState.ButtonControlModeIncrease < 99)
+      acceleration += carState.ButtonControlModeIncrease;
+    else
+      acceleration = 99;
+  }
+
+  int8_t valueDec = 0;
+  int8_t valueAcc = 0;
+  if (acceleration < 0) {
+    valueDec = -acceleration;
+  } else if (acceleration > 0) {
+    valueAcc = acceleration;
+  }
+
+  int valueDisplay = valueDec > 0 ? -valueDec : valueAcc;
+  // prepare and write motor acceleration and recuperation values to DigiPot
+  int valueDecPot = 0;
+  int valueAccPot = 0;
+  if (valueDisplay < 0) {
+    valueDecPot = -(int)(((float)valueDisplay / MAX_ACCELERATION_DISPLAY_VALUE) * DAC_MAX);
+    valueAccPot = 0;
+  } else {
+    valueDecPot = 0;
+    valueAccPot = (int)(((float)valueDisplay / MAX_ACCELERATION_DISPLAY_VALUE) * DAC_MAX);
+  }
+
+  if (valueDisplayLast != valueDisplay) {
+    hasChanged = true;
+    _set_dec_acc_values(valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
+  }
+  if (verboseMode) {
+    console << fmt::format(
+        "button mode: acc={:3d} --> valueDecPot={:4d}, valueAccPot={:4d} | valueDec={:3d}, valueAcc={:3d}, valueDisplay={:3d}\n",
+        acceleration, valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
+  }
+  return hasChanged;
+}
+
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
@@ -164,20 +227,17 @@ bool CarControl::read_paddles() {
   }
 
   if (valueDisplayLast != valueDisplay) {
-    // debug_printf("Dec (v0):  %5d --> %3d | Acc (v1): %5d --> %3d | ACCEL-DISPLAY: %3d"
-    //              " ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-    //              valueDec, valueDecNorm, valueAcc, valueAccNorm, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot,
-    //              ads_min_acc, ads_max_acc);
     hasChanged = true;
     _set_dec_acc_values(valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
   }
-
+  if (verboseMode) {
+    console << fmt::format("paddle mode: valueDecPot={:4d}, valueAccPot={:4d} | valueDec={:3d}, valueAcc={:3d}, valueDisplay={:3d}\n",
+                           valueDecPot, valueAccPot, valueDec, valueAcc, valueDisplay);
+  }
   return hasChanged;
 }
 
 void CarControl::_set_dec_acc_values(int valueDecPot, int valueAccPot, int16_t valueDec, int16_t valueAcc, int valueDisplay) {
-  // debug_printf("Dec (v0):  %5d  | Acc (v1): %5d  | ACCEL-DISPLAY: %3d ==> set POT0 =%3d (dec(%5d-%5d)), POT1 =%3d (acc(%5d-%5d))\n",
-  //              valueDec, valueAcc, valueDisplay, valueDecPot, ads_min_dec, ads_max_dec, valueAccPot, ads_min_acc, ads_max_acc);
   if (carState.ConstantModeOn && valueDec == 0 && valueAcc == 0)
     return;
 #if DAC_ON
@@ -213,7 +273,7 @@ void CarControl::adjust_paddles(int cycles) {
     engineerDisplay.getCursor(x, y);
   }
   while (cycles-- > 0) {
-    s = fmt::format(" paddle adjust:\n {:2d}", cycles);
+    s = fmt::format("paddle adjust: {:2d}\n", cycles);
     console << s;
     if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
       carState.DriverInfo = s;
@@ -295,7 +355,10 @@ void CarControl::task() {
 
     // handle changed INPUT pins
     bool someThingChanged = false;
-    someThingChanged |= read_paddles();
+    if (carState.ControlMode == CONTROL_MODE::PADDLES)
+      someThingChanged |= read_paddles();
+    else
+      someThingChanged |= read_PLUS_MINUS();
     someThingChanged |= read_motor_data();
     someThingChanged |= read_battery_data();
     someThingChanged |= read_speed();

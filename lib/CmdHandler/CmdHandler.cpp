@@ -186,8 +186,11 @@ void CmdHandler::task() {
           } else if (input[1] == 'd') {
             dac.verboseModeDAC = !dac.verboseModeDAC;
             console << "set verboseModeDAC: " << dac.verboseModeDAC << "\n";
+          } else if (input[1] == 'c') {
+            carControl.verboseMode = !carControl.verboseMode;
+            console << "set verboseMode for acc-/dec-controls: " << carControl.verboseMode << "\n";
           } else if (input[1] == 'R') {
-            console <<   ioExt.re_init()<< "\n";
+            console << ioExt.re_init() << "\n";
             msg = ioExt.re_init();
             console << msg << "\n";
           } else {

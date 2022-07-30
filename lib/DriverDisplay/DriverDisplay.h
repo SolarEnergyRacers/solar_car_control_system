@@ -23,6 +23,7 @@ public:
   string getName() { return "DriverDisplay"; };
 
 private:
+  // int x, int y, string label, string format, string unit, int textColor, int bgColor, int textSize
   DisplayValue<string> DriverInfo = DisplayValue<string>(0, 0, "", "%s", "");
   DisplayValue<INFO_TYPE> DriverInfoType = DisplayValue<INFO_TYPE>(0, 0, "", "%s", "");
   DisplayValue<DRIVE_DIRECTION> DriveDirection = DisplayValue<DRIVE_DIRECTION>(0, 0, "", "%s", "");
@@ -34,6 +35,7 @@ private:
 
   DisplayValue<int> Speed = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
   DisplayValue<int> Acceleration = DisplayValue<int>(0, -1, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
+  DisplayValue<CONTROL_MODE> ControlMode = DisplayValue<CONTROL_MODE>(10, 158, "", "%s", "", ILI9341_YELLOW, ILI9341_BLACK, 1);
   // this format will be changed dynamically in IOExt event handler in dependency of CONSTANT_MODE:
   DisplayValue<float> TargetSpeedPower = DisplayValue<float>(240, 130, " ", "%5.0f", "", ILI9341_WHITE, ILI9341_BLACK, 2);
 
@@ -70,6 +72,9 @@ private:
   int speedFrameSizeX = 156;
   int speedFrameSizeY = 76;
   int speedTextSize = 8;
+  int speedUnitX = 0;  // get claculated later
+  int speedUnitY = 108;
+  int speedUnitTextSize = 1;
 
   // target speed/power display
   int targetValueFrameX = -1; // get calculated later: (speedFrameX + speedFrameSizeX + 1;
@@ -108,7 +113,7 @@ private:
   // constant mode speed or power display
   int constantModeX = 242;
   int constantModeY = 158;
-  int constantModeTextSize = 2;
+  int constantModeTextSize = 1;
 
   // constant mode speed or power display
   int driveDirectionX = 220;
@@ -124,6 +129,11 @@ private:
 
   int lightX = 252;
   int lightY = 198;
+
+  // paddles/buttons control mode display
+  int controlModeX = 7;
+  int controlModeY = 158;
+  int controlModeTextSize = 1;
 
   // eco/pwr mode display
   int ecoPwrModeX = 242;
@@ -150,6 +160,7 @@ private:
   void draw_target_value_border(int color);
   void draw_display_background();
 
+  void control_mode_show();
   void constant_drive_mode_show();
   void eco_power_mode_show();
 

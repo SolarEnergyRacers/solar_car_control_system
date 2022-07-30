@@ -40,7 +40,31 @@ The first part shows the device init, the second part shows the control task cre
 
 At least the display holds for a 4 seconds countdown to allow an additional view to the values.
 
-### Adjust Paddles
+### Main Driver Screen
+
+TODO
+
+### Engineering Screen
+
+TODO
+
+### Classic Mode
+
+ Button        | Function
+---|---
+PLUS | decrease deceleration (recuperation) ... increase acceleration
+MINUS | decrease acceleration ... increase deceleration (recuperation)
+ADJUST | toggle between 1 unit and 10 unit steps for plus and minus 
+Break press | max break deceleration (recuperation)
+Break release | set acceleration to 0 (neither recuperation nor acceleration) 
+ |  
+
+
+### Paddle Mode
+
+Press button P2 until "PADDLES" is displayed on screen below the acceleration.
+
+#### Adjust Paddles
 
 After each start the paddles must be adjusted. Until that the acceleration is locked. It is shown by the number `-99` in the `acceleration/deceleration` display and the drivers information Acceleration still locked.
 
@@ -59,6 +83,8 @@ If you release both paddles and the `acceleration/deceleration` display doesn't 
 If the control range of the paddles is to rough then the adjust procedure must be repeated.
 
 ## Car Operate
+
+
 
 ## Steering Wheel
 

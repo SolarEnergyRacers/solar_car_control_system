@@ -65,6 +65,9 @@ void breakPedalHandler() {
   } else { // VCC_5V
     carState.BreakPedal = carState.getPin(PinBreakPedal)->value == 1;
   }
+  if (!carState.BreakPedal) { // break pedal released
+    carControl.reset_acceleration_values();
+  }
   console << "Break pedal pressed " << (carState.BreakPedal ? "pressed" : "released") << "\n";
 }
 
@@ -127,72 +130,100 @@ void light_switch() {
 void nextScreenHandler() {
   if (!systemOk)
     return;
+  if (carState.getPin(PinNextScreen)->value != 0)
+    return;
 
-  if (carState.getPin(PinNextScreen)->value == 0) {
-    switch (carState.displayStatus) {
-    case DISPLAY_STATUS::ENGINEER_RUNNING:
-      carState.displayStatus = DISPLAY_STATUS::DRIVER_SETUP;
-      console << "Switch Next Screen toggle: switch from eng --> driver\n";
-      break;
-    case DISPLAY_STATUS::DRIVER_RUNNING:
-      carState.displayStatus = DISPLAY_STATUS::ENGINEER_SETUP;
-      console << "Switch Next Screen toggle: switch from driver --> engineer\n";
-      break;
-    default:
-      break;
-    }
+  switch (carState.displayStatus) {
+  case DISPLAY_STATUS::ENGINEER_RUNNING:
+    carState.displayStatus = DISPLAY_STATUS::DRIVER_SETUP;
+    console << "Switch Next Screen toggle: switch from eng --> driver\n";
+    break;
+  case DISPLAY_STATUS::DRIVER_RUNNING:
+    carState.displayStatus = DISPLAY_STATUS::ENGINEER_SETUP;
+    console << "Switch Next Screen toggle: switch from driver --> engineer\n";
+    break;
+  default:
+    break;
   }
 }
 
 void constantModeOnHandler() {
   if (!systemOk)
     return;
-  if (carState.getPin(PinConstantModeOn)->value == 0) {
-    console << "ConstantMode ON";
-    if (carState.ConstantModeOn) {
-      carState.TargetSpeed = carState.Speed;                                       // unit: km/h
-      carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
-      console << " - overtake speed " << carState.TargetSpeed << " / power " << carState.TargetPower;
-    }
-    console << "\n";
-    carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
+  if (carState.getPin(PinConstantModeOn)->value != 0)
+    return;
+
+  console << "ConstantMode ON";
+  if (carState.ConstantModeOn) {
+    carState.TargetSpeed = carState.Speed;                                       // unit: km/h
+    carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
+    console << " - overtake speed " << carState.TargetSpeed << " / power " << carState.TargetPower;
   }
+  console << "\n";
+  carState.ConstantModeOn = true; // #SAFETY#: deceleration unlock const mode
 }
 
 void constantModeOffHandler() {
   if (!systemOk)
     return;
-  if (carState.getPin(PinConstantModeOff)->value == 0) {
-    if (carState.ConstantModeOn) {
-      console << "ConstantMode OFF\n";
-      carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
-    }
+  if (carState.getPin(PinConstantModeOff)->value != 0)
+    return;
+
+  if (carState.ConstantModeOn) {
+    console << "ConstantMode OFF\n";
+    carState.ConstantModeOn = false; // #SAFETY#: deceleration unlock const mode
   }
 }
 
 void constantModeHandler() {
   if (!systemOk)
     return;
-  if (carState.getPin(PinConstantMode)->value == 0) {
-    console << "Constant mode toggle\n";
-    if (carState.ConstantMode == CONSTANT_MODE::POWER) {
-      carState.TargetPower = 0;
-      carState.ConstantMode = CONSTANT_MODE::SPEED;
-    } else {
-      carState.TargetSpeed = 0;
-      carState.ConstantMode = CONSTANT_MODE::POWER;
-    }
-    carState.TargetSpeed = carState.Speed;                                       // unit: km/h
-    carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
+  if (carState.getPin(PinConstantMode)->value != 0)
+    return;
+
+  console << "Constant mode toggle\n";
+  if (carState.ConstantMode == CONSTANT_MODE::POWER) {
+    carState.TargetPower = 0;
+    carState.ConstantMode = CONSTANT_MODE::SPEED;
+  } else {
+    carState.TargetSpeed = 0;
+    carState.ConstantMode = CONSTANT_MODE::POWER;
   }
+  carState.TargetSpeed = carState.Speed;                                       // unit: km/h
+  carState.TargetPower = carState.MotorCurrent * carState.MotorVoltage / 1000; // unit: kW
 }
 
 void paddleAdjustHandler() {
   if (!systemOk)
     return;
-  if (carState.getPin(PinPaddleAdjust)->value == 0) {
-    console << "Request Paddle Adjust\n";
-    carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
+  if (carState.getPin(PinPaddleAdjust)->value != 0)
+    return;
+
+  if (carState.ControlMode == CONTROL_MODE::PADDLES) {
+    if (carState.getPin(PinPaddleAdjust)->value == 0) {
+      console << "Request Paddle Adjust\n";
+      carControl.adjust_paddles(carState.PaddleAdjustCounter); // manually adjust paddles (3s handling time)
+    }
+  } else {
+    carState.ButtonControlModeIncrease = carState.ButtonControlModeIncrease == carState.ButtonControlModeIncreaseLow
+                                             ? carState.ButtonControlModeIncreaseHeigh
+                                             : carState.ButtonControlModeIncreaseLow;
+    console << fmt::format("Set ButtonControlModeIncrease to {}\n", carState.ButtonControlModeIncrease);
+  }
+}
+
+void controlModeHandler() {
+  if (!systemOk)
+    return;
+  if (carState.getPin(PinControlMode)->value != 0)
+    return;
+  if (carState.ControlMode == CONTROL_MODE::PADDLES) {
+    console << fmt::format("Control mode {}\n", CONTROL_MODE_str[int(CONTROL_MODE::BUTTONS)]);
+    carState.ControlMode = CONTROL_MODE::BUTTONS;
+    carControl.reset_acceleration_values();
+  } else {
+    carState.ControlMode = CONTROL_MODE::PADDLES;
+    console << fmt::format("Control mode {}\n", CONTROL_MODE_str[int(CONTROL_MODE::PADDLES)]);
   }
 }
 
@@ -211,27 +242,37 @@ void sdCardDetectHandler() {
 }
 
 void decreaseHandler() {
-  if (!systemOk)
+  if (!systemOk || !carState.ConstantModeOn)
     return;
-  console << "Decrease constant mode target.\n";
-  carState.TargetSpeed -= carState.ConstSpeedIncrease;
-  if (carState.TargetSpeed < 0)
-    carState.TargetSpeed = 0;
+  if (carState.ControlMode == CONTROL_MODE::PADDLES) {
+    console << "Decrease constant mode target.\n";
+    carState.TargetSpeed -= carState.ConstSpeedIncrease;
+    if (carState.TargetSpeed < 0)
+      carState.TargetSpeed = 0;
 
-  carState.TargetPower -= carState.ConstPowerIncrease;
-  if (carState.TargetPower < 0)
-    carState.TargetPower = 0;
+    carState.TargetPower -= carState.ConstPowerIncrease;
+    if (carState.TargetPower < 0)
+      carState.TargetPower = 0;
+  } else {
+    // carState.Acceleration -= carState.ButtonControlModeIncrease;
+    // console << fmt::format("Decrease acceleration to {}.\n", carState.Acceleration);
+  }
 }
 
 void increaseHandler() {
-  if (!systemOk)
+  if (!systemOk || !carState.ConstantModeOn)
     return;
-  console << "Increase constant mode target.\n";
-  carState.TargetSpeed += carState.ConstSpeedIncrease;
-  if (carState.TargetSpeed > 111) // only until 111km/h
-    carState.TargetSpeed = 111;
+  if (carState.ControlMode == CONTROL_MODE::PADDLES) {
+    console << "Increase constant mode target.\n";
+    carState.TargetSpeed += carState.ConstSpeedIncrease;
+    if (carState.TargetSpeed > 111) // only until 111km/h
+      carState.TargetSpeed = 111;
 
-  carState.TargetPower += carState.ConstPowerIncrease;
-  if (carState.TargetPower > 4500) // only until 5kW
-    carState.TargetPower = 4500;
+    carState.TargetPower += carState.ConstPowerIncrease;
+    if (carState.TargetPower > 4500) // only until 5kW
+      carState.TargetPower = 4500;
+  } else {
+    // carState.Acceleration += carState.ButtonControlModeIncrease;
+    // console << fmt::format("Increase acceleration to {}.\n", carState.Acceleration);
+  }
 }

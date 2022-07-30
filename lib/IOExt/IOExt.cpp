@@ -197,17 +197,16 @@ bool IOExt::readAndHandlePins(PinHandleMode mode) {
   return false;
 }
 
-// int IOExt::getPort(int port) {
-//   // get device & port
-//   int devNr = port >> 4;
-//   int pin = port & 0xf;
-//   xSemaphoreTakeT(i2cBus.mutex);
-//   int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
-//   xSemaphoreGive(i2cBus.mutex);
-//   console << fmt::sprintf("Get BOOL--port:0x%02x--devNr:%d--pin:%d--value:%d---%ld-\n", port, devNr, pin, value, millis());
-//   console << fmt::sprintf("0x%02x [%d|%d]: %d\n", port, devNr, pin, value);
-//   return value;
-// }
+int IOExt::getPort(int port) {
+  // get device & port
+  int devNr = port >> 4;
+  int pin = port & 0xf;
+  xSemaphoreTakeT(i2cBus.mutex);
+  int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
+  xSemaphoreGive(i2cBus.mutex);
+  //console << fmt::format("port 0x{:02x} [{}|{}]: {} -- {}ms\n", port, devNr, pin, value, millis());
+  return value;
+}
 
 void IOExt::task() {
 

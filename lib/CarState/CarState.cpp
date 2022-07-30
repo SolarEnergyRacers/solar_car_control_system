@@ -73,9 +73,12 @@ bool CarState::initalize_config() {
     // [Dynamic]
     PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
     PaddleOffset = cf.get("Dynamic", "PaddleOffset", 999);
-    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 24);
+    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 18);
     ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
     ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
+    ButtonControlModeIncreaseLow = cf.get("Dynamic", "ButtonControlModeIncreaseLow", 2);
+    ButtonControlModeIncreaseHeigh = cf.get("Dynamic", "ButtonControlModeIncreaseHeigh", 10);
+    ButtonControlModeIncrease = ButtonControlModeIncreaseLow;
     // [Communication]
     // I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
     CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
@@ -279,6 +282,7 @@ const string CarState::csv(string msg, bool withHeader) {
 
     ss << "indicator, ";
     ss << "driveDirection, ";
+    ss << "controlMode";
     ss << "constantModeOn, ";
     ss << "sdCardDetected, ";
 
@@ -336,6 +340,7 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << SdCardDetect << ", ";
 
   ss << DISPLAY_STATUS_str[(int)displayStatus] << ", ";
+  ss << CONTROL_MODE_str[(int)(ControlMode)] << ", ";
   ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
   ss << TargetSpeed << ", ";
   ss << Kp << ", ";

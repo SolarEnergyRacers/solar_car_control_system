@@ -46,7 +46,7 @@
 #define PinNextScreen "NextScreen"
 #define PinIncrease "Increase"
 #define PinConstantModeOff "ConstantModeOff"
-#define PinDUMMY33 "DUMMY33"
+#define PinControlMode "PinControlMode"
 #define PinPaddleAdjust "PaddleAdjust"
 #define PinDecrease "Decrease"
 #define PinSdCardDetect "SdCardDetect"
@@ -70,6 +70,7 @@ public:
   void task(void);
 
   // Class member and functions
+  int getPort(int port);
   void setPort(int port, bool value);
   void writeAllPins(PinHandleMode mode = PinHandleMode::NORMAL);
   void readAllPins();

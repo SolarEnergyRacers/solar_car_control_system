@@ -48,7 +48,9 @@ TODO
 
 TODO
 
-### Classic Mode
+### Classic Control Mode
+
+Press button P2 until *button mode* is displayed on screen below the acceleration.
 
  Button        | Function
 ---|---
@@ -59,10 +61,13 @@ Break press | max break deceleration (recuperation)
 Break release | set acceleration to 0 (neither recuperation nor acceleration) 
  |  
 
+### Paddle Control Mode
 
-### Paddle Mode
+The paddles are used to control the acceleration and deceleration (recuperation) values send to the motor controller (MC).
 
-Press button P2 until "PADDLES" is displayed on screen below the acceleration.
+They are force sensitive: The more you pull them, the greater the setting value. 
+
+Press button P2 until *paddles mode* is displayed on screen below the acceleration.
 
 #### Adjust Paddles
 
@@ -100,6 +105,8 @@ Switch of the hazard light by pressing again both indicator buttons at the same 
 
 #### Constant Mode
 
+Constant mode is usable in paddle control mode and in classic control mode.
+
 
 | Button                 | function                                         |
 | ------------------------ | -------------------------------------------------- |
@@ -109,12 +116,6 @@ Switch of the hazard light by pressing again both indicator buttons at the same 
 | PWR/SPD                | switch between constant power and constant speed |
 | PLUS | increase the target speed |
 | MINUS | decrease the target speed |
-
-### Paddles
-
-The paddles are used to control the acceleration and deceleration (recuperation) values send to the motor controller (MC).
-
-They are force sensitive: The more you pull them, the greater the setting value. 
 
 ### Display
 

@@ -80,7 +80,6 @@ bool CarState::initalize_config() {
     ButtonControlModeIncreaseHeigh = cf.get("Dynamic", "ButtonControlModeIncreaseHeigh", 10);
     ButtonControlModeIncrease = ButtonControlModeIncreaseLow;
     // [Communication]
-    // I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
     CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
     Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
     Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 115200);
@@ -170,7 +169,6 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Const power invrease .. " << ConstPowerIncrease << endl;
 
   // [Communication]
-  ss << "I2C frequency ......... " << I2CFrequence << endl;
   ss << "Car data log period ... " << CarDataLogPeriod << endl;
   ss << "Serial 1 baud rate .... " << Serial1Baudrate << endl;
   ss << "Serial 2 baud rate .... " << Serial2Baudrate << endl;

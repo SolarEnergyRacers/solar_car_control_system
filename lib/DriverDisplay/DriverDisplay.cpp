@@ -354,9 +354,11 @@ void DriverDisplay::write_speed() {
 // acceleration value: -99...+99
 void DriverDisplay::write_acceleration() {
   int value = Acceleration.get_recent_overtake_last();
-  if (value >= -99 && value <= 99) {
-    accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, justInited, ILI9341_GREENYELLOW);
-  }
+  if (value <= -99)
+    value = -99;
+  if (value > 99)
+    value = 99;
+  accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, justInited, ILI9341_GREENYELLOW);
 }
 
 // commented out code is preparation for font usage

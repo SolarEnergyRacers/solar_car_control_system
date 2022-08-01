@@ -204,9 +204,9 @@ bool CarControl::read_paddles() {
   int16_t valueDec = adc.STW_DEC;
   int16_t valueAcc = adc.STW_ACC;
   // check if change is in damping
-  if (valueAcc != 0 && valueDec != 0)
-    if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
-      return false;
+  // if (valueAcc != 0 && valueDec != 0)
+  //   if (abs(accelLast - valueAcc) < carState.PaddleDamping && abs(recupLast - valueDec) < carState.PaddleDamping)
+  //     return false;
 
   // #SAFETY#: Reset constant mode on deceleration paddel touched
   if (valueDec > carState.PaddleDamping) {
@@ -316,7 +316,10 @@ void CarControl::adjust_paddles(int cycles) {
 int CarControl::_normalize(int minDisplayValue, int maxDisplayValue, int minValue, int maxValue, int value) {
   float displArea = maxDisplayValue - minDisplayValue;
   float valueArea = maxValue - minValue;
-
+  if (value < minValue)
+    value = minValue;
+  if (value > maxValue)
+    value = maxValue;
   float retValue = (value - minValue) * displArea / valueArea;
 
   return round(retValue);

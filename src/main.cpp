@@ -77,16 +77,13 @@ CmdHandler cmdHandler;
 Console console;
 DriverDisplay driverDisplay;
 EngineerDisplay engineerDisplay;
-GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
+GPInputOutput gpio; // I2C Interrupts, GPInputOutput pin settings
 I2CBus i2cBus;
 Indicator indicator;
 OneWireBus oneWireBus;
 SDCard sdCard;
 SPIBus spiBus;
 // Global objects (possibly to deactivated)
-#if INT_ON
-// TODO !!!GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
-#endif
 IOExt ioExt;
 #if ADC_ON
 ADC adc;
@@ -169,6 +166,7 @@ void app_main(void) {
   chip_info();
   console << "-gpio pin settings ----------\n";
   msg = gpio.init();
+  delay(2000);
   console << msg << "\n";
   console << "-init bus systems ------------\n";
   // init buses
@@ -184,7 +182,6 @@ void app_main(void) {
   engineerDisplay.print(msg + "\n");
 // ---- init modules ----
 #if INT_ON
-  // TODO !!!GPIputOutput gpio; // I2C Interrupts, GPIputOutput pin settings
   gpio.register_gpio_interrupt();
 #endif
 
@@ -283,7 +280,7 @@ void app_main(void) {
   carState.SdCardDetect = false;
   carState.ConstantMode = CONSTANT_MODE::SPEED;
   carState.Light = LIGHT::OFF;
-  msg = ioExt.create_task(4, 100, 4000);
+  msg = ioExt.create_task(4, 100, 6000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 
@@ -293,7 +290,9 @@ void app_main(void) {
   console << msg << "\n";
 #endif
 #if DS_ON
-  // xTaskCreate(&read_ds_demo_task, "read_ds_demo_task", CONFIG_ESP_SYSTEM_EVENT_TASK_STACK_SIZE, NULL, 5, NULL);
+  msg = ds.create_task();
+  console << msg << "\n";
+  engineerDisplay.print(msg + "\n");
 #endif
 #if ADC_ON
   msg = adc.create_task();

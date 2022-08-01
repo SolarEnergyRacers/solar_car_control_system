@@ -35,8 +35,7 @@ public:
   TaskHandle_t getHandle() { return xHandle; };
 #endif
 
-  virtual void set_SleepTime(uint32_t milliseconds) = 0;
-  virtual uint32_t get_SleepTime() = 0;
+  uint32_t sleep_polling_ms;
   void sleep(void);
   void sleep(int polling_ms);
   string report_task_init();

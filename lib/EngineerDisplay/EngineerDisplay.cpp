@@ -63,7 +63,7 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
   case DISPLAY_STATUS::ENGINEER_BACKGROUND:
     clear_screen(bgColor);
     draw_display_background();
-    set_SleepTime(500);
+    sleep_polling_ms = 500;
     status = DISPLAY_STATUS::ENGINEER_RUNNING;
     break;
   // working state:

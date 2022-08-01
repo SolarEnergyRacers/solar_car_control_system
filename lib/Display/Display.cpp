@@ -439,7 +439,7 @@ void Display::task(void) {
       }
       break;
     case DISPLAY_STATUS::ENGINEER_HALTED:
-      set_SleepTime(1500);
+      sleep_polling_ms = 1500;
       break;
 #if WithTaskSuspend == true
       vTaskSuspend(getHandle());
@@ -452,9 +452,6 @@ void Display::task(void) {
 #if LIFESIGN_ON == true
     lifeSignCounter++;
 #endif
-    // debug_printf("%16s -- sleep_polling_ms: %d\n", getName().c_str(), sleep_polling_ms);
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
-
-// } //namespace Display

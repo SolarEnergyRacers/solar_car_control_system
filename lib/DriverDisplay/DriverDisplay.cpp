@@ -409,7 +409,7 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     MotorCurrent.set_epsilon(0.1);
     MotorOn.showLabel(tft);
     TargetSpeedPower.showLabel(tft);
-    set_SleepTime(300);
+    sleep_polling_ms = 300;
     status = DISPLAY_STATUS::DRIVER_RUNNING;
     break;
 

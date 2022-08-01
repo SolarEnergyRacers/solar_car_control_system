@@ -244,7 +244,6 @@ void sdCardDetectHandler() {
 void decreaseHandler() {
   if (!systemOk || !carState.ConstantModeOn) // || carState.ControlMode == CONTROL_MODE::BUTTONS)
     return;
-  console << "Decrease constant mode target.\n";
   carState.TargetSpeed -= carState.ConstSpeedIncrease;
   if (carState.TargetSpeed < 0)
     carState.TargetSpeed = 0;
@@ -252,12 +251,13 @@ void decreaseHandler() {
   carState.TargetPower -= carState.ConstPowerIncrease;
   if (carState.TargetPower < 0)
     carState.TargetPower = 0;
+
+  console << "Decrease constant mode target to " << carState.TargetSpeed << "km/h / " << carState.TargetPower << "W.\n";
 }
 
 void increaseHandler() {
   if (!systemOk || !carState.ConstantModeOn) // || carState.ControlMode == CONTROL_MODE::BUTTONS)
     return;
-  console << "Increase constant mode target.\n";
   carState.TargetSpeed += carState.ConstSpeedIncrease;
   if (carState.TargetSpeed > 111) // only until 111km/h
     carState.TargetSpeed = 111;
@@ -265,4 +265,6 @@ void increaseHandler() {
   carState.TargetPower += carState.ConstPowerIncrease;
   if (carState.TargetPower > 4500) // only until 5kW
     carState.TargetPower = 4500;
+
+  console << "Increase constant mode target to " << carState.TargetSpeed << "km/h / " << carState.TargetPower << " W.\n";
 }

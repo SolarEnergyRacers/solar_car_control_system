@@ -21,12 +21,10 @@ using namespace std;
 
 extern Console console;
 
-// void abstract_task::sleep() { vTaskDelay(get_SleepTime() / portTICK_PERIOD_MS); };
-// void abstract_task::set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-// uint32_t abstract_task::get_SleepTime() { return sleep_polling_ms; };
+void abstract_task::sleep() { vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS); };
 
 string abstract_task::create_task(int priority, uint32_t sleep_polling, int stack_size) {
-  set_SleepTime(sleep_polling);
+  sleep_polling_ms = sleep_polling;
   console << "[  ] Create " << getName() << " as prio-" << priority << "-task (sleep_polling=" << sleep_polling
           << "ms, stack=" << stack_size << ") ...";
 #if WithTaskSuspend == true
@@ -57,6 +55,6 @@ string abstract_task::getInfo() { return getName(); }
 string abstract_task::report_task_init() { return report_task_init(this); }
 string abstract_task::report_task_init(abstract_task *task) {
   stringstream ss;
-  ss << "[ok] " << task->getName() << " started (" << task->get_SleepTime() << "ms).";
+  ss << "[ok] " << task->getName() << " started (" << task->sleep_polling_ms << "ms).";
   return ss.str();
 }

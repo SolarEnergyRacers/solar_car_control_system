@@ -17,6 +17,7 @@
 
 extern OneWireBus oneWireBus;
 extern Console console;
+extern Temp temp;
 
 string Temp::re_init() { return init(); }
 
@@ -61,6 +62,8 @@ string Temp::init(void) {
   return fmt::format("[{}] Temp initialized.", hasError ? "--" : "ok");
 }
 
+void Temp::exit() {}
+
 void Temp::request_temperatures(void) {
 
   xSemaphoreTake(oneWireBus.mutex, portMAX_DELAY);
@@ -98,20 +101,18 @@ float Temp::read_tempF_index(int index) {
                                     // actually communicate with the sensor
 }
 
-extern Temp ds;
-void read_ds_demo_task(void *pvParameter) {
-
+void Temp::task() {
   // polling loop
   while (1) {
 
     // request all temperature sensor readings
-    ds.request_temperatures();
+    request_temperatures();
 
     // print previously fetched results
-    for (int i = 0; i < ds.get_num_temp_dev(); i++) {
-      console << fmt::format("    [DS18B20] Temperature: {:4.2f}C / {:4.2f}F\n", ds.read_tempC_index(i), ds.read_tempF_index(i));
+    for (int i = 0; i < get_num_temp_dev(); i++) {
+      console << fmt::format("    [DS18B20] Temperature: {:4.2f}C / {:4.2f}F\n", read_tempC_index(i), read_tempF_index(i));
     }
 
-    vTaskDelay(ds.get_SleepTime() / portTICK_PERIOD_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }

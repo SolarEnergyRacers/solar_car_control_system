@@ -82,7 +82,7 @@ bool CarState::initalize_config() {
     // [Communication]
     CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
     Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
-    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 115200);
+    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
     // [Telemetry]
     SendInterval = cf.get("Telemetry", "", 1000);
     MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);

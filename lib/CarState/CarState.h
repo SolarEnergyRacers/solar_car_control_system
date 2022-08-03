@@ -254,7 +254,7 @@ public:
   // [Communication]
   int CarDataLogPeriod;         // = 1000; // [ms]
   int Serial1Baudrate = 115200; // 115200; //baud
-  int Serial2Baudrate = 115200; // 9600;   // baud
+  int Serial2Baudrate = 9600;   // baud
 
   // [Telemetry]
   int SendInterval;     // [ms]

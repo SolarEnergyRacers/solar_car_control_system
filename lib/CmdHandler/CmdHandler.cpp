@@ -113,9 +113,11 @@ void CmdHandler::task() {
           input = input.substring(0, input.length() - 1);
         }
 
-        if (input.length() < 1 || commands.find(input[0], 0) == -1) {
+        if (input.length() > 0 && commands.find(input[0], 0) == -1) {
           input = "h"; // help
         }
+        if (input.length() == 0)
+          break;
 
         switch (input[0]) {
         // ---------------- controller commands
@@ -226,29 +228,40 @@ void CmdHandler::task() {
           console << "Car speed control deactivated\n";
 #endif
           break;
-        case 't': {
-          time_t theTime = time(NULL);
-          struct tm t = *localtime(&theTime);
-          console << "Received: '" << input << "' --> DateTime: " << asctime(&t) << "\n";
-        } break;
+        case 'B':
+          if (input[1] == '\0') {
+            console << "Serial2 baudrate=" << carState.Serial2Baudrate << "\n";
+          } else {
+            carState.Serial2Baudrate = atof(&input[1]);
+            Serial2.end();
+            Serial2.begin(carState.Serial2Baudrate, SERIAL_8N1, SERIAL2_RX, SERIAL2_TX);
+            console << "Restart Serial2 with baudrate=" << carState.Serial2Baudrate << "\n";
+          }
+          break;
         case 'T': {
 #if RTC_ON
           string arr[6];
-          splitString(arr, &input[1]);
-          int yy = atof(arr[0].c_str());
-          int mm = atof(arr[1].c_str());
-          int dd = atof(arr[2].c_str());
-          int hh = atof(arr[3].c_str());
-          int MM = atof(arr[4].c_str());
-          int ss = atof(arr[5].c_str());
-          uint16_t days = DaysSinceFirstOfYear2000<uint16_t>(yy, mm, dd);
-          uint64_t seconds = SecondsIn<uint64_t>(days, hh, MM, ss);
-          RtcDateTime dateTime = RtcDateTime(seconds);
-          rtc.write_rtc_datetime(dateTime);
-          esp32time.setTime(ss, MM, hh, dd, mm, yy);
-          time_t theTime = time(NULL);
-          struct tm t = *localtime(&theTime);
-          console << "Received: '" << input << "' --> Set dateTime to: " << asctime(&t) << "\n";
+          int count = splitString(arr, &input[1]);
+          if (count == 0) {
+            time_t theTime = time(NULL);
+            struct tm t = *localtime(&theTime);
+            console << "Received: '" << input << "' --> DateTime: " << asctime(&t) << "\n";
+          } else {
+            int yy = atof(arr[0].c_str());
+            int mm = atof(arr[1].c_str());
+            int dd = atof(arr[2].c_str());
+            int hh = atof(arr[3].c_str());
+            int MM = atof(arr[4].c_str());
+            int ss = atof(arr[5].c_str());
+            uint16_t days = DaysSinceFirstOfYear2000<uint16_t>(yy, mm, dd);
+            uint64_t seconds = SecondsIn<uint64_t>(days, hh, MM, ss);
+            RtcDateTime dateTime = RtcDateTime(seconds);
+            rtc.write_rtc_datetime(dateTime);
+            esp32time.setTime(ss, MM, hh, dd, mm, yy);
+            time_t theTime = time(NULL);
+            struct tm t = *localtime(&theTime);
+            console << "Received: '" << input << "' --> Set dateTime to: " << asctime(&t) << "\n";
+          }
 #else
           console << "RTC deactivated\n";
 #endif

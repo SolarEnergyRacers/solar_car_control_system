@@ -23,7 +23,7 @@ string GPInputOutput::re_init() { return init(); }
 
 string GPInputOutput::init() {
   bool hasError = false;
-  console << "[  ] Init 'GPInputOutput' ...";
+  console << "[  ] Init 'GPInputOutput' ...\n";
   // vPortCPUInitializeMutex(&mutex);
   // Init GPIO pins for CS of SD-card and TFT
   pinMode(SPI_CS_SDCARD, OUTPUT);

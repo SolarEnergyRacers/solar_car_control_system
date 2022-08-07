@@ -67,8 +67,8 @@ bool CarState::initalize_config() {
     LogFilePeriod = cf.get("Main", "LogFilePeriod", 1000);
     LogInterval = cf.get("Main", "LogInterval", 1);
     // [PID]
-    Kp = cf.get("PID", "Kp", 5);
-    Ki = cf.get("PID", "Ki", 2);
+    Kp = cf.get("PID", "Kp", 15);
+    Ki = cf.get("PID", "Ki", 5);
     Kd = cf.get("PID", "Kd", 0.05);
     // [Dynamic]
     PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);

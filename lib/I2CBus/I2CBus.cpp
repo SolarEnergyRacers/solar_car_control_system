@@ -24,7 +24,7 @@ string I2CBus::re_init() { return init(); }
 
 string I2CBus::init(void) {
   bool hasError = false;
-  console << "[  ] Init '" << getName() << "'...\n";
+  console << "[  ] Init 'I2CBus'...\n";
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library

@@ -38,7 +38,7 @@ string Uart::init() {
   //  init serial for console IO
   Serial.begin(carState.Serial1Baudrate);
   delay(1000);
-  console << "[  ] Init 'Uart (" << getName() << ")'...\n";
+  console << "[  ] Init 'UartSerial'...\n";
   console << "     ---Serial------------\n";
   console << "     Serial TX0 is on pin: " << to_string(TX) << "\n";
   console << "     Serial RX0 is on pin: " << to_string(RX) << "\n";

@@ -335,7 +335,7 @@ void app_main(void) {
 #if CARCONTROL_ON
   msg = carControl.init();
   console << msg << "\n";
-  msg = carControl.create_task();
+  msg = carControl.create_task(10, 250, 6000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif

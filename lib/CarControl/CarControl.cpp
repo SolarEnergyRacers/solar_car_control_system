@@ -54,7 +54,7 @@ string CarControl::re_init() { return init(); }
 
 string CarControl::init() {
   bool hasError = false;
-  console << "[  ] Init 'CarControl'... ";
+  console << "[  ] Init 'CarControl'...\n";
   justInited = true;
   // mutex = xSemaphoreCreateMutex();
   // xSemaphoreGive(mutex);

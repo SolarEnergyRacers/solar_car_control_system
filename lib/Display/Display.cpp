@@ -56,7 +56,7 @@ bool lifeSignState = false;
 string Display::getName() { return "Display"; };
 
 string Display::init() {
-  console << "[  ] Init '" << getInfo() << "'...\n";
+  console << "[  ] Init 'Display'...\n";
   return re_init();
 }
 

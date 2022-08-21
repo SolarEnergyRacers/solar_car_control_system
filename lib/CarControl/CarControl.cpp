@@ -45,7 +45,8 @@ extern SDCard sdCard;
 
 using namespace std;
 
-unsigned long millisNextStamp = millis();
+unsigned long millisNextStampCsv = millis();
+unsigned long millisNextStampSnd = millis();
 
 // ------------------
 // FreeRTOS functions
@@ -369,11 +370,17 @@ void CarControl::task() {
     _handle_indicator();
 
     // one data row per second
-    if (sdCard.isReadyForLog() && (millis() > millisNextStamp)) {
-      millisNextStamp = millis() + carState.CarDataLogPeriod;
-      sdCard.write(carState.csv("Recent State"));
+    if ((millis() > millisNextStampCsv) || (millis() > millisNextStampSnd)) {
+      string record = carState.csv();
+      if (sdCard.isReadyForLog() && millis() > millisNextStampCsv) {
+        sdCard.write(record);
+        millisNextStampCsv = millis() + carState.LogInterval;
+      }
+      if (millis() > millisNextStampSnd) {
+        console << "d: " + record;
+        millisNextStampSnd = millis() + carState.CarDataSendPeriod;
+      }
     }
-
     // sleep
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

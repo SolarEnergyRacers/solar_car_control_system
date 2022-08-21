@@ -166,7 +166,7 @@ void app_main(void) {
   chip_info();
   console << "-gpio pin settings ----------\n";
   msg = gpio.init();
-  delay(2000);
+  delay(200);
   console << msg << "\n";
   console << "-init bus systems ------------\n";
   // init buses
@@ -198,7 +198,6 @@ void app_main(void) {
   msg = sdCard.init();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
-  console << "---01------------------------------------------\n";
 #endif
 
   //--- SD card available ----------------------------
@@ -295,7 +294,7 @@ void app_main(void) {
   engineerDisplay.print(msg + "\n");
 #endif
 #if ADC_ON
-  msg = adc.create_task();
+  msg = adc.create_task(21, 50);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
@@ -335,7 +334,7 @@ void app_main(void) {
 #if CARCONTROL_ON
   msg = carControl.init();
   console << msg << "\n";
-  msg = carControl.create_task(10, 250, 6000);
+  msg = carControl.create_task(10, 100, 6000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif

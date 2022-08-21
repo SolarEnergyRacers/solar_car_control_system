@@ -586,3 +586,358 @@ Request Paddle Adjust
     ==>dec 18131-20450 == acc  6860-18726
 ```
 
+## Boot Display LOG - 2022.08.07
+
+```log
+Building in release mode
+Retrieving maximum program size .pio/build/esp32dev/firmware.elf
+Checking size .pio/build/esp32dev/firmware.elf
+Advanced Memory Usage is available via "PlatformIO Home > Project Inspect"
+RAM:   [=         ]   9.3% (used 30472 bytes from 327680 bytes)
+Flash: [========= ]  87.0% (used 911985 bytes from 1048576 bytes)
+Configuring upload protocol...
+AVAILABLE: cmsis-dap, esp-bridge, esp-prog, espota, esptool, iot-bus-jtag, jlink, minimodule, olimex-arm-usb-ocd, olimex-arm-usb-ocd-h, olimex-arm-usb-tiny-h, olimex-jtag-tiny, tumpa
+CURRENT: upload_protocol = esptool
+Looking for upload port...
+Using manually specified: /dev/ttyUSB0
+Uploading .pio/build/esp32dev/firmware.bin
+esptool.py v3.3
+Serial port /dev/ttyUSB0
+Connecting.......
+Chip is ESP32-D0WDQ6 (revision 1)
+Features: WiFi, BT, Dual Core, 240MHz, VRef calibration in efuse, Coding Scheme None
+Crystal is 40MHz
+MAC: 0c:b8:15:e2:d1:1c
+Uploading stub...
+Running stub...
+Stub running...
+Changing baud rate to 460800
+Changed.
+Configuring flash size...
+Flash will be erased from 0x00001000 to 0x00007fff...
+Flash will be erased from 0x00008000 to 0x00008fff...
+Flash will be erased from 0x00010000 to 0x000eefff...
+Compressed 25280 bytes to 15794...
+Writing at 0x00001000... (100 %)
+Wrote 25280 bytes (15794 compressed) at 0x00001000 in 0.9 seconds (effective 233.0 kbit/s)...
+Hash of data verified.
+Compressed 3072 bytes to 103...
+Writing at 0x00008000... (100 %)
+Wrote 3072 bytes (103 compressed) at 0x00008000 in 0.1 seconds (effective 337.3 kbit/s)...
+Hash of data verified.
+Compressed 912368 bytes to 436508...
+Writing at 0x00010000... (3 %)
+Writing at 0x00019a79... (7 %)
+Writing at 0x00024776... (11 %)
+Writing at 0x0003147d... (14 %)
+Writing at 0x0004e5d2... (18 %)
+Writing at 0x00059d8e... (22 %)
+Writing at 0x0005f9b0... (25 %)
+Writing at 0x00067405... (29 %)
+Writing at 0x0006d7d4... (33 %)
+Writing at 0x00073e4b... (37 %)
+Writing at 0x0007b149... (40 %)
+Writing at 0x00083cf8... (44 %)
+Writing at 0x0008b1df... (48 %)
+Writing at 0x00091f06... (51 %)
+Writing at 0x00097eb2... (55 %)
+Writing at 0x0009e89f... (59 %)
+Writing at 0x000a47a0... (62 %)
+Writing at 0x000aa463... (66 %)
+Writing at 0x000b07ae... (70 %)
+Writing at 0x000b87f1... (74 %)
+Writing at 0x000c00ce... (77 %)
+Writing at 0x000c77b2... (81 %)
+Writing at 0x000cd2d5... (85 %)
+Writing at 0x000d3a09... (88 %)
+Writing at 0x000dc837... (92 %)
+Writing at 0x000e246d... (96 %)
+Writing at 0x000eadf5... (100 %)
+Wrote 912368 bytes (436508 compressed) at 0x00010000 in 11.7 seconds (effective 626.3 kbit/s)...
+Hash of data verified.
+
+Leaving...
+Hard resetting via RTS pin...
+======================================================================= [SUCCESS] Took 119.09 seconds =======================================================================
+--- Terminal on /dev/ttyUSB0 | 115200 8-N-1
+--- Available filters and text transformations: colorize, debug, default, direct, esp32_exception_decoder, hexlify, log2file, nocontrol, printable, send_on_enter, time
+--- More details at https://bit.ly/pio-monitor-filters
+--- Quit: Ctrl+C | Menu: Ctrl+T | Help: Ctrl+T followed by Ctrl+H
+[  ] Init 'UartSerial'...
+     ---Serial------------
+     Serial TX0 is on pin: 1
+     Serial RX0 is on pin: 3
+     Serial Baud Rate:     115200
+I (1577) uart: queue free spaces: 20
+     ---Serial2 HC-12------
+     Serial2 TX2 is on pin: 17
+     Serial2 RX2 is on pin: 16
+     Serial2 Baud Rate:     9600
+     done.
+[ok] Serial and Serial2 initialized.
+
+--------------------
+esp32dev + free RTOS
+Solar Energy Car Racers SER4 Controller
+--------------------
+-chip info -------------------
+This is ESP32 chip with 2 CPU cores, WiFi/BT/BLE, silicon revision 1, 4MB external flash
+-gpio pin settings ----------
+[  ] Init 'GPInputOutput' ...
+I (2997) gpio: GPIO[14]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (2997) gpio: GPIO[32]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+done.
+[ok] SPI_CS for TFT (32) and SD card (14) set, GPIO initialized.
+-init bus systems ------------
+[  ] Init 'SPI bus' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19...
+I (3377) gpio: GPIO[5]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (3377) gpio: GPIO[19]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (3387) gpio: GPIO[18]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+[ok] SPIBus initialized.
+[  ] Init 'OneWireBus'...
+I (3457) gpio: GPIO[12]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+[ok] OneWireBus initialized.  ONEWIRE_PIN=12
+[  ] Init 'I2CBus'...
+     I2C inited: I2C_SDA=23, I2C_SCL=22, I2C_FREQ=200000.
+     Scanning I2C addresses:
+     00 -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- 19 -- -- -- -- -- -- 
+     20 21 -- -- -- -- -- -- 28 -- -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+     -- -- -- -- -- -- -- -- 48 49 4a -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+     -- -- -- -- -- -- -- -- 68 69 -- -- -- -- -- -- 
+     -- -- -- -- -- -- -- -- -- -- -- -- -- -- -- --
+     Scan completed: 10 I2C devices found.
+     Expected addresses:
+     Address | Device                               | Location      
+     ------- | ------------------------------------ | --------------
+      0x00   | ESP32 I2C master                     | main noard    
+      0x19   | BMI088, 6-axis inertial sensor, acc  | main board    
+      0x20   | MCP23017, Extended digital IOs       | main board    
+      0x21   | MCP23017, Extended digital IOs       | steering wheel
+      0x28   | DS1803, digital analog coder         | main board    
+      0x48   | ADS1115, analog digital coder        | main board    
+      0x49   | ADS1115, analog digital coder        | main board    
+      0x4a   | ADS1115, analog digital coder        | steering wheel
+      0x68   | DS1307, real time clock              | main board    
+      0x69   | BMI088, 6-axis inertial sensor, gyro | main board    
+[ok] I2CBus initialized.
+[  ] Init 'Display'...
+     Setup 'ILI9341' for 'EngineerDisplay' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+I (5257) gpio: GPIO[32]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (5257) gpio: GPIO[4]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (5267) gpio: GPIO[21]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[ok] Display initialized.  Screen 'ILI9341' 240x320.     Status: ENGINEER_CONSOLE
+[  ] Init IOExt devices...
+     DeviceNr [0]:
+     ok IOExt[0]
+     DeviceNr [1]:
+     ok IOExt[1]
+I (6287) gpio: GPIO[33]| InputEn: 1| OutputEn: 0| OpenDrain: 0| Pullup: 1| Pulldown: 0| Intr:0 
+[ok] IOExt initialized.
+SD card removed.
+[  ] Init 'SDCard'...
+     No SD card detected!
+[--] SDCard initialized.
+---01------------------------------------------
+Start reading CONFIG.INI:SER4CONF.INI
+     No SD card detected!
+WARN: No readable configfile: 'SER4CONF.INI' found. Using coded settings.
+====SER4 Car Status====$GIT_BRANCH_$GIT_COMMIT_HASH==70.0.1_0:0:6====uptime:00:00:06s====Thu Jan  1 00:00:06 1970
+==State after reading SER4CONFIG.INI
+Display Status ........ ENGINEER_CONSOLE
+Speed ................. 0
+Acceleration locked ... true
+Acceleration .......... 0
+Deceleration .......... 0
+Acceleration Display... 0
+Break pedal pressed ... false
+Battery On............. 0
+Battery Voltage ....... 0
+Battery Current........ 0
+Battery Errors .........[]
+Battery Precharge State ERROR
+Photo Voltaic On ...... 0
+MPPT1 Current ......... 0
+MPPT2 Current ......... 0
+MPPT3 Current ......... 0
+Photo Voltaic Current . 0
+Photo Reference Cell .. 0
+Acceleration Display .. 0
+Break pedal pressed ... false
+Photo Voltaic On ...... 0
+Motor On .............. 0
+Motor Current ......... 0
+Drive Direction ....... fwd
+Green Light ........... 0
+
+Fan ................... 0
+------------------------
+Indicator ............. OFF
+Constant Mode On ...... false
+Constant Mode ......... SPEED
+Target Speed .......... 0
+Target Power .......... 0
+SD Card detected....... false(0)
+Info Last ............. [STATUS] Acceleration.still locked!
+Speed Arrow ........... OFF
+Light ................. OFF
+IO .................... 0: 1101-1000 | 0000-0111 | 1: 1111-1111 | 1111-1011
+Log file name ......... /SER4DATA.CSV
+Log file persiod ...... 1000
+Log file interval ..... 1
+Sleep time EIOExt ..... 400
+Kp .................... 15
+Ki .................... 5
+Kd .................... 0.05
+Paddle damping ........ 10
+Paddle offset ......... 999
+Paddle adjustment ..... 18
+Const speed increase .. 1
+Const power invrease .. 0.5
+Car data log period ... 1000
+Serial 1 baud rate .... 115200
+Serial 2 baud rate .... 9600
+Telemetry send intervall1000
+Telemetry cache records 100
+===========================================================================================
+
+     No SD card detected!
+[  ] Init 'CmdHandler'...
+[ok] CmdHandler initialized.
+[  ] Init 'RTC'...
+     DS1307_ADDRESS 68
+     [INFO] rtc compile date/time: 08/07/2022 09:05:04
+     [INFO] rtc time newer than compile time. Updating esp32time DateTime.
+[ok] RTC initialized.
+[  ] Init Indicator...done.
+[ok] Indicator initialized.
+[  ] Init 'DAC'...
+     DAC initialized with I2C_ADDRESS_DS1803=28.
+[ok] DAC initialized.
+     Init 'ADC[0]' with address 0x48 ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 3: 0.000563mV
+          [ADS1x15] AIN1 --> 2013: 0.377449mV
+          [ADS1x15] AIN2 --> 2016: 0.378012mV
+          [ADS1x15] AIN3 --> 2054: 0.385137mV
+     ok ADC[0] at 0x48 inited.
+     Init 'ADC[1]' with address 0x49 ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 2074: 0.388887mV
+          [ADS1x15] AIN1 --> 2040: 0.382512mV
+          [ADS1x15] AIN2 --> 2066: 0.387387mV
+          [ADS1x15] AIN3 --> 2044: 0.383262mV
+     ok ADC[1] at 0x49 inited.
+     Init 'ADC[2]' with address 0x4a ...
+        Max voltage=6.144000 with multiplier=0.000188
+          [ADS1x15] AIN0 --> 1: 0.000188mV
+          [ADS1x15] AIN1 --> 4: 0.000750mV
+          [ADS1x15] AIN2 --> 2232: 0.418513mV
+          [ADS1x15] AIN3 --> 2234: 0.418888mV
+     ok ADC[2] at 0x4a inited.
+[ok] ADC initialized.
+[  ] Init GyroAcc...
+     BMI088 is connected
+     BMI088 is initialized
+[ok] GyroAcc initialized.
+[  ] Init CANBus...
+     CANBus with rx=19m tx=1a inited.
+[ok] CANBus initialized.
+
+-----------------------------------------------------------------
+Startup sequence(s) successful. System creating FreeRTOS tasks...
+-----------------------------------------------------------------
+
+[  ] Create IOExt as prio-4-task (sleep_polling=100ms, stack=6000) ... done.
+[ok] IOExt started (100ms).
+[  ] Create Indicator as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] Indicator started (330ms).
+[  ] Create ADC as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] ADC started (330ms).
+[  ] Create GyroAcc as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] GyroAcc started (330ms).
+[  ] Create RTC as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] RTC started (330ms). RTC Time: 08/07/2022 09:25:33
+[  ] Create CmdHandler as prio-20-task (sleep_polling=350ms, stack=6000) ... done.
+[ok] CmdHandler started (350ms).
+[  ] Create CANBus as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] CANBus started (330ms).
+[  ] Init 'CarControl'...
+done.
+[ok] CarControl initialized.
+[  ] Create CarControl as prio-10-task (sleep_polling=250ms, stack=6000) ... done.
+[ok] CarControl started (250ms).
+[  ] Init 'CarSpeed'...
+[ok] CarSpeed initialized.
+[  ] Create CarSpeed as prio-10-task (sleep_polling=250ms, stack=3000) ... done.
+[ok] CarSpeed started (250ms).
+[  ] Create EngineerDisplay as prio-10-task (sleep_polling=330ms, stack=4096) ... done.
+[ok] EngineerDisplay started (1500ms).
+[  ] Init 'Display'...
+     Setup 'ILI9341' for 'DriverDisplay' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+I (17337) gpio: GPIO[32]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (17337) gpio: GPIO[4]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (17347) gpio: GPIO[21]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[  ] Create DriverDisplay as prio-16-task (sleep_polling=330ms, stack=4096) ... done.
+     Setup 'ILI9341' for 'DriverDisplay' with: SPI_CLK=5, SPI_MOSI=18, SPI_MISO=19, SPI_CS_TFT=32
+I (18287) gpio: GPIO[32]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (18287) gpio: GPIO[4]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+I (18297) gpio: GPIO[21]| InputEn: 1| OutputEn: 1| OpenDrain: 0| Pullup: 0| Pulldown: 0| Intr:0 
+[ok] DriverDisplay started (330ms).DRIVER_SETUP
+     ILI9341_RDMADCTL:   0xa
+     ILI9341_RDPIXFMT:   0x1
+     ILI9341_RDIMGFMT:   0xe0
+     ILI9341_RDSELFDIAG: 0xf0
+     ILI9341_RDMODE:     0xe5
+[v] 'DriverDisplay' inited: screen E ILI9341 with 240 x 320
+-----------------------------------------------------------------
+Battery On
+PV On
+MC Off
+EcoMowerMode Eco
+Direction ForwardFreeRTOS tasks successfully created. System running.
+
+Break pedal pressed -----------------------------------------------------------------
+released
+Light toggle
+Horn Off
+SD card removed.
+EcoMowerMode Power
+Direction Backward
+EcoMowerMode Eco
+Direction Forward
+Request Paddle Adjust
+paddle adjust: 17
+paddle adjust: 16
+paddle adjust: 15
+paddle adjust: 14
+paddle adjust: 13
+paddle adjust: 12
+paddle adjust: 11
+paddle adjust: 10
+paddle adjust:  9
+paddle adjust:  8
+paddle adjust:  7
+paddle adjust:  6---01------------------------------------------
+paddle adjust:  5
+paddle adjust:  4
+paddle adjust:  3
+paddle adjust:  2
+paddle adjust:  1
+paddle adjust:  0
+
+    ==> dec  1001-14570       ==> acc  1003-17464 => ok
+DAC unlocked.
+```

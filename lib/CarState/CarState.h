@@ -231,7 +231,7 @@ public:
   // [Main]
   string LogFilename; // telemetry data: %stamp% get replaced by datetime stamp if period != 0
   int LogFilePeriod;  // [h], after that a new log file is created, 0 - never
-  int LogInterval;    // [s]
+  int LogInterval;    // [ms]
 
   // [TaskTimings]
   int SleepTimeIOExt = 400; // [ms]
@@ -252,8 +252,8 @@ public:
   float ConstPowerIncrease;           // [W] per click
 
   // [Communication]
-  int CarDataLogPeriod;         // = 1000; // [ms]
-  int Serial1Baudrate = 115200; // 115200; //baud
+  int CarDataSendPeriod;        // [ms]
+  int Serial1Baudrate = 115200; // baud
   int Serial2Baudrate = 9600;   // baud
 
   // [Telemetry]

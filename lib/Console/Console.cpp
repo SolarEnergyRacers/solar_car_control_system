@@ -20,9 +20,10 @@ const char *strip_extended_chars(string str) {
 
 //------- OUT ---------
 Console &operator<<(Console &c, const char *str) {
-  cout << str;
-  cout.flush();
-
+  if (!(str[0] == 'd' && str[1] == ':')) {
+    cout << str;
+    cout.flush();
+  }
 #if SERIAL_RADIO_ON
   Serial2 << strip_extended_chars(string(str));
   Serial2.flush();

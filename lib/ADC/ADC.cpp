@@ -122,7 +122,7 @@ void ADC::task() {
 
     if (verboseModeADC) {
       console << fmt::format(
-          "adc: speed {:5d}-spd | acc {:5d} | dec {:5d} | batC {:5d} | motC {:5d}I | pvC {:5d} | batV {:5d} | motV {:5d} | refV {:5d}\n",
+          "adc: speed {:3d} | acc {:5d} | dec {:5d} | batC {:5d} | motC {:5d}I | pvC {:5d} | batV {:5d} | motV {:5d} | refV {:5d}\n",
           MOTOR_SPEED, STW_ACC, STW_DEC, BAT_CURRENT, MOTOR_CURRENT, PV_CURRENT, BAT_VOLTAGE, MOTOR_VOLTAGE, REFERENCE_CELL);
     }
 

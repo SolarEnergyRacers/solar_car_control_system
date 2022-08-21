@@ -80,7 +80,7 @@ bool CarState::initalize_config() {
     ButtonControlModeIncreaseHeigh = cf.get("Dynamic", "ButtonControlModeIncreaseHeigh", 10);
     ButtonControlModeIncrease = ButtonControlModeIncreaseLow;
     // [Communication]
-    CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
+    CarDataSendPeriod = cf.get("Communication", "CarDataSendPeriod", 3000);
     Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
     Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
     // [Telemetry]
@@ -150,8 +150,8 @@ const string CarState::print(string msg, bool withColors) {
   ss << "IO .................... " << printIOs("", false) << endl;
 
   ss << "Log file name ......... " << LogFilename << endl;
-  ss << "Log file persiod ...... " << LogFilePeriod << endl;
-  ss << "Log file interval ..... " << LogInterval << endl;
+  ss << "Log file period [h].... " << LogFilePeriod << endl;
+  ss << "Log file interval [ms]. " << LogInterval << endl;
 
   // [TaskTimings]
   ss << "Sleep time EIOExt ..... " << SleepTimeIOExt << endl;
@@ -169,7 +169,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Const power invrease .. " << ConstPowerIncrease << endl;
 
   // [Communication]
-  ss << "Car data log period ... " << CarDataLogPeriod << endl;
+  ss << "Car data send period [ms]. " << CarDataSendPeriod << endl;
   ss << "Serial 1 baud rate .... " << Serial1Baudrate << endl;
   ss << "Serial 2 baud rate .... " << Serial2Baudrate << endl;
 
@@ -240,13 +240,20 @@ const string CarState::serialize(string msg) {
 }
 
 const string CarState::csv(string msg, bool withHeader) {
+
+  //   carState.PrechargeState
+  // careState.BatteryVoltage
+  // carState.Uavg
+  // carState.BatteryCurrent
+  // carstate.batteryErrorsAsString()
+
   time_t theTime = time(NULL);
   struct tm t = *localtime(&theTime);
   string timeStamp = asctime(&t);
   timeStamp.erase(timeStamp.end() - 1);
   string tempStr = getCleanString(DriverInfo);
 
-  stringstream ss(msg);
+  stringstream ss("");
   if (withHeader) {
     // header
     ss << "timeStamp, ";

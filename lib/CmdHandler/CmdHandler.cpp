@@ -174,6 +174,10 @@ void CmdHandler::task() {
         case 'H':
           memory_info();
           break;
+        case 'b':
+          // ioExt.verboseModeDigitalIn = !ioExt.verboseModeDigitalIn;
+          // console << "set verboseModeDigitalIn: " << ioExt.verboseModeDigitalIn << "\n";
+          break;
         case 'i':
           console << "Received: '" << input << "' --> ";
           if (input[1] == 'i') {

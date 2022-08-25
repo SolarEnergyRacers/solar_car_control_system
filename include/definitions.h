@@ -82,9 +82,9 @@
  *  GPIO25  TX
  *  GPIO26  RX
  */
-#define CAN_TX (gpio_num_t)26
-#define CAN_RX (gpio_num_t)25
-#define CAN_SPEED 250E3 // Change CAN Speed on BMS to 125
+#define CAN_TX (gpio_num_t)25
+#define CAN_RX (gpio_num_t)26
+#define CAN_SPEED 125E3 // Change CAN Speed on BMS to 125
 #define BMS_BASE_ADDR 0x700
 #define MPPT1_BASE_ADDR 0x600
 #define MPPT2_BASE_ADDR 0x610
@@ -104,7 +104,7 @@
 #define MAXAGE_CMU_VOLTAGES 0
 #define MAXAGE_PACK_SOC 0
 #define MAXAGE_BALANCE_SOC 5000
-#define MAXAGE_CHARGER_CONTROL -1
+#define MAXAGE_CHARGER_CONTROL 0
 #define MAXAGE_PRECHARGE_STATUS 0
 #define MAXAGE_MIN_MAX_U_CELL 1000
 #define MAXAGE_MIN_MAX_T_CELL 0

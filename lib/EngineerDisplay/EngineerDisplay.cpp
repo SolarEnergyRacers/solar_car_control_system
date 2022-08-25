@@ -73,6 +73,10 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     MotorOn.Value = carState.MotorOn;
     BatteryVoltage.Value = carState.BatteryVoltage;
     BatteryCurrent.Value = carState.BatteryCurrent;
+    Temperature1.Value = carState.T1;
+    Temperature2.Value = carState.T2;
+    Temperature3.Value = carState.T3;
+    Temperature4.Value = carState.T4;
 
     BatteryOn.showValue(tft);
     PhotoVoltaicOn.showValue(tft);

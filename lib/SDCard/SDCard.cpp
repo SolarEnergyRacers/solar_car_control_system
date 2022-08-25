@@ -44,6 +44,10 @@ string SDCard::init() {
   return fmt::format("[{}] SDCard initialized.", hasError ? "--" : "ok");
 }
 
+
+// https://github.com/espressif/arduino-esp32/issues/5676
+// https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino
+
 bool SDCard::mount() {
   if (sdCard.isMounted()) {
     return true;
@@ -63,7 +67,7 @@ bool SDCard::mount() {
   try {
     console << "     Mounting SD card ...\n";
     xSemaphoreTakeT(spiBus.mutex);
-    mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
+    mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi, 40000000U, "/");
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
       console << "     SD card mounted.\n";

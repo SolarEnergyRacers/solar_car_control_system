@@ -17,7 +17,7 @@ public:
   void task(void);
 
   // Class functions and members
-  string commands = "!-:<>BCcDdEFGHiIJklLMPRsStTUuVvw";
+  string commands = "!-:<>bBCcDdEFGHiIJklLMPRsStTUuVvw";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -------------------------\n"
@@ -40,6 +40,7 @@ public:
                     "\t   [a|d]               - show ADC|DAC continuously\n"
                     "\t   [c]                 - show controls acc/dec continuously\n"
                     "\t   [R]                 - reinit\n"
+                    "\tb _ _ _ _ _ _ _ _ __  show CAN in\n"
                     "\tT [yyyy mm dd hh MM]  get/set RTC date and time\n"
                     "\tk [|kp ki kd|v] _ _ _ show / update PID constants, v- verbose display\n"
                     "\tG [-] _ _ _ _ _ _ _ _ Green light on  (-:off)\n"

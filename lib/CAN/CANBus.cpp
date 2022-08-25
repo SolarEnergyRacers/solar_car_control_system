@@ -130,11 +130,11 @@ string CANBus::init() {
   if (!CAN.begin(CAN_SPEED)) {
     xSemaphoreGive(mutex);
     // opening CAN failed :,(
-    console << fmt::format("     ERROR: CANBus with rx={:02x}m tx={:02x} NOT inited.\n", CAN_RX, CAN_TX);
+    console << fmt::format("     ERROR: CANBus with rx={:02x}, tx={:02x} NOT inited.\n", CAN_RX, CAN_TX);
     hasError = true;
   } else {
     xSemaphoreGive(mutex);
-    console << fmt::format("     CANBus with rx={:02x}m tx={:02x} inited.\n", CAN_RX, CAN_TX);
+    console << fmt::format("     CANBus with rx={:02x}, tx={:02x} inited.\n", CAN_RX, CAN_TX);
   }
 
   return fmt::format("[{}] CANBus initialized.", hasError ? "--" : "ok");
@@ -266,6 +266,12 @@ void CANBus::task() {
         // MPPT3 Output Voltage V packet.getData_f32(0)
         // MPPT3 Output Current A packet.getData_f32(1)
         break;
+      case MPPT2_BASE_ADDR | 0x2:
+        console << "Temp received" << "\n";
+        carState.T1 = packet.getData_f32(0);
+        carState.T2 = packet.getData_f32(1);
+        console << carState.T1 << ";" << carState.T2 << "\n";
+        carState.T3 = 3.5f;
       }
     }
     // sleep(CAN_TASK_WAIT);
@@ -279,7 +285,7 @@ void CANBus::onReceive(int packetSize) {
   uint64_t rxData = 0;
 
   packet.setID(CAN.packetId());
-
+  // console << ":";
   if (max_ages[packet.getID()] == 0 || (max_ages[packet.getID()] != -1 && millis() - ages[packet.getID()] > max_ages[packet.getID()])) {
 
     ages[packet.getID()] = millis();

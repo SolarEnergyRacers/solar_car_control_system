@@ -267,11 +267,12 @@ void CANBus::task() {
         // MPPT3 Output Current A packet.getData_f32(1)
         break;
       case MPPT2_BASE_ADDR | 0x2:
-        console << "Temp received" << "\n";
+        if (verboseMode)
+          console << "Temp received: T1=";
         carState.T1 = packet.getData_f32(0);
         carState.T2 = packet.getData_f32(1);
-        console << carState.T1 << ";" << carState.T2 << "\n";
-        carState.T3 = 3.5f;
+        if (verboseMode)
+          console << carState.T1 << ", T2=" << carState.T2 << "\n";
       }
     }
     // sleep(CAN_TASK_WAIT);
@@ -285,7 +286,7 @@ void CANBus::onReceive(int packetSize) {
   uint64_t rxData = 0;
 
   packet.setID(CAN.packetId());
-  // console << ":";
+
   if (max_ages[packet.getID()] == 0 || (max_ages[packet.getID()] != -1 && millis() - ages[packet.getID()] > max_ages[packet.getID()])) {
 
     ages[packet.getID()] = millis();

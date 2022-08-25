@@ -28,6 +28,7 @@
 #include <CarState.h>
 #include <CarStatePin.h>
 #include <CmdHandler.h>
+#include <CANBus.h>
 #include <Console.h>
 #include <DAC.h>
 #include <Display.h>
@@ -44,6 +45,7 @@
 #if ADC_ON
 extern ADC adc;
 #endif
+extern CANBus can;
 extern I2CBus i2cBus;
 #if DAC_ON
 extern DAC dac;
@@ -175,8 +177,8 @@ void CmdHandler::task() {
           memory_info();
           break;
         case 'b':
-          // ioExt.verboseModeDigitalIn = !ioExt.verboseModeDigitalIn;
-          // console << "set verboseModeDigitalIn: " << ioExt.verboseModeDigitalIn << "\n";
+          can.verboseMode = !can.verboseMode;
+          console << "set verboseMode for canbus: " << can.verboseMode << "\n";
           break;
         case 'i':
           console << "Received: '" << input << "' --> ";

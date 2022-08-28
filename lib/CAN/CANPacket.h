@@ -1,6 +1,6 @@
 #include <Arduino.h>
 
-typedef union _group_64 {
+typedef union {
   float data_fp[2];
   uint8_t data_u8[8];
   int8_t data_8[8];

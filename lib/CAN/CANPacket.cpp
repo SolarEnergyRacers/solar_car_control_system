@@ -4,20 +4,19 @@
 
 CANPacket::CANPacket() {
   id = 0;
-  data = 0;
+  data.data_u64 = 0;
 }
 
 CANPacket::CANPacket(uint16_t id, uint8_t data[]) {
   this->id = id;
-
-  for (uint8_t i = 0; i < 8; i++) {
-    this->data = this->data + (data[i] << (i * 8));
+  for(int i = 0; i < 8; i++){
+    this->data.data_u8[i] = data[i];
   }
 }
 
 CANPacket::CANPacket(uint16_t id, uint64_t data) {
   this->id = id;
-  this->data = data;
+  this->data.data_u64 = data;
 }
 
 void CANPacket::setID(uint16_t id) { this->id = id; }
@@ -25,40 +24,29 @@ void CANPacket::setID(uint16_t id) { this->id = id; }
 uint16_t CANPacket::getID() { return id; }
 
 void CANPacket::setData(uint8_t data[]) {
-  for (uint8_t i = 0; i < 8; i++) {
-    this->data = this->data + (data[i] << (i * 8));
+  for(int i = 0; i < 8; i++){
+    this->data.data_u8[i] = data[i];
   }
 }
 
-void CANPacket::setData(uint64_t data) { this->data = data; }
+void CANPacket::setData(uint64_t data) { this->data.data_u64 = data; }
 
-uint64_t CANPacket::getData_ui64() { return this->data; }
+uint64_t CANPacket::getData_ui64() { return this->data.data_u64; }
 
-// ToDo Test unsigned->signed on ESP32 runtime
-int64_t CANPacket::getData_i64() {
-  int64_t result = data & 0xFFFFFFFFFFFFFFFF;
-  return result;
-}
+int64_t CANPacket::getData_i64() { return this->data.data_64; }
 
-uint32_t CANPacket::getData_ui32(uint8_t index) { return (uint32_t)(data >> (32 * index)) & 0x00000000FFFFFFFF; }
+uint32_t CANPacket::getData_ui32(uint8_t index) { return this->data.data_u32[index]; }
 
-int32_t CANPacket::getData_i32(uint8_t index) { return (int32_t)(data >> (32 * index)) & 0x00000000FFFFFFFF; }
+int32_t CANPacket::getData_i32(uint8_t index) { return this->data.data_32[index]; }
 
-uint16_t CANPacket::getData_ui16(uint8_t index) { return (uint16_t)(data >> (16 * index)) & 0x000000000000FFFF; }
+uint16_t CANPacket::getData_ui16(uint8_t index) { return this->data.data_u16[index]; }
 
-int16_t CANPacket::getData_i16(uint8_t index) { return (int16_t)(data >> (16 * index)) & 0x000000000000FFFF; }
+int16_t CANPacket::getData_i16(uint8_t index) { return this->data.data_16[index]; }
 
-uint8_t CANPacket::getData_ui8(uint8_t index) { return (uint8_t)(data >> (8 * index)) & 0x00000000000000FF; }
+uint8_t CANPacket::getData_ui8(uint8_t index) { return this->data.data_u8[index]; }
 
-int8_t CANPacket::getData_i8(uint8_t index) { return (int8_t)(data >> (8 * index)) & 0x00000000000000FF; }
+int8_t CANPacket::getData_i8(uint8_t index) { return this->data.data_8[index]; }
 
-bool CANPacket::getData_b(uint8_t index) { return ((data >> index) & 0x0000000000000001); }
+bool CANPacket::getData_b(uint8_t index) { return ((this->data.data_u64 >> index) & 0x0000000000000001); }
 
-float CANPacket::getData_f32(uint8_t index) {
-  uint32_t ival = (uint32_t)(data >> (32 * index)) & 0x00000000FFFFFFFF;
-  float fval = 0.0;
-
-  memcpy(&fval, &ival, sizeof(fval));
-
-  return fval;
-}
+float CANPacket::getData_f32(uint8_t index) { return this->data.data_fp[index];  }

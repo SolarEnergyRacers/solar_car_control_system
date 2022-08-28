@@ -304,11 +304,15 @@ void CarControl::adjust_paddles(int cycles) {
   ads_min_dec += carState.PaddleOffset;
   ads_min_acc += carState.PaddleOffset;
   delay(1000);
-  string result = carState.AccelerationDisplay == 0 ? "ok" : "ERR";
-  s = fmt::format("==> dec {:5}-{:5}       ==> acc {:5}-{:5} => {}", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc, result);
+  string result = carState.AccelerationDisplay == 0 ? "ok" : (carState.AccelerationDisplay == -88) ? "BRK?" : "ERR";
+  s = fmt::format("=> dec {:5}-{:5}        => acc {:5}-{:5} => {}", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc, result);
   console << "\n    " << s << "\n";
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
     carState.DriverInfo = s;
+  }
+  if (result == "ok") {
+    delay(640);
+    carState.DriverInfo = "";
   }
   //#SAFTY#
   carState.PaddlesAdjusted = true;

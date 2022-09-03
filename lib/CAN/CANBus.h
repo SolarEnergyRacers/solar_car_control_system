@@ -32,5 +32,5 @@ public:
   void onReceive(int packetSize);
 
   SemaphoreHandle_t mutex;
-  bool verboseMode = false;
+  bool verboseModeCan = false;
 };

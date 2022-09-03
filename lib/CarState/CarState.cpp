@@ -241,12 +241,6 @@ const string CarState::serialize(string msg) {
 
 const string CarState::csv(string msg, bool withHeader) {
 
-  //   carState.PrechargeState
-  // careState.BatteryVoltage
-  // carState.Uavg
-  // carState.BatteryCurrent
-  // carstate.batteryErrorsAsString()
-
   time_t theTime = time(NULL);
   struct tm t = *localtime(&theTime);
   string timeStamp = asctime(&t);

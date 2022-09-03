@@ -9,7 +9,7 @@ CANPacket::CANPacket() {
 
 CANPacket::CANPacket(uint16_t id, uint8_t data[]) {
   this->id = id;
-  for(int i = 0; i < 8; i++){
+  for (int i = 0; i < 8; i++) {
     this->data.data_u8[i] = data[i];
   }
 }
@@ -24,7 +24,7 @@ void CANPacket::setID(uint16_t id) { this->id = id; }
 uint16_t CANPacket::getID() { return id; }
 
 void CANPacket::setData(uint8_t data[]) {
-  for(int i = 0; i < 8; i++){
+  for (int i = 0; i < 8; i++) {
     this->data.data_u8[i] = data[i];
   }
 }
@@ -49,4 +49,4 @@ int8_t CANPacket::getData_i8(uint8_t index) { return this->data.data_8[index]; }
 
 bool CANPacket::getData_b(uint8_t index) { return ((this->data.data_u64 >> index) & 0x0000000000000001); }
 
-float CANPacket::getData_f32(uint8_t index) { return this->data.data_fp[index];  }
+float CANPacket::getData_f32(uint8_t index) { return this->data.data_fp[index]; }

@@ -76,8 +76,8 @@ void CarControl::_handleValueChanged() {
 
 bool CarControl::read_battery_data() {
 #if ADC_ON
-  carState.BatteryVoltage = adc.BAT_VOLTAGE / 100.;  // TODO
-  carState.BatteryCurrent = adc.BAT_CURRENT / 1000.; // TODO
+  //Comes from CAN bus: carState.BatteryVoltage = adc.BAT_VOLTAGE / 100.;  // TODO
+  //Comes from CAN bus: carState.BatteryCurrent = adc.BAT_CURRENT / 1000.; // TODO
 #endif
   return true;
 }
@@ -92,7 +92,7 @@ bool CarControl::read_motor_data() {
 
 bool CarControl::read_pv_data() {
 #if ADC_ON
-  carState.PhotoVoltaicCurrent = adc.PV_CURRENT / 100.; // TODO
+  //Comes from CAN bus: carState.PhotoVoltaicCurrent = adc.PV_CURRENT / 100.; // TODO
 #endif
   return true;
 }

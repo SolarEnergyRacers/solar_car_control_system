@@ -23,12 +23,12 @@
 #include <Wire.h> // I2C
 
 #include <ADC.h>
+#include <CANBus.h>
 #include <CarControl.h>
 #include <CarSpeed.h>
 #include <CarState.h>
 #include <CarStatePin.h>
 #include <CmdHandler.h>
-#include <CANBus.h>
 #include <Console.h>
 #include <DAC.h>
 #include <Display.h>
@@ -177,8 +177,8 @@ void CmdHandler::task() {
           memory_info();
           break;
         case 'b':
-          can.verboseMode = !can.verboseMode;
-          console << "set verboseMode for canbus: " << can.verboseMode << "\n";
+          can.verboseModeCan = !can.verboseModeCan;
+          console << "set verboseMode for canbus: " << can.verboseModeCan << "\n";
           break;
         case 'i':
           console << "Received: '" << input << "' --> ";

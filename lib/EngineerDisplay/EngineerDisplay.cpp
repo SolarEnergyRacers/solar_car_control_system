@@ -77,6 +77,11 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature2.Value = carState.T2;
     Temperature3.Value = carState.T3;
     Temperature4.Value = carState.T4;
+    TemperatureMax.Value = carState.Tmax;
+
+    VoltageMin.Value = carState.Umin;
+    VoltageAvg.Value = carState.Uavg;
+    VoltageMax.Value = carState.Umax;
 
     BatteryOn.showValue(tft);
     PhotoVoltaicOn.showValue(tft);
@@ -101,6 +106,7 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature3.showValue(tft);
     Temperature4.showValue(tft);
     TemperatureMax.showValue(tft);
+    
     justInited = false;
     break;
   default:

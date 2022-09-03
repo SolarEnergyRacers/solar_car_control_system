@@ -12,7 +12,6 @@ typedef union {
   int64_t data_64;
 } group_64;
 
-
 class CANPacket {
 private:
   uint16_t id;

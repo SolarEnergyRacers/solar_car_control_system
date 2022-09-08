@@ -17,7 +17,7 @@ public:
   void task(void);
 
   // Class functions and members
-  string commands = "!-:<>bBCcDdEFGHiIJklLMPRsStTUuVvw";
+  string commands = "!-:<>abBCcDEFGHiIJklLMPRsStTUVvw";
   string helpText = "Available commands (" + commands +
                     "):\n"
                     "\t-------- SYSTEM COMMANDS -------------------------\n"
@@ -46,6 +46,7 @@ public:
                     "\tG [-] _ _ _ _ _ _ _ _ Green light on  (-:off)\n"
                     "\tF [-] _ _ _ _ _ _ _ _ Fan on  (-:off)\n"
                     "\t-------- DRIVER INFO COMMANDS --------------------\n"
+                    "\ta [u|d|o] _ _ _ _ _ _ speed arrow up | down | off\n"
                     "\t:<text> _ _ _ _ _ _ _ display driver info text\n"
                     "\t!<text> _ _ _ _ _ _ _ display driver warn text\n"
                     "\tu [-] _ _ _ _ _ _ _ _ green speed up arrow (-:off)\n"

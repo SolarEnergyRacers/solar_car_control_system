@@ -116,14 +116,17 @@ void ADC::task() {
     BAT_VOLTAGE = read(Pin::BAT_VOLTAGE_PORT);
     MOTOR_VOLTAGE = read(Pin::MOTOR_VOLTAGE_PORT);
     REFERENCE_CELL = read(Pin::REFERENCE_CELL_PORT);
+    GREEN_LIGHT = read(Pin::GREEN_LIGHT_PORT);
+    carState.GreenLight = GREEN_LIGHT > 13000 ? true : false;
     // ADC2 (steering wheel)
     STW_ACC = read(Pin::STW_ACC_PORT);
     STW_DEC = read(Pin::STW_DEC_PORT);
 
     if (verboseModeADC) {
-      console << fmt::format(
-          "adc: speed {:3d} | acc {:5d} | dec {:5d} | batC {:5d} | motC {:5d}I | pvC {:5d} | batV {:5d} | motV {:5d} | refV {:5d}\n",
-          MOTOR_SPEED, STW_ACC, STW_DEC, BAT_CURRENT, MOTOR_CURRENT, PV_CURRENT, BAT_VOLTAGE, MOTOR_VOLTAGE, REFERENCE_CELL);
+      console << fmt::format("adc: speed {:3d} | acc {:5d} | dec {:5d} | batC {:5d} | motC {:5d}I | pvC {:5d} | batV {:5d} | motV {:5d} | "
+                             "refV {:5d} | GreenLightb {:5d}\n",
+                             MOTOR_SPEED, STW_ACC, STW_DEC, BAT_CURRENT, MOTOR_CURRENT, PV_CURRENT, BAT_VOLTAGE, MOTOR_VOLTAGE,
+                             REFERENCE_CELL, GREEN_LIGHT);
     }
 
     // sleep

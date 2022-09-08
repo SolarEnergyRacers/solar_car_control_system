@@ -128,6 +128,7 @@ void IOExt::writeAllPins(PinHandleMode mode) {
       pin.inited = true;
     }
   }
+  console << "====================================================\n\n";
 }
 
 void IOExt::readAllPins() {

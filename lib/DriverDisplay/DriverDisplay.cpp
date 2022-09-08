@@ -160,6 +160,22 @@ void DriverDisplay::_arrow_decrease(int color) {
 }
 
 // show the slower arrow (red under the speed display)
+void DriverDisplay::arrow(SPEED_ARROW incDecOff) {
+  switch (incDecOff) {
+  default:
+  case SPEED_ARROW::OFF:
+    arrow_increase(false);
+    arrow_decrease(false);
+    break;
+  case SPEED_ARROW::INCREASE:
+    arrow_increase(true);
+    break;
+  case SPEED_ARROW::DECREASE:
+    arrow_decrease(true);
+    break;
+  }
+}
+
 void DriverDisplay::arrow_decrease(bool on) {
   int color = bgColor;
   if (on) {

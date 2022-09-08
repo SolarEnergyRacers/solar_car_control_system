@@ -287,28 +287,18 @@ void CmdHandler::task() {
           console << "Received: '" << input << "' -->  carState.Fan=" << carState.Fan << "\n";
           break;
         case 'G':
-          if (input[1] == '-') {
-            carState.GreenLight = false;
-            carState.getPin(PinGreenLightOut)->value = 0;
-          } else {
-            carState.GreenLight = true;
-            carState.getPin(PinGreenLightOut)->value = 1;
-          }
           console << "Received: '" << input << "' -->  carState.GreenLight=" << carState.GreenLight << "\n";
           break;
-        case 'u':
-          if (input[1] == '-') {
-            carState.SpeedArrow = SPEED_ARROW::OFF;
-          } else {
+        case 'a':
+          if (input[1] == 'u') {
             carState.SpeedArrow = SPEED_ARROW::INCREASE;
-          }
-          console << "Received: '" << input << "' -->  carState.SpeedArrow=" << SPEED_ARROW_str[(int)(carState.SpeedArrow)] << "\n";
-          break;
-        case 'd':
-          if (input[1] == '-') {
-            carState.SpeedArrow = SPEED_ARROW::OFF;
-          } else {
+            console << "set arrow increase: " << ioExt.verboseModeDigitalIn << "\n";
+          } else if (input[1] == 'd') {
             carState.SpeedArrow = SPEED_ARROW::DECREASE;
+            console << "set verboseModeDigitalOut: " << ioExt.verboseModeDigitalOut << "\n";
+          } else if (input[1] == 'o') {
+            carState.SpeedArrow = SPEED_ARROW::OFF;
+            console << "set verboseModeADC: " << adc.verboseModeADC << "\n";
           }
           console << "Received: '" << input << "' -->  carState.SpeedArrow=" << SPEED_ARROW_str[(int)(carState.SpeedArrow)] << "\n";
           break;

@@ -44,7 +44,6 @@ string SDCard::init() {
   return fmt::format("[{}] SDCard initialized.", hasError ? "--" : "ok");
 }
 
-
 // https://github.com/espressif/arduino-esp32/issues/5676
 // https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino
 

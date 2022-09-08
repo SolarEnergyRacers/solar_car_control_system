@@ -38,7 +38,7 @@ public:
     BAT_VOLTAGE_PORT = 0x10,
     MOTOR_VOLTAGE_PORT = 0x11,
     REFERENCE_CELL_PORT = 0x12,
-    Reserve_13_PORT = 0x13,
+    GREEN_LIGHT_PORT = 0x13,
     // ADC2 (steering wheel)
     STW_ACC_PORT = 0x20,
     STW_DEC_PORT = 0x21,
@@ -54,6 +54,7 @@ public:
   int16_t BAT_VOLTAGE;
   int16_t MOTOR_VOLTAGE;
   int16_t REFERENCE_CELL;
+  int16_t GREEN_LIGHT;
   // ADC2 (steering wheel)
   int16_t STW_ACC;
   int16_t STW_DEC;

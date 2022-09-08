@@ -153,6 +153,7 @@ private:
   void _hide_light();
   void _turn_Left(int color);
   void _turn_Right(int color);
+
   bool init_driver_display(void);
   void draw_display_border(int color);
   void draw_speed_border(int color);
@@ -174,6 +175,7 @@ private:
   void show_light();
 
   void speedCheck(int speed);
+  void arrow(SPEED_ARROW incDecOff);
   void arrow_increase(bool on);
   void arrow_decrease(bool on);
 

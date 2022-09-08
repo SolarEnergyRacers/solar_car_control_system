@@ -105,7 +105,7 @@ ESP32Time esp32time;
 DAC dac;
 #endif
 #if CAN_ON
-CANBus can; // TODO: gets a linking-error if we set CAN_ON to true
+CANBus can;
 #endif
 #if CARSPEED_ON
 CarSpeed carSpeed;

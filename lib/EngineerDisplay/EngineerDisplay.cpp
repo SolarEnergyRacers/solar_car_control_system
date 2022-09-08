@@ -106,7 +106,7 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature3.showValue(tft);
     Temperature4.showValue(tft);
     TemperatureMax.showValue(tft);
-    
+
     justInited = false;
     break;
   default:

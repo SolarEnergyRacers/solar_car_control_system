@@ -55,7 +55,7 @@ void ecoPowerHandler() {
 }
 
 void fwdBwdHandler() {
-  carState.DriveDirection = carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::BACKWARD : DRIVE_DIRECTION::FORWARD;
+  carState.DriveDirection = carState.getPin(PinFwdBwd)->value == 1 ? DRIVE_DIRECTION::FORWARD : DRIVE_DIRECTION::BACKWARD;
   console << "Direction " << (carState.DriveDirection == DRIVE_DIRECTION::FORWARD ? "Forward" : "Backward") << "\n";
 }
 

@@ -117,7 +117,7 @@ void ADC::task() {
     MOTOR_VOLTAGE = read(Pin::MOTOR_VOLTAGE_PORT);
     REFERENCE_CELL = read(Pin::REFERENCE_CELL_PORT);
     GREEN_LIGHT = read(Pin::GREEN_LIGHT_PORT);
-    carState.GreenLight = GREEN_LIGHT > 13000 ? true : false;
+    carState.GreenLight = GREEN_LIGHT < 7000 ? true : false;
     // ADC2 (steering wheel)
     STW_ACC = read(Pin::STW_ACC_PORT);
     STW_DEC = read(Pin::STW_DEC_PORT);

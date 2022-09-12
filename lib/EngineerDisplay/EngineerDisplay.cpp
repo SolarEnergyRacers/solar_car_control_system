@@ -78,6 +78,9 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature3.Value = carState.T3;
     Temperature4.Value = carState.T4;
     TemperatureMax.Value = carState.Tmax;
+    Mppt1.Value = carState.Mppt1Current;
+    Mppt2.Value = carState.Mppt2Current;
+    Mppt3.Value = carState.Mppt3Current;
 
     VoltageMin.Value = carState.Umin;
     VoltageAvg.Value = carState.Uavg;

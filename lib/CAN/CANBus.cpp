@@ -316,7 +316,8 @@ void CANBus::task() {
         }
       }
     }
-    vTaskDelay(sleep_polling_ms / portTICK_RATE_MS);
+    //vTaskDelay(sleep_polling_ms / portTICK_RATE_MS);
+    vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
 
@@ -344,6 +345,5 @@ void CANBus::onReceive(int packetSize) {
 
     // Add packet to buffer so task can handle it later
     rxBuffer.push(packet);
-    xSemaphoreGive(mutex);
   }
 }

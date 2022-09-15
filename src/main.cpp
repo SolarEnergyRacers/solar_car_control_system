@@ -114,11 +114,6 @@ CarSpeed carSpeed;
 bool startOk = true;
 bool systemOk = false;
 
-bool debug = true;
-bool debugl2 = false;
-bool debugl3 = false;
-// int debug_level = 3;
-
 string msg;
 
 void app_main(void) {
@@ -279,7 +274,7 @@ void app_main(void) {
   carState.SdCardDetect = false;
   carState.ConstantMode = CONSTANT_MODE::SPEED;
   carState.Light = LIGHT::OFF;
-  msg = ioExt.create_task(4, 100, 6000);
+  msg = ioExt.create_task(20, 100, 8000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 
@@ -322,7 +317,7 @@ void app_main(void) {
   engineerDisplay.print(msg + "\n");
 #endif
 #if COMMANDHANDLER_ON
-  msg = cmdHandler.create_task(20, 350, 6000);
+  msg = cmdHandler.create_task(15, 350, 8000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif

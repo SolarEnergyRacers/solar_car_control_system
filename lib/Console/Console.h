@@ -33,6 +33,7 @@ public:
   friend Console &operator<<(Console &c, const size_t &var) { return operator<<(c, to_string(var)); }
   friend Console &operator<<(Console &c, const string &var) { return operator<<(c, var.c_str()); }
   friend Console &operator<<(Console &c, const unsigned long &var) { return operator<<(c, to_string(var)); }
+  friend Console &operator<<(Console &c, const uint64_t &var) { return operator<<(c, to_string(var)); }
   friend Console &operator<<(Console &c, const volatile int &var) { return operator<<(c, to_string(var)); }
 
   friend Console &operator<<(Console &c, const char *str);

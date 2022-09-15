@@ -48,7 +48,7 @@ string SDCard::init() {
 // https://github.com/espressif/arduino-esp32/blob/master/libraries/SPI/examples/SPI_Multiple_Buses/SPI_Multiple_Buses.ino
 
 bool SDCard::mount() {
-  if (sdCard.isMounted()) {
+  if (isMounted()) {
     return true;
   }
   if (!carState.SdCardDetect) {
@@ -66,10 +66,31 @@ bool SDCard::mount() {
   try {
     console << "     Mounting SD card ...\n";
     xSemaphoreTakeT(spiBus.mutex);
-    mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi, 40000000U, "/");
+    // mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi, 400000U, "/", 10); fails!
+    mounted = SD.begin(SPI_CS_SDCARD, spiBus.spi);
     xSemaphoreGive(spiBus.mutex);
     if (mounted) {
       console << "     SD card mounted.\n";
+      uint8_t cardType = SD.cardType();
+      if (cardType == CARD_NONE) {
+        console << "No SD card attached.\n";
+        return false;
+      }
+
+      console << "SD Card Type: ";
+      if (cardType == CARD_MMC) {
+        console << "MMC";
+      } else if (cardType == CARD_SD) {
+        console << "SDSC";
+      } else if (cardType == CARD_SDHC) {
+        console << "SDHC";
+      } else {
+        console << "UNKNOWN";
+      }
+
+      uint64_t cardSize = SD.cardSize() / (1024 * 1024);
+      console << "SD Card Size: " << cardSize << "MB\n";
+
       return true;
     }
     console << "     ERROR: Unable to mount SD card.\n";
@@ -95,6 +116,8 @@ bool SDCard::open_log_file() {
       xSemaphoreGive(spiBus.mutex);
       console << "     ERROR opening '" << carState.LogFilename << "': " << ex.what() << "\n";
     }
+  } else {
+    console << "ERROR at open_log_file: SD card not mounted.\n";
   }
   return false;
 }
@@ -144,7 +167,7 @@ string SDCard::directory() {
     ss << "~~~~~~~~~~~~~~~~\n";
     return ss.str();
   }
-  return "ERROR reading SD card.";
+  return "ERROR at directory: SD card not mounted.";
 }
 
 void SDCard::printDirectory(File dir, int numTabs) {

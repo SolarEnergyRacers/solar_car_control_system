@@ -43,6 +43,7 @@ extern Console console;
 extern SPIBus spiBus;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
+extern RTC rtc;
 
 DISPLAY_STATUS DriverDisplay::display_setup() {
   console << "[v] '" << getName() << "' inited: screen E ILI9341 with " << height << " x " << width << "\n";
@@ -222,10 +223,10 @@ void DriverDisplay::constant_drive_mode_show() {
 }
 
 #define CONTROLMODE_PADDLES_STRING "paddle mode"
-#define CONTROLMODE_BUTTONS_STRING "button mode"
+#define CONTROLMODE_BUTTONS_STRING "button "
 void DriverDisplay::control_mode_show() {
   CONTROL_MODE mode = ControlMode.get_recent_overtake_last();
-  int width = getPixelWidthOfTexts(constantModeTextSize, CONTROLMODE_PADDLES_STRING, CONTROLMODE_BUTTONS_STRING) + 4;
+  int width = getPixelWidthOfTexts(constantModeTextSize, CONTROLMODE_PADDLES_STRING, CONTROLMODE_BUTTONS_STRING) + 6;
 
   xSemaphoreTakeT(spiBus.mutex);
   tft.fillRoundRect(controlModeX - 2, controlModeY - 2, width, 18, 3, ILI9341_BLACK);
@@ -236,7 +237,7 @@ void DriverDisplay::control_mode_show() {
     tft.print(CONTROLMODE_PADDLES_STRING);
   } else {
     tft.setTextColor(ILI9341_GREENYELLOW);
-    tft.print(CONTROLMODE_BUTTONS_STRING);
+    tft.print(fmt::format("{} {}", CONTROLMODE_BUTTONS_STRING, carState.ButtonControlModeIncrease).c_str());
   }
   xSemaphoreGive(spiBus.mutex);
 }
@@ -480,8 +481,10 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     }
 
     ControlMode.Value = carState.ControlMode;
-    if (ControlMode.Value != ControlMode.ValueLast || justInited) {
+    StepSize.Value = carState.ButtonControlModeIncrease;
+    if (ControlMode.Value != ControlMode.ValueLast || StepSize.Value != StepSize.ValueLast || justInited) {
       control_mode_show();
+      StepSize.get_recent_overtake_last();
     }
 
     EcoModeOn.Value = carState.EcoOn;
@@ -520,6 +523,8 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
       MotorOn.showValue(tft);
     }
     justInited = false;
+    // DateTimeStamp.Value = getDateTime();
+    // DateTimeStamp.showValue(tft);
     break;
 
   default:

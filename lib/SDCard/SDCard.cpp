@@ -102,7 +102,7 @@ bool SDCard::mount() {
 }
 
 bool SDCard::open_log_file() {
-  if (mount()) {
+  if (carState.LogFilename.length() > 0 && mount()) {
     try {
       xSemaphoreTakeT(spiBus.mutex);
       dataFile = SD.open(carState.LogFilename.c_str(), FILE_APPEND); // mode: APPEND: FILE_APPEND, OVERWRITE: FILE_WRITE

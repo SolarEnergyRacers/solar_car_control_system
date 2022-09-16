@@ -102,11 +102,12 @@ void CmdHandler::task() {
         if (Serial.available()) {
           input = Serial.readString();
           Serial.flush();
-        }
-        if (Serial2.available()) {
+        } else if (Serial2.available()) {
           input = Serial2.readString();
           Serial2.flush();
         }
+        if (input[0] < 0x20 || input[0] > 0x7F) // ignore
+          break;
 
         if (input.endsWith("\n")) {
           input = input.substring(0, input.length() - 1);
@@ -246,12 +247,11 @@ void CmdHandler::task() {
           break;
         case 'T': {
 #if RTC_ON
+          console << "Received: '" << input[0];
           string arr[6];
           int count = splitString(arr, &input[1]);
           if (count == 0) {
-            time_t theTime = time(NULL);
-            struct tm t = *localtime(&theTime);
-            console << "Received: '" << input << "' --> DateTime: " << asctime(&t) << "\n";
+            console << "' --> DateTime: ";
           } else {
             int yy = atof(arr[0].c_str());
             int mm = atof(arr[1].c_str());
@@ -264,10 +264,9 @@ void CmdHandler::task() {
             RtcDateTime dateTime = RtcDateTime(seconds);
             rtc.write_rtc_datetime(dateTime);
             esp32time.setTime(ss, MM, hh, dd, mm, yy);
-            time_t theTime = time(NULL);
-            struct tm t = *localtime(&theTime);
-            console << "Received: '" << input << "' --> Set dateTime to: " << asctime(&t) << "\n";
+            console << "' --> Set dateTime to: ";
           }
+          console << getDateTime() << ", uptime: " << getTimeStamp() << "\n";
 #else
           console << "RTC deactivated\n";
 #endif

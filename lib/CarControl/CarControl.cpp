@@ -136,7 +136,7 @@ int CarControl::calculate_displayvalue_acc_dec(int valueDec, int valueAcc) {
 bool CarControl::read_PLUS_MINUS() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
+    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -64);
     return true;
   }
 
@@ -199,7 +199,7 @@ bool CarControl::read_PLUS_MINUS() {
 bool CarControl::read_paddles() {
   bool hasChanged = false;
   if (carState.BreakPedal) {
-    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -88);
+    _set_dec_acc_values(DAC_MAX, 0, ADC_MAX, 0, -64);
     return true;
   }
   int16_t valueDec = adc.STW_DEC;
@@ -304,7 +304,7 @@ void CarControl::adjust_paddles(int cycles) {
   ads_min_dec += carState.PaddleOffset;
   ads_min_acc += carState.PaddleOffset;
   delay(1000);
-  string result = carState.AccelerationDisplay == 0 ? "ok" : (carState.AccelerationDisplay == -88) ? "BRK?" : "ERR";
+  string result = carState.AccelerationDisplay == 0 ? "ok" : (carState.AccelerationDisplay == -64) ? "BRK?" : "ERR";
   s = fmt::format("=> dec {:5}-{:5}        => acc {:5}-{:5} => {}", ads_min_dec, ads_max_dec, ads_min_acc, ads_max_acc, result);
   console << "\n    " << s << "\n";
   if (engineerDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {

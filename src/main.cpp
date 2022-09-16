@@ -171,7 +171,11 @@ void app_main(void) {
   console << msg << "\n";
   msg = i2cBus.init();
   console << msg << "\n";
-
+  // #if RTC_ON
+  //   msg = rtc.init();
+  //   console << msg << "\n";
+  //   engineerDisplay.print(msg + "\n");
+  // #endif
   msg = engineerDisplay.init();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
@@ -303,21 +307,13 @@ void app_main(void) {
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
-#if RTC_ON
-  RtcDateTime now = rtc.read_rtc_datetime();
-  esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
-  string actTime = formatDateTime(now);
-  msg = rtc.create_task();
-  console << msg << " RTC Time: " << actTime << "\n";
-  engineerDisplay.print(fmt::format("{} {}\n", msg, actTime));
-#endif
 #if INT_ON
   msg = gpio.create_task();
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
 #if COMMANDHANDLER_ON
-  msg = cmdHandler.create_task(15, 350, 8000);
+  msg = cmdHandler.create_task(15, 300, 8000);
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
@@ -340,10 +336,16 @@ void app_main(void) {
   console << msg << "\n";
   engineerDisplay.print(msg + "\n");
 #endif
+#if RTC_ON
+  string actTime = formatDateTime(rtc.read_rtc_datetime());
+  msg = rtc.create_task(3, 1000 * 60 * 10); // 10 minutes
+  console << msg << " RTC DateTime: " << actTime << "\n";
+  engineerDisplay.print(fmt::format("{} {} ({})\n", msg, actTime, getDateTime()));
+#endif
 
   engineerDisplay.print("\nready");
 #if RTC_ON
-  engineerDisplay.print(fmt::format(" at {}", esp32time.getDateTime().c_str()));
+  engineerDisplay.print(fmt::format(" at {}", getDateTime().c_str()));
 #endif
   //--let the bootscreen visible for a moment ------------------
   engineerDisplay.print(".\nWaiting for start of life display: ");
@@ -365,7 +367,6 @@ void app_main(void) {
   console << msg << driverDisplay.get_DisplayStatus_text() << "\n";
   engineerDisplay.print(msg + "\n");
   delay(1000);
-
   systemOk = true;
 
   console << "-----------------------------------------------------------------\n";

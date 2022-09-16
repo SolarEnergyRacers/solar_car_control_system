@@ -16,6 +16,7 @@
 #include <Indicator.h>
 #include <SDCard.h>
 #include <definitions.h>
+#include <rtc.h>
 
 using namespace std;
 
@@ -23,6 +24,7 @@ extern CarState carState;
 extern Console console;
 extern SDCard sdCard;
 extern IOExt ioExt;
+extern RTC rtc;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
@@ -100,14 +102,14 @@ const char *getCleanString(string str) {
 }
 
 const string CarState::print(string msg, bool withColors) {
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
+  // time_t theTime = time(NULL);
+  // struct tm t = *localtime(&theTime);
 
   stringstream ss(msg);
   string tempStr = getCleanString(DriverInfo);
   ss << "====SER4 Car Status====" << VERSION << "==";
-  ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
-  ss << "====uptime:" << getTimeStamp(millis() / 1000) << "s====" << asctime(&t) << "==";
+  // ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
+  ss << "====uptime:" << getTimeStamp() << "s====" << getDateTime() << "==\n";
   if (msg.length() > 0)
     ss << msg << endl;
   ss << "Display Status ........ " << DISPLAY_STATUS_str[(int)displayStatus] << endl;
@@ -194,7 +196,7 @@ const string CarState::serialize(string msg) {
 
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
   cJSON_AddStringToObject(dynData, "timeStamp", timeStamp.c_str());
-  cJSON_AddStringToObject(dynData, "uptime", getTimeStamp(millis() / 1000).c_str());
+  cJSON_AddStringToObject(dynData, "uptime", getTimeStamp().c_str());
   cJSON_AddStringToObject(dynData, "msg", msg.c_str());
   cJSON_AddNumberToObject(dynData, "speed", Speed);
   cJSON_AddNumberToObject(dynData, "acceleration", Acceleration);
@@ -303,7 +305,7 @@ const string CarState::csv(string msg, bool withHeader) {
   }
   // data
   ss << timeStamp.c_str() << ", ";
-  ss << getTimeStamp(millis() / 1000).c_str() << ", ";
+  ss << getTimeStamp().c_str() << ", ";
   ss << msg.c_str() << ", ";
   ss << Speed << ", ";
   ss << Acceleration << ", ";

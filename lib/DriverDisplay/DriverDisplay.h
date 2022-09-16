@@ -36,6 +36,8 @@ private:
   DisplayValue<int> Speed = DisplayValue<int>(0, 0, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
   DisplayValue<int> Acceleration = DisplayValue<int>(0, -1, "", "%d", "", ILI9341_WHITE, ILI9341_BLACK);
   DisplayValue<CONTROL_MODE> ControlMode = DisplayValue<CONTROL_MODE>(10, 158, "", "%s", "", ILI9341_YELLOW, ILI9341_BLACK, 1);
+  DisplayValue<int> StepSize = DisplayValue<int>(10, 200, "", "%s", "", ILI9341_YELLOW, ILI9341_BLACK, 1);
+  DisplayValue<string> DateTimeStamp = DisplayValue<string>(10, 164, "", "%s", "", ILI9341_YELLOW, ILI9341_BLACK, 1);
   // this format will be changed dynamically in IOExt event handler in dependency of CONSTANT_MODE:
   DisplayValue<float> TargetSpeedPower = DisplayValue<float>(240, 130, " ", "%5.0f", "", ILI9341_WHITE, ILI9341_BLACK, 2);
 

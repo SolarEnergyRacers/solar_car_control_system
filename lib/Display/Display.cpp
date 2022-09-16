@@ -384,7 +384,6 @@ void Display::lifeSign() {
   unsigned long allSeconds = millis() / 1000;
   if (secondLast < allSeconds) {
     secondLast = allSeconds;
-    // TODO: switch by debug level: console << getTimeStamp(allSeconds).c_str() << "\n";
   }
 }
 #endif

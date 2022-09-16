@@ -45,15 +45,23 @@ void xSemaphoreTakeT(xQueueHandle mutex) {
   }
 }
 
-string formatDateTime(RtcDateTime now) {
-  return fmt::format("{:02d}/{:02d}/{:04d} {:02d}:{:02d}:{:02d}", now.Month(), now.Day(), now.Year(), now.Hour(), now.Minute(),
-                     now.Second());
+string getDateTime() {
+  time_t nowDateTime = time(NULL);
+  struct tm t = *localtime(&nowDateTime);   
+  return fmt::format("{:04d}-{:02d}-{:02d},{:02d}:{:02d}:{:02d}", t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);;
 }
 
-string getTimeStamp(unsigned long seconds) {
-  int secsRemaining = seconds % 3600;
+string formatDateTime(RtcDateTime now) {
+  string static dateTimeString =
+      fmt::format("{:04d}-{:02d}-{:02d},{:02d}:{:02d}:{:02d}", now.Year(), now.Month(), now.Day(), now.Hour(), now.Minute(), now.Second());
+  return dateTimeString;
+}
+
+string getTimeStamp() {
+  unsigned long seconds = millis() / 1000;
+  unsigned long secsRemaining = seconds % 3600;
   int runHours = seconds / 3600;
   int runMinutes = secsRemaining / 60;
   int runSeconds = secsRemaining % 60;
-  return fmt::format("{:02d}:{:02d}:{:02d}", runHours, runMinutes, runSeconds);
+  return fmt::format("T{:02d}:{:02d}:{:02d}", runHours, runMinutes, runSeconds);
 }

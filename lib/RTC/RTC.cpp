@@ -32,17 +32,16 @@ string RTC::re_init() { return init(); }
 string RTC::init(void) {
   bool hasError = false;
   console << "[  ] Init 'RTC'...\n";
-  console << fmt::format("     DS1307_ADDRESS {:02x}\n", DS1307_ADDRESS);
+  console << fmt::format("     DS1307_ADDRESS 0x{:02x}\n", DS1307_ADDRESS);
   // print compile time
-  RtcDateTime compiled = RtcDateTime(__DATE__, __TIME__);
-  console << fmt::format("     [INFO] rtc compile date/time: {:02}/{:02}/{:04} {:02}:{:02}:{:02}\n", compiled.Month(), compiled.Day(),
-                         compiled.Year(), compiled.Hour(), compiled.Minute(), compiled.Second());
+  RtcDateTime compileTimeStamp = RtcDateTime(__DATE__, __TIME__);
   xSemaphoreTakeT(i2cBus.mutex);
   Rtc.Begin();
   // check validity and possibly update time
   bool isValid = Rtc.IsDateTimeValid();
   xSemaphoreGive(i2cBus.mutex);
   if (!isValid) {
+    hasError = true;
     // check & report error
     xSemaphoreTakeT(i2cBus.mutex);
     uint8_t lastError = Rtc.LastError();
@@ -55,10 +54,11 @@ string RTC::init(void) {
       //    2) the battery on the device is low or even missing
       console << "     [WARN] rtc lost confidence. Set datetime to compile time of this binary.\n";
       xSemaphoreTakeT(i2cBus.mutex);
-      Rtc.SetDateTime(compiled);
+      Rtc.SetDateTime(compileTimeStamp);
       xSemaphoreGive(i2cBus.mutex);
     }
   }
+  console << "     [INFO] rtc compile date/time: " << formatDateTime(compileTimeStamp) << "\n";
   // ------------------
 
   // start device
@@ -76,16 +76,18 @@ string RTC::init(void) {
   xSemaphoreTakeT(i2cBus.mutex);
   RtcDateTime now = Rtc.GetDateTime();
   xSemaphoreGive(i2cBus.mutex);
-  if (now < compiled) {
-    console << "     [INFO] rtc time older than compile time! Updating DateTime.\n";
+  if (now.TotalSeconds() < compileTimeStamp.TotalSeconds()) {
+    console << "     [INFO] rtc time (" << formatDateTime(now) << ") older than compile time (" << formatDateTime(compileTimeStamp)
+            << ") Updating rtc DateTime.\n";
     xSemaphoreTakeT(i2cBus.mutex);
-    Rtc.SetDateTime(compiled);
+    Rtc.SetDateTime(compileTimeStamp);
     xSemaphoreGive(i2cBus.mutex);
-  } else if (now > compiled) {
-    console << "     [INFO] rtc time newer than compile time. Updating esp32time DateTime.\n";
+  } else if (now.TotalSeconds() > compileTimeStamp.TotalSeconds()) {
+    console << "     [INFO] rtc time (" << formatDateTime(now) << ") newer than compile time (" << formatDateTime(compileTimeStamp)
+            << ").\n";
     esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
-  } else if (now == compiled) {
-    console << "     [INFO] rtc time equal to compile time.\n";
+  } else {
+    console << "     [INFO] rtc time equal to compile time (" << formatDateTime(now) << ").\n";
   }
 
   // set pin
@@ -155,10 +157,10 @@ void RTC::task() {
 
   while (1) {
 
-    // RtcDateTime now = read_rtc_datetime();
+    RtcDateTime now = read_rtc_datetime();
 
     // // setTime(30, 24, 15, 17, 1, 2021); // 17th Jan 2021 15:24:30
-    // esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year()); // 17th Jan 2021 15:24:30
+    esp32time.setTime(now.Second(), now.Minute(), now.Hour(), now.Day(), now.Month(), now.Year());
 
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

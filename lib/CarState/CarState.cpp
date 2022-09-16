@@ -102,9 +102,6 @@ const char *getCleanString(string str) {
 }
 
 const string CarState::print(string msg, bool withColors) {
-  // time_t theTime = time(NULL);
-  // struct tm t = *localtime(&theTime);
-
   stringstream ss(msg);
   string tempStr = getCleanString(DriverInfo);
   ss << "====SER4 Car Status====" << VERSION << "==";
@@ -184,10 +181,8 @@ const string CarState::print(string msg, bool withColors) {
 }
 
 const string CarState::serialize(string msg) {
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
-  string timeStamp = asctime(&t);
-  timeStamp.erase(timeStamp.end() - 1);
+  string timeStamp = getDateTime();
+  // timeStamp.erase(timeStamp.end() - 1);
   string tempStr = getCleanString(DriverInfo);
 
   cJSON *carData = cJSON_CreateObject();
@@ -242,11 +237,8 @@ const string CarState::serialize(string msg) {
 }
 
 const string CarState::csv(string msg, bool withHeader) {
-
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
-  string timeStamp = asctime(&t);
-  timeStamp.erase(timeStamp.end() - 1);
+  string timeStamp = getDateTime();
+  // timeStamp.erase(timeStamp.end() - 1);
   string tempStr = getCleanString(DriverInfo);
 
   stringstream ss("");

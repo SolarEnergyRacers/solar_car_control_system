@@ -7,6 +7,7 @@
 #include <iostream>
 #include <string>
 
+#include <ESP32Time.h>
 #include <RTC.h>
 #include <freertos/FreeRTOS.h>
 #include <freertos/semphr.h>
@@ -45,11 +46,10 @@ void xSemaphoreTakeT(xQueueHandle mutex) {
   }
 }
 
-string getDateTime() {
-  time_t nowDateTime = time(NULL);
-  struct tm t = *localtime(&nowDateTime);   
-  return fmt::format("{:04d}-{:02d}-{:02d},{:02d}:{:02d}:{:02d}", t.tm_year, t.tm_mon, t.tm_mday, t.tm_hour, t.tm_min, t.tm_sec);;
-}
+extern RTC rtc;
+extern ESP32Time esp32time;
+// https://github.com/fbiego/ESP32Time
+string getDateTime() { return esp32time.getTime("%Y-%m-%d,%H:%M:%S").c_str(); }
 
 string formatDateTime(RtcDateTime now) {
   string static dateTimeString =

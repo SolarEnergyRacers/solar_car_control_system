@@ -99,7 +99,7 @@ PWM pwm;
 #endif
 #if RTC_ON
 RTC rtc;
-ESP32Time esp32time;
+ESP32Time esp32time(0);
 #endif
 #if DAC_ON
 DAC dac;
@@ -340,12 +340,12 @@ void app_main(void) {
   string actTime = formatDateTime(rtc.read_rtc_datetime());
   msg = rtc.create_task(3, 1000 * 60 * 10); // 10 minutes
   console << msg << " RTC DateTime: " << actTime << "\n";
-  engineerDisplay.print(fmt::format("{} {} ({})\n", msg, actTime, getDateTime()));
+  engineerDisplay.print(fmt::format("{} {}\n", msg, getDateTime()));
 #endif
 
   engineerDisplay.print("\nready");
 #if RTC_ON
-  engineerDisplay.print(fmt::format(" at {}", getDateTime().c_str()));
+  engineerDisplay.print(fmt::format(" at {}", getDateTime()));
 #endif
   //--let the bootscreen visible for a moment ------------------
   engineerDisplay.print(".\nWaiting for start of life display: ");

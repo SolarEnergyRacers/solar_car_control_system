@@ -247,18 +247,18 @@ void CmdHandler::task() {
           break;
         case 'T': {
 #if RTC_ON
-          console << "Received: '" << input[0];
+          console << "Received: '" << input.c_str();
           string arr[6];
           int count = splitString(arr, &input[1]);
           if (count == 0) {
             console << "' --> DateTime: ";
           } else {
-            int yy = atof(arr[0].c_str());
-            int mm = atof(arr[1].c_str());
-            int dd = atof(arr[2].c_str());
-            int hh = atof(arr[3].c_str());
-            int MM = atof(arr[4].c_str());
-            int ss = atof(arr[5].c_str());
+            int yy = atoi(arr[0].c_str());
+            int mm = atoi(arr[1].c_str());
+            int dd = atoi(arr[2].c_str());
+            int hh = atoi(arr[3].c_str());
+            int MM = atoi(arr[4].c_str());
+            int ss = atoi(arr[5].c_str());
             uint16_t days = DaysSinceFirstOfYear2000<uint16_t>(yy, mm, dd);
             uint64_t seconds = SecondsIn<uint64_t>(days, hh, MM, ss);
             RtcDateTime dateTime = RtcDateTime(seconds);

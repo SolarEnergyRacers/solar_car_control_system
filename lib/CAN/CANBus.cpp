@@ -169,7 +169,7 @@ void CANBus::task() {
         // Battery Current mA packet.getData_i32(1)
         if (verboseModeCan) {
           console << ", Uavg=" << carState.Uavg << ", BatVolt=" << carState.BatteryVoltage << ", BatCur=" << carState.BatteryCurrent
-                  << "\n";
+                  << fmt::format(", raw: 0x{:08x}", packet.getData_ui64()) << "\n";
         }
         break;
       case BMS_BASE_ADDR | 0xF8:

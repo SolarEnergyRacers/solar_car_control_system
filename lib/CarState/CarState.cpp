@@ -247,7 +247,7 @@ const string CarState::csv(string msg, bool withHeader) {
   stringstream ss("");
   if (withHeader) {
     // header
-    ss << "Epoch";
+    ss << "Epoch, ";
     ss << "uptime, ";
     ss << "msg, ";
     ss << "speed, ";
@@ -351,7 +351,7 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << LIGHT_str[(int)(Light)] << ", ";
   ss << GreenLight << ", ";
   ss << Fan << ", ";
-  ss << printIOs("", false).c_str();
+  ss << printIOs("", false).c_str()<< ", ";
   ss << timeStamp.c_str() << ", ";
   ss << endl;
   return ss.str();

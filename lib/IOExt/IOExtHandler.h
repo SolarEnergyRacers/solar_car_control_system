@@ -31,9 +31,12 @@ void hornHandler();
 void nextScreenHandler();
 void lightHandler();
 void headLightHandler();
+void light_switch();
 void constantModeHandler();
 void constantModeOnHandler();
+void constantModeOnSwitch();
 void constantModeOffHandler();
+void controlModeHandler();
 void decreaseHandler();
 void increaseHandler();
 

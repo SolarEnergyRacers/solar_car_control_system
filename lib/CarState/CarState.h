@@ -27,10 +27,13 @@ enum class INFO_TYPE { INFO, STATUS, WARN, ERROR };
 static const char *INFO_TYPE_str[] = {"INFO", "STATUS", "WARN", "ERROR"};
 
 enum class SPEED_ARROW { OFF, INCREASE, DECREASE };
-static const char *SPEED_ARROW_str[]{"OFF", "INCREASE", "DECREASE"};
+static const char *SPEED_ARROW_str[] = {"OFF", "INCREASE", "DECREASE"};
 
 enum class CONSTANT_MODE { NONE, SPEED, POWER };
 static const char *CONSTANT_MODE_str[] = {"NONE", "SPEED", "POWER"};
+
+enum class CONTROL_MODE { PADDLES, BUTTONS };
+static const char *CONTROL_MODE_str[] = {"PADDLES", "BUTTONS"};
 
 enum class DRIVE_DIRECTION { FORWARD, BACKWARD };
 static const char *DRIVE_DIRECTION_str[] = {"fwd", "bwd"};
@@ -120,17 +123,20 @@ public:
     DriverInfo = "starting...";
     DriverInfoType = INFO_TYPE::STATUS;
     Light = LIGHT::OFF;
+    Fan = false;
 
     // init state flags
     // #SAFETY#: acceleration lock
-    PaddlesJustAdjusted = false;
+    PaddlesAdjusted = false;
     AccelerationLocked = true;
+    GreenLight = false;
     // BEGIN prevent stupid compiler warnings "defined but not used"
     (void)BOOL_str;
     (void)INDICATOR_str;
     (void)INFO_TYPE_str;
     (void)SPEED_ARROW_str;
     (void)CONSTANT_MODE_str;
+    (void)CONTROL_MODE_str;
     (void)DRIVE_DIRECTION_str;
     (void)LIGHT_str;
     (void)DISPLAY_STATUS_str;
@@ -141,27 +147,14 @@ public:
   ~CarState(){};
   bool initalize_config();
 
-  // ADC native values
-  int16_t MOTOR_SPEED;
-  int16_t BAT_CURRENT;
-  int16_t MOTOR_CURRENT;
-  int16_t PV_CURRENT;
-  // ADC1
-  int16_t BAT_VOLTAGE;
-  int16_t MOTOR_VOLTAGE;
-  int16_t REFERENCE_CELL;
-  // ADC2 (steering wheel)
-  int16_t STW_ACC;
-  int16_t STW_DEC;
-
   // physical car data (measurement values)
   int Speed;        // ADC
   int Acceleration; // ADC Steering Wheel
   int Deceleration; // ADC Steering Wheel
   // #SAFETY#: acceleration lock
-  bool AccelerationLocked;  // DSC lock
-  bool PaddlesJustAdjusted; // did just padd adjustment: release lock if AccelerationDisplay==0
-  int AccelerationDisplay;  // Display Value (-99...+99)
+  bool AccelerationLocked; // DSC lock
+  bool PaddlesAdjusted;    // did just padd adjustment: release lock if AccelerationDisplay==0
+  int AccelerationDisplay; // Display Value (-99...+99)
   //#SAFETY-END#
 
   bool BatteryOn;      // IO-In
@@ -186,10 +179,12 @@ public:
   float Uavg; // CAN
   float Umax; // CAN
 
-  float T1; // ??
-  float T2; // ??
-  float T3; // ??
-  float T4; // ??
+  float T1; // MPPT1
+  float T2; // MPPT2
+  float T3; // MPPT3
+  // float T4; // Motorcontroller
+  float Tmin; // max. cell temperatur from BMS
+  float Tmax; // max. cell temperatur from BMS
 
   bool BreakPedal;
 
@@ -200,6 +195,7 @@ public:
   DRIVE_DIRECTION DriveDirection;
   CONSTANT_MODE ConstantMode;
   bool ConstantModeOn; // #SAFETY#: deceleration unlock const mode
+  CONTROL_MODE ControlMode;
   INDICATOR Indicator;
   bool IndicatorBlink;
   bool SdCardDetect;
@@ -211,6 +207,8 @@ public:
   SPEED_ARROW SpeedArrow;
   INFO_TYPE DriverInfoType;
   LIGHT Light;
+  bool GreenLight;
+  bool Fan;
 
   // All IO pins
   static CarStatePin pins[IOExtPINCOUNT];
@@ -235,32 +233,34 @@ public:
   // [Main]
   string LogFilename; // telemetry data: %stamp% get replaced by datetime stamp if period != 0
   int LogFilePeriod;  // [h], after that a new log file is created, 0 - never
-  int LogInterval;    // [s]
+  int LogInterval;    // [ms]
 
   // [TaskTimings]
   int SleepTimeIOExt = 400; // [ms]
 
   // [PID]
-  double Kp; // = 2;   // proportional
-  double Ki; // = 1;   // integral
-  double Kd; // = 0.1; // differential
+  double Kp; // proportional
+  double Ki; // integral
+  double Kd; // differential
 
   // [Dynamic]
-  int PaddleDamping;        // = 10;         // 0...99
-  int PaddleOffset;         // = 3000;        // 0 ... 65535: offset when paddle recognize not 0 values
-  int PaddleAdjustCounter;  // = 20;   // about seconds§
-  float ConstSpeedIncrease; // = 1.0; // [km/h] per click
-  float ConstPowerIncrease; // = 1.0; // [W] per click
+  int PaddleDamping;                  // 0...99
+  int PaddleOffset;                   // 0 ... 65535: offset when paddle recognize not 0 values
+  int PaddleAdjustCounter;            // about seconds
+  int ButtonControlModeIncrease;      // on click means ButtonControlModeIncrease units
+  int ButtonControlModeIncreaseLow;   // ButtonControlModeIncrease low mode
+  int ButtonControlModeIncreaseHeigh; // ButtonControlModeIncrease hight mode
+  float ConstSpeedIncrease;           // [km/h] per click
+  float ConstPowerIncrease;           // [W] per click
 
   // [Communication]
-  int I2CFrequence;             // = 200;       // [kHz]
-  int CarDataLogPeriod;         // = 1000;  // [ms]
+  int CarDataSendPeriod;        // [ms]
   int Serial1Baudrate = 115200; // baud
-  int Serial2Baudrate = 115200; // baud
+  int Serial2Baudrate = 9600;   // baud
 
   // [Telemetry]
-  int SendInterval;     // = 1000;    // [ms]
-  int MaxCachedRecords; // = 100; // number of telemetry records hold in cache in case of trasmit errors
+  int SendInterval;     // [ms]
+  int MaxCachedRecords; // number of telemetry records hold in cache in case of trasmit errors
 };
 
 #endif // CARSTATE_H

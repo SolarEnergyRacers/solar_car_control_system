@@ -30,6 +30,8 @@ public:
   void lock();
   void set_pot(uint8_t val, pot_chan channel);
   uint16_t get_pot(pot_chan channel);
+
+  bool verboseModeDAC = false;
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_DAC_H

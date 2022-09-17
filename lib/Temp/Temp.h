@@ -6,20 +6,20 @@
 #define SOLAR_CAR_CONTROL_SYSTEM_TEMP_H
 
 #include <DallasTemperature.h> // DS18B20
+#include <abstract_task.h>
 
-void read_ds_demo_task(void *pvParameter);
-
-class Temp { //}: public abstract_task {
+class Temp : public abstract_task {
 private:
   DallasTemperature ds;
-  uint32_t sleep_polling_ms;
 
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
+  // RTOS task
+  string getName() { return "TempSensors"; };
+  string init(void);
+  string re_init(void);
+  void exit(void);
+  void task(void);
 
-  string init();
-  string re_init();
   void request_temperatures(void);
   int get_num_temp_dev(void);
   float read_tempC_index(int index);

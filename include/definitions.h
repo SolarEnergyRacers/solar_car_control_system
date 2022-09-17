@@ -22,7 +22,7 @@
  */
 
 /*
- *  GPIputOutput
+ *  GPInputOutput
  */
 #define GPIO_INTERRUPT_PIN 33
 
@@ -36,15 +36,15 @@
  */
 #define I2C_SDA 23
 #define I2C_SCL 22
-//#define I2C_FREQ 200000 // 200kHz
+#define I2C_FREQ 200000 // 200kHz
 //#define I2C_FREQ 100000 // 100kHz
-#define I2C_FREQ 50000 // 50kHz
+//#define I2C_FREQ 50000 // 50kHz
 
 // analog digital coder
 #define NUM_ADC_DEVICES 3
 #define I2C_ADDRESS_ADS1x15_0 0x48
+#define I2C_ADDRESS_ADS1x15_1 0x49
 #define I2C_ADDRESS_ADS1x15_2 0x4a
-#define I2C_ADDRESS_ADS1x15_1 0x4b
 #define ADC_MAX 65535
 
 // Puls width modifier
@@ -82,9 +82,9 @@
  *  GPIO25  TX
  *  GPIO26  RX
  */
-#define CAN_TX (gpio_num_t)26
-#define CAN_RX (gpio_num_t)25
-#define CAN_SPEED 250E3 // Change CAN Speed on BMS to 125
+#define CAN_TX (gpio_num_t)25
+#define CAN_RX (gpio_num_t)26
+#define CAN_SPEED 125E3 // Change CAN Speed on BMS to 125
 #define BMS_BASE_ADDR 0x700
 #define MPPT1_BASE_ADDR 0x600
 #define MPPT2_BASE_ADDR 0x610
@@ -104,7 +104,7 @@
 #define MAXAGE_CMU_VOLTAGES 0
 #define MAXAGE_PACK_SOC 0
 #define MAXAGE_BALANCE_SOC 5000
-#define MAXAGE_CHARGER_CONTROL -1
+#define MAXAGE_CHARGER_CONTROL 0
 #define MAXAGE_PRECHARGE_STATUS 0
 #define MAXAGE_MIN_MAX_U_CELL 1000
 #define MAXAGE_MIN_MAX_T_CELL 0
@@ -118,7 +118,7 @@
  */
 #define MAXAGE_MPPT_INPUT 0
 #define MAXAGE_MPPT_OUTPUT 0
-#define MAXAGE_MPPT_TEMP 0
+#define MAXAGE_MPPT_TEMP 5000
 #define MAXAGE_MPPT_AUX_POWER 0
 #define MAXAGE_MPPT_LIMITS 0
 #define MAXAGE_MPPT_STATUS 0

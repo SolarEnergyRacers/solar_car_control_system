@@ -10,12 +10,7 @@
 #include <abstract_task.h>
 
 class RTC : public abstract_task {
-private:
-  uint32_t sleep_polling_ms;
-
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
   // RTOS task
   string getName(void) { return "RTC"; };
   string init(void);
@@ -29,6 +24,7 @@ private:
 
 public:
   RtcDateTime read_rtc_datetime(void);
+  void write_rtc_datetime(RtcDateTime dateTime);
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_RTC_H

@@ -47,30 +47,25 @@ string IOExt::init() {
     console << "     DeviceNr [" << devNr << "]:\n";
     xSemaphoreTakeT(i2cBus.mutex);
     ioExt.IOExtDevs[devNr].init();
+    ioExt.IOExtDevs[devNr].writeRegister(MCP23017Register::GPIO_A, 0x00);
+    ioExt.IOExtDevs[devNr].writeRegister(MCP23017Register::GPIO_B, 0x00);
+    ioExt.IOExtDevs[devNr].writeRegister(MCP23017Register::IPOL_A, 0x00);
+    ioExt.IOExtDevs[devNr].writeRegister(MCP23017Register::IPOL_B, 0x00);
     ioExt.IOExtDevs[devNr].interruptMode(MCP23017InterruptMode::Or);
     ioExt.IOExtDevs[devNr].interrupt(MCP23017Port::A, CHANGE); // FALLING);
     ioExt.IOExtDevs[devNr].interrupt(MCP23017Port::B, CHANGE); // FALLING);
+    ioExt.IOExtDevs[devNr].clearInterrupts();
     xSemaphoreGive(i2cBus.mutex);
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       CarStatePin *pin = carState.getPin(devNr, pinNr);
       carState.idxOfPin.insert(pair<string, int>{pin->name, getIdx(devNr, pinNr)});
-      xSemaphoreTakeT(i2cBus.mutex);
-      ioExt.IOExtDevs[devNr].pinMode(pinNr, pin->mode);
-      // if (pin->mode != OUTPUT) {
-      //   pin->value = pin->oldValue = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
-      // }
-      xSemaphoreGive(i2cBus.mutex);
-      int dev = pin->port >> 4;
-      int devPin = pin->port & 0xf;
-      console << fmt::format("        {:#04x} [{:02d}] dev:{:02d}, devpin:{:02d}, mode:{}, value={} ({})\n", pin->port,
-                             carState.getIdx(pin->name), dev, devPin, pin->mode != OUTPUT ? "INPUT " : "OUTPUT", pin->value,
-                             pin->name.c_str());
+      setPortMode(pin->port, pin->mode);
     }
-    xSemaphoreTakeT(i2cBus.mutex);
-    ioExt.IOExtDevs[devNr].clearInterrupts();
-    xSemaphoreGive(i2cBus.mutex);
     console << "     ok " << getName() << "[" << devNr << "]\n";
   }
+  // inital read the io pins
+  readAllPins();
+  // setup inerrupt handling
   ioInterruptRequest = false;
   pinMode(I2C_INTERRUPT, INPUT_PULLUP);
   attachInterrupt(digitalPinToInterrupt(I2C_INTERRUPT), ioExt_interrupt_handler, CHANGE);
@@ -89,7 +84,7 @@ void IOExt::exit(void) {
 //   }
 //   isInInterruptHandler = true;
 //   // console << fmt::format("Do interrupt handler at {}}\n", millis());
-//   readPins();
+//   readAllPins();
 //   //readAll(true, false, "", false);
 //   // console << fmt::format("Clear interrupts   {}\n", millis());
 //   xSemaphoreTakeT(i2cBus.mutex);
@@ -104,142 +99,113 @@ void IOExt::exit(void) {
 //   isInInterruptHandler = false;
 // }
 
-// void IOExt::readAll(bool deltaOnly, bool forced, string indent, bool verbose) {
-//   const string normalColor = "\033[0;39m";
-//   const string highLightColorChg = "\033[1;36m"; // blue
-//   list<void (*)()> pinHandlerList;
-//   stringstream ss("");
-//   // xSemaphoreTakeT(i2cBus.mutex);
-//   for (int devNr = 0; devNr < MCP23017_NUM_DEVICES; devNr++) {
-//     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
-//       // console << "readAll dev:" << devNr << ", pinNr:" << pinNr << "\n";
-//       CarStatePin *pin = carState.getPin(devNr, pinNr);
-//       if (pin->mode != OUTPUT) {
-
-//         xSemaphoreTakeT(i2cBus.mutex);
-//         pin->value = ioExt.IOExtDevs[devNr].digitalRead(pinNr);
-//         xSemaphoreGive(i2cBus.mutex);
-//         if (verbose) {
-//           ss << normalColor << indent;
-//           ss << fmt::format("Port {:02x} DevNr {} PinNr {:x} Value={}   {}", pin->port, devNr, pinNr, pin->value, pin->name);
-//           if (pin->value != pin->oldValue)
-//             ss << " *";
-//           ss << "\n";
-//         }
-//         console << ":";
-//         if (pin->handlerFunction != NULL && (pin->value != pin->oldValue || !pin->inited || forced)) {
-//           console << "\n"
-//                   << pin->name << ": " << pin->oldValue << " -- " << pin->value << ", inited:" << pin->inited << ", (forced:" << forced
-//                   << ")"
-//                   << "\n";
-//           pin->inited = true;
-//           pinHandlerList.push_back(pin->handlerFunction);
-//           pin->oldValue = pin->value;
-//         }
-//       }
-//     }
-//   }
-//   // xSemaphoreGive(i2cBus.mutex);
-//   if (verbose) {
-//     console << ss.str();
-//   }
-//   if (verboseMode) {
-//     string outString = carState.printIOs("", true, deltaOnly);
-//     if (outString.length() > 0)
-//       console << indent << outString << "\n";
-//   }
-//   // avoid multi registration:
-//   pinHandlerList.unique();
-//   // call all handlers for changed pins
-
-//   for (void (*pinHandler)() : pinHandlerList) {
-//     pinHandler();
-//   }
-//   pinHandlerList.clear();
-// }
-
 void IOExt::setPortMode(int port, uint8_t mode) {
   int devNr = port >> 4;
-  int pin = port & 0xf;
+  int pinNr = port & 0xf;
   xSemaphoreTakeT(i2cBus.mutex);
-  ioExt.IOExtDevs[devNr].pinMode(pin, mode);
+  ioExt.IOExtDevs[devNr].pinMode(pinNr, mode);
   xSemaphoreGive(i2cBus.mutex);
 }
 
 void IOExt::setPort(int port, bool value) {
   int devNr = port >> 4;
-  int pin = port & 0xf;
+  int pinNr = port & 0xf;
   xSemaphoreTakeT(i2cBus.mutex);
-  ioExt.IOExtDevs[devNr].digitalWrite(pin, value ? 1 : 0);
+  ioExt.IOExtDevs[devNr].digitalWrite(pinNr, value ? 1 : 0);
   xSemaphoreGive(i2cBus.mutex);
-  if (verboseMode) {
-    console << fmt::format("Set BOOL -- port:0x{:02x}--devNr: {}--pin: {}--value= {}  <-- {}  ---{}-\n", port, devNr, pin, (value ? 1 : 0),
-                           carState.getPin(devNr, pin)->name, millis());
+  if (verboseModeDigitalOut) {
+    CarStatePin *pin = carState.getPin(devNr, pinNr);
+    console << fmt::format("Set BOOL -- 0x{:02x}, [{:x}|{:x}]: {} --> {}, inited: {:5}  <-- {:18s} \t({}ms)\n", pin->port, devNr, pinNr,
+                           pin->oldValue, pin->value, pin->inited, pin->name, millis());
   }
 }
 
-int IOExt::getPort(int port) {
-  int devNr = port >> 4;
-  int pin = port & 0xf;
-  xSemaphoreTakeT(i2cBus.mutex);
-  int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
-  xSemaphoreGive(i2cBus.mutex);
-  // console << fmt::format("Get BOOL--port:0x{:02x)--devNr:{}--pin:{}--value:{}--{}-\n", port, devNr, pin, value, millis());
-  return value;
+void IOExt::writeAllPins(PinHandleMode mode) {
+  for (auto &pin : carState.pins) {
+    if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited || mode == PinHandleMode::FORCED)) {
+      setPort(pin.port, pin.value);
+      pin.oldValue = pin.value;
+      pin.inited = true;
+    }
+  }
 }
 
-bool IOExt::readPins(PinReadMode type) {
-  if (!isInInputHandler) {
-    isInInputHandler = true;
-    bool hasChanges = false;
-    for (auto &pin : carState.pins) {
-      if (pin.mode != OUTPUT) {
-        pin.value = getPort(pin.port);
-        if (pin.oldValue != pin.value || type == PinReadMode::ALL) {
-          console << "Get BOOL -- " << pin.oldValue << " --> " << pin.value << ", inited:" << pin.inited << " <-- " << pin.name << "\t("<< millis()<<")\n";
-          if (pin.oldValue != pin.value)
-            hasChanges = true;
-        }
+void IOExt::readAllPins() {
+
+  xSemaphoreTakeT(i2cBus.mutex);
+  int16_t io0A = IOExtDevs[0].readPort(MCP23017Port::A);
+  int16_t io0B = IOExtDevs[0].readPort(MCP23017Port::B);
+  int16_t io1A = IOExtDevs[1].readPort(MCP23017Port::A);
+  int16_t io1B = IOExtDevs[1].readPort(MCP23017Port::B);
+  xSemaphoreGive(i2cBus.mutex);
+
+  for (CarStatePin &pin : carState.pins) {
+    if (pin.mode != OUTPUT) {
+      if (pin.port < 0x08) {
+        pin.value = io0A & pin.mask ? 1 : 0;
+      } else if (pin.port < 0x10) {
+        pin.value = io0B & pin.mask ? 1 : 0;
+      } else if (pin.port < 0x18) {
+        pin.value = io1A & pin.mask ? 1 : 0;
+      } else {
+        pin.value = io1B & pin.mask ? 1 : 0;
       }
     }
-    isInInputHandler = false;
-    return hasChanges;
   }
-  return false;
+  if (verboseModeDigitalIn) {
+    console << fmt::format("IOExt ({}ms)\t", millis()) << carState.printIOs("", true, false) << "\n";
+  }
 }
 
 bool IOExt::readAndHandlePins(PinHandleMode mode) {
   if (!isInInputHandler) {
     isInInputHandler = true;
+
     bool hasChanges = false;
+
+    readAllPins();
     list<void (*)()> pinHandlerList;
-    for (auto &pin : carState.pins) {
+    for (CarStatePin &pin : carState.pins) {
       if (pin.mode != OUTPUT) {
-        pin.inited = true;
-        pin.value = getPort(pin.port);
         unsigned long timestamp = millis();
         if (pin.handlerFunction != NULL && (pin.oldValue != pin.value || !pin.inited || mode == PinHandleMode::FORCED)) {
-          console << "Get BOOL -- " << pin.oldValue << " --> " << pin.value << ", inited:" << pin.inited << " <-- " << pin.name
-                  << "\t -> handle"<< "\t("<< timestamp - pin.timestamp<<")\n";
-          pin.inited = true;
+          // console << fmt::format("Get BOOL -- 0x{:02x}: {} --> {}, inited: {}  <-- {:15s} \t({})\t -> handle ({}ms)\n",
+          // pin.port, pin.oldValue, pin.value, pin.inited, pin.name, millis(), timestamp - pin.timestamp);
           pinHandlerList.push_back(pin.handlerFunction);
+          pin.inited = true;
+          if (pin.oldValue != pin.value)
+            hasChanges = true;
           pin.oldValue = pin.value;
           pin.timestamp = timestamp;
-          hasChanges = true;
         }
       }
     }
     // avoid multi registration:
     pinHandlerList.unique();
     // call all handlers for changed pins
-    for (void (*pinHandler)() : pinHandlerList) {
-      pinHandler();
+    if (systemOk) {
+      // xSemaphoreTakeT(i2cBus.mutex);
+      for (void (*pinHandler)() : pinHandlerList) {
+        pinHandler();
+      }
+      // xSemaphoreGive(i2cBus.mutex);
     }
     pinHandlerList.clear();
     isInInputHandler = false;
     return hasChanges;
   }
   return false;
+}
+
+int IOExt::getPort(int port) {
+  // get device & port
+  int devNr = port >> 4;
+  int pin = port & 0xf;
+  xSemaphoreTakeT(i2cBus.mutex);
+  int value = ioExt.IOExtDevs[devNr].digitalRead(pin);
+  xSemaphoreGive(i2cBus.mutex);
+  // console << fmt::format("port 0x{:02x} [{}|{}]: {} -- {}ms\n", port, devNr, pin, value, millis());
+  return value;
 }
 
 void IOExt::task() {
@@ -251,8 +217,7 @@ void IOExt::task() {
       if (changedInputs) {
         carControl.valueChangedHandler();
       }
-      // readAll(true, false, "", false);
-      //   handle INPUT pin interrupts
+      // handle INPUT pin interrupts
       //   if (ioInterruptRequest) {
       //     console << "jump ioInterruptRequest " << millis() << "\n";
       //     handleIoInterrupt();
@@ -260,15 +225,8 @@ void IOExt::task() {
       //     // carControl.valueChangedHandler();
       //   }
 
-      //  update OUTPUT pins
-      for (auto &pin : carState.pins) {
-        if (pin.mode == OUTPUT && (pin.oldValue != pin.value || !pin.inited)) {
-          // console << pin.name << ": " << pin.oldValue << " -- " << pin.value << ", inited:" << pin.inited << "\n";
-          pin.oldValue = pin.value;
-          pin.inited = true;
-          setPort(pin.port, pin.value);
-        }
-      }
+      // update OUTPUT pins
+      // writeAllPins(PinHandleMode::NORMAL);
     }
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }

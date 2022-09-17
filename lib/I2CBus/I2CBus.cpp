@@ -24,12 +24,12 @@ string I2CBus::re_init() { return init(); }
 
 string I2CBus::init(void) {
   bool hasError = false;
-  console << "[  ] Init '" << getName() << "'...\n";
+  console << "[  ] Init 'I2CBus'...\n";
 
   mutex = xSemaphoreCreateMutex();
   // init i2c wire library
-  // Wire.begin(I2C_SDA, I2C_SCL, carState.I2CFrequence * 1000); // frequency in Hz
-  Wire.begin(I2C_SDA, I2C_SCL, I2C_FREQ); // frequency in MHz
+  uint32_t frequency = I2C_FREQ;           // make to int to find the correct signature
+  Wire.begin(I2C_SDA, I2C_SCL, frequency); // frequency in kHz
   xSemaphoreGive(mutex);
   console << "     I2C inited: I2C_SDA=" << I2C_SDA << ", I2C_SCL=" << I2C_SCL << ", I2C_FREQ=" << I2C_FREQ << ".\n";
   scan_i2c_devices();
@@ -60,7 +60,7 @@ void I2CBus::scan_i2c_devices() {
    * Connect a 2.4k resistor between SDA and Vcc
    * Connect a 2.4k resistor between SCL and Vcc
    */
-  console << "     Scanning I2C addresses:\n    ";
+  console << "     Scanning I2C addresses:\n     ";
   uint8_t cnt = 0;
   string s;
 

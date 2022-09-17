@@ -26,12 +26,7 @@ template <typename Enumeration> auto as_integer(Enumeration const value) -> type
 }
 
 class Display : public abstract_task {
-protected:
-  uint32_t sleep_polling_ms;
-
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
   // RTOS task
   virtual string getName(void);
   string init(void);
@@ -69,6 +64,7 @@ public:
   int write_ganz_99(int x, int y, int valueLast, int value, int textSize, bool justInited = false, int color = ILI9341_ORANGE,
                     int bgColor = ILI9341_BLACK);
   void getCursor(int &x, int &y);
+  void setCursor(int x, int y);
   void clear_screen(int bgColor);
   int getPixelWidthOfTexts(int textSize, string t1, string t2);
 

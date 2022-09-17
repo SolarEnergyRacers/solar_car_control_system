@@ -5,18 +5,15 @@
 #ifndef SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H
 #define SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H
 
+#include <CarState.h>
 #include <PID_v1.h>
 #include <abstract_task.h>
 #include <stdio.h>
 
+extern CarState carState;
+
 class CarSpeed : public abstract_task {
-private:
-  uint32_t sleep_polling_ms;
-
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
-
   // RTOS task
   string getName(void) { return "CarSpeed"; };
   string init(void);
@@ -28,12 +25,9 @@ public:
 private:
   double input_value;
   double output_setpoint;
-  double target_speed;
-  double Kp = 2;
-  double Ki = 1;
-  double Kd = 0.1;
-  double speed_increment = 1.0;
-  PID pid = PID(&input_value, &output_setpoint, &target_speed, Kp, Ki, Kd, DIRECT);
+  double target_speed;          // in m/s
+  double speed_increment = 1.0; // in m/s
+  PID pid = PID(&input_value, &output_setpoint, &target_speed, carState.Kp, carState.Ki, carState.Kd, DIRECT);
 
 public:
   void set_target_speed(double speed);
@@ -42,6 +36,10 @@ public:
   void update_pid(double Kp, double Ki, double Kd);
   void target_speed_incr(void);
   void target_speed_decr(void);
+  double GetKp() { return pid.GetKp(); }
+  double GetKi() { return pid.GetKi(); }
+  double GetKd() { return pid.GetKd(); }
+  bool verboseModePID = false;
 };
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_CARSPEED_H

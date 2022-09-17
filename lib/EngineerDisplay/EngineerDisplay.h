@@ -47,13 +47,15 @@ private:
   // BMS error [string]
   DisplayValue<string> BmsStatus = DisplayValue<string>(4, 110, "BMS Msg:", "%18s", "");
 
-  // Battery temperatures 1...4 [°C]
-  DisplayValue<float> Temperature1 = DisplayValue<float>(168, 130, "T-1   :", "%4.1f", "C");
-  DisplayValue<float> Temperature2 = DisplayValue<float>(168, 150, "T-2   :", "%4.1f", "C");
-  DisplayValue<float> Temperature3 = DisplayValue<float>(168, 170, "T-3   :", "%4.1f", "C");
-  DisplayValue<float> Temperature4 = DisplayValue<float>(168, 190, "T-4   :", "%4.1f", "C");
-  // Max temperature [°C]
-  DisplayValue<float> TemperatureMax = DisplayValue<float>(168, 210, "T-max :", "%4.1f", "C", ILI9341_DARKCYAN);
+  // MPPT1...3 temperature [°C]
+  DisplayValue<float> Temperature1 = DisplayValue<float>(168, 130, "MPPT-1:", "%4.1f", "C");
+  DisplayValue<float> Temperature2 = DisplayValue<float>(168, 150, "MPPT-2:", "%4.1f", "C");
+  DisplayValue<float> Temperature3 = DisplayValue<float>(168, 170, "MPPT-3:", "%4.1f", "C");
+  // Motorcontroller temperature [°C]
+  //  DisplayValue<float> Temperature4 = DisplayValue<float>(168, 190, "T-4   :", "%4.1f", "C");
+  // Min and max BMS cell temperature [°C]
+  DisplayValue<float> TemperatureMin = DisplayValue<float>(168, 190, "BATmin:", "%4.1f", "C", ILI9341_DARKCYAN);
+  DisplayValue<float> TemperatureMax = DisplayValue<float>(168, 210, "BATmax:", "%4.1f", "C", ILI9341_DARKCYAN);
 
   // BMS current [A]
   DisplayValue<float> BatteryCurrent = DisplayValue<float>(4, 130, "BMS I:", "%5.2f", "A");

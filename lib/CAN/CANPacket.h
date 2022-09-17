@@ -1,9 +1,21 @@
 #include <Arduino.h>
 
+typedef union {
+  float data_fp[2];
+  uint8_t data_u8[8];
+  int8_t data_8[8];
+  uint16_t data_u16[4];
+  int16_t data_16[4];
+  uint32_t data_u32[2];
+  int32_t data_32[2];
+  uint64_t data_u64;
+  int64_t data_64;
+} group_64;
+
 class CANPacket {
 private:
   uint16_t id;
-  uint64_t data;
+  group_64 data;
 
 public:
   CANPacket();

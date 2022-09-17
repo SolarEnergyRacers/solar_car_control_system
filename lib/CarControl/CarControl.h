@@ -9,27 +9,22 @@
 #include <map>
 #include <string>
 
-#include <MCP23017.h>
+//#include <MCP23017.h>
 
 #include <abstract_task.h>
 #include <definitions.h>
 
+const int MAX_ACCELERATION_DISPLAY_VALUE = 99; // absolute of minimal or maximal value for acceleration scaling
+
 class CarControl : public abstract_task {
-private:
-  uint32_t sleep_polling_ms;
 
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
-
   // RTOS task
   string getName(void) { return "CarControl"; };
   string init(void);
   string re_init(void);
   void exit(void);
   void task(void);
-
-  // SemaphoreHandle_t mutex = NULL;
 
   // Class member and functions
   static void valueChangedHandler() { valueChangeRequest++; };
@@ -38,18 +33,16 @@ public:
   bool read_motor_data();
   bool read_pv_data();
   bool read_reference_cell_data();
-  bool read_speed();
+  bool read_speed(); // in km/h
 
+  int calculate_displayvalue_acc_dec(int valueDec, int valueAcc);
   bool read_paddles();
+  bool read_PLUS_MINUS();
   void adjust_paddles(int second = 1);
+  void reset_acceleration_values() { _set_dec_acc_values(0, 0, 0, 0, 0); }
+  bool verboseMode = false;
 
 private:
-  const int MIN_ADJUST_GAP = 10; // 0...Gap units show 0 (real reachable null point)
-  const int MAX_ADJUST_GAP = 10; // max ... max+Gap to avoid max higher then adjusted max
-  const int SMOOTHING = 1;
-  const int MIN_DISPLAY_VALUE = 99; // absolute of minimal value for negative scaling
-  const int MAX_DISPLAY_VALUE = 99;
-
   int ads_min_dec = 14000; // paddle_adjust overwrites this values
   int ads_min_acc = 21000;
   int ads_max_dec = 22000;

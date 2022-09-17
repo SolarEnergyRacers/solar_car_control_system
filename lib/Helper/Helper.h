@@ -16,6 +16,8 @@ using namespace std;
 char *fgets_stdio_blocking(char *str, int n);
 void xSemaphoreTakeT(xQueueHandle mutex);
 string formatDateTime(RtcDateTime now);
-string getTimeStamp(unsigned long seconds);
+string getDateTime();
+string getTime();
+string getTimeStamp();
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_HELPER_H

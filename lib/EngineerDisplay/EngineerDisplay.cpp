@@ -39,7 +39,8 @@ void EngineerDisplay::draw_display_background() {
   Temperature1.showLabel(tft);
   Temperature2.showLabel(tft);
   Temperature3.showLabel(tft);
-  Temperature4.showLabel(tft);
+  //Temperature4.showLabel(tft);
+  TemperatureMin.showLabel(tft);
   TemperatureMax.showLabel(tft);
   BatteryCurrent.showLabel(tft);
   BatteryVoltage.showLabel(tft);
@@ -63,7 +64,7 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
   case DISPLAY_STATUS::ENGINEER_BACKGROUND:
     clear_screen(bgColor);
     draw_display_background();
-    set_SleepTime(500);
+    sleep_polling_ms = 500;
     status = DISPLAY_STATUS::ENGINEER_RUNNING;
     break;
   // working state:
@@ -73,6 +74,19 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     MotorOn.Value = carState.MotorOn;
     BatteryVoltage.Value = carState.BatteryVoltage;
     BatteryCurrent.Value = carState.BatteryCurrent;
+    Temperature1.Value = carState.T1;
+    Temperature2.Value = carState.T2;
+    Temperature3.Value = carState.T3;
+    //Temperature4.Value = carState.T4;
+    TemperatureMin.Value = carState.Tmin;
+    TemperatureMax.Value = carState.Tmax;
+    Mppt1.Value = carState.Mppt1Current;
+    Mppt2.Value = carState.Mppt2Current;
+    Mppt3.Value = carState.Mppt3Current;
+
+    VoltageMin.Value = carState.Umin;
+    VoltageAvg.Value = carState.Uavg;
+    VoltageMax.Value = carState.Umax;
 
     BatteryOn.showValue(tft);
     PhotoVoltaicOn.showValue(tft);
@@ -95,8 +109,10 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature1.showValue(tft);
     Temperature2.showValue(tft);
     Temperature3.showValue(tft);
-    Temperature4.showValue(tft);
+    //Temperature4.showValue(tft);
+    TemperatureMin.showValue(tft);
     TemperatureMax.showValue(tft);
+
     justInited = false;
     break;
   default:

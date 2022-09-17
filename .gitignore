@@ -30,3 +30,4 @@ docs/electroCad/*.bck
 docs/electroCad/fp-info-cache
 docs/electroCad/test/**
 build/**
+platformio-device-monitor-*.log

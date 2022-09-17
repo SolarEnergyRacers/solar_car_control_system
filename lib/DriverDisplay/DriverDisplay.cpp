@@ -43,6 +43,7 @@ extern Console console;
 extern SPIBus spiBus;
 extern CarState carState;
 extern Adafruit_ILI9341 tft;
+extern RTC rtc;
 
 DISPLAY_STATUS DriverDisplay::display_setup() {
   console << "[v] '" << getName() << "' inited: screen E ILI9341 with " << height << " x " << width << "\n";
@@ -93,21 +94,34 @@ void DriverDisplay::draw_display_border(int color) {
 }
 
 // write color of the border of the speed display
+#define SPEED_UNIT "km/h"
 void DriverDisplay::draw_speed_border(int color) {
+  speedUnitX = speedFrameX + speedFrameSizeX + 2;
   xSemaphoreTakeT(spiBus.mutex);
   tft.drawRoundRect(speedFrameX, speedFrameY, speedFrameSizeX, speedFrameSizeY, 4, color);
+  tft.setCursor(speedUnitX, speedUnitY);
+  tft.setTextSize(speedUnitTextSize);
+  tft.setTextColor(ILI9341_GREENYELLOW);
+  tft.print(SPEED_UNIT);
   xSemaphoreGive(spiBus.mutex);
 }
 
 // write color of the border of the acceleration display
+#define ACCELERATION_UNIT "%"
 void DriverDisplay::draw_acceleration_border(int color) {
   accFrameSizeX = speedFrameX - 3;
+  int accUnitX = accFrameX + accFrameSizeX - 4 - getPixelWidthOfTexts(constantModeTextSize, ACCELERATION_UNIT, ACCELERATION_UNIT);
+  ;
   xSemaphoreTakeT(spiBus.mutex);
   tft.drawRoundRect(accFrameX, accFrameY, accFrameSizeX, accFrameSizeY, 4, color);
+  tft.setCursor(accUnitX, speedUnitY);
+  tft.setTextSize(speedUnitTextSize);
+  tft.setTextColor(ILI9341_GREENYELLOW);
+  tft.print(ACCELERATION_UNIT);
   xSemaphoreGive(spiBus.mutex);
 }
 
-// write color of the border of the acceleration display
+// write color of the border of the constand mode target display
 void DriverDisplay::draw_target_value_border(int color) {
   targetValueFrameX = speedFrameX + speedFrameSizeX + 1;
   targetValueFrameSizeX = tft.width() - accFrameSizeX - speedFrameSizeX - 6;
@@ -147,6 +161,22 @@ void DriverDisplay::_arrow_decrease(int color) {
 }
 
 // show the slower arrow (red under the speed display)
+void DriverDisplay::arrow(SPEED_ARROW incDecOff) {
+  switch (incDecOff) {
+  default:
+  case SPEED_ARROW::OFF:
+    arrow_increase(false);
+    arrow_decrease(false);
+    break;
+  case SPEED_ARROW::INCREASE:
+    arrow_increase(true);
+    break;
+  case SPEED_ARROW::DECREASE:
+    arrow_decrease(true);
+    break;
+  }
+}
+
 void DriverDisplay::arrow_decrease(bool on) {
   int color = bgColor;
   if (on) {
@@ -166,21 +196,21 @@ void DriverDisplay::arrow_increase(bool on) {
   _arrow_increase(color);
 }
 
-#define SPEED_STRING " Speed"
-#define POWER_STRING " Power"
+#define SPEED_STRING "Target SPEED"
+#define POWER_STRING "Target POWER"
 void DriverDisplay::constant_drive_mode_show() {
   CONSTANT_MODE mode = ConstantMode.get_recent_overtake_last();
   bool isOn = ConstantModeOn.get_recent_overtake_last();
   int width = getPixelWidthOfTexts(constantModeTextSize, SPEED_STRING, POWER_STRING) + 4;
   if (mode == CONSTANT_MODE::NONE || !isOn) {
     xSemaphoreTakeT(spiBus.mutex);
-    tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 18, 3, ILI9341_BLACK);
+    tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 11, 3, ILI9341_BLACK);
     xSemaphoreGive(spiBus.mutex);
     return;
   }
 
   xSemaphoreTakeT(spiBus.mutex);
-  tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 18, 3, ILI9341_YELLOW);
+  tft.fillRoundRect(constantModeX - 2, constantModeY - 2, width, 11, 3, ILI9341_YELLOW);
   tft.setCursor(constantModeX, constantModeY);
   tft.setTextSize(constantModeTextSize);
   tft.setTextColor(ILI9341_BLACK);
@@ -188,6 +218,46 @@ void DriverDisplay::constant_drive_mode_show() {
     tft.print(POWER_STRING);
   } else {
     tft.print(SPEED_STRING);
+  }
+  xSemaphoreGive(spiBus.mutex);
+}
+
+#define CONTROLMODE_PADDLES_STRING "paddle mode"
+#define CONTROLMODE_BUTTONS_STRING "button "
+void DriverDisplay::control_mode_show() {
+  CONTROL_MODE mode = ControlMode.get_recent_overtake_last();
+  int width = getPixelWidthOfTexts(constantModeTextSize, CONTROLMODE_PADDLES_STRING, CONTROLMODE_BUTTONS_STRING) + 6;
+
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.fillRoundRect(controlModeX - 2, controlModeY - 2, width, 18, 3, ILI9341_BLACK);
+  tft.setCursor(controlModeX, controlModeY);
+  tft.setTextSize(controlModeTextSize);
+  if (mode == CONTROL_MODE::PADDLES) {
+    tft.setTextColor(ILI9341_DARKGREEN);
+    tft.print(CONTROLMODE_PADDLES_STRING);
+  } else {
+    tft.setTextColor(ILI9341_GREENYELLOW);
+    tft.print(fmt::format("{} {}", CONTROLMODE_BUTTONS_STRING, carState.ButtonControlModeIncrease).c_str());
+  }
+  xSemaphoreGive(spiBus.mutex);
+}
+
+#define ECO_MODE_STRING " eco"
+#define PWR_MODE_STRING " power"
+void DriverDisplay::eco_power_mode_show() {
+  bool isEco = EcoModeOn.get_recent_overtake_last();
+  int width = getPixelWidthOfTexts(ecoPwrModeTextSize, ECO_MODE_STRING, PWR_MODE_STRING) + 4;
+
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.fillRoundRect(ecoPwrModeX - 2, ecoPwrModeY - 2, width, 18, 3, ILI9341_BLACK);
+  tft.setCursor(ecoPwrModeX, ecoPwrModeY);
+  tft.setTextSize(ecoPwrModeTextSize);
+  if (isEco) {
+    tft.setTextColor(ILI9341_GREEN);
+    tft.print(ECO_MODE_STRING);
+  } else {
+    tft.setTextColor(ILI9341_BLUE);
+    tft.print(PWR_MODE_STRING);
   }
   xSemaphoreGive(spiBus.mutex);
 }
@@ -301,9 +371,11 @@ void DriverDisplay::write_speed() {
 // acceleration value: -99...+99
 void DriverDisplay::write_acceleration() {
   int value = Acceleration.get_recent_overtake_last();
-  if (value >= -99 && value <= 99) {
-    accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, justInited, ILI9341_GREENYELLOW);
-  }
+  if (value <= -99)
+    value = -99;
+  if (value > 99)
+    value = 99;
+  accelerationLast = write_ganz_99(accFrameX + 4, accFrameY + 4, accelerationLast, value, accTextSize, justInited, ILI9341_GREENYELLOW);
 }
 
 // commented out code is preparation for font usage
@@ -356,7 +428,8 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     MotorCurrent.set_epsilon(0.1);
     MotorOn.showLabel(tft);
     TargetSpeedPower.showLabel(tft);
-    set_SleepTime(300);
+    //DateTimeStamp.showLabel(tft);
+    sleep_polling_ms = 300;
     status = DISPLAY_STATUS::DRIVER_RUNNING;
     break;
 
@@ -408,6 +481,18 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
       constant_drive_mode_show();
     }
 
+    ControlMode.Value = carState.ControlMode;
+    StepSize.Value = carState.ButtonControlModeIncrease;
+    if (ControlMode.Value != ControlMode.ValueLast || StepSize.Value != StepSize.ValueLast || justInited) {
+      control_mode_show();
+      StepSize.get_recent_overtake_last();
+    }
+
+    EcoModeOn.Value = carState.EcoOn;
+    if (EcoModeOn.Value != EcoModeOn.ValueLast || justInited) {
+      eco_power_mode_show();
+    }
+
     Indicator.Value = carState.Indicator;
     if (Indicator.Value != Indicator.ValueLast || justInited) {
       show_indicator();
@@ -421,7 +506,8 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (BatteryOn.is_changed() || justInited) {
       BatteryOn.showValue(tft);
     }
-    PhotoVoltaicCurrent.Value = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+    // TODO: PhotoVoltaicCurrent.Value = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
+    PhotoVoltaicCurrent.Value = carState.PhotoVoltaicCurrent;
     if (PhotoVoltaicCurrent.is_changed() || justInited) {
       PhotoVoltaicCurrent.showValue(tft);
     }
@@ -437,8 +523,11 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (MotorOn.is_changed() || justInited) {
       MotorOn.showValue(tft);
     }
+    // DateTimeStamp.Value = getTime();
+    // DateTimeStamp.showValue(tft);
     justInited = false;
-    break;
+    break;  
+  
 
   default:
     // ignore others

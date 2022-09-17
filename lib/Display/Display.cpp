@@ -56,7 +56,7 @@ bool lifeSignState = false;
 string Display::getName() { return "Display"; };
 
 string Display::init() {
-  console << "[  ] Init '" << getInfo() << "'...\n";
+  console << "[  ] Init 'Display'...\n";
   return re_init();
 }
 
@@ -110,8 +110,8 @@ string Display::_setup() {
     xSemaphoreGive(spiBus.mutex);
     throw ex;
   }
-  lifeSignX = width - lifeSignRadius - 6;
-  lifeSignY = height - lifeSignRadius - 6;
+  lifeSignX = width - lifeSignRadius - 4;
+  lifeSignY = height - lifeSignRadius - 4;
   return fmt::format("[{}] Display initialized.  Screen 'ILI9341' {}x{}.     Status: {}", hasError ? "--" : "ok", height, width,
                      DISPLAY_STATUS_str[(int)carState.displayStatus]);
 }
@@ -141,6 +141,12 @@ void Display::getCursor(int &x, int &y) {
   xSemaphoreTakeT(spiBus.mutex);
   x = tft.getCursorX();
   y = tft.getCursorY();
+  xSemaphoreGive(spiBus.mutex);
+}
+
+void Display::setCursor(int x, int y) {
+  xSemaphoreTakeT(spiBus.mutex);
+  tft.setCursor(x, y);
   xSemaphoreGive(spiBus.mutex);
 }
 
@@ -378,7 +384,6 @@ void Display::lifeSign() {
   unsigned long allSeconds = millis() / 1000;
   if (secondLast < allSeconds) {
     secondLast = allSeconds;
-    // TODO: switch by debug level: console << getTimeStamp(allSeconds).c_str() << "\n";
   }
 }
 #endif
@@ -433,7 +438,7 @@ void Display::task(void) {
       }
       break;
     case DISPLAY_STATUS::ENGINEER_HALTED:
-      set_SleepTime(1500);
+      sleep_polling_ms = 1500;
       break;
 #if WithTaskSuspend == true
       vTaskSuspend(getHandle());
@@ -446,9 +451,6 @@ void Display::task(void) {
 #if LIFESIGN_ON == true
     lifeSignCounter++;
 #endif
-    // debug_printf("%16s -- sleep_polling_ms: %d\n", getName().c_str(), sleep_polling_ms);
     vTaskDelay(sleep_polling_ms / portTICK_PERIOD_MS);
   }
 }
-
-// } //namespace Display

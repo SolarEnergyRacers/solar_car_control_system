@@ -23,17 +23,17 @@
 #define PinPvOnOff "PvOnOff"
 #define PinMcOnOff "McOnOff"
 #define PinEcoPower "EcoPower"
-#define PinDacLifeSign "PinDacLifeSign"
+#define PinDacLifeSign "PinDacLifeSign-p25"
 #define PinFwdBwd "FwdBwd"
-#define PinDUMMY06 "DUMMY06"
+#define PinGreenLightOut "PinGreenLightOut-p27"
 #define PinRelais11 "Relais11"
-#define PinIndicatorOutLeft "IndicatorOutLeft"
-#define PinIndicatorOutRight "IndicatorOutRight"
-#define PinFanOut "FanOut"
-#define PinHornOut "HornOut"
-#define PinLightOut "LightOut"
+#define PinIndicatorOutLeft "IndicatorOutLeft-p1"
+#define PinIndicatorOutRight "IndicatorOutRight-p2"
+#define PinFanOut "FanOut-p28"
+#define PinHornOut "HornOut-p3"
+#define PinLightOut "LightOut-p5"
 #define PinBreakPedal "BreakPedal"
-#define PinHeadLightOut "HeadLightOut"
+#define PinHeadLightOut "HeadLightOut-p4"
 #define PinDUMMY14 "DUMMY14"
 #define PinDUMMY15 "DUMMY15"
 #define PinIndicatorBtnLeft "IndicatorBtnLeft"
@@ -46,23 +46,17 @@
 #define PinNextScreen "NextScreen"
 #define PinIncrease "Increase"
 #define PinConstantModeOff "ConstantModeOff"
-#define PinDUMMY33 "DUMMY33"
+#define PinControlMode "PinControlMode"
 #define PinPaddleAdjust "PaddleAdjust"
 #define PinDecrease "Decrease"
 #define PinSdCardDetect "SdCardDetect"
 #define PinDUMMY37 "DUMMY37"
 #define PinDUMMY38 "DUMMY38"
 
-enum class PinReadMode { ALL, CHANGED };
 enum class PinHandleMode { NORMAL, FORCED };
 
 class IOExt : public abstract_task {
-private:
-  uint32_t sleep_polling_ms;
-
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
   // RTOS task
   string getName(void) { return "IOExt"; };
   string init(void);
@@ -71,17 +65,17 @@ public:
   void task(void);
 
   // Class member and functions
-  void setPort(int port, bool value);
   int getPort(int port);
-
-  // void readAll(bool deltaOnly = false, bool forced = false, string indent = "", bool verbose = false);
-  bool readPins(PinReadMode type = PinReadMode::CHANGED);
+  void setPort(int port, bool value);
+  void writeAllPins(PinHandleMode mode = PinHandleMode::NORMAL);
+  void readAllPins();
   bool readAndHandlePins(PinHandleMode mode = PinHandleMode::NORMAL);
 
   static int getIdx(int devNr, int pin) { return devNr * 16 + pin; };
   static int getIdx(int port) { return (port >> 4) * 16 + (port & 0x0F); };
 
-  bool verboseMode = false;
+  bool verboseModeDigitalIn = false;
+  bool verboseModeDigitalOut = false;
 
 private:
   // bool isInInterruptHandler = false;

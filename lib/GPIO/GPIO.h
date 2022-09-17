@@ -9,13 +9,8 @@
 #include <definitions.h>
 #include <driver/gpio.h>
 
-class GPIputOutput : public abstract_task {
-private:
-  uint32_t sleep_polling_ms;
-
+class GPInputOutput : public abstract_task {
 public:
-  void set_SleepTime(uint32_t milliseconds) { sleep_polling_ms = milliseconds; };
-  uint32_t get_SleepTime() { return sleep_polling_ms; }
   // RTOS task
   string getName(void) { return "GPIO"; };
   string init(void);

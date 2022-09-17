@@ -1,0 +1,48 @@
+# Mainmboard V5
+## Initial Data Info
+
+Before any program gets downloaded the processor prompts with:
+
+```
+[23:27:26:845] ets Jun  8 2016 00:22:57␍␊
+[23:27:26:845] ␍␊
+[23:27:26:845] rst:0x1 (POWERON_RESET),boot:0x17 (SPI_FAST_FLASH_BOOT)␍␊
+[23:27:26:845] configsip: 0, SPIWP:0xee␍␊
+[23:27:26:845] clk_drv:0x00,q_drv:0x00,d_drv:0x00,cs0_drv:0x00,hd_drv:0x00,wp_drv:0x00␍␊
+[23:27:26:845] mode:DIO, clock div:2␍␊
+[23:27:26:845] load:0x3fff0018,len:4␍␊
+[23:27:26:845] load:0x3fff001c,len:6932␍␊
+[23:27:26:866] load:0x40078000,len:13712␍␊
+[23:27:26:866] load:0x40080400,len:4260␍␊
+[23:27:26:866] entry 0x400806e4␍␊
+[23:27:26:866] <0x1b>[0;32mI (70) boot: Chip Revision: 1<0x1b>[0m␍␊
+[23:27:26:866] <0x1b>[0;32mI (70) boot_comm: chip revision: 1, min. bootloader chip revision: 0<0x1b>[0m␍␊
+[23:27:26:886] <0x1b>[0;32mI (39) boot: ESP-IDF v4.0.1-193-ge7ac221 2nd stage bootloader<0x1b>[0m␍␊
+[23:27:26:886] <0x1b>[0;32mI (39) boot: compile time 02:47:00<0x1b>[0m␍␊
+[23:27:26:886] <0x1b>[0;32mI (39) boot: Enabling RNG early entropy source...<0x1b>[0m␍␊
+[23:27:26:886] <0x1b>[0;32mI (45) boot: SPI Speed      : 40MHz<0x1b>[0m␍␊
+[23:27:26:886] <0x1b>[0;32mI (49) boot: SPI Mode       : DIO<0x1b>[0m␍␊
+[23:27:26:908] <0x1b>[0;32mI (53) boot: SPI Flash Size : 4MB<0x1b>[0m␍␊
+[23:27:26:908] <0x1b>[0;32mI (57) boot: Partition Table:<0x1b>[0m␍␊
+[23:27:26:908] <0x1b>[0;32mI (60) boot: ## Label            Usage          Type ST Offset   Length<0x1b>[0m␍␊
+[23:27:26:908] <0x1b>[0;32mI (68) boot:  0 phy_init         RF data          01 01 0000f000 00001000<0x1b>[0m␍␊
+[23:27:26:930] <0x1b>[0;32mI (75) boot:  1 otadata          OTA data         01 00 00010000 00002000<0x1b>[0m␍␊
+[23:27:26:930] <0x1b>[0;32mI (83) boot:  2 nvs              WiFi data        01 02 00012000 0000e000<0x1b>[0m␍␊
+[23:27:26:930] <0x1b>[0;32mI (90) boot:  3 at_customize     unknown          40 00 00020000 000e0000<0x1b>[0m␍␊
+[23:27:26:952] <0x1b>[0;32mI (98) boot:  4 ota_0            OTA app          00 10 00100000 00180000<0x1b>[0m␍␊
+[23:27:26:952] <0x1b>[0;32mI (105) boot:  5 ota_1            OTA app          00 11 00280000 00180000<0x1b>[0m␍␊
+[23:27:26:952] <0x1b>[0;32mI (113) boot: End of partition table<0x1b>[0m␍␊
+[23:27:26:952] <0x1b>[0;32mI (117) boot_comm: chip revision: 1, min. application chip revision: 0<0x1b>[0m␍␊
+[23:27:26:967] <0x1b>[0;32mI (124) esp_image: segment 0: paddr=0x00100020 vaddr=0x3f400020 size=0x29230 (168496) map<0x1b>[0m␍␊
+[23:27:27:039] <0x1b>[0;32mI (193) esp_image: segment 1: paddr=0x00129258 vaddr=0x3ffbdb60 size=0x03974 ( 14708) load<0x1b>[0m␍␊
+[23:27:27:039] <0x1b>[0;32mI (199) esp_image: segment 2: paddr=0x0012cbd4 vaddr=0x40080000 size=0x00400 (  1024) load<0x1b>[0m␍␊
+[23:27:27:039] <0x1b>[0;32mI (200) esp_image: segment 3: paddr=0x0012cfdc vaddr=0x40080400 size=0x03034 ( 12340) load<0x1b>[0m␍␊
+[23:27:27:052] <0x1b>[0;32mI (214) esp_image: segment 4: paddr=0x00130018 vaddr=0x400d0018 size=0x1068cc (1075404) map<0x1b>[0m␍␊
+[23:27:27:434] <0x1b>[0;32mI (603) esp_image: segment 5: paddr=0x002368ec vaddr=0x40083434 size=0x195c8 (103880) load<0x1b>[0m␍␊
+[23:27:27:478] <0x1b>[0;32mI (646) esp_image: segment 6: paddr=0x0024febc vaddr=0x400c0000 size=0x00064 (   100) load<0x1b>[0m␍␊
+[23:27:27:499] <0x1b>[0;32mI (664) boot: Loaded app from partition at offset 0x100000<0x1b>[0m␍␊
+[23:27:27:499] <0x1b>[0;32mI (664) boot: Disabling RNG early entropy source...<0x1b>[0m␍␊
+[23:27:27:670] BLUFI BLE is not connected yet␍␊
+[23:27:27:674] 2.1.0␍␍␊
+[23:27:27:684] max tx power=78,ret=0␍␍␊
+```

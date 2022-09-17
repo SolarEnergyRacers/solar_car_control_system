@@ -11,9 +11,11 @@
 #include <CarState.h>
 #include <ConfigFile.h>
 #include <Console.h>
+#include <ESP32Time.h>
 #include <Helper.h>
 #include <IOExt.h>
 #include <Indicator.h>
+#include <RTC.h>
 #include <SDCard.h>
 #include <definitions.h>
 
@@ -23,6 +25,8 @@ extern CarState carState;
 extern Console console;
 extern SDCard sdCard;
 extern IOExt ioExt;
+extern RTC rtc;
+extern ESP32Time esp32time;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
@@ -30,6 +34,7 @@ CarStatePin *CarState::getPin(int port) { return &(carState.pins[IOExt::getIdx(p
 CarStatePin *CarState::getPin(string pinName) { return &(carState.pins[carState.getIdx(pinName)]); }
 
 void CarState::init_values() {
+  // values read from sensors
   Speed = 0;
   Acceleration = 0;
   Deceleration = 0;
@@ -38,22 +43,24 @@ void CarState::init_values() {
   PhotoVoltaicCurrent = 0;
   ReferenceSolarCell = 0;
   MotorCurrent = 0;
+  SdCardDetect = false;
 
+  // values set by control elements or CarControl
   Indicator = INDICATOR::OFF;
   DriveDirection = DRIVE_DIRECTION::FORWARD;
   ConstantMode = CONSTANT_MODE::SPEED;
   ConstantModeOn = false; //#SAFETY#: deceleration unlock const mode
-  SdCardDetect = false;
-
   TargetSpeed = 0;
   TargetPower = 0;
   DriverInfo = "Acceleration\nstill locked!";
   DriverInfoType = INFO_TYPE::STATUS;
   Light = LIGHT::OFF;
+  GreenLight = false;
+  Fan = false;
 
-  // read from ser4config.ini file
+  // read from SER4CONFIG.INI file
   initalize_config();
-  // console << print("State after SER4CONF.INI") << "\n";
+  console << print("State after reading SER4CONFIG.INI") << "\n";
 }
 
 bool CarState::initalize_config() {
@@ -61,42 +68,47 @@ bool CarState::initalize_config() {
     ConfigFile cf = ConfigFile(FILENAME_SER4CONFIG);
     // [Main]
     LogFilename = cf.get("Main", "LogFilename", "/SER4DATA.CSV");
-    LogFilePeriod = cf.get("Main", "LogFilePeriod", 1);
+    LogFilePeriod = cf.get("Main", "LogFilePeriod", 1000);
     LogInterval = cf.get("Main", "LogInterval", 1);
     // [PID]
-    Kp = cf.get("PID", "Kp", 2);
-    Ki = cf.get("PID", "Ki", 1);
-    Kd = cf.get("PID", "Kd", 0.1);
+    Kp = cf.get("PID", "Kp", 15);
+    Ki = cf.get("PID", "Ki", 5);
+    Kd = cf.get("PID", "Kd", 0.05);
     // [Dynamic]
     PaddleDamping = cf.get("Dynamic", "PaddleDamping", 10);
-    PaddleOffset = cf.get("Dynamic", "PaddleOffset", 3000);
-    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 25);
+    PaddleOffset = cf.get("Dynamic", "PaddleOffset", 999);
+    PaddleAdjustCounter = cf.get("Dynamic", "PaddleAdjustCounter", 18);
     ConstSpeedIncrease = cf.get("Dynamic", "ConstSpeedIncrease", 1.0);
     ConstPowerIncrease = cf.get("Dynamic", "ConstPowerIncrease", 0.5);
+    ButtonControlModeIncreaseLow = cf.get("Dynamic", "ButtonControlModeIncreaseLow", 2);
+    ButtonControlModeIncreaseHeigh = cf.get("Dynamic", "ButtonControlModeIncreaseHeigh", 10);
+    ButtonControlModeIncrease = ButtonControlModeIncreaseLow;
     // [Communication]
-    // I2CFrequence = cf.get("Communication", "I2CFrequence", 50);
-    CarDataLogPeriod = cf.get("Communication", "CarDataLogPeriod", 1000);
+    CarDataSendPeriod = cf.get("Communication", "CarDataSendPeriod", 3000);
     Serial1Baudrate = cf.get("Communication", "Serail1Baudrate", 115200);
-    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 115200);
+    Serial2Baudrate = cf.get("Communication", "Serial2Baudrate", 9600);
     // [Telemetry]
     SendInterval = cf.get("Telemetry", "", 1000);
     MaxCachedRecords = cf.get("Telemetry", "MaxCachedRecords", 100);
 
   } catch (exception &ex) {
-    console << "WARN: No configfile: '" << FILENAME_SER4CONFIG << "' found: " << ex.what() << "\n";
+    console << "WARN: No config file: '" << FILENAME_SER4CONFIG << "' found or readable: " << ex.what() << "\n";
     return false;
   }
   return true;
 }
 
-const string CarState::print(string msg, bool withColors) {
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
+const char *getCleanString(string str) {
+  replace(str.begin(), str.end(), '\n', '.');
+  return str.c_str();
+}
 
+const string CarState::print(string msg, bool withColors) {
   stringstream ss(msg);
+  string tempStr = getCleanString(DriverInfo);
   ss << "====SER4 Car Status====" << VERSION << "==";
-  ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
-  ss << "====uptime:" << getTimeStamp(millis() / 1000) << "s====" << asctime(&t) << "==";
+  // ss << t.tm_year << "." << t.tm_mon << "." << t.tm_mday << "_" << t.tm_hour << ":" << t.tm_min << ":" << t.tm_sec;
+  ss << "====uptime:" << getTimeStamp() << "s====" << getDateTime() << "==\n";
   if (msg.length() > 0)
     ss << msg << endl;
   ss << "Display Status ........ " << DISPLAY_STATUS_str[(int)displayStatus] << endl;
@@ -107,7 +119,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Acceleration Display... " << AccelerationDisplay << endl;
   ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
   ss << "Battery On............. " << BatteryOn << endl;
-  ss << "Battery Voltage........ " << BatteryVoltage << endl;
+  ss << "Battery Voltage ....... " << BatteryVoltage << endl;
   ss << "Battery Current........ " << BatteryCurrent << endl;
   ss << "Battery Errors ........." << batteryErrorsAsString(true) << endl;
   ss << "Battery Precharge State " << PRECHARGE_STATE_str[(int)(PrechargeState)] << endl;
@@ -119,13 +131,12 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Photo Reference Cell .. " << ReferenceSolarCell << endl;
   ss << "Acceleration Display .. " << AccelerationDisplay << endl;
   ss << "Break pedal pressed ... " << BOOL_str[(int)(BreakPedal)] << endl;
-  ss << "Battery On ............ " << BatteryOn << endl;
-  ss << "Battery Voltage ....... " << BatteryVoltage << endl;
-  ss << "Battery Current ....... " << BatteryCurrent << endl;
   ss << "Photo Voltaic On ...... " << PhotoVoltaicOn << endl;
   ss << "Motor On .............. " << MotorOn << endl;
   ss << "Motor Current ......... " << MotorCurrent << endl;
   ss << "Drive Direction ....... " << DRIVE_DIRECTION_str[(int)(DriveDirection)] << endl;
+  ss << "Green Light ........... " << GreenLight << endl;
+  ss << "Fan ................... " << Fan << endl;
   ss << "------------------------" << endl;
   ss << "Indicator ............. " << INDICATOR_str[(int)(Indicator)] << endl;
   ss << "Constant Mode On ...... " << BOOL_str[(int)(ConstantModeOn)] << endl;
@@ -134,14 +145,14 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Target Power .......... " << TargetPower << endl;
   ss << "SD Card detected....... " << BOOL_str[(int)(SdCardDetect)] << "(" << SdCardDetect << ")" << endl;
   ss << "Info Last ............. "
-     << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << DriverInfo << endl;
+     << "[" << INFO_TYPE_str[(int)DriverInfoType] << "] " << tempStr << endl;
   ss << "Speed Arrow ........... " << SPEED_ARROW_str[(int)SpeedArrow] << endl;
   ss << "Light ................. " << LIGHT_str[(int)(Light)] << endl;
   ss << "IO .................... " << printIOs("", false) << endl;
 
   ss << "Log file name ......... " << LogFilename << endl;
-  ss << "Log file persiod ...... " << LogFilePeriod << endl;
-  ss << "Log file interval ..... " << LogInterval << endl;
+  ss << "Log file period [h].... " << LogFilePeriod << endl;
+  ss << "Log file interval [ms]. " << LogInterval << endl;
 
   // [TaskTimings]
   ss << "Sleep time EIOExt ..... " << SleepTimeIOExt << endl;
@@ -159,8 +170,7 @@ const string CarState::print(string msg, bool withColors) {
   ss << "Const power invrease .. " << ConstPowerIncrease << endl;
 
   // [Communication]
-  ss << "I2C frequency ......... " << I2CFrequence << endl;
-  ss << "Car data log period ... " << CarDataLogPeriod << endl;
+  ss << "Car data send period [ms]. " << CarDataSendPeriod << endl;
   ss << "Serial 1 baud rate .... " << Serial1Baudrate << endl;
   ss << "Serial 2 baud rate .... " << Serial2Baudrate << endl;
 
@@ -173,10 +183,9 @@ const string CarState::print(string msg, bool withColors) {
 }
 
 const string CarState::serialize(string msg) {
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
-  string timeStamp = asctime(&t);
-  timeStamp.erase(timeStamp.end() - 1);
+  string timeStamp = getDateTime();
+  // timeStamp.erase(timeStamp.end() - 1);
+  string tempStr = getCleanString(DriverInfo);
 
   cJSON *carData = cJSON_CreateObject();
   cJSON *dynData = cJSON_CreateObject();
@@ -184,7 +193,7 @@ const string CarState::serialize(string msg) {
 
   cJSON_AddItemToObject(carData, "dynamicData", dynData);
   cJSON_AddStringToObject(dynData, "timeStamp", timeStamp.c_str());
-  cJSON_AddStringToObject(dynData, "uptime", getTimeStamp(millis() / 1000).c_str());
+  cJSON_AddStringToObject(dynData, "uptime", getTimeStamp().c_str());
   cJSON_AddStringToObject(dynData, "msg", msg.c_str());
   cJSON_AddNumberToObject(dynData, "speed", Speed);
   cJSON_AddNumberToObject(dynData, "acceleration", Acceleration);
@@ -207,7 +216,8 @@ const string CarState::serialize(string msg) {
   cJSON_AddNumberToObject(dynData, "t1", floor(T1 * 1000.0 + .5) / 1000.0);
   cJSON_AddNumberToObject(dynData, "t2", floor(T2 * 1000.0 + .5) / 1000.0);
   cJSON_AddNumberToObject(dynData, "t3", floor(T3 * 1000.0 + .5) / 1000.0);
-  cJSON_AddNumberToObject(dynData, "t4", floor(T4 * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "tmin", floor(Tmin * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "tmax", floor(Tmax * 1000.0 + .5) / 1000.0);
 
   cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator)]);
   cJSON_AddStringToObject(dynData, "driveDirection", DRIVE_DIRECTION_str[(int)(DriveDirection)]);
@@ -220,23 +230,24 @@ const string CarState::serialize(string msg) {
   cJSON_AddStringToObject(ctrData, "constantMode", CONSTANT_MODE_str[(int)(ConstantMode)]);
   cJSON_AddNumberToObject(ctrData, "targetSpeed", TargetSpeed);
   cJSON_AddNumberToObject(ctrData, "targetPower", TargetPower);
-  cJSON_AddStringToObject(ctrData, "driverInfo", fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], DriverInfo.c_str()).c_str());
+  cJSON_AddStringToObject(ctrData, "driverInfo", fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], tempStr).c_str());
   cJSON_AddStringToObject(ctrData, "speedArrow", SPEED_ARROW_str[(int)SpeedArrow]);
   cJSON_AddStringToObject(ctrData, "light", LIGHT_str[(int)(Light)]);
+  cJSON_AddBoolToObject(dynData, "greenLight", GreenLight);
+  cJSON_AddBoolToObject(dynData, "fan", Fan);
   cJSON_AddStringToObject(ctrData, "io:", printIOs("", false).c_str());
   return fmt::format("{}\n", cJSON_PrintUnformatted(carData));
 }
 
 const string CarState::csv(string msg, bool withHeader) {
-  time_t theTime = time(NULL);
-  struct tm t = *localtime(&theTime);
-  string timeStamp = asctime(&t);
-  timeStamp.erase(timeStamp.end() - 1);
+  string timeStamp = getDateTime();
+  // timeStamp.erase(timeStamp.end() - 1);
+  string tempStr = getCleanString(DriverInfo);
 
-  stringstream ss(msg);
+  stringstream ss("");
   if (withHeader) {
     // header
-    ss << "timeStamp, ";
+    ss << "Epoch, ";
     ss << "uptime, ";
     ss << "msg, ";
     ss << "speed, ";
@@ -263,16 +274,18 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "T1, ";
     ss << "T2, ";
     ss << "T3, ";
-    ss << "T4, ";
+    ss << "Tmin, ";
+    ss << "Tmax, ";
 
     ss << "indicator, ";
     ss << "driveDirection, ";
+    ss << "controlMode";
     ss << "constantModeOn, ";
+    ss << "constantMode, ";
     ss << "sdCardDetected, ";
 
     ss << "displayStatus, ";
 
-    ss << "constantMode, ";
     ss << "targetSpeed, ";
     ss << "Kp, ";
     ss << "Ki, ";
@@ -281,12 +294,16 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "driverInfo, ";
     ss << "speedArrow, ";
     ss << "light, ";
-    ss << "io ";
+    ss << "greenLight, ";
+    ss << "fan, ";
+    ss << "io, ";
+    ss << "timeStampDate, ";
+    ss << "timeStampTime, ";
     ss << endl;
   }
   // data
-  ss << timeStamp.c_str() << ", ";
-  ss << getTimeStamp(millis() / 1000).c_str() << ", ";
+  ss << esp32time.getEpoch() << ", " ;
+  ss << millis()/1000 << ", ";
   ss << msg.c_str() << ", ";
   ss << Speed << ", ";
   ss << Acceleration << ", ";
@@ -312,33 +329,43 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << floor(T1 * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(T2 * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(T3 * 1000.0 + .5) / 1000.0 << ", ";
-  ss << floor(T4 * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Tmin * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Tmax * 1000.0 + .5) / 1000.0 << ", ";
 
   ss << INDICATOR_str[(int)(Indicator)] << ", ";
   ss << DRIVE_DIRECTION_str[(int)(DriveDirection)] << ", ";
-  ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
-  ss << BOOL_str[(int)(SdCardDetect)] << ", ";
+  ss << CONTROL_MODE_str[(int)(ControlMode)] << ", ";
+  ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
+  ss << ConstantModeOn << ", ";
+  ss << SdCardDetect << ", ";
 
   ss << DISPLAY_STATUS_str[(int)displayStatus] << ", ";
-  ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
+  
   ss << TargetSpeed << ", ";
   ss << Kp << ", ";
   ss << Ki << ", ";
   ss << Kd << ", ";
   ss << TargetPower << ", ";
-  string field = DriverInfo.replace(DriverInfo.begin(), DriverInfo.end(), '\n', ' ');
-  ss << fmt::format("[{}] {}", INFO_TYPE_str[(int)DriverInfoType], field) << ", ";
+  ss << fmt::format("\"{}: {}\"", INFO_TYPE_str[(int)DriverInfoType], tempStr) << ", ";
   ss << SPEED_ARROW_str[(int)SpeedArrow] << ", ";
   ss << LIGHT_str[(int)(Light)] << ", ";
-  ss << printIOs("", false).c_str() << ", ";
+  ss << GreenLight << ", ";
+  ss << Fan << ", ";
+  ss << printIOs("", false).c_str()<< ", ";
+  ss << timeStamp.c_str() << ", ";
   ss << endl;
   return ss.str();
 }
 
 const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
-  string normalColor = "\033[0;39m";
-  string highLightColorOut = "\033[1;31m"; // red
-  string highLightColorChg = "\033[1;36m"; // blue
+  string normalColor = "";
+  string highLightColorOut = "";
+  string highLightColorChg = "";
+  if (withColors) {
+    normalColor = "\033[0;39m";
+    highLightColorOut = "\033[1;31m"; // red
+    highLightColorChg = "\033[1;36m"; // blue
+  }
   stringstream ss(msg);
   if (msg.length() > 0)
     ss << msg << endl;
@@ -349,7 +376,7 @@ const string CarState::printIOs(string msg, bool withColors, bool deltaOnly) {
     for (int pinNr = 0; pinNr < MCP23017_NUM_PORTS; pinNr++) {
       int idx = IOExt::getIdx(devNr, pinNr);
       CarStatePin *pin = carState.getPin(devNr, pinNr);
-      if (pin->mode == OUTPUT && withColors) {
+      if (pin->mode == OUTPUT) {
         if (pin->value != pin->oldValue) {
           hasDelta = true;
           ss << highLightColorChg << pin->value << normalColor;

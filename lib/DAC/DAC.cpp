@@ -86,32 +86,22 @@ void DAC::reset_and_lock_pot() {
 void DAC::set_pot(uint8_t val, pot_chan channel) {
   // #SAFETY#: acceleration lock
   if (isLocked) {
-    if (carState.PaddlesJustAdjusted && carState.AccelerationDisplay == 0) {
-      unlock();
-      carState.AccelerationLocked = false;
-      string s = "DAC unlocked.\n";
-      console << s;
-      if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
-        driverDisplay.print(s.c_str());
-      }
-    } else {
-      // XXXXX
-      // string s = "Motor potentiometer locked!\n";
-      // console << s;
-      // if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
-      //   driverDisplay.print(s.c_str());
-      // }
+    if (!carState.PaddlesAdjusted || carState.AccelerationDisplay != 0)
       return;
+
+    // release unlock state and take over into to car state
+    unlock();
+    carState.AccelerationLocked = false;
+    string s = "DAC unlocked.\n";
+    console << s;
+    if (driverDisplay.get_DisplayStatus() == DISPLAY_STATUS::DRIVER_RUNNING) {
+      driverDisplay.print(s.c_str());
     }
   }
   // setup command
   uint8_t command = get_cmd(channel);
   uint8_t oldValue = get_pot(channel);
   if (oldValue != val) {
-    // #SAFETY#: Reset constant mode on deceleration paddel touched
-    if (channel == POT_CHAN1 || channel == POT_CHAN_ALL) {
-      carState.ConstantModeOn = false;
-    }
     xSemaphoreTakeT(i2cBus.mutex);
     Wire.beginTransmission(I2C_ADDRESS_DS1803);
     Wire.write(command);
@@ -121,8 +111,10 @@ void DAC::set_pot(uint8_t val, pot_chan channel) {
     }
     Wire.endTransmission();
     xSemaphoreGive(i2cBus.mutex);
-    // console << fmt::sprintf("Write motor potentiometer [0x%02x/Ch%d] 0x%02x to %d -- reread: %d\n", I2C_ADDRESS_DS1803, channel, command,
-    //                         val, get_pot(channel));
+    if (verboseModeDAC) {
+      console << fmt::format("dac:    {:02x}-chn | {:5d}-val | {:5d}-acc | {:5d}-dec  | {:5d}-accD | {}-lck\n", channel, val,
+                             carState.Acceleration, carState.Deceleration, carState.AccelerationDisplay, carState.AccelerationLocked);
+    }
   }
 }
 

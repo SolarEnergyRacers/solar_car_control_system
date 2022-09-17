@@ -39,7 +39,8 @@ void EngineerDisplay::draw_display_background() {
   Temperature1.showLabel(tft);
   Temperature2.showLabel(tft);
   Temperature3.showLabel(tft);
-  Temperature4.showLabel(tft);
+  //Temperature4.showLabel(tft);
+  TemperatureMin.showLabel(tft);
   TemperatureMax.showLabel(tft);
   BatteryCurrent.showLabel(tft);
   BatteryVoltage.showLabel(tft);
@@ -76,7 +77,8 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature1.Value = carState.T1;
     Temperature2.Value = carState.T2;
     Temperature3.Value = carState.T3;
-    Temperature4.Value = carState.T4;
+    //Temperature4.Value = carState.T4;
+    TemperatureMin.Value = carState.Tmin;
     TemperatureMax.Value = carState.Tmax;
     Mppt1.Value = carState.Mppt1Current;
     Mppt2.Value = carState.Mppt2Current;
@@ -107,7 +109,8 @@ DISPLAY_STATUS EngineerDisplay::task(int lifeSignCounter) {
     Temperature1.showValue(tft);
     Temperature2.showValue(tft);
     Temperature3.showValue(tft);
-    Temperature4.showValue(tft);
+    //Temperature4.showValue(tft);
+    TemperatureMin.showValue(tft);
     TemperatureMax.showValue(tft);
 
     justInited = false;

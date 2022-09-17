@@ -230,11 +230,13 @@ void CANBus::task() {
         // Precharge Timer info also available
         break;
       case BMS_BASE_ADDR | 0xF9:
+        carState.Tmin = packet.getData_ui16(0) / 10.;
         carState.Tmax = packet.getData_ui16(1) / 10.;
         if (verboseModeCan) {
-          console << ", Tmax=" << carState.Tmax << "\n";
+          console << ", Bat Tmin=" << carState.Tmin << ", Bat Tmax=" << carState.Tmax << "\n";
         }
         break;
+
       case BMS_BASE_ADDR | 0xFD:
 
         carState.BatteryErrors.clear();
@@ -267,6 +269,7 @@ void CANBus::task() {
 
         // Extra Cell present packet.getData_b(12)
         break;
+
       case MPPT1_BASE_ADDR | 0x1:
         carState.Mppt1Current = packet.getData_f32(1);
         carState.PhotoVoltaicCurrent = carState.Mppt1Current + carState.Mppt2Current + carState.Mppt3Current;
@@ -312,7 +315,7 @@ void CANBus::task() {
       case MPPT3_BASE_ADDR | 0x2:
         carState.T3 = packet.getData_f32(0);
         if (verboseModeCan) {
-          console << "T3=" << carState.T2 << "\n";
+          console << "T3=" << carState.T3 << "\n";
         }
       }
     }

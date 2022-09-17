@@ -11,12 +11,13 @@
 #include <CarState.h>
 #include <ConfigFile.h>
 #include <Console.h>
+#include <ESP32Time.h>
 #include <Helper.h>
 #include <IOExt.h>
 #include <Indicator.h>
+#include <RTC.h>
 #include <SDCard.h>
 #include <definitions.h>
-#include <rtc.h>
 
 using namespace std;
 
@@ -25,6 +26,7 @@ extern Console console;
 extern SDCard sdCard;
 extern IOExt ioExt;
 extern RTC rtc;
+extern ESP32Time esp32time;
 
 int CarState::getIdx(string pinName) { return idxOfPin.find(pinName)->second; }
 CarStatePin *CarState::getPin(int devNr, int pinNr) { return &(carState.pins[IOExt::getIdx(devNr, pinNr)]); }
@@ -214,7 +216,8 @@ const string CarState::serialize(string msg) {
   cJSON_AddNumberToObject(dynData, "t1", floor(T1 * 1000.0 + .5) / 1000.0);
   cJSON_AddNumberToObject(dynData, "t2", floor(T2 * 1000.0 + .5) / 1000.0);
   cJSON_AddNumberToObject(dynData, "t3", floor(T3 * 1000.0 + .5) / 1000.0);
-  cJSON_AddNumberToObject(dynData, "t4", floor(T4 * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "tmin", floor(Tmin * 1000.0 + .5) / 1000.0);
+  cJSON_AddNumberToObject(dynData, "tmax", floor(Tmax * 1000.0 + .5) / 1000.0);
 
   cJSON_AddStringToObject(dynData, "indicator", INDICATOR_str[(int)(Indicator)]);
   cJSON_AddStringToObject(dynData, "driveDirection", DRIVE_DIRECTION_str[(int)(DriveDirection)]);
@@ -244,7 +247,7 @@ const string CarState::csv(string msg, bool withHeader) {
   stringstream ss("");
   if (withHeader) {
     // header
-    ss << "timeStamp, ";
+    ss << "Epoch";
     ss << "uptime, ";
     ss << "msg, ";
     ss << "speed, ";
@@ -271,7 +274,8 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "T1, ";
     ss << "T2, ";
     ss << "T3, ";
-    ss << "T4, ";
+    ss << "Tmin, ";
+    ss << "Tmax, ";
 
     ss << "indicator, ";
     ss << "driveDirection, ";
@@ -290,14 +294,15 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "driverInfo, ";
     ss << "speedArrow, ";
     ss << "light, ";
-    ss << "greenLight";
-    ss << "fan";
-    ss << "io ";
+    ss << "greenLight, ";
+    ss << "fan, ";
+    ss << "io, ";
+    ss << "timeStamp";
     ss << endl;
   }
   // data
-  ss << timeStamp.c_str() << ", ";
-  ss << getTimeStamp().c_str() << ", ";
+  ss << esp32time.getEpoch() << ", " ;
+  ss << millis()/1000 << ", ";
   ss << msg.c_str() << ", ";
   ss << Speed << ", ";
   ss << Acceleration << ", ";
@@ -323,7 +328,8 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << floor(T1 * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(T2 * 1000.0 + .5) / 1000.0 << ", ";
   ss << floor(T3 * 1000.0 + .5) / 1000.0 << ", ";
-  ss << floor(T4 * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Tmin * 1000.0 + .5) / 1000.0 << ", ";
+  ss << floor(Tmax * 1000.0 + .5) / 1000.0 << ", ";
 
   ss << INDICATOR_str[(int)(Indicator)] << ", ";
   ss << DRIVE_DIRECTION_str[(int)(DriveDirection)] << ", ";
@@ -346,6 +352,7 @@ const string CarState::csv(string msg, bool withHeader) {
   ss << GreenLight << ", ";
   ss << Fan << ", ";
   ss << printIOs("", false).c_str();
+  ss << timeStamp.c_str() << ", ";
   ss << endl;
   return ss.str();
 }

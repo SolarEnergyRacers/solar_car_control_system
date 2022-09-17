@@ -17,6 +17,7 @@ char *fgets_stdio_blocking(char *str, int n);
 void xSemaphoreTakeT(xQueueHandle mutex);
 string formatDateTime(RtcDateTime now);
 string getDateTime();
+string getTime();
 string getTimeStamp();
 
 #endif // SOLAR_CAR_CONTROL_SYSTEM_HELPER_H

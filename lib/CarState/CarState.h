@@ -179,10 +179,11 @@ public:
   float Uavg; // CAN
   float Umax; // CAN
 
-  float T1;   // MPPT1
-  float T2;   // MPPT2
-  float T3;   // MPPT3
-  float T4;   // Motorcontroller
+  float T1; // MPPT1
+  float T2; // MPPT2
+  float T3; // MPPT3
+  // float T4; // Motorcontroller
+  float Tmin; // max. cell temperatur from BMS
   float Tmax; // max. cell temperatur from BMS
 
   bool BreakPedal;

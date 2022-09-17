@@ -17,6 +17,9 @@
 #include <Helper.h>
 
 extern Console console;
+extern RTC rtc;
+extern ESP32Time esp32time;
+
 using namespace std;
 
 char *fgets_stdio_blocking(char *str, int n) {
@@ -46,10 +49,9 @@ void xSemaphoreTakeT(xQueueHandle mutex) {
   }
 }
 
-extern RTC rtc;
-extern ESP32Time esp32time;
 // https://github.com/fbiego/ESP32Time
 string getDateTime() { return esp32time.getTime("%Y-%m-%d,%H:%M:%S").c_str(); }
+string getTime() { return esp32time.getTime("%H:%M:%S").c_str(); }
 
 string formatDateTime(RtcDateTime now) {
   string static dateTimeString =

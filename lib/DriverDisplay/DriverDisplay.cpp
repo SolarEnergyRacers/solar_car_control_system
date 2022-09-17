@@ -428,6 +428,7 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     MotorCurrent.set_epsilon(0.1);
     MotorOn.showLabel(tft);
     TargetSpeedPower.showLabel(tft);
+    //DateTimeStamp.showLabel(tft);
     sleep_polling_ms = 300;
     status = DISPLAY_STATUS::DRIVER_RUNNING;
     break;
@@ -522,10 +523,11 @@ DISPLAY_STATUS DriverDisplay::task(int lifeSignCounter) {
     if (MotorOn.is_changed() || justInited) {
       MotorOn.showValue(tft);
     }
-    justInited = false;
-    // DateTimeStamp.Value = getDateTime();
+    // DateTimeStamp.Value = getTime();
     // DateTimeStamp.showValue(tft);
-    break;
+    justInited = false;
+    break;  
+  
 
   default:
     // ignore others

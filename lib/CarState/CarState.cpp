@@ -281,11 +281,11 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "driveDirection, ";
     ss << "controlMode";
     ss << "constantModeOn, ";
+    ss << "constantMode, ";
     ss << "sdCardDetected, ";
 
     ss << "displayStatus, ";
 
-    ss << "constantMode, ";
     ss << "targetSpeed, ";
     ss << "Kp, ";
     ss << "Ki, ";
@@ -297,7 +297,8 @@ const string CarState::csv(string msg, bool withHeader) {
     ss << "greenLight, ";
     ss << "fan, ";
     ss << "io, ";
-    ss << "timeStamp";
+    ss << "timeStampDate, ";
+    ss << "timeStampTime, ";
     ss << endl;
   }
   // data
@@ -333,14 +334,13 @@ const string CarState::csv(string msg, bool withHeader) {
 
   ss << INDICATOR_str[(int)(Indicator)] << ", ";
   ss << DRIVE_DIRECTION_str[(int)(DriveDirection)] << ", ";
-  // ss << BOOL_str[(int)(ConstantModeOn)] << ", ";
+  ss << CONTROL_MODE_str[(int)(ControlMode)] << ", ";
+  ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
   ss << ConstantModeOn << ", ";
-  // ss << BOOL_str[(int)(SdCardDetect)] << ", ";
   ss << SdCardDetect << ", ";
 
   ss << DISPLAY_STATUS_str[(int)displayStatus] << ", ";
-  ss << CONTROL_MODE_str[(int)(ControlMode)] << ", ";
-  ss << CONSTANT_MODE_str[(int)(ConstantMode)] << ", ";
+  
   ss << TargetSpeed << ", ";
   ss << Kp << ", ";
   ss << Ki << ", ";
